@@ -280,6 +280,22 @@ class EndpointsConfig(BaseModel):
     cmems: CMEMSEndpointConfig
 
 
+class S1DenoiseConfig(BaseModel):
+    enabled: bool = True
+    subswaths: list[str] = ["EW1", "EW2", "EW3", "EW4", "EW5"]
+    min_sigma0_db: float = -45.0
+    max_sigma0_db: float = 15.0
+
+
+class PreprocessingConfig(BaseModel):
+    engine: str = "python"
+    snap_docker_image: str = "mundialis/esa-snap:latest"
+    snap_graph: str = "configs/snap/s1_ew_grd_preprocessing.xml"
+    orbit_preference: str = "POEORB"
+    gshhg_resolution: str = "h"
+    s1denoise: S1DenoiseConfig = Field(default_factory=S1DenoiseConfig)
+
+
 class CFARConfig(BaseModel):
     default_pfa: float
     guard_window: list[int]
@@ -302,6 +318,7 @@ class ProjectConfig(BaseModel):
     tiling: TilingConfig
     taxonomy: TaxonomyConfig
     endpoints: EndpointsConfig
+    preprocessing: PreprocessingConfig = Field(default_factory=PreprocessingConfig)
     cfar: CFARConfig
 
 

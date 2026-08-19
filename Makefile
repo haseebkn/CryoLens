@@ -13,6 +13,7 @@ help:
 	@echo "  make db-up       - Start PostGIS database container in background"
 	@echo "  make db-down     - Stop PostGIS database container"
 	@echo "  make db-logs     - Follow PostGIS database logs"
+	@echo "  make preprocess  - Run SAR radiometric preprocessing on a scene (e.g. make preprocess SCENE=<id>)"
 	@echo "  make clean       - Remove cached bytecode, test artifacts, and build directories"
 
 dev:
@@ -42,6 +43,9 @@ db-down:
 
 db-logs:
 	docker compose logs -f postgis
+
+preprocess:
+	$(UV) run python -m cryolens.preprocess $(if $(SCENE),--scene $(SCENE),) $(if $(ENGINE),--engine $(ENGINE),)
 
 clean:
 	rm -rf build/ dist/ *.egg-info .pytest_cache/ .mypy_cache/ .ruff_cache/ htmlcov/ .coverage

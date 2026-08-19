@@ -82,3 +82,16 @@ This document records the foundational architectural decisions, scientific const
   * The baseline drift model uses OpenDrift's `openberg` physical model with dynamic ocean currents (CMEMS), atmospheric wind forcing (ERA5/NWP), and multi-layer iceberg keel geometry.
   * Keel grounding checks are performed against high-resolution CHS NONNA-100 bathymetry.
   * ML (XGBoost) is applied strictly as a residual correction to the physical model output.
+
+---
+
+## ADR-007: Sentinel-1 EW Subswath Noise Removal — SNAP vs. s1denoise
+
+* **Date:** 2026-08-19
+* **Status:** Accepted (Recommendation: NERSC `s1denoise`)
+* **Context:** Sentinel-1 Extra Wide (EW) swath SAR imagery consists of 5 subswaths (EW1 to EW5). Thermal noise floor variations (NESZ scalloping between $-28\text{ dB}$ and $-24\text{ dB}$) in the cross-polarization channel (HV) exceed calm ocean backscatter ($<-32\text{ dB}$). Standard ESA SNAP `ThermalNoiseRemoval` operator removes standard metadata noise vectors but frequently leaves residual inter-subswath boundary steps and scalloping streaks, triggering false-alarm stripes along range seams in CFAR and object detection.
+* **Evaluation & Decision:**
+  * **ESA SNAP Standard TNR:** Suitable for high-backscatter land surfaces, but insufficient for low-clutter maritime open ocean.
+  * **NERSC `s1denoise` (Park et al. 2018, Korosov et al. 2022):** Dynamically estimates inter-subswath scaling factors $k_i$ across overlap regions and subtracts scaled noise floors in linear power space without negative clipping.
+  * **Recommendation:** Use `s1denoise` as the primary thermal denoising engine across all operational detection pipelines. SNAP remains available as a secondary reference in `configs/snap/s1_ew_grd_preprocessing.xml`.
+

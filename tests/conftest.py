@@ -118,7 +118,7 @@ def sample_project_yaml_path(tmp_path: Path, sample_aoi_geojson_path: Path) -> P
                 "stac_url": "https://stac.dataspace.copernicus.eu/v1",
                 "token_url": "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token",
                 "odata_url": "https://catalogue.dataspace.copernicus.eu/odata/v1",
-                "collection": "SENTINEL-1",
+                "collection": "sentinel-1-grd",
                 "instrument_mode": "EW",
                 "polarizations": ["HH", "HV"],
                 "product_type": "GRD",
@@ -130,6 +130,19 @@ def sample_project_yaml_path(tmp_path: Path, sample_aoi_geojson_path: Path) -> P
             "cmems": {
                 "live_product_id": "GLOBAL_ANALYSISFORECAST_PHY_001_024",
                 "hindcast_product_id": "GLOBAL_MULTIYEAR_PHY_001_030",
+            },
+        },
+        "preprocessing": {
+            "engine": "python",
+            "snap_docker_image": "mundialis/esa-snap:latest",
+            "snap_graph": "configs/snap/s1_ew_grd_preprocessing.xml",
+            "orbit_preference": "POEORB",
+            "gshhg_resolution": "h",
+            "s1denoise": {
+                "enabled": True,
+                "subswaths": ["EW1", "EW2", "EW3", "EW4", "EW5"],
+                "min_sigma0_db": -45.0,
+                "max_sigma0_db": 15.0,
             },
         },
         "cfar": {
