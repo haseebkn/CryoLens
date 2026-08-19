@@ -1,0 +1,85 @@
+# ==============================================================================
+# CryoLens Project Configuration
+# Non-secret system parameters, spatial definitions, and service endpoints
+# ==============================================================================
+
+project:
+  name: "CryoLens"
+  description: "Autonomous SAR iceberg detection, validation, and drift forecasting"
+  version: "0.1.0"
+
+spatial:
+  target_crs: "EPSG:3978"  # NAD83 / Canada Atlas Lambert (conformal LCC)
+  source_crs: "EPSG:4326"  # WGS84
+  pixel_spacing_m: 40.0    # S1 EW GRD nominal pixel spacing
+  effective_resolution_m: 90.0
+  aoi_file: "configs/aoi.geojson"
+  bbox:
+    west: -60.0
+    south: 43.5
+    east: -46.0
+    north: 55.0
+
+season:
+  peak_months: [4, 5, 6]       # April to June
+  extended_months: [2, 3, 4, 5, 6, 7] # February to July
+
+tiling:
+  tile_size_px: 256
+  tile_overlap_px: 32
+  min_object_dim_px: 2        # Clamp tiny objects to prevent 0-area box collapse
+
+taxonomy:
+  classes:
+    - iceberg
+    - ship
+    - offshore_structure
+    - sea_ice_feature
+    - clutter
+  iip_size_classes:
+    - name: "Growler"
+      length_m: [0, 5]
+      height_m: [0, 1]
+      detectable_ew_grd: false
+    - name: "Bergy Bit"
+      length_m: [5, 15]
+      height_m: [1, 5]
+      detectable_ew_grd: false
+    - name: "Small"
+      length_m: [15, 60]
+      height_m: [5, 15]
+      detectable_ew_grd: true
+    - name: "Medium"
+      length_m: [60, 120]
+      height_m: [15, 45]
+      detectable_ew_grd: true
+    - name: "Large"
+      length_m: [120, 200]
+      height_m: [45, 75]
+      detectable_ew_grd: true
+    - name: "Very Large"
+      length_m: [200, 1000]
+      height_m: [75, 500]
+      detectable_ew_grd: true
+
+endpoints:
+  cdse:
+    stac_url: "https://stac.dataspace.copernicus.eu/v1"
+    token_url: "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
+    odata_url: "https://catalogue.dataspace.copernicus.eu/odata/v1"
+    collection: "SENTINEL-1"
+    instrument_mode: "EW"
+    polarizations: ["HH", "HV"]
+    product_type: "GRD"
+  mpc:
+    stac_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
+    collection: "sentinel-1-grd"
+  cmems:
+    live_product_id: "GLOBAL_ANALYSISFORECAST_PHY_001_024"
+    hindcast_product_id: "GLOBAL_MULTIYEAR_PHY_001_030"
+
+cfar:
+  default_pfa: 1.0e-5
+  guard_window: [3, 3]
+  background_window: [15, 15]
+  distribution: "k_distribution" # Options: cell_averaging, k_distribution, gamma

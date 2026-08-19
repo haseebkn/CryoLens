@@ -1,0 +1,23 @@
+services:
+  postgis:
+    image: postgis/postgis:16-3.4
+    container_name: cryolens_postgis
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cryolens}
+      POSTGRES_USER: ${POSTGRES_USER:-cryolens_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cryolens_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cryolens_user} -d ${POSTGRES_DB:-cryolens}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgis_data:
+    name: cryolens_postgis_data

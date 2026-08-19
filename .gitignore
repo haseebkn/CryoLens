@@ -1,0 +1,96 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Environment and secrets (CRITICAL: Never commit credentials)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.secret
+
+# Geospatial & SAR raw data, rasters, and outputs (CRITICAL)
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/cache/*
+!data/cache/.gitkeep
+*.SAFE/
+*.safe/
+*.tif
+*.tiff
+*.TIF
+*.TIFF
+*.nc
+*.nc4
+*.h5
+*.hdf5
+*.zarr
+*.cog
+*.grd
+*.dim
+*.data/
+statoil-iceberg-classifier-challenge/
+
+# Machine Learning weights, checkpoints, runs
+*.pt
+*.pth
+*.onnx
+*.bin
+*.weights
+mlruns/
+wandb/
+lightning_logs/
+
+# Testing and linters
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# IDE & OS
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# QGIS & Jupyter
+*.qgs~
+*.qgz~
+.ipynb_checkpoints/
+
+# DVC local storage
+.dvc/cache
+.dvc/tmp
