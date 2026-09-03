@@ -1,6 +1,7 @@
 """Unit tests for geographic vectorization and shape metric extraction."""
 
 import numpy as np
+import pytest
 import rasterio.transform
 import shapely.geometry
 
@@ -93,3 +94,74 @@ def test_min_pixels_filtering() -> None:
 
     assert len(targets) == 1
     assert targets[0].pixel_area == 4
+
+
+class TestGeolocatedVectorisation:
+    """Tie-point geolocation mode, used for Sentinel-1 and AI4Arctic products."""
+
+    @staticmethod
+    def _grid(h: int = 20, w: int = 20) -> tuple[np.ndarray, np.ndarray]:
+        """A regular lat/lon grid over the Grand Banks."""
+        lat = np.linspace(47.0, 48.0, h)[:, None] * np.ones((1, w))
+        lon = np.ones((h, 1)) * np.linspace(-53.0, -52.0, w)[None, :]
+        return lat.astype(np.float32), lon.astype(np.float32)
+
+    def test_single_pixel_target_has_nonzero_area(self) -> None:
+        """A one-pixel detection must not collapse to a degenerate polygon."""
+        lat, lon = self._grid()
+        mask = np.zeros((20, 20), dtype=bool)
+        mask[10, 10] = True
+        hv = np.full((20, 20), -30.0, dtype=np.float32)
+        hv[10, 10] = -15.0
+
+        targets = TargetVectorizer(min_pixels=1).extract_targets(
+            detection_mask=mask,
+            transform=None,
+            sigma0_hv_db=hv,
+            latitude=lat,
+            longitude=lon,
+            pixel_spacing_m=80.0,
+        )
+
+        assert len(targets) == 1
+        assert targets[0].geom_wgs84.area > 0.0
+        assert targets[0].geom_epsg3978.area > 0.0
+
+    def test_centroid_lands_on_the_detected_pixel(self) -> None:
+        lat, lon = self._grid()
+        mask = np.zeros((20, 20), dtype=bool)
+        mask[5, 15] = True
+        hv = np.full((20, 20), -30.0, dtype=np.float32)
+
+        targets = TargetVectorizer(min_pixels=1).extract_targets(
+            detection_mask=mask,
+            transform=None,
+            sigma0_hv_db=hv,
+            latitude=lat,
+            longitude=lon,
+            pixel_spacing_m=80.0,
+        )
+        c = targets[0].centroid_wgs84
+        assert c.y == pytest.approx(float(lat[5, 15]), abs=1e-4)
+        assert c.x == pytest.approx(float(lon[5, 15]), abs=1e-4)
+
+    def test_requires_georeferencing(self) -> None:
+        hv = np.full((5, 5), -30.0, dtype=np.float32)
+        with pytest.raises(ValueError, match="affine transform or"):
+            TargetVectorizer().extract_targets(
+                detection_mask=np.zeros((5, 5), dtype=bool),
+                transform=None,
+                sigma0_hv_db=hv,
+            )
+
+    def test_requires_pixel_spacing_in_geolocated_mode(self) -> None:
+        lat, lon = self._grid(5, 5)
+        hv = np.full((5, 5), -30.0, dtype=np.float32)
+        with pytest.raises(ValueError, match="pixel_spacing_m is required"):
+            TargetVectorizer().extract_targets(
+                detection_mask=np.zeros((5, 5), dtype=bool),
+                transform=None,
+                sigma0_hv_db=hv,
+                latitude=lat,
+                longitude=lon,
+            )

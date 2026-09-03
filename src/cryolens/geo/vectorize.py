@@ -36,6 +36,28 @@ class ExtractedTarget:
     properties: dict[str, Any] = field(default_factory=dict)
 
 
+def _local_half_pixel_degrees(
+    latitude: np.ndarray,
+    longitude: np.ndarray,
+    row: int,
+    col: int,
+) -> tuple[float, float]:
+    """Estimate half a pixel step in degrees at a given grid location.
+
+    Sampled from the neighbouring geolocation entries rather than assumed, since
+    degrees per pixel varies strongly with latitude across a 400 km EW swath.
+    """
+    h, w = latitude.shape
+    r1 = min(row + 1, h - 1)
+    c1 = min(col + 1, w - 1)
+
+    dlon = abs(float(longitude[row, c1]) - float(longitude[row, col]))
+    dlat = abs(float(latitude[r1, col]) - float(latitude[row, col]))
+
+    # Fall back to a small nonzero epsilon on a degenerate 1-pixel grid.
+    return (max(dlon, 1e-6) / 2.0, max(dlat, 1e-6) / 2.0)
+
+
 class TargetVectorizer:
     """Transforms 2D binary CFAR hit masks into georeferenced polygons and physical metrics."""
 
@@ -167,12 +189,21 @@ class TargetVectorizer:
                 centroid_wgs84 = shapely.geometry.Point(
                     float(longitude[ri, ci]), float(latitude[ri, ci])
                 )
-                poly_wgs84 = shapely.geometry.box(
-                    float(np.nanmin(lons)),
-                    float(np.nanmin(lats)),
-                    float(np.nanmax(lons)),
-                    float(np.nanmax(lats)),
-                )
+
+                lon_min, lon_max = float(np.nanmin(lons)), float(np.nanmax(lons))
+                lat_min, lat_max = float(np.nanmin(lats)), float(np.nanmax(lats))
+
+                # A region only one pixel wide in either axis would collapse to a
+                # zero-area polygon, because every sampled coordinate is the same
+                # pixel centre. A detected pixel covers a pixel-sized footprint,
+                # so the box is grown by half a pixel using the local grid step.
+                half_dlon, half_dlat = _local_half_pixel_degrees(latitude, longitude, ri, ci)
+                if lon_max - lon_min < half_dlon:
+                    lon_min, lon_max = lon_min - half_dlon, lon_max + half_dlon
+                if lat_max - lat_min < half_dlat:
+                    lat_min, lat_max = lat_min - half_dlat, lat_max + half_dlat
+
+                poly_wgs84 = shapely.geometry.box(lon_min, lat_min, lon_max, lat_max)
                 centroid_3978 = shapely.ops.transform(to_projected.transform, centroid_wgs84)
                 poly_3978 = shapely.ops.transform(to_projected.transform, poly_wgs84)
             else:
