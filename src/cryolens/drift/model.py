@@ -1,4 +1,10 @@
-"""OpenDrift IcebergDrift model wrapper for Phase 4."""
+"""OpenDrift openberg wrapper for physics-based iceberg drift forecasting.
+
+Status: scaffolded, not validated. Forcing and bathymetry readers are constant
+synthetic stand-ins rather than CMEMS and CHS NONNA-100, there is no residual
+correction model, and nothing here has been validated against IIP resightings.
+See docs/LIMITATIONS.md section 8 before relying on any output.
+"""
 
 import logging
 from datetime import timedelta
@@ -24,9 +30,18 @@ class IcebergDriftRunner:
 
         try:
             from opendrift.models.iceberg import IcebergDrift
-        except ImportError:
-            logger.warning("opendrift module not found. Returning mocked trajectory.")
-            return self._mock_trajectory(detection, hours)
+        except ImportError as exc:
+            # ADR-012: a fabricated trajectory is worse than no trajectory. It is
+            # indistinguishable from a real forecast once written to the
+            # database and served through the API, and drift output is the kind
+            # of product someone might act on.
+            raise RuntimeError(
+                "OpenDrift is not installed, so no physical drift forecast can be "
+                "produced. Install it and configure CMEMS and ERA5 forcing before "
+                "running forecasts; see docs/LIMITATIONS.md section 8. To generate "
+                "an explicitly synthetic trajectory for interface testing, call "
+                "synthetic_trajectory() directly and label the output as synthetic."
+            ) from exc
 
         # Initialize the OpenDrift Iceberg model
         o = IcebergDrift(loglevel=30)
@@ -90,8 +105,14 @@ class IcebergDriftRunner:
         logger.info(f"Forecast complete. Generated {len(trajectory)} waypoints.")
         return trajectory
 
-    def _mock_trajectory(self, detection: DetectionModel, hours: float) -> list[dict[str, Any]]:
-        """Mock trajectory generation when OpenDrift is unavailable."""
+    def synthetic_trajectory(self, detection: DetectionModel, hours: float) -> list[dict[str, Any]]:
+        """Generate an explicitly synthetic south-easterly drift track.
+
+        This is **not** a forecast. It exists so the API and dashboard
+        trajectory rendering can be exercised without OpenDrift installed, and
+        every waypoint it returns carries ``"synthetic": True`` so the output
+        can never be mistaken for physics downstream.
+        """
         if detection.centroid_wgs84 is None:
             return []
 
@@ -102,13 +123,15 @@ class IcebergDriftRunner:
         acq_time = detection.scene.acquisition_time if detection.scene else detection.created_at
 
         trajectory = []
-        # Simulate drifting south-east
+        # A crude south-easterly track, loosely in the sense of the Labrador
+        # Current. It carries no force balance, no forcing, and no grounding.
         for i in range(int(hours) + 1):
             trajectory.append(
                 {
                     "lon": lon + (i * 0.01),
                     "lat": lat - (i * 0.015),
                     "time": acq_time + timedelta(hours=i),
+                    "synthetic": True,
                 }
             )
         return trajectory
