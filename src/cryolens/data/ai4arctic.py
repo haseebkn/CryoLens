@@ -149,19 +149,29 @@ class AI4ArcticScene:
         """True where the land-distance zonation marks land."""
         return self.land_distance_zone <= LAND_ZONE_ID
 
-    def sea_ice_fraction(self) -> float:
-        """Fraction of charted pixels with sea ice concentration at or above 15 percent.
+    def sea_ice_fraction(self) -> float | None:
+        """Fraction of charted pixels with sea ice concentration above the ice edge.
 
-        Returns 0.0 when the scene carries no ice chart (for example the
-        unlabelled challenge test scenes).
+        Returns ``None`` — not zero — when the scene carries no usable ice chart.
+        The AI4Arctic *challenge test* scenes have their SIC/SOD/FLOE labels
+        withheld (every pixel is the 255 fill value), and the withheld truth
+        ships separately in the matching ``*_prep_reference.nc`` file. Returning
+        0.0 for those scenes would silently classify them as open water and
+        corrupt any ice-stratified metric, so the absence of a chart is
+        represented explicitly.
         """
         if self.sic_class is None:
-            return 0.0
+            return None
         charted = self.sic_class != SIC_FILL_VALUE
         if not charted.any():
-            return 0.0
+            return None
         ice = (self.sic_class >= 2) & charted  # class 2 == 20 percent, first bin above 15
         return float(ice.sum() / charted.sum())
+
+    @property
+    def has_ice_chart(self) -> bool:
+        """True when the scene carries a usable sea ice chart."""
+        return self.sea_ice_fraction() is not None
 
     def pixel_area_km2(self) -> float:
         """Ground area of one pixel in square kilometres."""

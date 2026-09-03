@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 
 from cryolens.data.ai4arctic import (
+    AI4ArcticScene,
     SceneExtent,
     _denormalise_linear,
     _interpolate_tiepoint_grid,
@@ -154,3 +155,52 @@ class TestAOIFiltering:
         d = _extent("s").to_dict()
         assert "\\" not in d["path"]
         assert d["scene_id"] == "s"
+
+
+class TestIceChartAvailability:
+    """A withheld ice chart must never be read as zero ice concentration.
+
+    The AI4Arctic challenge *test* scenes ship with SIC/SOD/FLOE set entirely to
+    the 255 fill value; the truth lives in a separate reference file. Returning
+    0.0 for those scenes would classify them as open water and silently corrupt
+    every ice-stratified metric.
+    """
+
+    @staticmethod
+    def _scene(sic: np.ndarray | None) -> AI4ArcticScene:
+        """Build a minimal scene carrying only the fields under test."""
+        z = np.zeros((4, 4), dtype=np.float32)
+        return AI4ArcticScene(
+            scene_id="s",
+            original_id="",
+            ice_service="cis",
+            pixel_spacing_m=80.0,
+            sigma0_hh_db=z,
+            sigma0_hv_db=z,
+            incidence_angle_deg=z,
+            land_distance_zone=np.full((4, 4), 40, dtype=np.int16),
+            latitude=z,
+            longitude=z,
+            sic_class=sic,
+        )
+
+    def test_all_fill_returns_none(self) -> None:
+        scene = self._scene(np.full((4, 4), 255, dtype=np.uint8))
+        assert scene.sea_ice_fraction() is None
+        assert scene.has_ice_chart is False
+
+    def test_absent_chart_returns_none(self) -> None:
+        assert self._scene(None).sea_ice_fraction() is None
+
+    def test_charted_open_water_returns_zero_not_none(self) -> None:
+        scene = self._scene(np.zeros((4, 4), dtype=np.uint8))
+        assert scene.sea_ice_fraction() == pytest.approx(0.0)
+        assert scene.has_ice_chart is True
+
+    def test_fraction_counts_only_charted_pixels(self) -> None:
+        sic = np.array(
+            [[0, 0, 255, 255], [5, 5, 255, 255], [0, 5, 255, 255], [255, 255, 255, 255]],
+            dtype=np.uint8,
+        )
+        # Six charted pixels, three of them at class 5 (50 percent ice).
+        assert self._scene(sic).sea_ice_fraction() == pytest.approx(0.5)

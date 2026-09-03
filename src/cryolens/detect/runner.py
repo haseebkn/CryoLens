@@ -53,7 +53,7 @@ class SceneDetectionResult:
     suppression: SuppressionStats
     mask_breakdown: dict[str, float]
     ice_regime: str
-    sea_ice_fraction: float
+    sea_ice_fraction: float | None
     wind_regime: str
     runtime_s: float
     assumptions: dict[str, str] = field(default_factory=dict)
@@ -91,7 +91,9 @@ class SceneDetectionResult:
             "raw_candidates_per_1000km2": round(self.raw_candidates_per_1000km2, 3),
             "suppression_factor": round(self.suppression_factor, 2),
             "ice_regime": self.ice_regime,
-            "sea_ice_fraction": round(self.sea_ice_fraction, 4),
+            "sea_ice_fraction": (
+                None if self.sea_ice_fraction is None else round(self.sea_ice_fraction, 4)
+            ),
             "wind_regime": self.wind_regime,
             "runtime_s": round(self.runtime_s, 2),
             "suppression": self.suppression.as_dict(),
@@ -127,9 +129,18 @@ def classify_wind_regime(
     return "moderate"
 
 
-def classify_ice_regime(scene: AI4ArcticScene) -> tuple[str, float]:
-    """Classify a scene as open water or ice-affected, returning the ice fraction."""
+def classify_ice_regime(scene: AI4ArcticScene) -> tuple[str, float | None]:
+    """Classify a scene as open water, ice-affected, or unknown.
+
+    Scenes without a usable ice chart return ``"unknown"`` rather than being
+    folded into open water. The AI4Arctic challenge test scenes have their ice
+    labels withheld, and treating an absent chart as zero ice concentration
+    would put them in the wrong stratum and understate detection density over
+    ice.
+    """
     fraction = scene.sea_ice_fraction()
+    if fraction is None:
+        return "unknown", None
     regime = "ice_affected" if fraction >= ICE_REGIME_AREA_FRACTION else "open_water"
     return regime, fraction
 
