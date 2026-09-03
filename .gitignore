@@ -102,3 +102,6 @@ CryoLens Data/
 # Cached geospatial derivatives
 *.gpkg
 *.zip
+
+# Published benchmark artefacts are part of the deliverable and are tracked.
+!docs/benchmarks/
