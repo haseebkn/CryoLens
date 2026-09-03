@@ -88,7 +88,12 @@ def test_real_project_yaml_file_exists() -> None:
 
 
 def test_real_aoi_geojson_file_valid() -> None:
-    """Ensure configs/aoi.geojson is valid GeoJSON covering Grand Banks coordinates."""
+    """Ensure configs/aoi.geojson is valid GeoJSON over Newfoundland & Labrador.
+
+    The AOI carries the full marine area plus the Labrador Shelf and Grand Banks
+    sub-regions, so metrics can be reported for the northern transit corridor and
+    the southern production area separately.
+    """
     aoi_path = Path("configs/aoi.geojson")
     assert aoi_path.is_file()
 
@@ -96,10 +101,24 @@ def test_real_aoi_geojson_file_valid() -> None:
         data = json.load(f)
 
     assert data["type"] == "FeatureCollection"
-    assert len(data["features"]) == 1
-    coords = data["features"][0]["geometry"]["coordinates"][0]
-    assert len(coords) == 5  # Closed polygon (5 vertices)
-    assert coords[0] == coords[-1]  # Closed loop
+    features = data["features"]
+    assert len(features) >= 1
+
+    ids = {f["properties"]["id"] for f in features}
+    assert "newfoundland_labrador_marine" in ids
+
+    for feature in features:
+        coords = feature["geometry"]["coordinates"][0]
+        assert len(coords) == 5, "each AOI polygon is a closed rectangle"
+        assert coords[0] == coords[-1], "polygon must close"
+
+    primary = next(f for f in features if f["properties"]["id"] == "newfoundland_labrador_marine")
+    west, south, east, north = primary["properties"]["bbox"]
+    # Cape Chidley is the northern tip of Labrador; the Tail of the Grand Bank
+    # is the southern limit of the area CryoLens covers.
+    assert north >= 60.0, "AOI must reach the northern tip of Labrador"
+    assert south <= 43.0, "AOI must reach the Tail of the Grand Bank"
+    assert west <= -60.0 and east >= -46.0
 
 
 def test_get_app_config() -> None:

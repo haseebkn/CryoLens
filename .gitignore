@@ -94,3 +94,11 @@ Thumbs.db
 # DVC local storage
 .dvc/cache
 .dvc/tmp
+
+# Large third-party dataset drops kept outside the data/ tree
+xView/
+CryoLens Data/
+
+# Cached geospatial derivatives
+*.gpkg
+*.zip

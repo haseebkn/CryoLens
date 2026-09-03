@@ -5,8 +5,43 @@ from collections.abc import Generator
 from pathlib import Path
 from typing import Any
 
+import geoalchemy2.admin.dialects.sqlite
 import pytest
 import yaml
+
+# Monkeypatch GeoAlchemy2's SQLite dialect to avoid trying to call SpatiaLite DDL functions.
+# This allows us to use an in-memory SQLite database for fast unit testing of our models
+# without needing to compile or load the mod_spatialite extension.
+geoalchemy2.admin.dialects.sqlite.after_create = lambda *args, **kwargs: None
+geoalchemy2.admin.dialects.sqlite.before_create = lambda *args, **kwargs: None
+geoalchemy2.admin.dialects.sqlite.after_drop = lambda *args, **kwargs: None
+geoalchemy2.admin.dialects.sqlite.before_drop = lambda *args, **kwargs: None
+
+from geoalchemy2.types import Geometry  # noqa: E402
+from sqlalchemy.ext.compiler import compiles  # noqa: E402
+
+
+@compiles(Geometry, "sqlite")
+def compile_geometry_sqlite(element, compiler, **kw):
+    return "BLOB"
+
+from geoalchemy2.elements import WKTElement  # noqa: E402
+from geoalchemy2.types import _GISType  # noqa: E402
+
+_GISType.bind_expression = lambda self, bindvalue: bindvalue
+_GISType.column_expression = lambda self, col: col
+_GISType.result_processor = lambda self, dialect, coltype: lambda value: WKTElement(value) if isinstance(value, str) else value
+
+from geoalchemy2.functions import ST_AsGeoJSON, ST_GeomFromGeoJSON  # noqa: E402
+
+
+@compiles(ST_GeomFromGeoJSON, "sqlite")
+def compile_st_geomfromgeojson_sqlite(element, compiler, **kw):
+    return compiler.process(element.clauses.clauses[0], **kw)
+
+@compiles(ST_AsGeoJSON, "sqlite")
+def compile_st_asgeojson_sqlite(element, compiler, **kw):
+    return compiler.process(element.clauses.clauses[0], **kw)
 
 
 @pytest.fixture
