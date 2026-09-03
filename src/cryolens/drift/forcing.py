@@ -6,6 +6,7 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
+
 class ForcingManager:
     """Manages CMEMS (ocean) and ERA5 (wind) forcing data for OpenDrift."""
 

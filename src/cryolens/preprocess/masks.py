@@ -80,11 +80,7 @@ class LandMaskGenerator:
 
     def _shapefile_path(self, level: int = 1) -> Path:
         """Path to the GSHHG shapefile for the configured resolution and level."""
-        return (
-            self.gshhg_root
-            / self.resolution
-            / f"GSHHS_{self.resolution}_L{level}.shp"
-        )
+        return self.gshhg_root / self.resolution / f"GSHHS_{self.resolution}_L{level}.shp"
 
     def _build_regional_cache(self) -> None:
         """Clip the global shoreline to the AOI and cache it as a GeoPackage."""

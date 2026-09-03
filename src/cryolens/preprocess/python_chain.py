@@ -74,7 +74,9 @@ class PurePythonSARProcessor:
         from rasterio.control import GroundControlPoint
         from rasterio.transform import from_gcps
 
-        logger.info("Building 4-band stack from calibrated sigma0 (shape %s)", sigma0_hh_linear.shape)
+        logger.info(
+            "Building 4-band stack from calibrated sigma0 (shape %s)", sigma0_hh_linear.shape
+        )
 
         hv_linear = np.asarray(sigma0_hv_linear, dtype=np.float32)
         if apply_denoise:

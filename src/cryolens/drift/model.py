@@ -10,10 +10,12 @@ from cryolens.drift.forcing import ForcingManager
 
 logger = logging.getLogger(__name__)
 
+
 class IcebergDriftRunner:
     """Wrapper around OpenDrift IcebergDrift physical model."""
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Create the forcing and bathymetry managers."""
         self.forcing_mgr = ForcingManager()
         self.bathy_mgr = BathymetryManager()
 
@@ -36,6 +38,7 @@ class IcebergDriftRunner:
         # Extract coordinates (WGS84)
         if detection.centroid_wgs84 is not None:
             from geoalchemy2.shape import to_shape
+
             point = to_shape(detection.centroid_wgs84)
             lon, lat = point.x, point.y
         else:
@@ -76,11 +79,13 @@ class IcebergDriftRunner:
         # o.elements_lon() returns a 2D array: (time_steps, elements)
         # Since we seeded 1 element, we extract the first column
         for i, dt in enumerate(times[0]):
-            trajectory.append({
-                "lon": float(lons[i, 0]),
-                "lat": float(lats[i, 0]),
-                "time": dt,
-            })
+            trajectory.append(
+                {
+                    "lon": float(lons[i, 0]),
+                    "lat": float(lats[i, 0]),
+                    "time": dt,
+                }
+            )
 
         logger.info(f"Forecast complete. Generated {len(trajectory)} waypoints.")
         return trajectory
@@ -91,6 +96,7 @@ class IcebergDriftRunner:
             return []
 
         from geoalchemy2.shape import to_shape
+
         point = to_shape(detection.centroid_wgs84)
         lon, lat = point.x, point.y
         acq_time = detection.scene.acquisition_time if detection.scene else detection.created_at
@@ -98,9 +104,11 @@ class IcebergDriftRunner:
         trajectory = []
         # Simulate drifting south-east
         for i in range(int(hours) + 1):
-            trajectory.append({
-                "lon": lon + (i * 0.01),
-                "lat": lat - (i * 0.015),
-                "time": acq_time + timedelta(hours=i),
-            })
+            trajectory.append(
+                {
+                    "lon": lon + (i * 0.01),
+                    "lat": lat - (i * 0.015),
+                    "time": acq_time + timedelta(hours=i),
+                }
+            )
         return trajectory

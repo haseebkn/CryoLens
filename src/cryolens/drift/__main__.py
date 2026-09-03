@@ -8,8 +8,11 @@ from cryolens.db.repositories import DetectionRepository, DriftForecastRepositor
 from cryolens.db.session import get_db_session_factory
 from cryolens.drift.model import IcebergDriftRunner
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run drift forecasts for detections in a scene.")
@@ -26,7 +29,9 @@ def main() -> None:
 
     logger.info(f"Fetching validated iceberg detections for scene {args.scene}")
 
-    detections = det_repo.list_detections(session=session, scene_id=args.scene, predicted_class="iceberg")
+    detections = det_repo.list_detections(
+        session=session, scene_id=args.scene, predicted_class="iceberg"
+    )
 
     # In a real operational scenario, we'd only drift validated ones,
     # but for bulk testing, we'll run on all predicted icebergs.
@@ -52,6 +57,7 @@ def main() -> None:
 
     session.close()
     logger.info("Drift forecasting complete.")
+
 
 if __name__ == "__main__":
     main()

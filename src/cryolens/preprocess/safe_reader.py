@@ -83,9 +83,7 @@ class CalibrationLUT:
             row = grid[r]
             ok = np.isfinite(row)
             if ok.any() and not ok.all():
-                grid[r] = np.interp(
-                    np.arange(row.size), np.flatnonzero(ok), row[ok]
-                )
+                grid[r] = np.interp(np.arange(row.size), np.flatnonzero(ok), row[ok])
 
         target_lines = np.arange(n_lines, dtype=np.float64)
         target_pixels = np.arange(n_samples, dtype=np.float64)
@@ -198,7 +196,9 @@ def _parse_noise(path: Path) -> CalibrationLUT | None:
             break
 
     if not values:
-        logger.warning("No noise vectors found in %s; thermal noise removal will be skipped.", path.name)
+        logger.warning(
+            "No noise vectors found in %s; thermal noise removal will be skipped.", path.name
+        )
         return None
 
     return CalibrationLUT(
@@ -294,7 +294,9 @@ class SAFEProductReader:
         measurement = pick(sorted(self.measurement_dir.glob("*.tiff")))
         annotation = pick(sorted(self.annotation_dir.glob("*.xml")))
         calib_dir = self.annotation_dir / "calibration"
-        calibration = pick(sorted(calib_dir.glob("calibration-*.xml"))) if calib_dir.is_dir() else None
+        calibration = (
+            pick(sorted(calib_dir.glob("calibration-*.xml"))) if calib_dir.is_dir() else None
+        )
         noise = pick(sorted(calib_dir.glob("noise-*.xml"))) if calib_dir.is_dir() else None
 
         if measurement is None or annotation is None or calibration is None:

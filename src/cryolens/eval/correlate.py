@@ -18,7 +18,9 @@ class SpatiotemporalMatcher:
     def __init__(self, max_drift_speed_ms: float = 0.5):
         self.max_drift_speed_ms = max_drift_speed_ms
 
-    def correlate_scene(self, session: Session, scene_id: str, time_window_hours: float = 24.0) -> int:
+    def correlate_scene(
+        self, session: Session, scene_id: str, time_window_hours: float = 24.0
+    ) -> int:
         """Find IIP sightings near a scene's detections within the time window.
 
         Tags matching detections with `IIP_CORRELATED = True` in their properties.
@@ -69,16 +71,8 @@ class SpatiotemporalMatcher:
 
                 # Let's run a spatial query
                 dist_query = select(
-                    ST_Distance(
-                        DetectionModel.geom_epsg3978,
-                        IIPSightingModel.geom_epsg3978
-                    )
-                ).where(
-                    and_(
-                        DetectionModel.id == detection.id,
-                        IIPSightingModel.id == sighting.id
-                    )
-                )
+                    ST_Distance(DetectionModel.geom_epsg3978, IIPSightingModel.geom_epsg3978)
+                ).where(and_(DetectionModel.id == detection.id, IIPSightingModel.id == sighting.id))
                 distance_m = session.scalar(dist_query)
 
                 if distance_m is not None and distance_m <= buffer_radius_m:
@@ -93,5 +87,7 @@ class SpatiotemporalMatcher:
                 correlated_count += 1
 
         session.commit()
-        logger.info(f"Correlated {correlated_count}/{len(detections)} detections with IIP sightings.")
+        logger.info(
+            f"Correlated {correlated_count}/{len(detections)} detections with IIP sightings."
+        )
         return correlated_count

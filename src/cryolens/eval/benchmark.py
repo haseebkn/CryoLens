@@ -278,7 +278,9 @@ class DetectionBenchmark:
         ):
             lines.append(f"## {title}")
             lines.append("")
-            lines.append("| stratum | scenes | area km² | detections | per 1000 km² | suppression |")
+            lines.append(
+                "| stratum | scenes | area km² | detections | per 1000 km² | suppression |"
+            )
             lines.append("|---|---|---|---|---|---|")
             for s in report[key]:
                 lines.append(

@@ -416,8 +416,12 @@ def build_scene_index(root: Path | str, output_path: Path | str | None = None) -
             continue
         try:
             with Dataset(str(path)) as ds:
-                lat = np.ma.filled(ds.variables["sar_grid2d_latitude"][:].astype(np.float64), np.nan)
-                lon = np.ma.filled(ds.variables["sar_grid2d_longitude"][:].astype(np.float64), np.nan)
+                lat = np.ma.filled(
+                    ds.variables["sar_grid2d_latitude"][:].astype(np.float64), np.nan
+                )
+                lon = np.ma.filled(
+                    ds.variables["sar_grid2d_longitude"][:].astype(np.float64), np.nan
+                )
                 extents.append(
                     SceneExtent(
                         path=path,

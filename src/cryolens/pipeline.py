@@ -4,6 +4,7 @@ import logging
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import Literal, cast
 
 import numpy as np
 import pyproj
@@ -36,7 +37,8 @@ logger = logging.getLogger(__name__)
 class PipelineRunner:
     """Orchestrates end-to-end processing of Sentinel-1 scenes."""
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Wire the CDSE client, database session factory, and output tree."""
         self.config = get_app_config()
         self.cdse_client = CDSEClient()
         self.session_factory = get_db_session_factory()
@@ -151,8 +153,12 @@ class PipelineRunner:
             hv_db = src.read(2)
             inc_deg = src.read(4) if src.count >= 4 else None
 
+        distribution = cast(
+            'Literal["cell_averaging", "k_distribution", "gamma"]',
+            self.config.project.cfar.distribution,
+        )
         detector = get_cfar_detector(
-            distribution=self.config.project.cfar.distribution,
+            distribution=distribution,
             pfa=self.config.project.cfar.default_pfa,
         )
 
@@ -208,7 +214,9 @@ class PipelineRunner:
             # Upsert Scene
             db_scene = SceneRepository.get_by_product_id(session, scene.scene_id)
             if not db_scene:
-                poly_3978 = shapely.geometry.box(bounds.left, bounds.bottom, bounds.right, bounds.top)
+                poly_3978 = shapely.geometry.box(
+                    bounds.left, bounds.bottom, bounds.right, bounds.top
+                )
                 transformer = pyproj.Transformer.from_crs("EPSG:3978", "EPSG:4326", always_xy=True)
                 poly_4326 = shapely.ops.transform(transformer.transform, poly_3978)
 

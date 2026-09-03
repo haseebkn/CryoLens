@@ -83,7 +83,9 @@ class TestAnalysisMask:
         zones[:20, :] = 0  # land
         zones[20:25, :] = 2  # coastal zones within the buffer
 
-        cfg = SuppressionConfig(coastal_buffer_zones=2, border_exclusion_px=0, seam_detection_enabled=False)
+        cfg = SuppressionConfig(
+            coastal_buffer_zones=2, border_exclusion_px=0, seam_detection_enabled=False
+        )
         mask, breakdown = build_analysis_mask(valid, zones, None, None, cfg)
 
         assert not mask[:25, :].any(), "land and buffered coast must be excluded"
@@ -105,11 +107,15 @@ class TestAnalysisMask:
         sic = np.zeros((40, 40), dtype=np.uint8)
         sic[:20, :] = 8  # 80 percent ice
 
-        keep = SuppressionConfig(border_exclusion_px=0, seam_detection_enabled=False, exclude_sea_ice=False)
+        keep = SuppressionConfig(
+            border_exclusion_px=0, seam_detection_enabled=False, exclude_sea_ice=False
+        )
         mask_keep, _ = build_analysis_mask(valid, None, sic, None, keep)
         assert mask_keep.all(), "ice must be retained by default so it can be measured"
 
-        drop = SuppressionConfig(border_exclusion_px=0, seam_detection_enabled=False, exclude_sea_ice=True)
+        drop = SuppressionConfig(
+            border_exclusion_px=0, seam_detection_enabled=False, exclude_sea_ice=True
+        )
         mask_drop, breakdown = build_analysis_mask(valid, None, sic, None, drop)
         assert not mask_drop[:20, :].any()
         assert breakdown["sea_ice"] == pytest.approx(0.5, abs=1e-6)

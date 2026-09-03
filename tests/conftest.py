@@ -22,25 +22,34 @@ from sqlalchemy.ext.compiler import compiles  # noqa: E402
 
 
 @compiles(Geometry, "sqlite")
-def compile_geometry_sqlite(element, compiler, **kw):
+def compile_geometry_sqlite(element: Any, compiler: Any, **kw: Any) -> str:
+    """Store geometry columns as opaque blobs under SQLite."""
     return "BLOB"
+
 
 from geoalchemy2.elements import WKTElement  # noqa: E402
 from geoalchemy2.types import _GISType  # noqa: E402
 
-_GISType.bind_expression = lambda self, bindvalue: bindvalue
-_GISType.column_expression = lambda self, col: col
-_GISType.result_processor = lambda self, dialect, coltype: lambda value: WKTElement(value) if isinstance(value, str) else value
+# Deliberate method replacement: GeoAlchemy2 emits PostGIS-specific SQL that
+# SQLite cannot execute, so the geometry round-trip is short-circuited for tests.
+_GISType.bind_expression = lambda self, bindvalue: bindvalue  # type: ignore[method-assign]
+_GISType.column_expression = lambda self, col: col  # type: ignore[method-assign]
+_GISType.result_processor = lambda self, dialect, coltype: (  # type: ignore[method-assign]
+    lambda value: WKTElement(value) if isinstance(value, str) else value
+)
 
 from geoalchemy2.functions import ST_AsGeoJSON, ST_GeomFromGeoJSON  # noqa: E402
 
 
 @compiles(ST_GeomFromGeoJSON, "sqlite")
-def compile_st_geomfromgeojson_sqlite(element, compiler, **kw):
+def compile_st_geomfromgeojson_sqlite(element: Any, compiler: Any, **kw: Any) -> Any:
+    """Pass GeoJSON through unchanged; SQLite has no PostGIS constructor."""
     return compiler.process(element.clauses.clauses[0], **kw)
 
+
 @compiles(ST_AsGeoJSON, "sqlite")
-def compile_st_asgeojson_sqlite(element, compiler, **kw):
+def compile_st_asgeojson_sqlite(element: Any, compiler: Any, **kw: Any) -> Any:
+    """Pass geometry through unchanged; SQLite has no PostGIS serialiser."""
     return compiler.process(element.clauses.clauses[0], **kw)
 
 

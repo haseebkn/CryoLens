@@ -259,7 +259,9 @@ class IIPSightingRepository:
         sighting = IIPSightingModel(
             sighting_time=sighting_time,
             geom_wgs84=pt_wgs84,
-            geom_epsg3978=func.ST_Transform(func.ST_GeomFromText(f"POINT({lon} {lat})", 4326), 3978),
+            geom_epsg3978=func.ST_Transform(
+                func.ST_GeomFromText(f"POINT({lon} {lat})", 4326), 3978
+            ),
             size_class=size_class,
             shape=shape,
             source=source,
@@ -309,6 +311,7 @@ class IIPSightingRepository:
             .all()
         )
 
+
 class DriftForecastRepository:
     """CRUD operations for Drift Forecast trajectories."""
 
@@ -317,13 +320,12 @@ class DriftForecastRepository:
         session: Session,
         detection_id: str,
         trajectory_points: list[dict[str, Any]],
-        method: str = "openberg"
+        method: str = "openberg",
     ) -> None:
         """Save a list of trajectory waypoints to the database."""
         # First, clear any existing forecasts for this detection from this method
         session.query(DriftForecastModel).filter(
-            DriftForecastModel.detection_id == detection_id,
-            DriftForecastModel.method == method
+            DriftForecastModel.detection_id == detection_id, DriftForecastModel.method == method
         ).delete()
 
         forecasts = []

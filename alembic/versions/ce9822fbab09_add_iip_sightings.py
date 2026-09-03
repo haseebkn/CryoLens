@@ -5,18 +5,19 @@ Revises: 0001
 Create Date: 2026-08-19 18:16:10.851240
 
 """
-from typing import Sequence, Union
+
+from collections.abc import Sequence
+
+import geoalchemy2
+import sqlalchemy as sa
 
 from alembic import op
-import sqlalchemy as sa
-import geoalchemy2
-
 
 # revision identifiers, used by Alembic.
-revision: str = 'ce9822fbab09'
-down_revision: Union[str, None] = '0001'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+revision: str = "ce9822fbab09"
+down_revision: str | None = "0001"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:

@@ -57,9 +57,7 @@ class SuppressionStats:
     def as_dict(self) -> dict[str, Any]:
         """Serialise for storage in detection provenance."""
         return {
-            "stages": [
-                {"stage": s, "removed": r, "remaining": k} for s, r, k in self.stages
-            ],
+            "stages": [{"stage": s, "removed": r, "remaining": k} for s, r, k in self.stages],
             "total_removed": self.total_removed,
         }
 
@@ -268,11 +266,14 @@ def build_analysis_mask(
             sigma0_hv_db, valid_mask, cfg.seam_gradient_sigma, cfg.max_seam_fraction
         )
         if seams.any():
-            widened = np.convolve(
-                seams.astype(np.float64),
-                np.ones(2 * cfg.seam_exclusion_px + 1),
-                mode="same",
-            ) > 0
+            widened = (
+                np.convolve(
+                    seams.astype(np.float64),
+                    np.ones(2 * cfg.seam_exclusion_px + 1),
+                    mode="same",
+                )
+                > 0
+            )
             before = float(mask.sum())
             mask &= ~widened[None, :]
             breakdown["subswath_seams"] = (before - float(mask.sum())) / total
@@ -323,6 +324,7 @@ def filter_targets(
     apply("copol_dominance", lambda t: t.hh_hv_ratio_db <= cfg.max_hh_hv_ratio_db)
 
     if clutter_mean_db is not None:
+
         def contrast_ok(t: ExtractedTarget) -> bool:
             r0, c0, r1, c1 = t.pixel_bbox
             r1 = max(r1, r0 + 1)
@@ -369,7 +371,10 @@ def deduplicate_across_tiles(
     for candidate in ordered:
         duplicate = False
         for existing in kept:
-            if candidate.centroid_epsg3978.distance(existing.centroid_epsg3978) <= centroid_tolerance_m:
+            if (
+                candidate.centroid_epsg3978.distance(existing.centroid_epsg3978)
+                <= centroid_tolerance_m
+            ):
                 duplicate = True
                 break
             inter = candidate.geom_epsg3978.intersection(existing.geom_epsg3978).area

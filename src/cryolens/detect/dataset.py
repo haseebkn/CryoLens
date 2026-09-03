@@ -15,6 +15,7 @@ stride-8 detector can resolve.
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -132,9 +133,7 @@ class DatasetBuilder:
         """Write a single-object YOLO label file with normalised coordinates."""
         cx, cy = centre_xy
         bw, bh = box_wh
-        label_path.write_text(
-            f"{class_id} {cx:.6f} {cy:.6f} {bw:.6f} {bh:.6f}\n", encoding="utf-8"
-        )
+        label_path.write_text(f"{class_id} {cx:.6f} {cy:.6f} {bw:.6f} {bh:.6f}\n", encoding="utf-8")
 
     def write_data_yaml(self) -> Path:
         """Write the Ultralytics dataset descriptor."""
@@ -153,7 +152,7 @@ class DatasetBuilder:
     def build_dataset(
         self,
         session: Session,
-        band_loader: object | None = None,
+        band_loader: Callable[[str], dict[str, NDArray[np.floating]]] | None = None,
     ) -> list[ChipRecord]:
         """Extract chips for every validated detection.
 
@@ -186,7 +185,7 @@ class DatasetBuilder:
             scene_id = str(detection.scene_id)
 
             if scene_id not in band_cache:
-                band_cache[scene_id] = band_loader(scene_id)  # type: ignore[operator]
+                band_cache[scene_id] = band_loader(scene_id)
             bands = band_cache[scene_id]
 
             params = detection.detector_params or {}
@@ -204,7 +203,9 @@ class DatasetBuilder:
                 continue
             chip, (local_r, local_c) = cut
 
-            class_id = VERDICT_TO_CLASS.get(str(val.analyst_verdict), VERDICT_TO_CLASS["REJECTED_CLUTTER"])
+            class_id = VERDICT_TO_CLASS.get(
+                str(val.analyst_verdict), VERDICT_TO_CLASS["REJECTED_CLUTTER"]
+            )
 
             stem = f"{scene_id}_{detection.id}"
             image_path = self.images_dir / f"{stem}.tif"

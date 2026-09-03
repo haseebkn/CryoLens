@@ -203,9 +203,7 @@ class GammaCFARDetector(BaseCFARDetector):
         changes fastest (small shape parameters, i.e. the heavy-tailed high sea
         state regime that actually drives false alarms).
         """
-        log_grid = np.linspace(
-            np.log(self._NU_MIN), np.log(self._NU_MAX), self._NU_GRID_POINTS
-        )
+        log_grid = np.linspace(np.log(self._NU_MIN), np.log(self._NU_MAX), self._NU_GRID_POINTS)
         nu_grid = np.exp(log_grid)
         q_grid = gamma.ppf(1.0 - self.pfa, a=nu_grid, scale=1.0)
 

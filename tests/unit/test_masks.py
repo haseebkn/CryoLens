@@ -64,9 +64,7 @@ class TestLandMask:
         assert wide.sum() > tight.sum(), "a seaward buffer must enlarge the land mask"
 
     def test_missing_shoreline_without_fallback_raises(self, tmp_path: Path) -> None:
-        gen = LandMaskGenerator(
-            gshhg_root=tmp_path / "absent", cache_path=tmp_path / "absent.gpkg"
-        )
+        gen = LandMaskGenerator(gshhg_root=tmp_path / "absent", cache_path=tmp_path / "absent.gpkg")
         with pytest.raises(FileNotFoundError, match="GSHHG shoreline not found"):
             gen.load_geometries()
 

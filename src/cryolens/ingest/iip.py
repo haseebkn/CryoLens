@@ -1,23 +1,27 @@
 """International Ice Patrol (IIP) ground truth ingestion client."""
 
 import csv
+import logging
 from datetime import UTC, datetime
 from pathlib import Path
 
-import pyproj
-from loguru import logger
-from shapely.geometry import Point
 from sqlalchemy.orm import Session
 
 from cryolens.db.repositories import IIPSightingRepository
+
+logger = logging.getLogger(__name__)
 
 
 class IIPClient:
     """Parses and ingests IIP iceberg sightings from CSV datasets (e.g., NSIDC G00807)."""
 
-    def __init__(self):
-        # Transformer from WGS84 to EPSG:3978 (Canada Atlas Lambert)
-        self.transformer = pyproj.Transformer.from_crs("EPSG:4326", "EPSG:3978", always_xy=True)
+    def __init__(self) -> None:
+        """Create an ingestion client.
+
+        Reprojection to EPSG:3978 is performed in the database by
+        ``IIPSightingRepository.create_sighting`` via PostGIS ST_Transform, so
+        no client-side transformer is needed.
+        """
 
     def ingest_csv(self, session: Session, csv_path: str | Path) -> int:
         """Parse an IIP CSV file and ingest records into the database.
@@ -54,7 +58,7 @@ class IIPClient:
                         continue
 
                     # Normalize time_str
-                    time_str = time_str.zfill(4) # Ensure at least 4 digits
+                    time_str = time_str.zfill(4)  # Ensure at least 4 digits
 
                     try:
                         # Try parsing common IIP formats
@@ -76,25 +80,19 @@ class IIPClient:
                     if lon > 0 and lon > 30 and lon < 80:
                         lon = -lon
 
-                    geom_wgs84 = Point(lon, lat)
-
-                    # 3. Transform to EPSG:3978
-                    x, y = self.transformer.transform(lon, lat)
-                    geom_epsg3978 = Point(x, y)
-
-                    # 4. Attributes
+                    # 3. Attributes
                     size_class = row.get("SIZE")
                     shape = row.get("SHAPE")
 
-                    # 5. Insert
+                    # 4. Insert. The repository builds both CRS geometries.
                     IIPSightingRepository.create_sighting(
                         session=session,
                         sighting_time=dt,
-                        geom_epsg3978=geom_epsg3978,
-                        geom_wgs84=geom_wgs84,
+                        lon=lon,
+                        lat=lat,
                         size_class=size_class,
                         shape=shape,
-                        source=f"IIP_CSV_{csv_path.name}"
+                        source=f"IIP_CSV_{csv_path.name}",
                     )
                     count += 1
                 except Exception as e:
