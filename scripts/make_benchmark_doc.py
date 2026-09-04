@@ -208,7 +208,9 @@ def main() -> int:
 
     o = report["overall"]
     print(f"  scenes {o['n_scenes']}, {o['area_km2']:,.0f} km2")
-    print(f"  raw {o['raw_density_per_1000km2']:.2f} -> final {o['density_per_1000km2']:.2f} per 1000 km2")
+    print(
+        f"  raw {o['raw_density_per_1000km2']:.2f} -> final {o['density_per_1000km2']:.2f} per 1000 km2"
+    )
     return 0
 
 

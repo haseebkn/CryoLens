@@ -35,7 +35,11 @@ from typing import Any
 
 from cryolens.data.ai4arctic import SceneExtent, load_scene
 from cryolens.detect.filters import SuppressionConfig
-from cryolens.detect.runner import SceneDetectionResult, SceneDetectionRunner
+from cryolens.detect.runner import (
+    SceneDetectionResult,
+    SceneDetectionRunner,
+    assign_wind_regimes,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -168,6 +172,9 @@ class DetectionBenchmark:
             logger.info("[%d/%d] %s (%s)", i, len(chosen), extent.scene_id, detector_kind)
             results.append(runner.run(scene))
 
+        # Wind regimes are relative terciles across the cohort, so they can only
+        # be assigned once every scene in the run has been measured.
+        assign_wind_regimes(results)
         return results
 
     def sweep_pfa(

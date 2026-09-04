@@ -55,6 +55,11 @@ class SceneDetectionResult:
     ice_regime: str
     sea_ice_fraction: float | None
     wind_regime: str
+    """Assigned by :func:`assign_wind_regimes` once the whole cohort is known."""
+
+    wind_statistic: float | None
+    """Scene median wind magnitude in standardised units; None when absent."""
+
     runtime_s: float
     assumptions: dict[str, str] = field(default_factory=dict)
 
@@ -95,38 +100,78 @@ class SceneDetectionResult:
                 None if self.sea_ice_fraction is None else round(self.sea_ice_fraction, 4)
             ),
             "wind_regime": self.wind_regime,
+            "wind_statistic": (
+                None if self.wind_statistic is None else round(self.wind_statistic, 5)
+            ),
             "runtime_s": round(self.runtime_s, 2),
             "suppression": self.suppression.as_dict(),
             "mask_breakdown": {k: round(v, 5) for k, v in self.mask_breakdown.items()},
         }
 
 
-def classify_wind_regime(
-    scene: AI4ArcticScene,
-    low_quantile: float = 0.33,
-    high_quantile: float = 0.67,
-) -> str:
-    """Bin a scene into a relative wind regime.
+def scene_wind_statistic(scene: AI4ArcticScene) -> float | None:
+    """Summarise a scene's wind field as a single scalar, or None if absent.
 
     The ERA5 fields in the AI4Arctic ready-to-train distribution are
     standardised with no recorded extremes, so absolute metres per second is not
-    recoverable. Scenes are therefore binned by the within-scene distribution of
-    wind magnitude, which still separates the calm and roughened sea-surface
-    regimes that drive ocean clutter, while remaining honest about the missing
-    absolute calibration.
+    recoverable (see docs/LIMITATIONS.md section 3). The median magnitude is
+    still a monotone function of the true wind speed, so it orders scenes
+    correctly even though its units are arbitrary.
     """
     if scene.wind_speed_normalised is None:
-        return "unknown"
+        return None
     values = scene.wind_speed_normalised[np.isfinite(scene.wind_speed_normalised)]
     if values.size == 0:
-        return "unknown"
-    median = float(np.median(values))
-    lo, hi = np.quantile(values, [low_quantile, high_quantile])
-    if median <= lo:
-        return "low"
-    if median >= hi:
-        return "high"
-    return "moderate"
+        return None
+    return float(np.median(values))
+
+
+def assign_wind_regimes(
+    results: list[SceneDetectionResult],
+    low_quantile: float = 1.0 / 3.0,
+    high_quantile: float = 2.0 / 3.0,
+) -> None:
+    """Assign low/moderate/high wind regimes by terciles **across the cohort**.
+
+    Binning must be done between scenes, not within one. A scene's own median
+    lies between its own 33rd and 67th percentiles by construction, so a
+    within-scene comparison labels every scene "moderate" and produces a
+    stratification table that says nothing. Terciles are therefore computed over
+    the per-scene statistics of the whole run.
+
+    Scenes with no wind field keep the "unknown" regime and are excluded from
+    the tercile computation so they cannot shift the boundaries.
+    """
+    measured = [r for r in results if r.wind_statistic is not None]
+    if len(measured) < 3:
+        for r in measured:
+            r.wind_regime = "unknown"
+        logger.warning(
+            "Only %d scenes carry wind data; too few to form terciles, so wind "
+            "stratification is reported as unknown.",
+            len(measured),
+        )
+        return
+
+    stats = np.array([r.wind_statistic for r in measured], dtype=np.float64)
+    lo, hi = np.quantile(stats, [low_quantile, high_quantile])
+
+    for r in measured:
+        assert r.wind_statistic is not None
+        if r.wind_statistic <= lo:
+            r.wind_regime = "low"
+        elif r.wind_statistic >= hi:
+            r.wind_regime = "high"
+        else:
+            r.wind_regime = "moderate"
+
+    logger.info(
+        "Wind terciles across %d scenes: low <= %.4f < moderate < %.4f <= high "
+        "(standardised units, not m/s)",
+        len(measured),
+        float(lo),
+        float(hi),
+    )
 
 
 def classify_ice_regime(scene: AI4ArcticScene) -> tuple[str, float | None]:
@@ -224,14 +269,14 @@ class SceneDetectionRunner:
             mask_breakdown=breakdown,
             ice_regime=ice_regime,
             sea_ice_fraction=ice_fraction,
-            wind_regime=classify_wind_regime(scene),
+            wind_regime="unknown",  # resolved by assign_wind_regimes over the cohort
+            wind_statistic=scene_wind_statistic(scene),
             runtime_s=time.perf_counter() - started,
             assumptions=dict(scene.assumptions),
         )
 
         logger.info(
-            "%s: %d raw px -> %d candidates -> %d targets over %.0f km2 "
-            "(%.2f per 1000 km2, %s, %s wind)",
+            "%s: %d raw px -> %d candidates -> %d targets over %.0f km2 (%.2f per 1000 km2, %s)",
             scene.scene_id,
             raw_pixel_hits,
             len(candidates),
@@ -239,6 +284,5 @@ class SceneDetectionRunner:
             analysed_area_km2,
             outcome.detections_per_1000km2,
             ice_regime,
-            outcome.wind_regime,
         )
         return outcome
