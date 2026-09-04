@@ -17,6 +17,12 @@ from cryolens.detect.filters import (
 from cryolens.geo.vectorize import ExtractedTarget
 
 
+def _count_runs(flags: np.ndarray) -> int:
+    """Count contiguous True runs in a boolean 1-D array."""
+    padded = np.concatenate(([False], flags.astype(bool), [False]))
+    return int((padded[1:] != padded[:-1]).sum() // 2)
+
+
 def _target(
     target_id: int = 1,
     pixel_area: int = 10,
@@ -145,6 +151,38 @@ class TestSeamDetection:
         hv = rng.normal(-33.0, 0.05, size=(200, 300))
         seams = detect_subswath_seams(hv, sigma=8.0)
         assert seams.sum() <= 3, "a homogeneous scene should yield almost no seam columns"
+
+    def test_group_cap_limits_masked_columns(self) -> None:
+        """Broad scene structure must not be masked as dozens of seams.
+
+        Sentinel-1 EW has four interior subswath boundaries. A scene whose
+        cross-pol profile wanders — a sharp ice edge running across range, say —
+        previously tripped the gradient test across hundreds of columns, and
+        with each widened by the exclusion margin a third of the swath could be
+        discarded as "seams".
+        """
+        rng = np.random.default_rng(2)
+        # A noisy, structured profile with many gradient outliers.
+        hv = rng.normal(-33.0, 0.05, size=(120, 600))
+        hv += np.sin(np.linspace(0, 40 * np.pi, 600))[None, :] * 2.0
+
+        unlimited = detect_subswath_seams(hv, sigma=2.0, max_groups=10_000)
+        capped = detect_subswath_seams(hv, sigma=2.0, max_groups=4)
+
+        groups = _count_runs(capped)
+        assert groups <= 4, f"expected at most 4 seam groups, got {groups}"
+        assert capped.sum() <= unlimited.sum()
+
+    def test_strongest_groups_are_the_ones_kept(self) -> None:
+        rng = np.random.default_rng(3)
+        hv = rng.normal(-33.0, 0.02, size=(120, 400))
+        hv[:, 100:] += 0.5  # a weak step
+        hv[:, 300:] += 5.0  # a much stronger step
+
+        capped = detect_subswath_seams(hv, sigma=3.0, max_groups=1)
+        assert capped.any()
+        kept = np.flatnonzero(capped)
+        assert 290 <= kept.mean() <= 310, "the stronger step should survive the cap"
 
     def test_all_nan_input_is_safe(self) -> None:
         hv = np.full((10, 10), np.nan)

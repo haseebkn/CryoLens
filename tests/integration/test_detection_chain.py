@@ -118,7 +118,7 @@ class TestMasking:
         assert sum(breakdown.values()) < 0.7
 
     def test_seam_masking_respects_its_ceiling(self, scene: AI4ArcticScene) -> None:
-        cfg = SuppressionConfig(max_seam_fraction=0.05, seam_exclusion_px=8)
+        cfg = SuppressionConfig(max_seam_groups=6, seam_exclusion_px=8)
         _, breakdown = build_analysis_mask(
             valid_mask=scene.valid_mask,
             land_distance_zone=scene.land_distance_zone,
@@ -126,9 +126,10 @@ class TestMasking:
             sigma0_hv_db=scene.sigma0_hv_db,
             config=cfg,
         )
-        # Each flagged column is widened by +/- seam_exclusion_px, so the area
-        # removed can exceed the column fraction, but not without bound.
-        assert breakdown.get("subswath_seams", 0.0) < 0.30
+        # At most max_seam_groups runs survive, each widened by
+        # +/- seam_exclusion_px, so seam masking cannot consume a large share of
+        # the swath the way an unbounded column count could.
+        assert breakdown.get("subswath_seams", 0.0) < 0.10
 
 
 class TestDetectionChain:

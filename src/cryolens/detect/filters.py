@@ -109,8 +109,10 @@ class SuppressionConfig:
     """Robust z-score on the range-direction gradient of the column-median HV
     profile above which a column is treated as a subswath seam."""
 
-    max_seam_fraction: float = 0.05
-    """Ceiling on the fraction of range columns attributable to subswath seams."""
+    max_seam_groups: int = 6
+    """Ceiling on the number of contiguous seam runs retained per scene.
+    Sentinel-1 EW has four interior subswath boundaries, so the physical control
+    is a seam count, not a fraction of the range extent."""
 
     # --- post-detection gating -------------------------------------------
     min_target_pixels: int = 4
@@ -156,7 +158,7 @@ def detect_subswath_seams(
     sigma0_hv_db: NDArray[np.floating],
     valid_mask: NDArray[np.bool_] | None = None,
     sigma: float = 6.0,
-    max_seam_fraction: float = 0.05,
+    max_groups: int = 6,
 ) -> NDArray[np.bool_]:
     """Locate probable subswath seam columns from the range-direction profile.
 
@@ -168,13 +170,9 @@ def detect_subswath_seams(
     that profile.
 
     Args:
-        max_seam_fraction: Ceiling on the proportion of columns that may be
-            flagged. Sentinel-1 EW has four interior subswath boundaries, so
-            genuine seams occupy a small fraction of the range extent. A scene
-            with strong large-scale radiometric structure — a sharp ice edge
-            running across range, for example — can otherwise trip the gradient
-            test across a wide band and mask out most of the swath. When the
-            ceiling is exceeded only the strongest columns are kept.
+        max_groups: Ceiling on the number of contiguous seam runs retained.
+            Sentinel-1 EW has four interior subswath boundaries; the default
+            allows a little headroom without letting scene structure through.
 
     Returns:
         A 1-D boolean array over columns, True where a seam is suspected.
@@ -195,25 +193,57 @@ def detect_subswath_seams(
     seams = np.asarray(z > sigma, dtype=np.bool_)
 
     n_cols = data.shape[1]
-    max_seams = max(1, int(max_seam_fraction * n_cols))
-    if int(seams.sum()) > max_seams:
-        logger.warning(
-            "Seam test flagged %d of %d columns (%.1f%%), above the %.0f%% ceiling; "
-            "keeping only the %d strongest. This usually means large-scale scene "
-            "structure, not subswath boundaries.",
-            int(seams.sum()),
-            n_cols,
-            100.0 * seams.sum() / n_cols,
-            100.0 * max_seam_fraction,
-            max_seams,
-        )
-        keep = np.argsort(z)[-max_seams:]
-        seams = np.zeros(n_cols, dtype=np.bool_)
-        seams[keep] = True
+    return _keep_strongest_seam_groups(seams, z, max_groups, n_cols)
 
-    if seams.any():
-        logger.debug("Detected %d candidate subswath seam columns", int(seams.sum()))
-    return seams
+
+def _keep_strongest_seam_groups(
+    seams: NDArray[np.bool_],
+    strength: NDArray[np.float64],
+    max_groups: int,
+    n_cols: int,
+) -> NDArray[np.bool_]:
+    """Reduce flagged columns to the ``max_groups`` strongest contiguous runs.
+
+    Capping a *fraction of columns* is the wrong control. Sentinel-1 EW is built
+    from five subswaths, so there are exactly four interior boundaries; the
+    physical quantity to bound is the number of seams, not how much of the range
+    extent they occupy. A fractional cap on a 5000-sample swath still admits
+    hundreds of columns, and once each is widened by the exclusion margin a
+    scene with a sharp ice edge running across range can lose a third of its
+    water to "seams" that are not seams.
+
+    Adjacent flagged columns belong to one physical boundary, so they are first
+    grouped into contiguous runs, each run scored by its peak gradient outlier,
+    and only the strongest runs kept.
+    """
+    if not seams.any():
+        return seams
+
+    # Identify contiguous runs of flagged columns.
+    padded = np.concatenate(([False], seams, [False]))
+    edges = np.flatnonzero(padded[1:] != padded[:-1])
+    starts, ends = edges[0::2], edges[1::2]
+
+    if len(starts) <= max_groups:
+        logger.debug("Detected %d subswath seam group(s)", len(starts))
+        return seams
+
+    peaks = np.array([float(strength[s:e].max()) for s, e in zip(starts, ends, strict=True)])
+    keep_idx = np.argsort(peaks)[-max_groups:]
+
+    logger.info(
+        "Seam test flagged %d groups across %d columns; keeping the %d strongest. "
+        "Sentinel-1 EW has four interior subswath boundaries, so a larger count "
+        "indicates large-scale scene structure such as an ice edge, not seams.",
+        len(starts),
+        n_cols,
+        max_groups,
+    )
+
+    reduced = np.zeros_like(seams)
+    for i in keep_idx:
+        reduced[starts[i] : ends[i]] = True
+    return reduced
 
 
 def build_analysis_mask(
@@ -263,7 +293,7 @@ def build_analysis_mask(
 
     if cfg.seam_detection_enabled and sigma0_hv_db is not None:
         seams = detect_subswath_seams(
-            sigma0_hv_db, valid_mask, cfg.seam_gradient_sigma, cfg.max_seam_fraction
+            sigma0_hv_db, valid_mask, cfg.seam_gradient_sigma, cfg.max_seam_groups
         )
         if seams.any():
             widened = (

@@ -148,6 +148,19 @@ def render(report: dict[str, Any], has_plot: bool) -> str:
                 f"{row['density_per_1000km2']:.2f} | {row['n_scenes']} |"
             )
         lines.append("")
+        sweep_scenes = {row["n_scenes"] for row in report["pfa_sweep"]}
+        headline_scenes = report["overall"]["n_scenes"]
+        if sweep_scenes and sweep_scenes != {headline_scenes}:
+            n = sorted(sweep_scenes)[0]
+            lines += [
+                f"The sweep runs on a {n}-scene subset rather than the full "
+                f"{headline_scenes}, because each additional Pfa multiplies the "
+                "compute by a whole pass over the cohort. Absolute densities here "
+                "are therefore **not** directly comparable with the headline "
+                "figure above; the curve's shape and the ratio between operating "
+                "points are what it is published for.",
+                "",
+            ]
         if has_plot:
             lines += ["![Operating points](benchmarks/operating_points.png)", ""]
 

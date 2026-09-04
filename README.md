@@ -6,18 +6,33 @@
 
 ## The result
 
-Running a Gamma/K-distribution CFAR detector plus a multi-stage suppression
-chain over **PENDING_N_SCENES real Sentinel-1 Extra Wide swath scenes**
-(PENDING_AREA km² of analysed water) across the Labrador Shelf and Grand Banks:
+Gamma/K-distribution CFAR plus a multi-stage suppression chain, run over
+**39 real Sentinel-1 Extra Wide swath scenes** covering **3.9 million km² of
+analysed water** across the Labrador Shelf and Grand Banks:
 
 | Metric | Value |
-|---|---|
-| Raw CFAR candidates per 1000 km² | **PENDING_RAW** |
-| After false-alarm suppression | **PENDING_FINAL** |
-| Suppression factor | **PENDING_FACTOR** |
+|---|---:|
+| Raw CFAR candidates per 1000 km² | 50.47 |
+| **After false-alarm suppression** | **1.13** |
+| **Open water only** | **0.28** |
+| Suppression factor | **44.5×** (105× over open water) |
 
-Full table, per-stage ledger, ice/wind stratification and the Pfa operating-point
-curve: **[docs/BENCHMARK.md](docs/BENCHMARK.md)**.
+Stratified, because a single blended number would hide the thing that matters:
+
+| Regime | Scenes | Per 1000 km² |
+|---|---:|---:|
+| Open water | 6 | **0.28** |
+| Ice-affected | 30 | 1.35 |
+| Low wind | 13 | 0.97 |
+| High wind | 13 | 1.30 |
+
+Ice-affected water runs ~5× higher than open water, and detections rise
+monotonically with wind. Both are physically expected — ridged ice and floe
+edges genuinely scatter like targets, and wind roughens the sea surface — which
+is exactly why these are reported separately rather than averaged away.
+
+Full table, per-stage ledger, and the Pfa operating-point curve:
+**[docs/BENCHMARK.md](docs/BENCHMARK.md)**.
 
 ### What that number is, and is not
 
@@ -61,19 +76,21 @@ heavy-tailed clutter at higher sea states.
 every stage records what it removed:
 
 ```
-stage              removed  remaining
-min_size              3955        128
-max_size                 0        128
-aspect_ratio             0        128
-min_peak_hv              1        127
-copol_dominance          2        125
-clutter_contrast         0        125
+stage              removed  remaining  % of raw
+min_size            190,863      5,373     97.3%
+max_size                  0      5,373      0.0%
+aspect_ratio              1      5,372      0.0%
+min_peak_hv             244      5,128      0.1%
+copol_dominance         679      4,449      0.3%
+clutter_contrast         44      4,405      0.0%
 ```
 
-That ledger is honest about something a single aggregate number would hide: one
-stage does most of the work, because CFAR speckle hits are predominantly
-isolated single pixels while real targets form clusters. The recall cost of that
-threshold is **not measured** — see LIMITATIONS §9.
+Published rather than summarised, because it shows what a single aggregate
+number would hide: **one stage does 97% of the work.** CFAR at this Pfa produces
+predominantly isolated single-pixel speckle hits, while genuine targets form
+multi-pixel clusters. The recall cost of that threshold is **not measured** —
+raising it discards small icebergs along with false alarms, and without ground
+truth the trade-off cannot be located. See LIMITATIONS §9.
 
 ---
 
@@ -135,7 +152,7 @@ the UTM zone seams at 54°W and 48°W that cut straight through the AOI.
 make dev              # editable install with dev dependencies
 make fetch-shorelines # GSHHG coastlines, 150 MB, no credentials needed
 make db-up            # PostGIS 16
-make test             # 106 tests
+make test             # 121 unit + 14 integration tests
 make lint             # ruff + mypy
 ```
 
