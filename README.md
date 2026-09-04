@@ -7,29 +7,51 @@
 ## The result
 
 Gamma/K-distribution CFAR plus a multi-stage suppression chain, run over
-**39 real Sentinel-1 Extra Wide swath scenes** covering **3.9 million km² of
+**39 real Sentinel-1 Extra Wide swath scenes** covering **4.6 million km² of
 analysed water** across the Labrador Shelf and Grand Banks:
 
 | Metric | Value |
 |---|---:|
-| Raw CFAR candidates per 1000 km² | 50.47 |
-| **After false-alarm suppression** | **1.13** |
-| **Open water only** | **0.28** |
-| Suppression factor | **44.5×** (105× over open water) |
+| Raw CFAR candidates per 1000 km² | 58.40 |
+| **After false-alarm suppression** | **1.27** |
+| **Open water only** | **0.26** |
+| Suppression factor | **45.9×** (111× over open water) |
 
 Stratified, because a single blended number would hide the thing that matters:
 
-| Regime | Scenes | Per 1000 km² |
-|---|---:|---:|
-| Open water | 6 | **0.28** |
-| Ice-affected | 30 | 1.35 |
-| Low wind | 13 | 0.97 |
-| High wind | 13 | 1.30 |
+| Sea ice regime | Scenes | Water (km²) | Per 1000 km² |
+|---|---:|---:|---:|
+| Open water | 6 | 862,502 | **0.26** |
+| Ice-affected | 30 | 3,409,999 | 1.53 |
+| Unknown (labels withheld) | 3 | 336,711 | 1.25 |
 
-Ice-affected water runs ~5× higher than open water, and detections rise
-monotonically with wind. Both are physically expected — ridged ice and floe
-edges genuinely scatter like targets, and wind roughens the sea surface — which
-is exactly why these are reported separately rather than averaged away.
+Ice-affected water runs ~6× higher than open water. That is physically expected
+— ridged ice and floe edges genuinely scatter like targets — and is exactly why
+the two are reported separately rather than averaged into one number.
+
+Wind stratification (13 scenes per tercile) gives **1.14 / 1.37 / 1.31** per
+1000 km² for low / moderate / high. That is *not* a monotonic trend, and with
+relative rather than absolute wind units and only 13 scenes a bin, it is not a
+result worth leaning on. It is reported because it was measured.
+
+### Two detectors, one harness
+
+Cell-averaging and Gamma/K-distribution CFAR over the same 12-scene subset
+(1.49 million km²), identical suppression chain and Pfa:
+
+| Detector | raw per 1000 km² | after suppression | detections |
+|---|---:|---:|---:|
+| CA-CFAR | 2.69 | 0.179 | 267 |
+| Gamma-CFAR | 80.73 | 1.469 | 2,186 |
+
+**This does not say which is better, and it cannot.** CA-CFAR sets its threshold
+from the local *mean*, and over sea ice that mean is inflated by the very heavy
+tail it is trying to separate from, so the threshold climbs and targets fall
+below it. Gamma-CFAR estimates the tail's shape and adapts — which is why
+ADR-008 specifies it above sea state 3. Whether CA-CFAR's lower density means
+*fewer false alarms* or *fewer real detections* is undeterminable without
+verified positives. Calling it a win either way would be reading a result the
+data does not support.
 
 Full table, per-stage ledger, and the Pfa operating-point curve:
 **[docs/BENCHMARK.md](docs/BENCHMARK.md)**.
@@ -77,12 +99,12 @@ every stage records what it removed:
 
 ```
 stage              removed  remaining  % of raw
-min_size            190,863      5,373     97.3%
-max_size                  0      5,373      0.0%
-aspect_ratio              1      5,372      0.0%
-min_peak_hv             244      5,128      0.1%
-copol_dominance         679      4,449      0.3%
-clutter_contrast         44      4,405      0.0%
+min_size            261,468      7,687     97.1%
+max_size                  0      7,687      0.0%
+aspect_ratio              3      7,684      0.0%
+min_peak_hv             642      7,042      0.2%
+copol_dominance       1,096      5,946      0.4%
+clutter_contrast         82      5,864      0.0%
 ```
 
 Published rather than summarised, because it shows what a single aggregate
@@ -152,7 +174,7 @@ the UTM zone seams at 54°W and 48°W that cut straight through the AOI.
 make dev              # editable install with dev dependencies
 make fetch-shorelines # GSHHG coastlines, 150 MB, no credentials needed
 make db-up            # PostGIS 16
-make test             # 121 unit + 14 integration tests
+make test             # 139 tests (125 unit + 14 integration on real SAR)
 make lint             # ruff + mypy
 ```
 

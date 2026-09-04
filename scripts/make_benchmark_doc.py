@@ -164,6 +164,49 @@ def render(report: dict[str, Any], has_plot: bool) -> str:
         if has_plot:
             lines += ["![Operating points](benchmarks/operating_points.png)", ""]
 
+    comparison_path = Path("data/processed/benchmarks/detector_comparison.json")
+    if comparison_path.is_file():
+        comp = json.loads(comparison_path.read_text(encoding="utf-8"))
+        any_row = next(iter(comp.values()))
+        lines += [
+            "---",
+            "",
+            "## Two detectors, one harness",
+            "",
+            f"Cell-averaging and Gamma/K-distribution CFAR run over the same "
+            f"{any_row['n_scenes']}-scene subset ({any_row['area_km2']:,.0f} km²), same "
+            "suppression chain, same Pfa:",
+            "",
+            "| Detector | raw per 1000 km² | after suppression | detections | suppression |",
+            "|---|---:|---:|---:|---:|",
+        ]
+        for label, v in sorted(comp.items()):
+            lines.append(
+                f"| {label} | {v['raw_density_per_1000km2']:.2f} | "
+                f"{v['density_per_1000km2']:.3f} | {v['targets']:,} | "
+                f"{v['suppression_factor']:.1f}× |"
+            )
+        lines += [
+            "",
+            "**This table does not say which detector is better, and it cannot.**",
+            "",
+            "CA-CFAR retains far fewer targets. That is the expected consequence of",
+            "its clutter model: the cell-averaging estimator sets its threshold from",
+            "the local *mean*, and over sea ice the mean is inflated by the same",
+            "heavy tail the detector is trying to separate from, so the threshold",
+            "rises and genuine targets fall below it. The Gamma detector estimates a",
+            "shape parameter by method of moments and adapts to that tail, which is",
+            "precisely why ADR-008 specifies it for sea states at or above 3.",
+            "",
+            "Whether CA-CFAR's lower density represents *fewer false alarms* or",
+            "*fewer detections of real targets* is not determinable from these",
+            "numbers. Separating the two requires verified positives, which do not",
+            "exist for these scenes (LIMITATIONS §1). Reporting the comparison as a",
+            "win for either detector would be reading a result the data does not",
+            "support.",
+            "",
+        ]
+
     lines += [
         "---",
         "",
