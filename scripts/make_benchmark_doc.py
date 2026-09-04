@@ -92,9 +92,13 @@ def render(report: dict[str, Any], has_plot: bool) -> str:
     ]
     lines += _stratum_table(report["by_wind_regime"], "By relative wind regime")
     lines += [
-        "Wind bins are **relative terciles within each scene**, not absolute m/s. The",
-        "ERA5 fields in this distribution are standardised with no recorded extremes,",
-        "so metres per second is unrecoverable (LIMITATIONS §3).",
+        "Wind bins are **terciles across this scene cohort**, not absolute m/s, and",
+        "not within-scene quantiles. The ERA5 fields in this distribution are",
+        "standardised with no recorded extremes, so metres per second is",
+        "unrecoverable (LIMITATIONS §3); the per-scene median still orders scenes",
+        "correctly, so the split is between scenes rather than inside one.",
+        "`unknown` marks scenes carrying no wind field, which are excluded from the",
+        "tercile fit.",
         "",
         "---",
         "",

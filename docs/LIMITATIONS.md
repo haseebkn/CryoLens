@@ -58,11 +58,18 @@ two SAR channels the packagers preserved the pre-normalisation extremes in the
 **The ERA5 wind fields carry no such attributes**, so metres per second cannot be
 restored from the file alone.
 
-Wind stratification is therefore reported in **relative terciles** (low /
-moderate / high within the scene distribution), not in absolute m/s bins. This
-still separates calm from roughened sea-surface regimes, which is what drives
-ocean clutter, but it is not comparable to a published FAR-versus-wind-speed
-curve. Restoring absolute values requires fetching ERA5 directly.
+Wind stratification is therefore reported in **relative terciles across the
+scene cohort** — each scene's median wind magnitude is ranked against the other
+scenes in the run — not in absolute m/s bins. This still separates calm from
+roughened sea-surface regimes, which is what drives ocean clutter, but it is not
+comparable to a published FAR-versus-wind-speed curve, and the boundaries move
+if the scene set changes. Restoring absolute values requires fetching ERA5
+directly.
+
+Note that the binning must be *between* scenes. An earlier implementation
+compared each scene's median against its own quantiles, which returns "moderate"
+for every scene by construction, and produced a stratification table with a
+single row covering the whole run.
 
 ## 4. Incidence angle is approximate in the benchmark scenes
 
@@ -125,8 +132,12 @@ across and YOLOv8's finest stride is 8.
 
 `drift/` wires OpenDrift's `openberg` model, but:
 
-- `opendrift` is not currently a declared dependency, so every call falls
-  through to a mock trajectory.
+- `opendrift` is not a declared dependency, so `run_forecast` currently raises.
+  It previously fell through to a mock trajectory that was written to
+  `drift_forecasts` and served through `/api/v1/drift/{id}` indistinguishable
+  from a real forecast; that fallback was removed under ADR-012. An explicitly
+  labelled `synthetic_trajectory()` remains for interface testing, and stamps
+  every waypoint with `"synthetic": True`.
 - Ocean and wind forcing use **constant synthetic readers**, not CMEMS or ERA5.
 - Bathymetry uses a **constant 80 m depth**, not CHS NONNA-100. Grounding
   detection on the Grand Banks is therefore not meaningfully implemented.
