@@ -95,3 +95,69 @@ This document records the foundational architectural decisions, scientific const
   * **NERSC `s1denoise` (Park et al. 2018, Korosov et al. 2022):** Dynamically estimates inter-subswath scaling factors $k_i$ across overlap regions and subtracts scaled noise floors in linear power space without negative clipping.
   * **Recommendation:** Use `s1denoise` as the primary thermal denoising engine across all operational detection pipelines. SNAP remains available as a secondary reference in `configs/snap/s1_ew_grd_preprocessing.xml`.
 
+---
+
+## ADR-008: Statistical CFAR Detection Architecture, Clutter Distribution Models, and 2D Integral Images
+
+* **Date:** 2026-08-19
+* **Status:** Accepted
+* **Context:** Maritime SAR target detection requires robust statistical thresholds to maintain a constant false-alarm probability ($P_{fa}$) under varying sea states and wind clutter. Decibel SAR data violates the multiplicative Rayleigh/exponential speckle assumption, necessitating all CFAR operations in linear power intensity space ($\sigma^0$). Furthermore, 2D sliding-window filtering with spatial guard bands is computationally intensive on large SAR rasters ($8000 \times 8000$ pixels).
+* **Decision:**
+  1. **Linear Power Execution:** All CFAR statistics (mean, variance, quantile inversion) are strictly computed on linear intensity $I = 10^{\sigma^0_{\text{dB}} / 10}$.
+  2. **CA-CFAR Formulation:** For a 2D rectangular window with background half-width $W_b$ and guard half-width $W_g$, the valid training cell count is $N_{train} = (2W_b + 1)^2 - (2W_g + 1)^2 - 1$. The threshold multiplier for iid exponential speckle is $\alpha = N_{train}(P_{fa}^{-1/N_{train}} - 1)$, producing threshold $T = \alpha \cdot \hat{\mu}$.
+  3. **Gamma / K-Distribution CFAR for Heterogeneous Clutter:** For sea states $\ge 3$, sea clutter exhibits heavy-tailed non-Gaussian texture. We fit a two-parameter Gamma distribution via the Method of Moments (MoM) estimator: $\hat{\nu} = \hat{\mu}^2 / (\hat{\sigma}^2 - \hat{\mu}^2/N_{train})$, bounded to $[0.1, 50.0]$. The detection threshold is inverted via the upper quantile: `scipy.stats.gamma.ppf(1 - P_fa, a=nu, scale=mu/nu)`.
+  4. **2D Integral Image Optimization:** Rather than using spatial convolutions or `scipy.ndimage.uniform_filter` (which cannot exclude inner guard bands), we implement 2D prefix-sum integral images for intensity $I$, intensity squared $I^2$, and valid pixel masks. This enables exact $O(1)$ rectangle queries per pixel, achieving $>10\times$ speedup over iterative sliding windows.
+
+
+
+---
+
+## ADR-009: False-Alarm Suppression as an Auditable Multi-Stage Chain
+
+* **Date:** 2026-09-03
+* **Status:** Accepted
+* **Context:** A CFAR detector is tuned to a *pixel-wise* probability of false alarm. That guarantee says nothing about the absolute number of false detections on a full Sentinel-1 EW swath. A $5000 \times 5400$ raster at $P_{fa} = 10^{-5}$ yields on the order of 270 spurious pixel hits over ideal homogeneous clutter, before any structured artefact. Measured across 39 real Newfoundland and Labrador scenes covering $4.6$ million $\text{km}^2$ of analysed water, raw CFAR output ran at $58.4$ candidates per $1000\text{ km}^2$ — far above an operationally usable rate.
+* **Decision:** Suppression is implemented as an explicit ordered chain in `detect/filters.py`, split into two groups, with every stage recording how many candidates it removed.
+  1. **Pre-detection masking** (`build_analysis_mask`) decides where CFAR may look *and* which pixels may contribute to clutter statistics: land plus a coastal buffer, swath borders, detected subswath seams, and optionally sea ice.
+  2. **Post-detection gating** (`filter_targets`) rejects candidates on connected-component size, aspect ratio, peak cross-pol backscatter, co-pol dominance, and contrast against the local clutter floor.
+  3. **Cross-tile deduplication** (`deduplicate_across_tiles`) resolves the same physical target detected in overlapping tiles, in projected coordinates rather than pixel space.
+* **Rationale for the ledger:** A single aggregate suppression number is unfalsifiable. Recording per-stage removals makes the false-alarm budget auditable and exposes — rather than conceals — that one stage (minimum component size) does most of the work, because CFAR speckle hits are predominantly isolated single pixels while genuine targets form clusters.
+* **Consequences:** Measured suppression is $45.9\times$ overall and $111\times$ over open water, taking detection density from $58.4$ to $1.27$ per $1000\text{ km}^2$ overall, and to $0.26$ over open water. The published ledger shows the minimum-size stage alone accounts for 97.1 percent of removals. The recall cost is **not measured**, because no iceberg ground truth exists for these scenes; raising the minimum size threshold necessarily discards small icebergs. This trade-off is stated in `docs/LIMITATIONS.md` rather than buried.
+
+---
+
+## ADR-010: Land Masking from GSHHG Shorelines, Not Hand-Drawn Polygons
+
+* **Date:** 2026-09-03
+* **Status:** Accepted
+* **Context:** Coastal returns are the largest single source of false alarms in maritime SAR detection. An earlier implementation approximated Newfoundland with two hand-drawn polygons totalling eleven vertices, and omitted Labrador entirely. Newfoundland and Labrador have an intricate coast with thousands of islands, fjords and skerries; a coarse outline leaves bright land inside the analysis mask.
+* **Decision:** Use GSHHG (Global Self-consistent, Hierarchical, High-resolution Geography) full-resolution level-1 polygons, clipped once to the AOI and cached as a GeoPackage. Clipping the NL marine area yields **6,404 shoreline polygons**. Apply a configurable seaward dilation (default $500\text{ m}$) before rasterisation.
+* **Rationale for the buffer:** Masking only the land polygon is insufficient. Geolocation error, radar layover, and the CFAR background window all reach beyond the coastline; a target whose training window overlaps land gets an inflated clutter mean and is suppressed, while shoreline pixels themselves generate detections.
+* **Consequences:** A one-time 150 MB download (`make fetch-shorelines`), and a first-run clipping pass. Both are cached. Land masking is now driven by a real shoreline product rather than by an approximation whose error was invisible.
+
+---
+
+## ADR-011: Detection Density per 1000 km² as the Reportable Metric
+
+* **Date:** 2026-09-03
+* **Status:** Accepted
+* **Context:** ADR-004 committed to evaluating detectors on false alarms per $1000\text{ km}^2$. Executing that commitment requires verified positives to separate true from false detections. No freely available dataset provides iceberg positions co-registered to the Sentinel-1 acquisitions analysed here: AI4Arctic supplies ice charts (polygons describing sea ice, not icebergs), IIP supplies sightings that cannot be intersected with SAR pixels (ADR-005), and xView3-SAR supplies vessel annotations.
+* **Decision:** Report **detection density per 1000 km² of analysed water**, stratified by sea ice regime and relative wind regime, and state explicitly that over open water away from land and ice this is an **upper bound on the false-alarm rate**, not an estimate of it. Do not report precision, recall, F1, or mAP.
+* **Rationale:** Over open water at EW resolution, genuine icebergs are sparse, so detection density there is dominated by false alarms and is a defensible bound. Reporting precision without positives would be fabrication; reporting nothing would forfeit the one operational metric that *can* be measured rigorously.
+* **Area normalisation:** Every rate is divided by the water area actually examined, after masking. False alarms per *scene* is meaningless when swath coverage, land fraction, and masking differ between acquisitions.
+* **Consequences:** The headline number is honest but weaker than a full ROC curve. Recovering precision and recall requires the analyst validation loop (Phase 6) to generate verified labels, or a commercial iceberg-observation feed.
+
+---
+
+## ADR-012: Refusing to Fabricate Data in Place of Unimplemented Components
+
+* **Date:** 2026-09-03
+* **Status:** Accepted (Non-Negotiable)
+* **Context:** An audit of the pipeline found three components that returned synthetic data so that the end-to-end flow would appear to work: `pipeline.py` generated random exponential arrays with hardcoded bright rectangles instead of reading the downloaded SAFE product; `detect/yolo.py` returned a fixed detection at $-52.0^\circ, 47.0^\circ$ regardless of input; `detect/dataset.py` wrote zero-byte placeholder chips. Each made a benchmark or a demonstration look successful while measuring nothing.
+* **Decision:** A component that cannot do its job **fails loudly**. Specifically:
+  * `pipeline.py` now reads real measurement rasters and calibration annotations through `preprocess/safe_reader.py`, and raises if the product cannot be calibrated. There is no synthetic fallback.
+  * `detect/yolo.py` raises `NotImplementedError` with the prerequisites stated, rather than emitting a placeholder detection.
+  * `detect/dataset.py` requires a `band_loader` and refuses to write placeholder chips without a pixel source.
+  * `preprocess/masks.py` logs a warning when it falls back to an assumed uniform ice field, so an absent ice product can never masquerade as measured ice cover.
+* **Rationale:** A detection produced from fabricated backscatter is worse than no detection, because it is indistinguishable from a real one downstream and silently corrupts any metric computed over it. For a system whose entire value proposition is a credible false-alarm rate, this is disqualifying.
+* **Consequences:** Fewer components "work" end to end without credentials or data. `make train-yolo` now exits non-zero with an explanation. This is the intended behaviour: the honest surface area of the project is smaller than the fabricated one was, and is measured.

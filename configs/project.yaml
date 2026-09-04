@@ -14,11 +14,13 @@ spatial:
   pixel_spacing_m: 40.0    # S1 EW GRD nominal pixel spacing
   effective_resolution_m: 90.0
   aoi_file: "configs/aoi.geojson"
+  # Newfoundland & Labrador marine area: Labrador Sea and Labrador Shelf through
+  # the NE Newfoundland Shelf to the Tail of the Grand Bank and Flemish Cap.
   bbox:
-    west: -60.0
-    south: 43.5
-    east: -46.0
-    north: 55.0
+    west: -64.5
+    south: 42.5
+    east: -44.0
+    north: 60.5
 
 season:
   peak_months: [4, 5, 6]       # April to June

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CryoLens — Autonomous SAR Iceberg Intelligence</title>
+  <meta name="description" content="Operational Maritime Domain Awareness dashboard for autonomous SAR iceberg detection, polarimetric analysis, and analyst validation over the Grand Banks.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">🧊</div>
+        <div class="brand-text">
+          <h1>CryoLens <span class="badge-tag">MDA Core</span></h1>
+          <p class="subtitle">Grand Banks SAR Iceberg Detection & Validation</p>
+        </div>
+      </div>
+
+      <div class="header-metrics">
+        <div class="metric-pill">
+          <span class="dot live"></span>
+          <span class="label">STATUS:</span>
+          <span class="val" id="api-status">CONNECTING</span>
+        </div>
+        <div class="metric-pill">
+          <span class="label">CRS:</span>
+          <span class="val font-mono">EPSG:3978</span>
+        </div>
+        <div class="metric-pill">
+          <span class="label">TARGETS:</span>
+          <span class="val font-mono" id="hud-total-count">0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="workspace">
+      <!-- Sidebar Control Panel -->
+      <aside class="sidebar glass-panel">
+        <section class="panel-section">
+          <h2 class="section-title">Scene Acquisition</h2>
+          <div class="input-group">
+            <label for="scene-select">Active S1 EW Scene:</label>
+            <select id="scene-select" class="custom-select">
+              <option value="">Loading processed scenes...</option>
+            </select>
+          </div>
+          <div id="scene-meta" class="scene-meta-box font-mono">
+            <div class="meta-row"><span>Platform:</span> <span id="meta-platform">--</span></div>
+            <div class="meta-row"><span>Acquisition:</span> <span id="meta-time">--</span></div>
+            <div class="meta-row"><span>Mode/Pol:</span> <span id="meta-mode">--</span></div>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <h2 class="section-title">Detection Filters</h2>
+          <div class="input-group">
+            <div class="slider-header">
+              <label for="confidence-slider">Min Confidence:</label>
+              <span id="confidence-val" class="font-mono">0.50</span>
+            </div>
+            <input type="range" id="confidence-slider" min="0.0" max="1.0" step="0.05" value="0.50" class="custom-slider">
+          </div>
+
+          <div class="filter-classes">
+            <label class="checkbox-container">
+              <input type="checkbox" id="filter-iceberg" checked>
+              <span class="checkmark iceberg-check"></span>
+              <span class="filter-label">🧊 Icebergs</span>
+              <span id="count-iceberg" class="class-badge font-mono">0</span>
+            </label>
+
+            <label class="checkbox-container">
+              <input type="checkbox" id="filter-ship" checked>
+              <span class="checkmark ship-check"></span>
+              <span class="filter-label">🚢 Vessels / Ships</span>
+              <span id="count-ship" class="class-badge font-mono">0</span>
+            </label>
+
+            <label class="checkbox-container">
+              <input type="checkbox" id="filter-clutter">
+              <span class="checkmark clutter-check"></span>
+              <span class="filter-label">🌊 Clutter / Reject</span>
+              <span id="count-clutter" class="class-badge font-mono">0</span>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <h2 class="section-title">Layer Toggles</h2>
+          <div class="layer-toggles">
+            <label class="toggle-row">
+              <span>Scene Footprint Polygon</span>
+              <input type="checkbox" id="toggle-footprint" checked>
+            </label>
+            <label class="toggle-row">
+              <span>AOI Operational Boundary</span>
+              <input type="checkbox" id="toggle-aoi" checked>
+            </label>
+            <label class="toggle-row">
+              <span>IIP Ground Truth</span>
+              <input type="checkbox" id="toggle-iip" checked>
+            </label>
+            <label class="toggle-row">
+              <span>Only show IIP Correlated</span>
+              <input type="checkbox" id="filter-iip-correlated">
+            </label>
+          </div>
+        </section>
+        
+        <section class="control-group">
+          <h3>Detector Source</h3>
+          <div class="toggle-list">
+            <label class="toggle-row">
+              <span>CFAR Baseline</span>
+              <input type="radio" name="detector-source" id="detector-cfar" value="cfar" checked>
+            </label>
+            <label class="toggle-row">
+              <span>YOLOv8 Deep Learning</span>
+              <input type="radio" name="detector-source" id="detector-yolo" value="yolo">
+            </label>
+          </div>
+        </section>
+
+        <section class="panel-section summary-section">
+          <h2 class="section-title">Analyst Activity</h2>
+          <div class="stats-grid font-mono">
+            <div class="stat-card">
+              <span class="stat-num" id="stat-validated">0</span>
+              <span class="stat-label">Validated</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-num" id="stat-pending">0</span>
+              <span class="stat-label">Pending</span>
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <!-- Map Viewport -->
+      <main class="map-viewport">
+        <div id="map"></div>
+
+        <!-- Floating Target Inspector Drawer -->
+        <div id="target-drawer" class="target-drawer glass-panel hidden">
+          <div class="drawer-header">
+            <div class="drawer-title">
+              <span id="drawer-icon" class="target-icon">🧊</span>
+              <div>
+                <h3 id="drawer-id">Target #--</h3>
+                <span id="drawer-class-badge" class="target-badge">ICEBERG</span>
+              </div>
+            </div>
+            <button id="drawer-close" class="btn-close" aria-label="Close Inspector">&times;</button>
+          </div>
+
+          <div class="drawer-body">
+            <div class="metric-group">
+              <span class="group-title">Radar Polarimetry (Linear &amp; dB)</span>
+              <div class="metric-table font-mono">
+                <div class="table-row"><span>Peak σ⁰ HV:</span> <strong id="t-peak-hv">-- dB</strong></div>
+                <div class="table-row"><span>Mean σ⁰ HV:</span> <strong id="t-mean-hv">-- dB</strong></div>
+                <div class="table-row"><span>Peak σ⁰ HH:</span> <strong id="t-peak-hh">-- dB</strong></div>
+                <div class="table-row"><span>HH / HV Ratio:</span> <strong id="t-ratio">-- dB</strong></div>
+                <div class="table-row"><span>Incidence Angle (θ):</span> <strong id="t-inc">--°</strong></div>
+              </div>
+            </div>
+
+            <div class="metric-group">
+              <span class="group-title">Physical Geometry</span>
+              <div class="metric-table font-mono">
+                <div class="table-row"><span>Est. Length:</span> <strong id="t-length">-- m</strong></div>
+                <div class="table-row"><span>Est. Width:</span> <strong id="t-width">-- m</strong></div>
+                <div class="table-row"><span>Radar Area:</span> <strong id="t-area">-- m²</strong></div>
+                <div class="table-row"><span>WGS84 Coordinates:</span> <span id="t-coords" class="small-coords">--</span></div>
+              </div>
+            </div>
+
+            <div class="metric-group validation-group">
+              <span class="group-title">Analyst Ground Truth Verdict</span>
+              <div class="validation-status" id="t-validation-status">
+                Status: <span class="status-tag pending">UNVALIDATED</span>
+              </div>
+              <div class="action-buttons">
+                <button class="btn-action btn-confirm" id="btn-validate-iceberg">✓ Confirm Iceberg</button>
+                <button class="btn-action btn-ship" id="btn-validate-ship">🚢 Vessel</button>
+                <button class="btn-action btn-reject" id="btn-validate-clutter">✗ Reject Clutter</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toast" class="toast hidden"></div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

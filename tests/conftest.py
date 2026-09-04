@@ -5,8 +5,52 @@ from collections.abc import Generator
 from pathlib import Path
 from typing import Any
 
+import geoalchemy2.admin.dialects.sqlite
 import pytest
 import yaml
+
+# Monkeypatch GeoAlchemy2's SQLite dialect to avoid trying to call SpatiaLite DDL functions.
+# This allows us to use an in-memory SQLite database for fast unit testing of our models
+# without needing to compile or load the mod_spatialite extension.
+geoalchemy2.admin.dialects.sqlite.after_create = lambda *args, **kwargs: None
+geoalchemy2.admin.dialects.sqlite.before_create = lambda *args, **kwargs: None
+geoalchemy2.admin.dialects.sqlite.after_drop = lambda *args, **kwargs: None
+geoalchemy2.admin.dialects.sqlite.before_drop = lambda *args, **kwargs: None
+
+from geoalchemy2.types import Geometry  # noqa: E402
+from sqlalchemy.ext.compiler import compiles  # noqa: E402
+
+
+@compiles(Geometry, "sqlite")
+def compile_geometry_sqlite(element: Any, compiler: Any, **kw: Any) -> str:
+    """Store geometry columns as opaque blobs under SQLite."""
+    return "BLOB"
+
+
+from geoalchemy2.elements import WKTElement  # noqa: E402
+from geoalchemy2.types import _GISType  # noqa: E402
+
+# Deliberate method replacement: GeoAlchemy2 emits PostGIS-specific SQL that
+# SQLite cannot execute, so the geometry round-trip is short-circuited for tests.
+_GISType.bind_expression = lambda self, bindvalue: bindvalue  # type: ignore[method-assign]
+_GISType.column_expression = lambda self, col: col  # type: ignore[method-assign]
+_GISType.result_processor = lambda self, dialect, coltype: (  # type: ignore[method-assign]
+    lambda value: WKTElement(value) if isinstance(value, str) else value
+)
+
+from geoalchemy2.functions import ST_AsGeoJSON, ST_GeomFromGeoJSON  # noqa: E402
+
+
+@compiles(ST_GeomFromGeoJSON, "sqlite")
+def compile_st_geomfromgeojson_sqlite(element: Any, compiler: Any, **kw: Any) -> Any:
+    """Pass GeoJSON through unchanged; SQLite has no PostGIS constructor."""
+    return compiler.process(element.clauses.clauses[0], **kw)
+
+
+@compiles(ST_AsGeoJSON, "sqlite")
+def compile_st_asgeojson_sqlite(element: Any, compiler: Any, **kw: Any) -> Any:
+    """Pass geometry through unchanged; SQLite has no PostGIS serialiser."""
+    return compiler.process(element.clauses.clauses[0], **kw)
 
 
 @pytest.fixture

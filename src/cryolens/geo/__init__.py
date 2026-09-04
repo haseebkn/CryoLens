@@ -1,3 +1,5 @@
-"""Geospatial coordinate conversions, polygon vectorization, and affine transforms."""
+"""Geographic and spatial operations module for CryoLens."""
 
-__all__: list[str] = []
+from cryolens.geo.vectorize import ExtractedTarget, TargetVectorizer
+
+__all__ = ["ExtractedTarget", "TargetVectorizer"]

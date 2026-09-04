@@ -38,11 +38,16 @@ dependencies = [
     "geojson-pydantic>=1.0.2",
     "psycopg2-binary>=2.9.9",
     "sqlalchemy>=2.0.28",
+    "geoalchemy2>=0.15.0",
     "alembic>=1.13.1",
+    "scikit-image>=0.22.0",
     "rio-cogeo>=5.0.0",
     "docker>=7.0.0",
     "xarray>=2024.1.0",
     "xarray-sentinel>=0.9.0",
+    "netcdf4>=1.7.4",
+    "h5netcdf>=1.8.1",
+    "matplotlib>=3.11.1",
 ]
 
 [project.optional-dependencies]
@@ -60,6 +65,7 @@ dev = [
     "pytest-mock>=3.12.0",
     "ruff>=0.4.0",
     "mypy>=1.10.0",
+    "pre-commit>=3.7.0",
     "types-PyYAML>=6.0.12.20240311",
     "types-requests>=2.31.0.20240406",
 ]
@@ -117,6 +123,8 @@ module = [
     "rio_cogeo.*",
     "xarray_sentinel.*",
     "rioxarray.*",
+    "geoalchemy2.*",
+    "skimage.*",
 ]
 ignore_missing_imports = true
 

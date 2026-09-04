@@ -1,6 +1,6 @@
 {
   "type": "FeatureCollection",
-  "name": "cryolens_aoi_grand_banks",
+  "name": "cryolens_aoi_newfoundland_labrador",
   "crs": {
     "type": "name",
     "properties": {
@@ -11,20 +11,62 @@
     {
       "type": "Feature",
       "properties": {
-        "id": "grand_banks_ne_newfoundland",
-        "name": "Grand Banks & NE Newfoundland Shelf",
-        "description": "Primary operational area for CryoLens iceberg detection and drift forecasting",
-        "bbox": [-60.0, 43.5, -46.0, 55.0]
+        "id": "newfoundland_labrador_marine",
+        "name": "Newfoundland & Labrador marine area",
+        "description": "Operational area for CryoLens: the Labrador Shelf and Labrador Sea, the Northeast Newfoundland Shelf, and the Grand Banks including Flemish Cap. This is Iceberg Alley, the corridor along which Baffin Bay and Greenland-calved icebergs drift south past the Labrador coast to the Grand Banks.",
+        "bbox": [-64.5, 42.5, -44.0, 60.5],
+        "northern_limit_note": "60.5 N approximates Cape Chidley, the northern tip of Labrador. Acquisitions extending beyond it are retained when their centre falls inside the AOI.",
+        "southern_limit_note": "42.5 N covers the Tail of the Grand Bank."
       },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
           [
-            [-60.0, 43.5],
-            [-46.0, 43.5],
-            [-46.0, 55.0],
-            [-60.0, 55.0],
-            [-60.0, 43.5]
+            [-64.5, 42.5],
+            [-44.0, 42.5],
+            [-44.0, 60.5],
+            [-64.5, 60.5],
+            [-64.5, 42.5]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "labrador_shelf",
+        "name": "Labrador Shelf sub-region",
+        "description": "Northern sub-region: the main iceberg transit corridor along the Labrador coast."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-64.5, 52.0],
+            [-48.0, 52.0],
+            [-48.0, 60.5],
+            [-64.5, 60.5],
+            [-64.5, 52.0]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "grand_banks_ne_shelf",
+        "name": "Grand Banks & NE Newfoundland Shelf sub-region",
+        "description": "Southern sub-region: offshore production fields (Hibernia, Terra Nova, White Rose) and the transatlantic shipping lanes."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-56.0, 42.5],
+            [-44.0, 42.5],
+            [-44.0, 52.0],
+            [-56.0, 52.0],
+            [-56.0, 42.5]
           ]
         ]
       }
