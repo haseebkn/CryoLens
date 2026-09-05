@@ -109,7 +109,7 @@ def test_real_aoi_geojson_file_valid() -> None:
 
     for feature in features:
         coords = feature["geometry"]["coordinates"][0]
-        assert len(coords) == 5, "each AOI polygon is a closed rectangle"
+        assert len(coords) >= 4, "AOI polygon needs at least three vertices"
         assert coords[0] == coords[-1], "polygon must close"
 
     primary = next(f for f in features if f["properties"]["id"] == "newfoundland_labrador_marine")

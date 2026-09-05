@@ -1,7 +1,7 @@
 """PostGIS relational database models for CryoLens."""
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from geoalchemy2 import Geometry
@@ -80,11 +80,11 @@ class DetectionModel(Base):
         Geometry(geometry_type="POINT", srid=4326, spatial_index=True),
         nullable=True,
     )
-    confidence: Mapped[float] = mapped_column(Float, nullable=False, default=1.0)
+    confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
     detector_name: Mapped[str] = mapped_column(String(64), nullable=False, default="CA-CFAR")
     detector_params: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False, default=dict)
     predicted_class: Mapped[str] = mapped_column(
-        String(64), nullable=False, default="iceberg", index=True
+        String(64), nullable=False, default="unclassified", index=True
     )
     length_m: Mapped[float | None] = mapped_column(Float, nullable=True)
     width_m: Mapped[float | None] = mapped_column(Float, nullable=True)
@@ -101,7 +101,10 @@ class DetectionModel(Base):
 
     scene: Mapped["SceneModel"] = relationship("SceneModel", back_populates="detections")
     validations: Mapped[list["ValidationModel"]] = relationship(
-        "ValidationModel", back_populates="detection", cascade="all, delete-orphan"
+        "ValidationModel",
+        back_populates="detection",
+        cascade="all, delete-orphan",
+        order_by="(ValidationModel.validated_at, ValidationModel.id)",
     )
     drift_forecasts: Mapped[list["DriftForecastModel"]] = relationship(
         "DriftForecastModel", back_populates="detection", cascade="all, delete-orphan"
@@ -136,7 +139,10 @@ class ValidationModel(Base):
     analyst_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     validated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, server_default=func.now()
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        server_default=func.now(),
     )
 
     detection: Mapped["DetectionModel"] = relationship(
@@ -167,7 +173,7 @@ class DriftForecastModel(Base):
         nullable=True,
     )
     method: Mapped[str] = mapped_column(String(64), nullable=False, default="openberg")
-    uncertainty_radius_m: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    uncertainty_radius_m: Mapped[float | None] = mapped_column(Float, nullable=True)
     wind_speed_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
     current_speed_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
     created_at: Mapped[datetime] = mapped_column(

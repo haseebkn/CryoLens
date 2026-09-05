@@ -9,22 +9,26 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
+import pyproj
 import pytest
 import rasterio
 import rasterio.transform
 import shapely.geometry
+import shapely.ops
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from cryolens.api.main import app
+from cryolens.config.settings import get_settings
 from cryolens.db.models import Base
 from cryolens.db.repositories import DetectionRepository, SceneRepository
 from cryolens.db.session import get_db_session
 from cryolens.detect.cfar import GammaCFARDetector
 from cryolens.geo.vectorize import TargetVectorizer
 from cryolens.preprocess.stack import COGStackBuilder
+from tests.spatial_sqlite import register_spatial_functions
 
 
 @pytest.fixture
@@ -62,7 +66,10 @@ def synthetic_4band_cog(tmp_path: Path) -> Path:
 
     # Write 4-band COG using the real COGStackBuilder API
     scene_id = "S1B_EW_SLICE_TEST"
-    transform = rasterio.transform.from_origin(2000000.0, 1000000.0, 40.0, 40.0)
+    origin_x, origin_y = pyproj.Transformer.from_crs(
+        "EPSG:4326", "EPSG:3978", always_xy=True
+    ).transform(-52.0, 48.0)
+    transform = rasterio.transform.from_origin(origin_x, origin_y, 40.0, 40.0)
 
     builder = COGStackBuilder(output_dir=tmp_path)
     cog_path = builder.build_and_export_cog(
@@ -80,7 +87,9 @@ def synthetic_4band_cog(tmp_path: Path) -> Path:
     return cog_path
 
 
-def test_end_to_end_cfar_vertical_slice(synthetic_4band_cog: Path) -> None:
+def test_end_to_end_cfar_vertical_slice(
+    synthetic_4band_cog: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Execute complete vertical slice: COG -> CFAR -> Vectorize -> DB -> API GeoJSON."""
     # 1. Open COG and read bands
     with rasterio.open(synthetic_4band_cog) as src:
@@ -111,7 +120,8 @@ def test_end_to_end_cfar_vertical_slice(synthetic_4band_cog: Path) -> None:
 
     # We should have extracted the 3 injected icebergs
     assert len(targets) >= 3
-    icebergs = [t for t in targets if t.predicted_class == "iceberg"]
+    assert all(t.predicted_class == "unclassified" for t in targets)
+    icebergs = [t for t in targets if t.properties["heuristic_class"] == "iceberg"]
     assert len(icebergs) >= 3
 
     # Check brightest iceberg metrics (Target 1)
@@ -125,6 +135,7 @@ def test_end_to_end_cfar_vertical_slice(synthetic_4band_cog: Path) -> None:
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
+    register_spatial_functions(engine)
     Base.metadata.create_all(engine)
     session_factory = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -152,7 +163,11 @@ def test_end_to_end_cfar_vertical_slice(synthetic_4band_cog: Path) -> None:
             polarizations=["HH", "HV"],
             acquisition_time=datetime.now(UTC),
             cog_path=str(synthetic_4band_cog),
-            footprint_wgs84=poly_3978,
+            footprint_epsg3978=poly_3978,
+            footprint_wgs84=shapely.ops.transform(
+                pyproj.Transformer.from_crs("EPSG:3978", "EPSG:4326", always_xy=True).transform,
+                poly_3978,
+            ),
             status="DETECTED",
         )
         session.add(scene)
@@ -187,11 +202,24 @@ def test_end_to_end_cfar_vertical_slice(synthetic_4band_cog: Path) -> None:
     assert geojson_data["type"] == "FeatureCollection"
     assert len(geojson_data["features"]) == len(targets)
 
-    # 6. Test Analyst Validation API on one detection
+    # 6. Test authenticated, evidence-bearing analyst review on one synthetic fixture.
+    monkeypatch.setenv("CRYOLENS_ANALYST_API_KEY", "synthetic-integration-review-key")
+    monkeypatch.setenv("CRYOLENS_ANALYST_ID", "analyst_lead")
+    get_settings.cache_clear()
     first_det_id = geojson_data["features"][0]["properties"]["id"]
     val_res = client.post(
         f"/api/v1/detections/{first_det_id}/validate",
-        json={"analyst_verdict": "CONFIRMED_ICEBERG", "analyst_id": "analyst_lead"},
+        headers={"X-Analyst-Key": "synthetic-integration-review-key"},
+        json={
+            "analyst_verdict": "CONFIRMED_ICEBERG",
+            "analyst_id": "analyst_lead",
+            "notes": "Synthetic injected target used only to exercise the analyst review API.",
+        },
     )
     assert val_res.status_code == 201
     assert val_res.json()["analyst_verdict"] == "CONFIRMED_ICEBERG"
+
+    app.dependency_overrides.pop(get_db_session, None)
+    get_settings.cache_clear()
+    client.close()
+    engine.dispose()

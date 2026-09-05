@@ -90,9 +90,8 @@ class TestAssignWindRegimes:
     def test_constant_wind_cohort_does_not_crash(self) -> None:
         results = [_result(f"s{i}", 5.0) for i in range(5)]
         assign_wind_regimes(results)
-        # With no spread every scene sits on both boundaries; the low branch
-        # wins, and the important property is that it terminates cleanly.
-        assert {r.wind_regime for r in results} == {"low"}
+        # No spread means there is no defensible relative regime assignment.
+        assert {r.wind_regime for r in results} == {"unknown"}
 
     def test_empty_input_is_safe(self) -> None:
         assign_wind_regimes([])

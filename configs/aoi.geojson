@@ -1,75 +1,18 @@
 {
   "type": "FeatureCollection",
   "name": "cryolens_aoi_newfoundland_labrador",
-  "crs": {
-    "type": "name",
+  "features": [{
+    "type": "Feature",
     "properties": {
-      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
-    }
-  },
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {
-        "id": "newfoundland_labrador_marine",
-        "name": "Newfoundland & Labrador marine area",
-        "description": "Operational area for CryoLens: the Labrador Shelf and Labrador Sea, the Northeast Newfoundland Shelf, and the Grand Banks including Flemish Cap. This is Iceberg Alley, the corridor along which Baffin Bay and Greenland-calved icebergs drift south past the Labrador coast to the Grand Banks.",
-        "bbox": [-64.5, 42.5, -44.0, 60.5],
-        "northern_limit_note": "60.5 N approximates Cape Chidley, the northern tip of Labrador. Acquisitions extending beyond it are retained when their centre falls inside the AOI.",
-        "southern_limit_note": "42.5 N covers the Tail of the Grand Bank."
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [-64.5, 42.5],
-            [-44.0, 42.5],
-            [-44.0, 60.5],
-            [-64.5, 60.5],
-            [-64.5, 42.5]
-          ]
-        ]
-      }
+      "id": "newfoundland_labrador_marine",
+      "name": "Newfoundland and Labrador shelf study area",
+      "description": "Hand-defined research polygon covering the Labrador coastal corridor, Northeast Newfoundland Shelf and Grand Banks. Not a provincial boundary, EEZ, navigation chart or C-CORE operational area. Land and coastal buffers are excluded separately. Analysis is clipped at pixel centres.",
+      "bbox": [-60.5, 42.5, -44.0, 60.5],
+      "source": "CryoLens study design, 2026-09-05; not an authoritative boundary"
     },
-    {
-      "type": "Feature",
-      "properties": {
-        "id": "labrador_shelf",
-        "name": "Labrador Shelf sub-region",
-        "description": "Northern sub-region: the main iceberg transit corridor along the Labrador coast."
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [-64.5, 52.0],
-            [-48.0, 52.0],
-            [-48.0, 60.5],
-            [-64.5, 60.5],
-            [-64.5, 52.0]
-          ]
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "id": "grand_banks_ne_shelf",
-        "name": "Grand Banks & NE Newfoundland Shelf sub-region",
-        "description": "Southern sub-region: offshore production fields (Hibernia, Terra Nova, White Rose) and the transatlantic shipping lanes."
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [-56.0, 42.5],
-            [-44.0, 42.5],
-            [-44.0, 52.0],
-            [-56.0, 52.0],
-            [-56.0, 42.5]
-          ]
-        ]
-      }
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [[[-60.5,60.5],[-56.0,60.5],[-51.0,55.0],[-48.0,52.0],[-44.0,48.0],[-44.0,45.0],[-49.0,42.5],[-54.5,44.0],[-58.5,47.0],[-59.5,50.5],[-56.5,52.0],[-60.5,56.0],[-60.5,60.5]]]
     }
-  ]
+  }]
 }

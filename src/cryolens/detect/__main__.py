@@ -1,10 +1,12 @@
 """CLI entrypoint for running CFAR detection and vectorization on processed SAR COGs."""
 
 import argparse
+import re
 import sys
 import time
 from datetime import UTC, datetime
 
+import numpy as np
 import pyproj
 import rasterio
 import shapely.geometry
@@ -15,7 +17,10 @@ from cryolens.config.settings import get_app_config
 from cryolens.db.repositories import DetectionRepository, SceneRepository
 from cryolens.db.session import get_db_session_factory
 from cryolens.detect.cfar import get_cfar_detector
+from cryolens.detect.filters import SuppressionConfig, build_analysis_mask, filter_targets
+from cryolens.geo.aoi import raster_aoi_mask
 from cryolens.geo.vectorize import TargetVectorizer
+from cryolens.preprocess.masks import LandMaskGenerator
 
 
 def parse_args() -> argparse.Namespace:
@@ -45,8 +50,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--save-db",
         action="store_true",
-        default=True,
+        default=False,
         help="Save scene and detections to PostGIS database.",
+    )
+    parser.add_argument(
+        "--allow-unknown-ice",
+        action="store_true",
+        help="Explicit research opt-in: this COG path has no aligned sea-ice chart; all candidates require ice-context review.",
     )
     return parser.parse_args()
 
@@ -54,9 +64,20 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     """Execute end-to-end CFAR detection slice on given scene."""
     args = parse_args()
+    if not args.allow_unknown_ice:
+        raise ValueError(
+            "This COG path has no aligned sea-ice chart. Use the conservative AI4Arctic importer, or explicitly pass --allow-unknown-ice for research screening."
+        )
     config = get_app_config()
 
     scene_id = args.scene
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", scene_id):
+        raise ValueError("Scene ID may contain only letters, digits, underscores and hyphens")
+    timestamp = re.search(r"\d{8}T\d{6}", scene_id)
+    if args.save_db and timestamp is None:
+        raise ValueError(
+            "Database persistence requires the acquisition timestamp in a Sentinel product ID"
+        )
     processed_dir = config.settings.data_dir / "processed" / scene_id
     cog_path = processed_dir / f"{scene_id}_4band_EPSG3978.tif"
 
@@ -81,7 +102,11 @@ def main() -> None:
     with rasterio.open(cog_path) as src:
         bounds = src.bounds
         transform = src.transform
-        crs = src.crs or CRS.from_epsg(3978)
+        if src.crs != CRS.from_epsg(3978) or src.count != 4:
+            raise ValueError(
+                "Detection requires a calibrated four-band EPSG:3978 COG with explicit CRS"
+            )
+        crs = src.crs
         width = src.width
         height = src.height
 
@@ -91,6 +116,17 @@ def main() -> None:
         hh_db = src.read(1)
         hv_db = src.read(2)
         inc_deg = src.read(4) if src.count >= 4 else None
+        valid = (src.read_masks(1) > 0) & (src.read_masks(2) > 0)
+
+    valid &= np.isfinite(hh_db) & np.isfinite(hv_db) & (hh_db > -90.0) & (hv_db > -90.0)
+    valid &= raster_aoi_mask(hv_db.shape, transform, crs)
+    land = LandMaskGenerator().generate_land_mask(hv_db.shape, transform, str(crs))
+    suppression = SuppressionConfig()
+    valid, mask_breakdown = build_analysis_mask(
+        valid, np.where(land, 0, 99), sigma0_hv_db=hv_db, config=suppression
+    )
+    if not valid.any():
+        raise ValueError("No eligible NL study-area water after masking")
 
     # Instantiate CFAR detector
     detector = get_cfar_detector(
@@ -105,6 +141,8 @@ def main() -> None:
     cfar_result = detector.detect(
         sigma0_hv_db=hv_db,
         sigma0_hh_db=hh_db,
+        valid_mask=valid,
+        max_hh_hv_ratio_db=None,
     )
     cfar_time = time.perf_counter() - t0
     num_hits = int(cfar_result.detection_mask.sum())
@@ -121,20 +159,24 @@ def main() -> None:
         detector_name=dist_name,
     )
     print(f"  Clustered into {len(targets)} targets (min_pixels={vectorizer.min_pixels})")
+    targets, suppression_stats = filter_targets(targets, suppression, cfar_result.clutter_mean_db)
+    print(suppression_stats.format_table())
 
     # Tally classes
-    icebergs = sum(1 for t in targets if t.predicted_class == "iceberg")
-    ships = sum(1 for t in targets if t.predicted_class == "ship")
-    clutter = sum(1 for t in targets if t.predicted_class == "clutter")
-    print(f"  Classification: {icebergs} Icebergs | {ships} Vessels | {clutter} Clutter")
+    print(f"  {len(targets)} unverified SAR candidates; no confirmed iceberg or vessel identity")
 
     # Persist to database
     if args.save_db:
+        assert timestamp is not None  # persistence guard above requires acquisition metadata
         try:
             session_factory = get_db_session_factory()
             with session_factory() as session:
                 # 1. Create or get scene
                 scene = SceneRepository.get_by_product_id(session, scene_id)
+                if scene is not None and scene.detections:
+                    raise ValueError(
+                        "Scene already has detections; preserving existing candidates and analyst reviews"
+                    )
                 if scene is None:
                     # Construct scene footprint polygon in EPSG:3978
                     poly_3978 = shapely.geometry.box(
@@ -151,7 +193,9 @@ def main() -> None:
                         platform="Sentinel-1B" if "S1B" in scene_id else "Sentinel-1A",
                         mode="EW",
                         polarizations=["HH", "HV"],
-                        acquisition_time=datetime.now(UTC),
+                        acquisition_time=datetime.strptime(
+                            timestamp.group(), "%Y%m%dT%H%M%S"
+                        ).replace(tzinfo=UTC),
                         cog_path=str(cog_path),
                         footprint_epsg3978=poly_3978,
                         footprint_wgs84=poly_4326,
@@ -160,6 +204,9 @@ def main() -> None:
                             "pfa": detector.pfa,
                             "guard_window": [detector.guard_h, detector.guard_w],
                             "bg_window": [detector.bg_h, detector.bg_w],
+                            "mask_breakdown": mask_breakdown,
+                            "suppression": suppression_stats.as_dict(),
+                            "sea_ice_mask": "unavailable; candidates require ice-chart review",
                         },
                         status="DETECTED",
                     )
@@ -192,7 +239,8 @@ def main() -> None:
                 session.commit()
                 print(f"  [SUCCESS] Persisted {len(targets)} detections to PostGIS database.")
         except Exception as exc:
-            print(f"  [WARNING] Database save skipped / error: {exc}", file=sys.stderr)
+            print(f"  [ERROR] Database persistence failed: {exc}", file=sys.stderr)
+            sys.exit(1)
 
     total_time = time.perf_counter() - start_time
     print(f"=== Total Pipeline Execution Time: {total_time:.2f}s ===")

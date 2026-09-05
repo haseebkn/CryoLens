@@ -64,7 +64,9 @@ def test_target_vectorization_metrics() -> None:
     assert t.estimated_area_m2 == 14400.0
     assert t.length_m >= 40.0
     assert t.width_m >= 40.0
-    assert t.predicted_class == "iceberg"
+    assert t.predicted_class == "unclassified"
+    assert t.properties["heuristic_class"] == "iceberg"
+    assert t.properties["validation_status"] == "unverified"
 
     # Verify WGS84 geometry
     assert isinstance(t.geom_wgs84, shapely.geometry.Polygon)
@@ -94,6 +96,43 @@ def test_min_pixels_filtering() -> None:
 
     assert len(targets) == 1
     assert targets[0].pixel_area == 4
+
+
+def test_affine_envelope_uses_pixel_edges_and_missing_metrics_are_unknown() -> None:
+    transform = rasterio.transform.from_origin(2000000, 1000000, 40, 40)
+    mask = np.zeros((20, 20), dtype=bool)
+    mask[5:7, 8:11] = True
+    target = TargetVectorizer().extract_targets(mask, transform, np.full(mask.shape, -20.0))[0]
+    assert target.geom_epsg3978.bounds == (2000320, 999720, 2000440, 999800)
+    assert target.peak_sigma0_hh_db is None
+    assert target.hh_hv_ratio_db is None
+    assert target.incidence_angle_deg is None
+    assert target.predicted_class == "unclassified"
+
+
+def test_rotated_affine_pixel_area_uses_determinant() -> None:
+    transform = rasterio.transform.Affine(40, 10, 2000000, 10, -40, 1000000)
+    mask = np.ones((2, 2), dtype=bool)
+    target = TargetVectorizer().extract_targets(mask, transform, np.full(mask.shape, -20.0))[0]
+    assert target.estimated_area_m2 == 6800.0
+    assert target.geom_epsg3978.area == pytest.approx(6800)
+
+
+def test_response_dimensions_respect_anisotropic_pixel_spacing() -> None:
+    transform = rasterio.transform.from_origin(2000000, 1000000, 40, 80)
+    target = TargetVectorizer().extract_targets(
+        np.ones((2, 1), dtype=bool), transform, np.full((2, 1), -20.0)
+    )[0]
+    assert target.length_m == 160.0
+    assert target.width_m == 40.0
+
+
+def test_target_mean_averages_power_not_decibels() -> None:
+    transform = rasterio.transform.from_origin(2000000, 1000000, 40, 40)
+    target = TargetVectorizer().extract_targets(
+        np.ones((1, 2), dtype=bool), transform, np.array([[-10.0, -30.0]])
+    )[0]
+    assert target.mean_sigma0_hv_db == pytest.approx(10 * np.log10((0.1 + 0.001) / 2), abs=0.01)
 
 
 class TestGeolocatedVectorisation:

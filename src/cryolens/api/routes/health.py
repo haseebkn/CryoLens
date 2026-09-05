@@ -23,8 +23,9 @@ def get_health(session: Session = Depends(get_db_session)) -> HealthResponse:
         # Check PostGIS extension
         res = session.execute(text("SELECT postgis_version();")).scalar()
         postgis_ver = str(res) if res else "unknown"
-    except Exception as exc:
-        db_status = f"error: {exc}"
+    except Exception:
+        session.rollback()
+        db_status = "unavailable"
 
     return HealthResponse(
         status="healthy" if db_status == "connected" else "degraded",

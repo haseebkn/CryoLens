@@ -1,5 +1,6 @@
 """Statistical Constant False Alarm Rate (CFAR) detection engine in linear power space."""
 
+import warnings
 from dataclasses import dataclass
 from typing import Literal, cast
 
@@ -19,6 +20,7 @@ class CFARResult:
     threshold_db: np.ndarray  # Computed detection threshold in dB
     clutter_mean_db: np.ndarray  # Estimated local clutter floor in dB
     clutter_shape: np.ndarray | None  # Estimated Gamma shape parameter nu (if applicable)
+    analysis_mask: np.ndarray | None = None  # CUTs with sufficient valid training support
 
 
 def _compute_integral_image(arr: np.ndarray) -> NDArray[np.float64]:
@@ -57,17 +59,58 @@ class BaseCFARDetector:
         background_window: tuple[int, int] = (15, 15),
         pfa: float = 1e-5,
         min_linear_intensity: float = 1e-6,
+        min_training_fraction: float = 0.5,
     ) -> None:
         """Initialize CFAR detector with window half-widths and target Pfa."""
         self.guard_h, self.guard_w = guard_window
         self.bg_h, self.bg_w = background_window
         self.pfa = pfa
         self.min_linear_intensity = min_linear_intensity
+        self.min_training_fraction = min_training_fraction
+
+        if any(
+            not isinstance(v, (int, np.integer)) or v < 0
+            for v in (*guard_window, *background_window)
+        ):
+            raise ValueError("Window half-widths must be nonnegative integers")
+        if not np.isfinite(pfa) or not 0.0 < pfa < 1.0:
+            raise ValueError("pfa must be finite and strictly between 0 and 1")
+        if not np.isfinite(min_linear_intensity) or min_linear_intensity <= 0:
+            raise ValueError("min_linear_intensity must be finite and positive")
+        if not 0.0 < min_training_fraction <= 1.0:
+            raise ValueError("min_training_fraction must be in (0, 1]")
 
         if self.guard_h >= self.bg_h or self.guard_w >= self.bg_w:
             raise ValueError(
                 f"Guard window {guard_window} must be strictly smaller than background window {background_window}."
             )
+
+    def _prepare_input(
+        self, hv: np.ndarray, valid_mask: np.ndarray | None, hh: np.ndarray | None
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Combine caller masks with actual data validity before any prefix sum."""
+        hv = np.asarray(hv, dtype=np.float64)
+        if hv.ndim != 2 or hv.size == 0:
+            raise ValueError("Backscatter must be a nonempty 2D array")
+        if valid_mask is not None and np.shape(valid_mask) != hv.shape:
+            raise ValueError("valid_mask must match the backscatter shape")
+        if hh is not None and np.shape(hh) != hv.shape:
+            raise ValueError("HH must match the HV backscatter shape")
+        valid = np.isfinite(hv) & (hv > -90.0)
+        if valid_mask is not None:
+            valid &= np.asarray(valid_mask, dtype=bool)
+        with np.errstate(over="ignore", invalid="ignore"):
+            power = np.power(10.0, np.where(valid, hv, -90.0) / 10.0)
+            valid &= np.isfinite(power) & (power < np.sqrt(np.finfo(float).max))
+        return np.where(valid, np.maximum(power, self.min_linear_intensity), 0.0), valid
+
+    def _analysis_mask(self, valid_mask: np.ndarray, count: np.ndarray, minimum: int) -> np.ndarray:
+        nominal = (2 * self.bg_h + 1) * (2 * self.bg_w + 1) - (2 * self.guard_h + 1) * (
+            2 * self.guard_w + 1
+        )
+        return valid_mask & (
+            count >= max(minimum, int(np.ceil(nominal * self.min_training_fraction)))
+        )
 
     def _extract_training_statistics(
         self,
@@ -138,15 +181,7 @@ class CACFARDetector(BaseCFARDetector):
         max_hh_hv_ratio_db: float | None = 20.0,
     ) -> CFARResult:
         """Execute CA-CFAR on linear intensity."""
-        if valid_mask is None:
-            valid_mask = np.isfinite(sigma0_hv_db) & (sigma0_hv_db > -90.0)
-
-        # ADR-004: Convert decibel backscatter to linear intensity
-        linear_hv = np.where(
-            valid_mask,
-            np.maximum(10.0 ** (sigma0_hv_db / 10.0), self.min_linear_intensity),
-            self.min_linear_intensity,
-        )
+        linear_hv, valid_mask = self._prepare_input(sigma0_hv_db, valid_mask, sigma0_hh_db)
 
         train_sum, _, train_cnt = self._extract_training_statistics(linear_hv, valid_mask)
 
@@ -158,17 +193,22 @@ class CACFARDetector(BaseCFARDetector):
         mu_clutter = train_sum / safe_cnt
 
         # CA-CFAR scaling factor: alpha = N * (P_fa^(-1/N) - 1)
-        alpha = safe_cnt * (self.pfa ** (-1.0 / safe_cnt) - 1.0)
+        alpha = safe_cnt * np.expm1(-np.log(self.pfa) / safe_cnt)
         threshold_linear = alpha * mu_clutter
 
         # Cell Under Test (CUT) detection condition
-        hits = (linear_hv > threshold_linear) & valid_mask & (train_cnt >= min_cells)
+        analysis_mask = self._analysis_mask(valid_mask, train_cnt, min_cells)
+        hits = (linear_hv > threshold_linear) & analysis_mask
 
         # Optional Dual-pol ratio cross-check veto:
         # Reject clutter spikes where HH is excessively larger than HV (no volume scattering)
         if sigma0_hh_db is not None and max_hh_hv_ratio_db is not None:
             ratio_db = sigma0_hh_db - sigma0_hv_db
-            hits = hits & (ratio_db <= max_hh_hv_ratio_db)
+            hits &= (
+                np.isfinite(sigma0_hh_db)
+                & (sigma0_hh_db > -90.0)
+                & (ratio_db <= max_hh_hv_ratio_db)
+            )
 
         # Diagnostic maps
         threshold_db = 10.0 * np.log10(np.maximum(threshold_linear, 1e-12))
@@ -186,11 +226,16 @@ class CACFARDetector(BaseCFARDetector):
             threshold_db=threshold_db,
             clutter_mean_db=clutter_mean_db,
             clutter_shape=None,
+            analysis_mask=analysis_mask,
         )
 
 
 class GammaCFARDetector(BaseCFARDetector):
-    """Gamma / K-Distribution CFAR with Method of Moments (MoM) shape estimation."""
+    """Adaptive Gamma threshold with method-of-moments shape estimation.
+
+    This is not a compound K-distribution detector. The plug-in quantile does
+    not guarantee the design Pfa on finite, correlated or non-Gamma clutter.
+    """
 
     _NU_MIN = 0.1
     _NU_MAX = 50.0
@@ -205,7 +250,7 @@ class GammaCFARDetector(BaseCFARDetector):
         """
         log_grid = np.linspace(np.log(self._NU_MIN), np.log(self._NU_MAX), self._NU_GRID_POINTS)
         nu_grid = np.exp(log_grid)
-        q_grid = gamma.ppf(1.0 - self.pfa, a=nu_grid, scale=1.0)
+        q_grid = gamma.isf(self.pfa, a=nu_grid, scale=1.0)
 
         log_nu = np.log(np.clip(nu, self._NU_MIN, self._NU_MAX))
         return np.asarray(np.interp(log_nu, log_grid, q_grid), dtype=np.float64)
@@ -217,15 +262,8 @@ class GammaCFARDetector(BaseCFARDetector):
         sigma0_hh_db: np.ndarray | None = None,
         max_hh_hv_ratio_db: float | None = 20.0,
     ) -> CFARResult:
-        """Execute Gamma/K-CFAR using local mean and variance method-of-moments."""
-        if valid_mask is None:
-            valid_mask = np.isfinite(sigma0_hv_db) & (sigma0_hv_db > -90.0)
-
-        linear_hv = np.where(
-            valid_mask,
-            np.maximum(10.0 ** (sigma0_hv_db / 10.0), self.min_linear_intensity),
-            self.min_linear_intensity,
-        )
+        """Execute adaptive Gamma thresholding using local mean and variance."""
+        linear_hv, valid_mask = self._prepare_input(sigma0_hv_db, valid_mask, sigma0_hh_db)
 
         train_sum, train_sq, train_cnt = self._extract_training_statistics(linear_hv, valid_mask)
 
@@ -235,11 +273,14 @@ class GammaCFARDetector(BaseCFARDetector):
         mu_hat = train_sum / safe_cnt
         m2_hat = train_sq / safe_cnt
         # Unbiased sample variance
-        var_hat = np.maximum((safe_cnt / (safe_cnt - 1.0)) * (m2_hat - mu_hat**2), 1e-12)
+        var_hat = np.maximum(
+            (safe_cnt / (safe_cnt - 1.0)) * (m2_hat - mu_hat**2), np.finfo(float).tiny
+        )
 
-        # Method of Moments estimator for Gamma shape parameter: nu_hat = mu^2 / (var - mu^2 / N)
-        denom = np.maximum(var_hat - (mu_hat**2 / safe_cnt), 1e-10)
-        nu_hat = np.clip(mu_hat**2 / denom, 0.1, 50.0)
+        # Gamma mean = shape * scale; variance = shape * scale**2.
+        # Subtracting mu**2/N here incorrectly narrows the fitted clutter tail.
+        with np.errstate(over="ignore"):
+            nu_hat = np.clip(mu_hat**2 / var_hat, self._NU_MIN, self._NU_MAX)
 
         # Quantile calculation: Gamma(shape=nu, scale=mu/nu).
         # gamma.ppf is a root-find per element and is intractable evaluated
@@ -254,11 +295,16 @@ class GammaCFARDetector(BaseCFARDetector):
         unit_quantile = self._unit_gamma_quantile(nu_hat)
         threshold_linear = scale_hat * unit_quantile
 
-        hits = (linear_hv > threshold_linear) & valid_mask & (train_cnt >= min_cells)
+        analysis_mask = self._analysis_mask(valid_mask, train_cnt, min_cells)
+        hits = (linear_hv > threshold_linear) & analysis_mask
 
         if sigma0_hh_db is not None and max_hh_hv_ratio_db is not None:
             ratio_db = sigma0_hh_db - sigma0_hv_db
-            hits = hits & (ratio_db <= max_hh_hv_ratio_db)
+            hits &= (
+                np.isfinite(sigma0_hh_db)
+                & (sigma0_hh_db > -90.0)
+                & (ratio_db <= max_hh_hv_ratio_db)
+            )
 
         threshold_db = 10.0 * np.log10(np.maximum(threshold_linear, 1e-12))
         clutter_mean_db = 10.0 * np.log10(np.maximum(mu_hat, 1e-12))
@@ -275,6 +321,7 @@ class GammaCFARDetector(BaseCFARDetector):
             threshold_db=threshold_db,
             clutter_mean_db=clutter_mean_db,
             clutter_shape=nu_hat,
+            analysis_mask=analysis_mask,
         )
 
 
@@ -293,6 +340,12 @@ def get_cfar_detector(
     target_pfa = pfa if pfa is not None else cfg.default_pfa
 
     if dist_name in ("k_distribution", "gamma"):
+        if dist_name == "k_distribution":
+            warnings.warn(
+                "k_distribution is a deprecated alias for Gamma; no K-distribution model is implemented",
+                DeprecationWarning,
+                stacklevel=2,
+            )
         return GammaCFARDetector(guard_window=gw, background_window=bw, pfa=target_pfa)
     elif dist_name == "cell_averaging":
         return CACFARDetector(guard_window=gw, background_window=bw, pfa=target_pfa)

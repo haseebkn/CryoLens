@@ -20,7 +20,7 @@ class SubswathBoundary:
 
 
 class S1SubswathDenoise:
-    """Implements inter-subswath thermal noise balancing (Park et al. 2018, Korosov et al. 2022).
+    """Experimental noise-field helper, not an implementation of published s1denoise.
 
     Sentinel-1 EW cross-polarization (HV) mode suffers from severe NESZ scalloping (-28 dB to -24 dB)
     across subswath boundaries (EW1 to EW5). Standard SNAP thermal noise subtraction often leaves
@@ -116,13 +116,20 @@ class S1SubswathDenoise:
         h, w = linear_intensity_hv.shape
 
         if noise_equivalent_sigma0 is None:
-            # Synthetic parabolic NESZ profile across swaths (-28 dB to -24 dB range)
-            x = np.linspace(-1, 1, w)
-            base_nesz = 10 ** ((-28.0 + 4.0 * (x**2)) / 10.0)
-            noise_equivalent_sigma0 = np.tile(base_nesz, (h, 1))
+            raise ValueError(
+                "A measured noise field is required; synthetic NESZ is not calibration."
+            )
+        if noise_equivalent_sigma0.shape != (h, w):
+            raise ValueError("Noise field must match the intensity raster shape.")
+        if not np.isfinite(noise_equivalent_sigma0).all() or np.any(noise_equivalent_sigma0 < 0):
+            raise ValueError("Noise field must be finite and nonnegative.")
 
         if subswath_boundaries is None:
-            subswath_boundaries = self.estimate_subswath_boundaries(w, len(self.subswaths))
+            # Annotated power needs no guessed swath boundaries or empirical rescaling.
+            return np.asarray(
+                np.maximum(linear_intensity_hv - noise_equivalent_sigma0, self.min_linear_floor),
+                dtype=np.float32,
+            ), {}
 
         factors = self.compute_inter_subswath_factors(
             linear_intensity_hv, noise_equivalent_sigma0, subswath_boundaries

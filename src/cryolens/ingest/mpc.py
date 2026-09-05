@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Any
 
 from cryolens.config.settings import PlanetaryComputerSettings, get_app_config
+from cryolens.geo.aoi import load_aoi, scene_intersects_aoi
 from cryolens.ingest.cdse import SARSceneMetadata
 
 logger = logging.getLogger(__name__)
@@ -48,6 +49,9 @@ class MPCClient:
         elif start_date:
             s_str = start_date.isoformat() if isinstance(start_date, datetime) else start_date
             datetime_query = f"{s_str}/.."
+        elif end_date:
+            e_str = end_date.isoformat() if isinstance(end_date, datetime) else end_date
+            datetime_query = f"../{e_str}"
 
         query_params: dict[str, Any] = {
             "sar:instrument_mode": {"eq": instrument_mode},
@@ -57,10 +61,11 @@ class MPCClient:
         catalog = pystac_client.Client.open(stac_url)
         search = catalog.search(
             collections=[collection],
-            bbox=bbox,
+            bbox=bbox or list(load_aoi().bounds),
             datetime=datetime_query,
             query=query_params,
             limit=limit,
+            max_items=limit,
         )
 
         results: list[tuple[SARSceneMetadata, Any]] = []
@@ -71,7 +76,11 @@ class MPCClient:
                 signed_item = item
 
             metadata = self._parse_mpc_item(signed_item)
-            if metadata:
+            if (
+                metadata
+                and {"HH", "HV"}.issubset(metadata.polarizations)
+                and scene_intersects_aoi(metadata.footprint_geojson)
+            ):
                 results.append((metadata, signed_item))
 
         logger.info("Found %d Planetary Computer scenes.", len(results))
@@ -84,14 +93,23 @@ class MPCClient:
         if not scene_id:
             return None
 
-        dt = item.datetime or datetime(2020, 1, 1)
+        dt = item.datetime
+        if dt is None or dt.tzinfo is None:
+            return None
         start_time = item.properties.get("start_datetime")
         end_time = item.properties.get("end_datetime")
 
-        start_dt = datetime.fromisoformat(start_time.replace("Z", "+00:00")) if start_time else dt
-        end_dt = datetime.fromisoformat(end_time.replace("Z", "+00:00")) if end_time else dt
+        try:
+            start_dt = (
+                datetime.fromisoformat(start_time.replace("Z", "+00:00")) if start_time else dt
+            )
+            end_dt = datetime.fromisoformat(end_time.replace("Z", "+00:00")) if end_time else dt
+        except ValueError:
+            return None
+        if start_dt.tzinfo is None or end_dt.tzinfo is None:
+            return None
 
-        pols = props.get("sar:polarizations") or ["HH", "HV"]
+        pols = props.get("sar:polarizations") or []
         if isinstance(pols, str):
             pols = [pols]
 

@@ -116,8 +116,58 @@ def test_get_cfar_detector_factory() -> None:
     d_ca = get_cfar_detector("cell_averaging")
     assert isinstance(d_ca, CACFARDetector)
 
-    d_gamma = get_cfar_detector("k_distribution")
+    with pytest.warns(DeprecationWarning, match="no K-distribution"):
+        d_gamma = get_cfar_detector("k_distribution")
     assert isinstance(d_gamma, GammaCFARDetector)
 
     with pytest.raises(ValueError, match="Unknown CFAR distribution"):
         get_cfar_detector("invalid_distribution_type")  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("detector_class", [CACFARDetector, GammaCFARDetector])
+def test_explicit_mask_cannot_admit_nodata(detector_class: type) -> None:
+    hv = np.full((80, 80), -32.0)
+    hv[5, 5] = np.nan
+    hv[10, 10] = np.inf
+    hv[20, 20] = -9999.0
+    hv[50, 50] = -10.0
+    result = detector_class().detect(hv, valid_mask=np.ones_like(hv, dtype=bool))
+    assert result.detection_mask[50, 50]
+    assert not result.detection_mask[5, 5]
+    assert np.isfinite(result.clutter_mean_db).all()
+    assert np.isfinite(result.threshold_db).all()
+
+
+@pytest.mark.parametrize("pfa", [0, 1, -0.1, np.nan, np.inf])
+def test_invalid_false_alarm_probability_rejected(pfa: float) -> None:
+    with pytest.raises(ValueError, match="pfa"):
+        GammaCFARDetector(pfa=pfa)
+
+
+def test_sparse_training_support_is_not_analysed() -> None:
+    hv = np.full((60, 60), -32.0)
+    hv[30, 30] = -10.0
+    valid = np.zeros_like(hv, dtype=bool)
+    valid[30:32, 20:40] = True
+    result = GammaCFARDetector().detect(hv, valid)
+    assert not result.detection_mask.any()
+    assert result.analysis_mask is not None
+    assert not result.analysis_mask.any()
+
+
+def test_gamma_quantile_keeps_extreme_tail_finite() -> None:
+    result = GammaCFARDetector(pfa=1e-20).detect(np.full((60, 60), -32.0))
+    assert np.isfinite(result.threshold_db).all()
+
+
+def test_gamma_moment_shape_matches_training_sample() -> None:
+    rng = np.random.default_rng(711)
+    power = rng.gamma(2.0, 0.001, (51, 51))
+    detector = GammaCFARDetector(guard_window=(1, 1), background_window=(10, 10))
+    sample = power[15:36, 15:36].copy()
+    keep = np.ones(sample.shape, dtype=bool)
+    keep[9:12, 9:12] = False
+    expected = sample[keep].mean() ** 2 / sample[keep].var(ddof=1)
+    result = detector.detect(10 * np.log10(power))
+    assert result.clutter_shape is not None
+    assert result.clutter_shape[25, 25] == pytest.approx(expected, rel=1e-8)

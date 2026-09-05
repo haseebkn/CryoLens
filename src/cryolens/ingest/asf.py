@@ -1,10 +1,11 @@
 """ASF DAAC client for bulk historical Sentinel-1 catalog queries."""
 
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from cryolens.config.settings import EarthdataSettings, get_app_config
+from cryolens.geo.aoi import load_aoi, scene_intersects_aoi
 from cryolens.ingest.cdse import SARSceneMetadata
 
 logger = logging.getLogger(__name__)
@@ -35,7 +36,8 @@ class ASFClient:
                 "asf-search is required. Install via `pip install asf-search`."
             ) from exc
 
-        pols = polarization or ["HH+HV", "HH", "HV"]
+        pols = polarization or ["HH+HV"]
+        bbox = bbox or list(load_aoi().bounds)
         wkt_polygon = None
         if bbox:
             w, s, e, n = bbox
@@ -76,7 +78,11 @@ class ASFClient:
         parsed_list: list[SARSceneMetadata] = []
         for product in results:
             parsed = self._convert_asf_product(product)
-            if parsed:
+            if (
+                parsed
+                and {"HH", "HV"}.issubset(parsed.polarizations)
+                and scene_intersects_aoi(parsed.footprint_geojson)
+            ):
                 parsed_list.append(parsed)
 
         return parsed_list
@@ -88,7 +94,9 @@ class ASFClient:
         if not scene_id:
             return None
 
-        start_time_str = props.get("startTime") or "2020-01-01T00:00:00Z"
+        start_time_str = props.get("startTime")
+        if not start_time_str:
+            return None
         stop_time_str = props.get("stopTime") or start_time_str
         clean_start = start_time_str.replace("Z", "+00:00")
         clean_stop = stop_time_str.replace("Z", "+00:00")
@@ -97,9 +105,12 @@ class ASFClient:
             start_dt = datetime.fromisoformat(clean_start)
             stop_dt = datetime.fromisoformat(clean_stop)
         except ValueError:
-            start_dt = stop_dt = datetime(2020, 1, 1)
+            return None
+        if start_dt.tzinfo is None or stop_dt.tzinfo is None:
+            return None
+        start_dt, stop_dt = start_dt.astimezone(UTC), stop_dt.astimezone(UTC)
 
-        pol_raw = props.get("polarization") or "HH+HV"
+        pol_raw = props.get("polarization") or ""
         pols = pol_raw.split("+") if "+" in pol_raw else [pol_raw]
 
         geojson_geom = product.geometry if hasattr(product, "geometry") else {}

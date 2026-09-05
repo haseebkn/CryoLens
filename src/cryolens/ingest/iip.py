@@ -2,12 +2,14 @@
 
 import csv
 import logging
+import math
 from datetime import UTC, datetime
 from pathlib import Path
 
 from sqlalchemy.orm import Session
 
 from cryolens.db.repositories import IIPSightingRepository
+from cryolens.geo.aoi import contains_point
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +60,9 @@ class IIPClient:
                         continue
 
                     # Normalize time_str
-                    time_str = time_str.zfill(4)  # Ensure at least 4 digits
+                    time_str = (
+                        time_str.strip().replace(":", "").zfill(4)
+                    )  # Ensure at least 4 digits
 
                     try:
                         # Try parsing common IIP formats
@@ -73,12 +77,20 @@ class IIPClient:
                     dt = dt.replace(tzinfo=UTC)
 
                     # 2. Parse Coordinates
-                    lat = float(row.get("LATITUDE", 0))
-                    lon = float(row.get("LONGITUDE", 0))
+                    lat = float(row["LATITUDE"])
+                    lon = float(row["LONGITUDE"])
 
                     # Ensure western longitudes are negative
                     if lon > 0 and lon > 30 and lon < 80:
                         lon = -lon
+
+                    if (
+                        not math.isfinite(lat)
+                        or not math.isfinite(lon)
+                        or not contains_point(lon, lat)
+                    ):
+                        logger.warning("Skipping invalid or outside-study-area IIP coordinates.")
+                        continue
 
                     # 3. Attributes
                     size_class = row.get("SIZE")
@@ -95,7 +107,7 @@ class IIPClient:
                         source=f"IIP_CSV_{csv_path.name}",
                     )
                     count += 1
-                except Exception as e:
+                except (ValueError, TypeError, KeyError) as e:
                     logger.error(f"Failed to parse row: {row}. Error: {e}")
 
         session.commit()

@@ -2,44 +2,56 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, 'codex/**']
   pull_request:
     branches: [main, master]
 
+permissions:
+  contents: read
+
 jobs:
   lint-and-test:
-    name: Lint, Type Check & Unit Tests
+    name: Lint, types, unit tests and PostGIS
     runs-on: ubuntu-latest
+    services:
+      postgis:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_DB: cryolens_test
+          POSTGRES_USER: cryolens_test
+          POSTGRES_PASSWORD: ci-local-test-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U cryolens_test -d cryolens_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
+          python-version: '3.11'
+      - uses: astral-sh/setup-uv@v6
         with:
-          version: "latest"
-
-      - name: Install dependencies
+          version: '0.8.19'
+      - name: Install locked dependencies
+        run: uv sync --frozen --extra dev
+      - name: Lint and formatting
         run: |
-          uv pip install --system -e ".[dev]"
-
-      - name: Run Ruff Linter
+          uv run --frozen ruff check .
+          uv run --frozen ruff format --check .
+      - name: Type check
+        run: uv run --frozen mypy src tests
+      - name: Unit and portable integration tests
+        run: uv run --frozen pytest --cov=src/cryolens --cov-report=term-missing
+      - name: Migrate and verify real PostGIS
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_DB: cryolens_test
+          POSTGRES_USER: cryolens_test
+          POSTGRES_PASSWORD: ci-local-test-password
         run: |
-          ruff check .
-
-      - name: Run Ruff Formatter Check
+          uv run --frozen alembic upgrade head
+          uv run --frozen python scripts/check_postgis.py
+      - name: Build distribution
         run: |
-          ruff format --check .
-
-      - name: Run Mypy Type Checking
-        run: |
-          mypy src tests
-
-      - name: Run Pytest Suite
-        run: |
-          pytest tests/unit --cov=src/cryolens --cov-report=term-missing
+          uv build
+          uv run --frozen python scripts/check_wheel.py dist/cryolens-0.1.0-py3-none-any.whl

@@ -1,24 +1,20 @@
 """Pydantic and GeoJSON schemas for CryoLens REST API."""
 
-from datetime import datetime
-from typing import Any, Literal
+from datetime import UTC, datetime
+from typing import Any, Literal, cast
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class HealthResponse(BaseModel):
-    """System health and service connectivity status."""
-
     status: str = "healthy"
     database: str
     postgis_version: str | None = None
     version: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class SceneProperties(BaseModel):
-    """Metadata properties for SAR scene GeoJSON feature."""
-
     id: str
     product_id: str
     platform: str
@@ -26,17 +22,15 @@ class SceneProperties(BaseModel):
     polarizations: list[str]
     acquisition_time: datetime
     status: str
-    cog_path: str
+    raster_available: bool = False
     detection_count: int = 0
     processing_provenance: dict[str, Any] = Field(default_factory=dict)
 
 
 class DetectionProperties(BaseModel):
-    """Comprehensive radiometric, geometric, and validation properties for target detection."""
-
     id: str
     scene_id: str
-    confidence: float
+    confidence: float | None = None
     detector_name: str
     predicted_class: str
     length_m: float | None = None
@@ -54,23 +48,41 @@ class DetectionProperties(BaseModel):
 
 
 class ValidationRequest(BaseModel):
-    """Analyst validation submission payload."""
+    """A human review with attributable evidence, not detector-derived ground truth."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
     analyst_verdict: Literal[
-        "CONFIRMED_ICEBERG",
-        "REJECTED_CLUTTER",
-        "VESSEL",
-        "OFFSHORE_STRUCTURE",
-        "SEA_ICE",
+        "CONFIRMED_ICEBERG", "REJECTED_CLUTTER", "VESSEL", "OFFSHORE_STRUCTURE", "SEA_ICE"
     ]
-    corrected_class: str | None = None
-    analyst_id: str | None = "analyst_1"
-    notes: str | None = None
+    corrected_class: (
+        Literal["iceberg", "ship", "offshore_structure", "sea_ice_feature", "clutter"] | None
+    ) = None
+    analyst_id: str | None = Field(default=None, min_length=1, max_length=128)
+    notes: str = Field(
+        min_length=10,
+        max_length=4000,
+        description="Evidence and rationale for the review decision.",
+    )
+
+    @model_validator(mode="after")
+    def consistent_class(self) -> "ValidationRequest":
+        expected = {
+            "CONFIRMED_ICEBERG": "iceberg",
+            "VESSEL": "ship",
+            "OFFSHORE_STRUCTURE": "offshore_structure",
+            "SEA_ICE": "sea_ice_feature",
+            "REJECTED_CLUTTER": "clutter",
+        }[self.analyst_verdict]
+        if self.corrected_class is not None and self.corrected_class != expected:
+            raise ValueError("corrected_class conflicts with analyst_verdict")
+        self.corrected_class = cast(
+            Literal["iceberg", "ship", "offshore_structure", "sea_ice_feature", "clutter"], expected
+        )
+        return self
 
 
 class ValidationResponse(BaseModel):
-    """Response confirming analyst verdict registration."""
-
     id: str
     detection_id: str
     analyst_verdict: str

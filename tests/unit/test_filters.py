@@ -83,6 +83,26 @@ class TestSuppressionStats:
 class TestAnalysisMask:
     """Pre-detection masking decides where clutter statistics may be estimated."""
 
+    @pytest.mark.parametrize("sic", [None, np.full((20, 20), 255)])
+    def test_open_water_only_excludes_unknown_charts(self, sic: np.ndarray | None) -> None:
+        config = SuppressionConfig(
+            exclude_sea_ice=True, border_exclusion_px=0, seam_detection_enabled=False
+        )
+        mask, breakdown = build_analysis_mask(
+            np.ones((20, 20), dtype=bool), sic_class=sic, config=config
+        )
+        assert not mask.any()
+        assert breakdown["sea_ice_or_unknown"] == 1.0
+
+    def test_seam_widening_preserves_narrow_raster_shape(self) -> None:
+        hv = np.random.default_rng(9).normal(-30, 0.01, (40, 10))
+        hv[:, 5:] += 5
+        config = SuppressionConfig(
+            border_exclusion_px=0, seam_exclusion_px=20, seam_gradient_sigma=2
+        )
+        mask, _ = build_analysis_mask(np.ones(hv.shape, dtype=bool), sigma0_hv_db=hv, config=config)
+        assert mask.shape == hv.shape
+
     def test_land_and_coastal_buffer_removed(self) -> None:
         valid = np.ones((100, 100), dtype=bool)
         zones = np.full((100, 100), 40, dtype=np.int16)
@@ -124,7 +144,7 @@ class TestAnalysisMask:
         )
         mask_drop, breakdown = build_analysis_mask(valid, None, sic, None, drop)
         assert not mask_drop[:20, :].any()
-        assert breakdown["sea_ice"] == pytest.approx(0.5, abs=1e-6)
+        assert breakdown["sea_ice_or_unknown"] == pytest.approx(0.5, abs=1e-6)
 
     def test_invalid_pixels_never_enter_the_mask(self) -> None:
         valid = np.ones((30, 30), dtype=bool)
@@ -136,6 +156,11 @@ class TestAnalysisMask:
 
 class TestSeamDetection:
     """Subswath seams appear as steps in the range-direction noise profile."""
+
+    def test_exact_step_is_detected_even_when_background_mad_is_zero(self) -> None:
+        hv = np.full((20, 100), -32.0)
+        hv[:, 50:] = -27.0
+        assert detect_subswath_seams(hv)[49:51].all()
 
     def test_finds_injected_step(self) -> None:
         rng = np.random.default_rng(0)
@@ -200,6 +225,12 @@ class TestTargetFilters:
         assert [t.target_id for t in kept] == [2]
         assert stats.stages[0][0] == "min_size"
         assert stats.stages[0][1] == 1
+
+    def test_missing_polarization_or_clutter_cannot_pass_quality_gates(self) -> None:
+        target = _target()
+        target.hh_hv_ratio_db = None
+        assert filter_targets([target])[0] == []
+        assert filter_targets([_target()], clutter_mean_db=np.full((40, 40), np.nan))[0] == []
 
     def test_max_size_removes_ice_floes(self) -> None:
         targets = [_target(1, pixel_area=50_000), _target(2, pixel_area=10)]

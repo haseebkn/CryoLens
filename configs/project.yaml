@@ -5,7 +5,7 @@
 
 project:
   name: "CryoLens"
-  description: "Autonomous SAR iceberg detection, validation, and drift forecasting"
+  description: "SAR candidate screening for Newfoundland and Labrador research"
   version: "0.1.0"
 
 spatial:
@@ -17,7 +17,7 @@ spatial:
   # Newfoundland & Labrador marine area: Labrador Sea and Labrador Shelf through
   # the NE Newfoundland Shelf to the Tail of the Grand Bank and Flemish Cap.
   bbox:
-    west: -64.5
+    west: -60.5
     south: 42.5
     east: -44.0
     north: 60.5
@@ -87,7 +87,7 @@ preprocessing:
   orbit_preference: "POEORB"  # Falls back to RESORB with UserWarning
   gshhg_resolution: "h"       # full (f), high (h), intermediate (i), low (l), crude (c)
   s1denoise:
-    enabled: true
+    enabled: false
     subswaths: ["EW1", "EW2", "EW3", "EW4", "EW5"]
     min_sigma0_db: -45.0
     max_sigma0_db: 15.0
@@ -96,4 +96,4 @@ cfar:
   default_pfa: 1.0e-5
   guard_window: [3, 3]
   background_window: [15, 15]
-  distribution: "k_distribution" # Options: cell_averaging, k_distribution, gamma
+  distribution: "gamma" # Options: cell_averaging, k_distribution, gamma

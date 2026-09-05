@@ -233,3 +233,46 @@ class TestSAFEProductReader:
     def test_unknown_polarisation_raises(self, safe_product: Path) -> None:
         with pytest.raises(FileNotFoundError, match="Incomplete SAFE product"):
             SAFEProductReader(safe_product).read_sigma0("VV")
+
+
+def test_modern_noise_includes_azimuth_factor(safe_product: Path) -> None:
+    path = next((safe_product / "annotation" / "calibration").glob("noise-*hh*.xml"))
+    text = path.read_text().replace(
+        "</noise>",
+        """<noiseAzimuthVectorList><noiseAzimuthVector>
+    <firstAzimuthLine>0</firstAzimuthLine><lastAzimuthLine>39</lastAzimuthLine>
+    <firstRangeSample>0</firstRangeSample><lastRangeSample>59</lastRangeSample>
+    <line>0 39</line><noiseAzimuthLut>2 2</noiseAzimuthLut>
+    </noiseAzimuthVector></noiseAzimuthVectorList></noise>""",
+    )
+    path.write_text(text)
+    result = SAFEProductReader(safe_product).read_sigma0("HH")
+    assert result["sigma0_linear"][0, 0] == pytest.approx(100 - 8 / 10000, abs=1e-5)
+
+
+def test_missing_noise_fails_closed(safe_product: Path) -> None:
+    next((safe_product / "annotation" / "calibration").glob("noise-*hh*.xml")).unlink()
+    with pytest.raises(ValueError, match="noise annotation is missing"):
+        SAFEProductReader(safe_product).read_sigma0("HH")
+
+
+def test_already_corrected_product_is_not_subtracted_twice(safe_product: Path) -> None:
+    path = next((safe_product / "annotation").glob("*hh*.xml"))
+    path.write_text(
+        path.read_text().replace(
+            "</product>",
+            "<thermalNoiseCorrectionPerformed>true</thermalNoiseCorrectionPerformed></product>",
+        )
+    )
+    result = SAFEProductReader(safe_product).read_sigma0("HH")
+    assert result["sigma0_linear"][0, 0] == pytest.approx(100.0)
+    assert result["thermal_noise_removed"] is True
+
+
+def test_lut_irregular_pixel_coordinates_interpolate_physically() -> None:
+    lut = CalibrationLUT(
+        np.array([0, 0, 1, 1, 1]),
+        np.array([0, 10, 0, 2, 10]),
+        np.array([1.0, 11.0, 1.0, 3.0, 11.0]),
+    )
+    assert lut.interpolate((2, 11))[0, 2] == pytest.approx(3.0)

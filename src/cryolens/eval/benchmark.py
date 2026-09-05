@@ -1,4 +1,4 @@
-"""Operational benchmark harness for maritime SAR target detection.
+"""Exploratory benchmark harness for maritime SAR target detection.
 
 What this measures, and what it does not
 ----------------------------------------
@@ -12,24 +12,22 @@ measured rigorously without label leakage:
 stratified by sea ice regime and relative wind regime, together with the
 suppression ledger showing where the candidate budget went.
 
-Over open water away from land and ice, at the resolution of Sentinel-1 EW,
-genuine icebergs are sparse. Detection density in that stratum is therefore
-dominated by false alarms and functions as a defensible upper bound on the
-false-alarm rate. It is reported as such, and never labelled precision or
-recall, because no verified positives exist to support those terms.
+Candidate density bounds false-candidate density by counting all candidates;
+it is not a measured false-alarm probability or evidence of precision. Iceberg
+prevalence and the number of missed objects are unknown.
 
-Recall against IIP sightings requires the NASA Earthdata credential path and is
-implemented separately in :mod:`cryolens.eval.correlate`; see docs/LIMITATIONS.md
-for why IIP cannot be intersected naively with SAR pixels.
+IIP spatiotemporal association is implemented separately; it cannot establish
+recall or turn a nearby candidate into independently verified ground truth.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 from collections import defaultdict
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
@@ -148,6 +146,7 @@ class DetectionBenchmark:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.suppression = suppression or SuppressionConfig()
+        self.run_manifests: list[dict[str, Any]] = []
 
     def run_scene_set(
         self,
@@ -160,21 +159,52 @@ class DetectionBenchmark:
         runner = SceneDetectionRunner(
             detector_kind=detector_kind, pfa=pfa, suppression=self.suppression
         )
-        chosen = list(extents)[:limit] if limit else list(extents)
+        if limit is not None and limit < 1:
+            raise ValueError("limit must be a positive integer")
+        chosen = list(extents)[:limit] if limit is not None else list(extents)
         results: list[SceneDetectionResult] = []
+        manifest: dict[str, Any] = {
+            "detector": detector_kind,
+            "pfa": pfa,
+            "eligible_scenes": len(extents),
+            "selected_scenes": len(chosen),
+            "processed_scenes": 0,
+            "failed_scenes": [],
+            "skipped_scenes": [],
+        }
+        self.run_manifests.append(manifest)
 
         for i, extent in enumerate(chosen, start=1):
             try:
                 scene = load_scene(extent.path)
             except Exception as exc:  # noqa: BLE001 - archive integrity varies
+                manifest["failed_scenes"].append({"scene_id": extent.scene_id, "error": str(exc)})
                 logger.warning("Skipping %s: %s", extent.scene_id, exc)
                 continue
             logger.info("[%d/%d] %s (%s)", i, len(chosen), extent.scene_id, detector_kind)
-            results.append(runner.run(scene))
+            result = runner.run(scene)
+            if result.analysed_area_km2 <= 0:
+                manifest["skipped_scenes"].append(
+                    {
+                        "scene_id": extent.scene_id,
+                        "reason": "No eligible water after AOI, quality and training-support masks",
+                        "mask_breakdown": result.mask_breakdown,
+                    }
+                )
+                continue
+            with extent.path.open("rb") as source:
+                result.assumptions["source_sha256"] = hashlib.file_digest(
+                    source, "sha256"
+                ).hexdigest()
+            results.append(result)
+            manifest["processed_scenes"] += 1
 
         # Wind regimes are relative terciles across the cohort, so they can only
         # be assigned once every scene in the run has been measured.
         assign_wind_regimes(results)
+        (self.output_dir / "benchmark_run_manifest.json").write_text(
+            json.dumps(self.run_manifests, indent=2, allow_nan=False), encoding="utf-8"
+        )
         return results
 
     def sweep_pfa(
@@ -202,6 +232,8 @@ class DetectionBenchmark:
         detector_label: str = "Gamma-CFAR",
     ) -> dict[str, Any]:
         """Write JSON results, a markdown table, and the operating-point plot."""
+        if not results or sum(r.analysed_area_km2 for r in results) <= 0:
+            raise ValueError("Cannot report a benchmark without eligible analysed water")
         by_ice = summarise_by(results, "ice_regime")
         by_wind = summarise_by(results, "wind_regime")
         overall = StratumSummary(
@@ -213,6 +245,19 @@ class DetectionBenchmark:
         )
 
         report: dict[str, Any] = {
+            "schema_version": 2,
+            "methodology": {
+                "metric": "unverified_candidate_density_per_1000km2",
+                "precision_recall_measured": False,
+                "design_pfa_is_measured_far": False,
+                "classification": "unclassified; radiometric heuristic stored separately",
+                "confidence_kind": "uncalibrated_heuristic_score",
+                "aoi": "configs/aoi.geojson newfoundland_labrador_marine; per-pixel centre clipping",
+                "area": "eligible pixel count times nominal spacing squared; exposure sum, not unique ocean area",
+                "suppression": asdict(self.suppression),
+                "source_scaling": "See per-scene assumptions and source_sha256",
+            },
+            "run_manifests": self.run_manifests,
             "detector": detector_label,
             "n_scenes": len(results),
             "overall": overall.to_dict(),
@@ -246,7 +291,7 @@ class DetectionBenchmark:
             ]
 
         json_path = self.output_dir / "benchmark_results.json"
-        json_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        json_path.write_text(json.dumps(report, indent=2, allow_nan=False), encoding="utf-8")
         logger.info("Wrote %s", json_path)
 
         md_path = self.output_dir / "benchmark_table.md"
@@ -264,6 +309,10 @@ class DetectionBenchmark:
         lines: list[str] = []
         o = report["overall"]
         lines.append(f"# Detection benchmark — {report['detector']}")
+        lines.append("")
+        lines.append(
+            "Unverified candidate density only. Precision, recall and operational false-alarm rate have not been measured. Area sums acquisition exposures and is not unique water coverage."
+        )
         lines.append("")
         lines.append(
             f"{o['n_scenes']} Sentinel-1 EW scenes, {o['area_km2']:,.0f} km² of analysed water."

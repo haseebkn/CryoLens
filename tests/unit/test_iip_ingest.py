@@ -114,3 +114,18 @@ class TestIngestion:
     def test_missing_file_raises(self, tmp_path: Path) -> None:
         with pytest.raises(FileNotFoundError):
             IIPClient().ingest_csv(None, tmp_path / "absent.csv")  # type: ignore[arg-type]
+
+
+def test_colon_time_and_invalid_coordinates(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    recorder = _RecordingRepository()
+    monkeypatch.setattr("cryolens.ingest.iip.IIPSightingRepository", recorder)
+    path = tmp_path / "sightings.csv"
+    path.write_text(
+        "DATE,TIME,LATITUDE,LONGITUDE\n2020-04-15,12:30,48.5,-52.3\n2020-04-15,12:30,nan,-52.3\n2020-04-15,12:30,70,-130\n"
+    )
+    from unittest.mock import Mock
+
+    assert IIPClient().ingest_csv(Mock(), path) == 1
+    assert recorder.calls[0]["sighting_time"] == datetime(2020, 4, 15, 12, 30, tzinfo=UTC)

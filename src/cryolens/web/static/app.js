@@ -1,464 +1,283 @@
-/**
- * CryoLens — Maritime Domain Awareness Leaflet Controller
- */
+/* CryoLens research dashboard. Server data is always inserted as text. */
+'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // State
-  let map;
-  let sceneFootprintsLayer;
-  let detectionsLayer;
-  let aoiLayer;
-  let iipLayer;
-  let driftLayer;
-  let currentDetections = [];
-  let currentIIPSightings = [];
+  const $ = (id) => document.getElementById(id);
+  let selectedScene = null;
+  let detections = [];
   let selectedTarget = null;
-  let currentSceneId = null;
+  let requestVersion = 0;
+  let writeEnabled = false;
+  let reviewBusy = false;
+  let toastTimer;
+  let scenePartial = false;
+  let detectionPartial = false;
+  const drawer = $('target-drawer');
+  const reviewButtons = [...document.querySelectorAll('[data-verdict]')];
 
-  // DOM Elements
-  const apiStatusEl = document.getElementById('api-status');
-  const hudTotalCountEl = document.getElementById('hud-total-count');
-  const sceneSelectEl = document.getElementById('scene-select');
-  const metaPlatformEl = document.getElementById('meta-platform');
-  const metaTimeEl = document.getElementById('meta-time');
-  const metaModeEl = document.getElementById('meta-mode');
-  const confidenceSlider = document.getElementById('confidence-slider');
-  const confidenceValEl = document.getElementById('confidence-val');
-  const filterIceberg = document.getElementById('filter-iceberg');
-  const filterShip = document.getElementById('filter-ship');
-  const filterClutter = document.getElementById('filter-clutter');
-  const countIcebergEl = document.getElementById('count-iceberg');
-  const countShipEl = document.getElementById('count-ship');
-  const countClutterEl = document.getElementById('count-clutter');
-  const statValidatedEl = document.getElementById('stat-validated');
-  const statPendingEl = document.getElementById('stat-pending');
-  const toggleFootprint = document.getElementById('toggle-footprint');
-  const toggleAoi = document.getElementById('toggle-aoi');
-  const toggleIip = document.getElementById('toggle-iip');
-  const filterIipCorrelated = document.getElementById('filter-iip-correlated');
-  const detectorCfar = document.getElementById('detector-cfar');
-  const detectorYolo = document.getElementById('detector-yolo');
-
-  // Drawer Elements
-  const targetDrawer = document.getElementById('target-drawer');
-  const drawerCloseBtn = document.getElementById('drawer-close');
-  const drawerIconEl = document.getElementById('drawer-icon');
-  const drawerIdEl = document.getElementById('drawer-id');
-  const drawerClassBadgeEl = document.getElementById('drawer-class-badge');
-  const tPeakHvEl = document.getElementById('t-peak-hv');
-  const tMeanHvEl = document.getElementById('t-mean-hv');
-  const tPeakHhEl = document.getElementById('t-peak-hh');
-  const tRatioEl = document.getElementById('t-ratio');
-  const tIncEl = document.getElementById('t-inc');
-  const tLengthEl = document.getElementById('t-length');
-  const tWidthEl = document.getElementById('t-width');
-  const tAreaEl = document.getElementById('t-area');
-  const tCoordsEl = document.getElementById('t-coords');
-  const tValidationStatusEl = document.getElementById('t-validation-status');
-  const btnValidateIceberg = document.getElementById('btn-validate-iceberg');
-  const btnValidateShip = document.getElementById('btn-validate-ship');
-  const btnValidateClutter = document.getElementById('btn-validate-clutter');
-  const toastEl = document.getElementById('toast');
-
-  // 1. Initialize Map
-  function initMap() {
-    map = L.map('map', {
-      center: [47.5, -52.0],
-      zoom: 6,
-      zoomControl: true,
-      attributionControl: false,
-    });
-
-    // Dark Matter basemap
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 18,
-      subdomains: 'abcd',
-    }).addTo(map);
-
-    sceneFootprintsLayer = L.geoJSON(null, {
-      style: {
-        color: '#00E5FF',
-        weight: 2,
-        dashArray: '4, 4',
-        fillColor: '#00E5FF',
-        fillOpacity: 0.08,
-      },
-    }).addTo(map);
-
-    detectionsLayer = L.layerGroup().addTo(map);
-
-    // Operational Grand Banks AOI Box [-60.0, 43.5, -46.0, 55.0]
-    const aoiBounds = [[43.5, -60.0], [55.0, -46.0]];
-    aoiLayer = L.rectangle(aoiBounds, {
-      color: '#48CAE4',
-      weight: 1,
-      dashArray: '8, 8',
-      fill: false,
-    }).addTo(map);
-
-    iipLayer = L.layerGroup().addTo(map);
-    driftLayer = L.layerGroup().addTo(map);
+  function message(text) {
+    $('map-message').textContent = text;
+    $('map-message').hidden = !text;
+  }
+  function toast(text) {
+    clearTimeout(toastTimer);
+    $('toast').textContent = text;
+    $('toast').hidden = false;
+    toastTimer = setTimeout(() => { $('toast').hidden = true; }, 6500);
+  }
+  if (typeof L === 'undefined') {
+    message('The map library could not load. Check your connection to the public Leaflet CDN. The API documentation remains available.');
+    $('api-status').textContent = 'Map unavailable';
+    $('scene-select').replaceChildren(new Option('Map library unavailable', ''));
+    return;
   }
 
-  // Toast Helper
-  function showToast(msg) {
-    toastEl.textContent = msg;
-    toastEl.classList.remove('hidden');
-    setTimeout(() => {
-      toastEl.classList.add('hidden');
-    }, 3000);
-  }
+  const map = L.map('map', { center: [53.1, -55.5], zoom: 5, minZoom: 4, maxZoom: 16 });
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
+  const footprint = L.geoJSON(null, { style: { color: '#75bdcf', weight: 1.5, fillOpacity: 0.05, dashArray: '5 5' } }).addTo(map);
+  const targets = L.layerGroup().addTo(map);
+  const observations = L.layerGroup().addTo(map);
 
-  // 2. Fetch Health
-  async function checkHealth() {
+  async function request(url, options = {}) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15000);
     try {
-      const res = await fetch('/health');
-      if (res.ok) {
-        const data = await res.json();
-        apiStatusEl.textContent = data.status === 'healthy' ? 'ACTIVE' : 'DEGRADED';
-        apiStatusEl.parentElement.querySelector('.dot').className = 'dot live';
-      } else {
-        apiStatusEl.textContent = 'OFFLINE';
+      const response = await fetch(url, { ...options, signal: controller.signal });
+      if (!response.ok) {
+        let detail = `Service returned HTTP ${response.status}`;
+        try {
+          const body = await response.json();
+          if (typeof body.detail === 'string') detail = body.detail;
+          else if (Array.isArray(body.detail)) detail = body.detail.map((e) => e.msg).join('; ');
+        } catch (_) { /* Use the HTTP status when a proxy returns HTML. */ }
+        throw new Error(detail);
       }
-    } catch (e) {
-      apiStatusEl.textContent = 'DISCONNECTED';
+      return await response.json();
+    } finally { clearTimeout(timer); }
+  }
+
+  async function collect(path, params, maximum) {
+    const features = [];
+    let offset = 0;
+    for (let page = 0; page < 25; page++) {
+      const query = new URLSearchParams({ ...params, offset: String(offset) });
+      const data = await request(`${path}?${query}`);
+      if (!Array.isArray(data.features)) throw new Error('Service returned an invalid observation collection.');
+      features.push(...data.features);
+      if (data.next_offset === null || data.next_offset === undefined) return { features, partial: false };
+      if (features.length >= maximum) return { features: features.slice(0, maximum), partial: true };
+      if (data.next_offset <= offset) throw new Error('Service returned invalid pagination.');
+      offset = data.next_offset;
+    }
+    return { features, partial: true };
+  }
+
+  const when = (value) => value && Number.isFinite(Date.parse(value)) ? new Date(value).toISOString().replace('T', ' ').replace('.000Z', ' UTC') : 'Unknown';
+  const number = (value, suffix, digits = 1) => typeof value === 'number' && Number.isFinite(value) ? `${value.toFixed(digits)}${suffix}` : 'Unknown';
+  function pointOf(feature) {
+    const coords = feature.properties?.centroid || (feature.geometry?.type === 'Point' ? feature.geometry.coordinates : null);
+    return coords && coords.length >= 2 && coords.every(Number.isFinite) ? [coords[1], coords[0]] : null;
+  }
+  const confirmed = (p) => p.analyst_verdict === 'CONFIRMED_ICEBERG' && p.validated;
+  const assessment = (p) => p.validated ? (confirmed(p) ? 'Analyst-confirmed iceberg' : `Analyst review: ${(p.analyst_verdict || 'unknown').replaceAll('_', ' ').toLowerCase()}`) : 'Unverified SAR candidate';
+
+  function closeDrawer() {
+    selectedTarget = null;
+    drawer.hidden = true;
+  }
+  function render() {
+    targets.clearLayers();
+    const filter = $('assessment-filter').value;
+    const minimum = Number($('score-filter').value);
+    let visible = 0;
+    let selectionVisible = false;
+    for (const feature of detections) {
+      const p = feature.properties;
+      if (filter === 'confirmed' && !confirmed(p)) continue;
+      if (filter === 'candidate' && p.validated) continue;
+      if (filter === 'reviewed' && !p.validated) continue;
+      if (minimum > 0 && (typeof p.confidence !== 'number' || p.confidence < minimum)) continue;
+      const location = pointOf(feature);
+      if (!location) continue;
+      const color = confirmed(p) ? '#87dddb' : p.validated ? '#9eb2c3' : '#edc279';
+      const marker = L.circleMarker(location, { radius: confirmed(p) ? 7 : 5, weight: 1.5, color, fillColor: color, fillOpacity: p.validated ? 0.7 : 0.15 });
+      const tooltip = document.createElement('span');
+      tooltip.textContent = `${assessment(p)} · ${String(p.id).slice(0, 8)}`;
+      marker.bindTooltip(tooltip);
+      marker.on('click', () => inspect(feature));
+      marker.addTo(targets);
+      visible++;
+      if (selectedTarget?.properties.id === p.id) selectionVisible = true;
+    }
+    $('count-visible').textContent = String(visible);
+    $('count-candidates').textContent = String(detections.filter((f) => !f.properties.validated).length);
+    $('count-confirmed').textContent = String(detections.filter((f) => confirmed(f.properties)).length);
+    if (selectedTarget && !selectionVisible) closeDrawer();
+    if (visible) message(detectionPartial ? 'Showing a bounded subset of this scene. Use the paginated API for the complete review set.' : '');
+    else if (!detections.length) message('No stored candidates for this observation. This does not establish that the area is iceberg-free.');
+    else if (filter === 'confirmed') message('No analyst-confirmed icebergs meet this filter. Select “Unverified SAR candidates” to inspect the pending radar evidence.');
+    else message('No targets meet the current review and score filters.');
+  }
+
+  async function loadScene(scene) {
+    const version = ++requestVersion;
+    selectedScene = scene;
+    detections = [];
+    targets.clearLayers();
+    observations.clearLayers();
+    footprint.clearLayers();
+    closeDrawer();
+    for (const id of ['count-visible', 'count-candidates', 'count-confirmed']) $(id).textContent = '—';
+    $('meta-time').textContent = when(scene.properties.acquisition_time);
+    $('meta-platform').textContent = scene.properties.platform || 'Unknown';
+    $('meta-mode').textContent = `${scene.properties.mode || 'Unknown'} / ${(scene.properties.polarizations || []).join('+') || 'Unknown'}`;
+    footprint.addData(scene);
+    const bounds = footprint.getBounds();
+    if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 60], maxZoom: 9 });
+    message('Loading candidates for the selected acquisition…');
+    loadIip(scene, version);
+    try {
+      const data = await collect('/api/v1/detections', { scene_id: scene.properties.id, limit: '1000' }, 10000);
+      if (version !== requestVersion) return;
+      detections = data.features;
+      detectionPartial = data.partial;
+      render();
+    } catch (error) {
+      if (version !== requestVersion) return;
+      message(`Candidates unavailable. ${error.message}`);
     }
   }
 
-  // 3. Load Scenes
-  async function loadScenes() {
+  async function loadIip(scene, version) {
+    const acquisition = Date.parse(scene.properties.acquisition_time);
+    if (!Number.isFinite(acquisition)) {
+      $('data-status').textContent = 'IIP context unavailable: acquisition time unknown';
+      return;
+    }
+    $('data-status').textContent = 'Loading IIP observations within ±12 hours…';
     try {
-      const res = await fetch('/api/v1/scenes');
-      const data = await res.json();
-
-      sceneSelectEl.innerHTML = '';
-      if (!data.features || data.features.length === 0) {
-        sceneSelectEl.innerHTML = '<option value="">No processed scenes found</option>';
-        return;
+      const data = await collect('/api/v1/iip', {
+        start_date: new Date(acquisition - 12 * 3600000).toISOString(),
+        end_date: new Date(acquisition + 12 * 3600000).toISOString(), limit: '1000',
+      }, 5000);
+      if (version !== requestVersion) return;
+      for (const feature of data.features) {
+        const location = pointOf(feature);
+        if (!location) continue;
+        const p = feature.properties;
+        const tooltip = document.createElement('span');
+        tooltip.textContent = `IIP observation · ${when(p.sighting_time)} · ${p.size_class || 'Unknown size'} · Association is unverified`;
+        L.circleMarker(location, { radius: 5, color: '#c5a4e5', fillOpacity: 0.4, weight: 1.5 }).bindTooltip(tooltip).addTo(observations);
       }
-
-      sceneFootprintsLayer.clearLayers();
-      sceneFootprintsLayer.addData(data);
-
-      data.features.forEach((feat, idx) => {
-        const opt = document.createElement('option');
-        opt.value = feat.properties.id;
-        opt.textContent = `${feat.properties.product_id.substring(0, 32)}... (${feat.properties.detection_count} targets)`;
-        opt.dataset.meta = JSON.stringify(feat.properties);
-        sceneSelectEl.appendChild(opt);
-
-        if (idx === 0) {
-          currentSceneId = feat.properties.id;
-          updateSceneMeta(feat.properties);
-        }
-      });
-
-      if (currentSceneId) {
-        await loadDetections(currentSceneId);
-      }
-    } catch (err) {
-      console.error('Failed to load scenes:', err);
+      $('data-status').textContent = `IIP context: ${data.features.length}${data.partial ? '+' : ''} stored observations within ±12h${scenePartial ? ' · Scene list is partial' : ''}`;
+    } catch (error) {
+      if (version !== requestVersion) return;
+      $('data-status').textContent = `IIP context unavailable: ${error.message}`;
     }
   }
 
-  function updateSceneMeta(meta) {
-    metaPlatformEl.textContent = meta.platform || 'Sentinel-1';
-    metaTimeEl.textContent = meta.acquisition_time ? new Date(meta.acquisition_time).toUTCString() : '--';
-    metaModeEl.textContent = `${meta.mode || 'EW'} / ${(meta.polarizations || []).join('+')}`;
-  }
-
-  // 4. Load Detections
-  async function loadDetections(sceneId) {
-    try {
-      const res = await fetch(`/api/v1/detections?scene_id=${sceneId}&limit=2000`);
-      const data = await res.json();
-      currentDetections = data.features || [];
-      renderDetections();
-    } catch (err) {
-      console.error('Failed to load detections:', err);
-    }
-  }
-
-  // Fetch IIP Sightings
-  async function loadIIPSightings() {
-    try {
-      const res = await fetch('/api/v1/iip?limit=1000');
-      const data = await res.json();
-      currentIIPSightings = data.features || [];
-      renderIIPSightings();
-    } catch (err) {
-      console.error('Failed to load IIP sightings:', err);
-    }
-  }
-
-  function renderIIPSightings() {
-    iipLayer.clearLayers();
-    
-    currentIIPSightings.forEach((feat) => {
-      const p = feat.properties;
-      const lng = feat.geometry.coordinates[0];
-      const lat = feat.geometry.coordinates[1];
-      
-      // IIP Circle Marker
-      const marker = L.circleMarker([lat, lng], {
-        radius: 6,
-        color: '#FFA500', // Orange
-        weight: 2,
-        fillColor: '#FFA500',
-        fillOpacity: 0.5,
-      });
-      
-      marker.bindTooltip(`<b>IIP Sighting</b><br>Time: ${p.sighting_time}<br>Size: ${p.size_class || 'Unknown'}<br>Shape: ${p.shape || 'Unknown'}`);
-      
-      // Drift buffer (approx 12h at 0.5 m/s = ~21.6km)
-      // Visual aid
-      const buffer = L.circle([lat, lng], {
-        radius: 21600, // meters
-        color: '#FFA500',
-        weight: 1,
-        dashArray: '4, 4',
-        fill: false,
-      });
-
-      iipLayer.addLayer(marker);
-      iipLayer.addLayer(buffer);
-    });
-  }
-
-  // 5. Render Detections on Map
-  function renderDetections() {
-    detectionsLayer.clearLayers();
-
-    const minConf = parseFloat(confidenceSlider.value);
-    const showIce = filterIceberg.checked;
-    const showShip = filterShip.checked;
-    const showClutter = filterClutter.checked;
-
-    let iceCount = 0;
-    let shipCount = 0;
-    let clutterCount = 0;
-    let validatedCount = 0;
-    let visibleCount = 0;
-
-    currentDetections.forEach((feat) => {
-      const p = feat.properties;
-      const cls = p.predicted_class;
-      const conf = p.confidence;
-
-      if (cls === 'iceberg') iceCount++;
-      if (cls === 'ship') shipCount++;
-      if (cls === 'clutter') clutterCount++;
-      if (p.validated) validatedCount++;
-
-      // Source check
-      const showYolo = detectorYolo.checked;
-      const isYolo = p.detector_name.toLowerCase().includes('yolo');
-      if (showYolo && !isYolo) return;
-      if (!showYolo && isYolo) return;
-
-      // Filter check
-      if (conf < minConf) return;
-      if (cls === 'iceberg' && !showIce) return;
-      if (cls === 'ship' && !showShip) return;
-      if (cls === 'clutter' && !showClutter) return;
-      
-      if (filterIipCorrelated.checked && !p.IIP_CORRELATED) return;
-
-      visibleCount++;
-
-      // Centroid coordinates
-      let lat, lng;
-      if (feat.geometry.type === 'Point') {
-        lng = feat.geometry.coordinates[0];
-        lat = feat.geometry.coordinates[1];
-      } else if (feat.geometry.type === 'Polygon') {
-        const ring = feat.geometry.coordinates[0];
-        lng = ring.reduce((sum, c) => sum + c[0], 0) / ring.length;
-        lat = ring.reduce((sum, c) => sum + c[1], 0) / ring.length;
-      }
-
-      if (!lat || !lng) return;
-
-      // Icon & Marker
-      const iconChar = cls === 'iceberg' ? '🧊' : (cls === 'ship' ? '🚢' : '🌊');
-      const pinClass = cls === 'ship' ? 'marker-pin ship' : (cls === 'clutter' ? 'marker-pin clutter' : 'marker-pin');
-
-      const customIcon = L.divIcon({
-        className: 'target-marker-icon',
-        html: `<div class="${pinClass}">${iconChar}</div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
-      });
-
-      const marker = L.marker([lat, lng], { icon: customIcon });
-      marker.on('click', () => openTargetDrawer(feat, [lat, lng]));
-      detectionsLayer.addLayer(marker);
-    });
-
-    // Update HUD counters
-    hudTotalCountEl.textContent = visibleCount;
-    countIcebergEl.textContent = iceCount;
-    countShipEl.textContent = shipCount;
-    countClutterEl.textContent = clutterCount;
-    statValidatedEl.textContent = validatedCount;
-    statPendingEl.textContent = currentDetections.length - validatedCount;
-  }
-
-  // 6. Open Target Inspector Drawer
-  function openTargetDrawer(feature, coords) {
+  function inspect(feature) {
     selectedTarget = feature;
     const p = feature.properties;
-    
-    // Clear previous drift forecasts
-    driftLayer.clearLayers();
-
-    drawerIconEl.textContent = p.predicted_class === 'iceberg' ? '🧊' : (p.predicted_class === 'ship' ? '🚢' : '🌊');
-    drawerIdEl.textContent = `Target #${p.id.substring(0, 8)}`;
-    drawerClassBadgeEl.textContent = p.predicted_class.toUpperCase();
-
-    tPeakHvEl.textContent = `${p.peak_sigma0_hv_db ?? '--'} dB`;
-    tMeanHvEl.textContent = `${p.mean_sigma0_hv_db ?? '--'} dB`;
-    tPeakHhEl.textContent = `${p.peak_sigma0_hh_db ?? '--'} dB`;
-    tRatioEl.textContent = `${p.hh_hv_ratio_db ?? '--'} dB`;
-    tIncEl.textContent = `${p.incidence_angle_deg ?? '--'}°`;
-
-    tLengthEl.textContent = `${p.length_m ?? '--'} m`;
-    tWidthEl.textContent = `${p.width_m ?? '--'} m`;
-    tAreaEl.textContent = `${p.estimated_area_m2 ?? '--'} m²`;
-    tCoordsEl.textContent = `${coords[0].toFixed(4)}°N, ${Math.abs(coords[1]).toFixed(4)}°W`;
-
-    if (p.validated) {
-      tValidationStatusEl.innerHTML = `Status: <span class="status-tag confirmed">✓ ${p.analyst_verdict}</span>`;
-    } else {
-      tValidationStatusEl.innerHTML = `Status: <span class="status-tag pending">UNVALIDATED</span>`;
-    }
-    
-    if (p.IIP_CORRELATED) {
-       tValidationStatusEl.innerHTML += `<div style="margin-top: 5px; color: #FFA500; font-size: 0.85rem;">[IIP Correlated]</div>`;
-    }
-
-    targetDrawer.classList.remove('hidden');
-    
-    // Fetch and display drift forecast if it's an iceberg
-    if (p.predicted_class === 'iceberg') {
-       fetchDriftForecast(p.id);
-    }
+    const location = pointOf(feature);
+    $('drawer-id').textContent = `Target ${String(p.id).slice(0, 8)}`;
+    $('target-assessment').textContent = assessment(p);
+    $('target-observed').textContent = `Observed: ${when(p.observation_time)}`;
+    $('target-detector').textContent = `${p.detector_name || 'Unknown'} / ${p.predicted_class || 'Unknown'}`;
+    $('target-score').textContent = number(p.confidence, '', 3);
+    $('target-hv').textContent = `${number(p.peak_sigma0_hv_db, ' dB')} / ${number(p.mean_sigma0_hv_db, ' dB')}`;
+    $('target-hh').textContent = `${number(p.peak_sigma0_hh_db, ' dB')} / ${number(p.hh_hv_ratio_db, ' dB')}`;
+    $('target-size').textContent = `${number(p.length_m, ' m')} × ${number(p.width_m, ' m')}`;
+    $('target-area').textContent = number(p.estimated_area_m2, ' m²', 0);
+    $('target-position').textContent = location ? `${location[0].toFixed(4)}°, ${location[1].toFixed(4)}°` : 'Unknown';
+    $('target-iip').textContent = p.iip_association ? 'Proximity association; unverified' : 'No stored association';
+    $('review-history').textContent = p.validated ? `${assessment(p)} by ${p.analyst_id || 'unknown analyst'} at ${when(p.validated_at)}. ${p.review_notes || 'No evidence notes stored.'}` : 'No analyst review recorded.';
+    $('review-notes').value = '';
+    updateReviewAccess();
+    drawer.hidden = false;
+    $('drawer-close').focus({ preventScroll: true });
   }
 
-  // Fetch Drift Forecast
-  async function fetchDriftForecast(detectionId) {
-    try {
-      const res = await fetch(`/api/v1/drift/${detectionId}`);
-      const data = await res.json();
-      
-      if (data.features && data.features.length > 0) {
-         L.geoJSON(data, {
-            style: {
-               color: '#FF00FF', // Magenta for drift
-               weight: 3,
-               opacity: 0.8,
-               dashArray: '5, 5'
-            },
-            onEachFeature: function (feature, layer) {
-                // Try to put a small tooltip at the end
-                if (feature.geometry.coordinates && feature.geometry.coordinates.length > 0) {
-                    const times = feature.properties.times;
-                    if (times && times.length > 0) {
-                        const lastTime = new Date(times[times.length-1]);
-                        layer.bindTooltip(`<b>Drift Forecast</b><br>+${times.length} hours<br>Until: ${lastTime.toUTCString()}`);
-                    }
-                }
-            }
-         }).addTo(driftLayer);
-      }
-    } catch (err) {
-      console.error('Failed to fetch drift forecast:', err);
-    }
+  function updateReviewAccess() {
+    $('review-access').textContent = writeEnabled ? 'A configured analyst key is required. The server records its assigned analyst identity.' : 'Read-only portfolio. Analyst writes are disabled on the server.';
+    reviewButtons.forEach((button) => { button.disabled = !writeEnabled || reviewBusy; });
+    $('analyst-key').disabled = !writeEnabled || reviewBusy;
+    $('review-notes').disabled = !writeEnabled || reviewBusy;
   }
 
-  // 7. Submit Validation
-  async function submitValidation(verdict, correctedClass = null) {
-    if (!selectedTarget) return;
-
+  async function review(verdict) {
+    if (!selectedTarget || reviewBusy || !writeEnabled) return;
+    const id = selectedTarget.properties.id;
+    const version = requestVersion;
+    const key = $('analyst-key').value;
+    const notes = $('review-notes').value.trim();
+    if (!key || notes.length < 10) { toast('Provide the analyst key and at least 10 characters describing review evidence.'); return; }
+    reviewBusy = true;
+    updateReviewAccess();
     try {
-      const res = await fetch(`/api/v1/detections/${selectedTarget.properties.id}/validate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          analyst_verdict: verdict,
-          corrected_class: correctedClass || selectedTarget.properties.predicted_class,
-          analyst_id: 'c-core_analyst_1',
-          notes: 'Validated via interactive Leaflet operations dashboard',
-        }),
+      await request(`/api/v1/detections/${encodeURIComponent(id)}/validate`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Analyst-Key': key },
+        body: JSON.stringify({ analyst_verdict: verdict, notes }),
       });
-
-      if (res.ok) {
-        showToast(`Ground truth recorded: ${verdict}`);
-        selectedTarget.properties.validated = true;
-        selectedTarget.properties.analyst_verdict = verdict;
-        if (correctedClass) selectedTarget.properties.predicted_class = correctedClass;
-
-        tValidationStatusEl.innerHTML = `Status: <span class="status-tag confirmed">✓ ${verdict}</span>`;
-        renderDetections();
+      const refreshed = await request(`/api/v1/detections/${encodeURIComponent(id)}`);
+      if (version === requestVersion) {
+        detections = detections.map((f) => f.properties.id === id ? refreshed : f);
+        const stillSelected = selectedTarget?.properties.id === id;
+        render();
+        if (stillSelected && selectedTarget) inspect(refreshed);
       }
-    } catch (e) {
-      showToast('Validation failed to save');
-    }
+      toast('Analyst review saved. The raw detector result remains preserved.');
+    } catch (error) { toast(`Review could not be completed: ${error.message}`); }
+    finally { reviewBusy = false; updateReviewAccess(); }
   }
 
-  // Event Listeners
-  sceneSelectEl.addEventListener('change', (e) => {
-    currentSceneId = e.target.value;
-    const selectedOption = e.target.selectedOptions[0];
-    if (selectedOption && selectedOption.dataset.meta) {
-      updateSceneMeta(JSON.parse(selectedOption.dataset.meta));
+  $('scene-select').addEventListener('change', (event) => {
+    const scene = event.target.selectedOptions[0]?.scene;
+    if (scene) loadScene(scene);
+  });
+  $('assessment-filter').addEventListener('change', render);
+  $('score-filter').addEventListener('input', (event) => { $('score-value').textContent = Number(event.target.value).toFixed(2); render(); });
+  $('toggle-footprint').addEventListener('change', (event) => { if (event.target.checked) footprint.addTo(map); else map.removeLayer(footprint); });
+  $('toggle-iip').addEventListener('change', (event) => { if (event.target.checked) observations.addTo(map); else map.removeLayer(observations); });
+  $('drawer-close').addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeDrawer(); });
+  reviewButtons.forEach((button) => button.addEventListener('click', () => review(button.dataset.verdict)));
+
+  async function initialize() {
+    request('/health').then((data) => {
+      $('api-status').textContent = data.status === 'healthy' ? 'Database connected' : 'Database unavailable';
+    }).catch(() => { $('api-status').textContent = 'Service unavailable'; });
+    try {
+      const capabilities = await request('/api/v1/capabilities');
+      writeEnabled = capabilities.analyst_writes_enabled === true;
+      updateReviewAccess();
+      const studyArea = L.geoJSON(capabilities.aoi, { style: { color: '#6895a3', weight: 1, dashArray: '6 5', fill: false }, interactive: false }).addTo(map);
+      const bounds = studyArea.getBounds();
+      if (bounds.isValid()) { map.fitBounds(bounds, { padding: [24, 24] }); map.setMaxBounds(bounds.pad(0.2)); }
+      const data = await collect('/api/v1/scenes', { limit: '100' }, 500);
+      scenePartial = data.partial;
+      $('scene-select').replaceChildren();
+      if (!data.features.length) {
+        $('scene-select').append(new Option('No processed NL scenes', ''));
+        for (const id of ['count-visible', 'count-candidates', 'count-confirmed']) $(id).textContent = '0';
+        message('No processed observations are available in the NL study area. Ingest and process an authentic scene to begin review. No demonstration detections are substituted.');
+        $('data-status').textContent = 'IIP context: no scene selected';
+        return;
+      }
+      for (const scene of data.features) {
+        const option = new Option(`${when(scene.properties.acquisition_time).slice(0, 16)} · ${scene.properties.platform} · ${scene.properties.detection_count} candidates`, scene.properties.id);
+        option.scene = scene;
+        $('scene-select').append(option);
+      }
+      await loadScene(data.features[0]);
+    } catch (error) {
+      $('scene-select').replaceChildren(new Option('Observation service unavailable', ''));
+      message(`Cannot load stored observations. ${error.message}`);
+      $('data-status').textContent = 'Observation service unavailable';
     }
-    if (currentSceneId) {
-      loadDetections(currentSceneId);
-    }
-  });
-
-  confidenceSlider.addEventListener('input', (e) => {
-    confidenceValEl.textContent = parseFloat(e.target.value).toFixed(2);
-    renderDetections();
-  });
-
-  filterIceberg.addEventListener('change', renderDetections);
-  filterShip.addEventListener('change', renderDetections);
-  filterClutter.addEventListener('change', renderDetections);
-
-  toggleFootprint.addEventListener('change', (e) => {
-    if (e.target.checked) map.addLayer(sceneFootprintsLayer);
-    else map.removeLayer(sceneFootprintsLayer);
-  });
-
-  toggleAoi.addEventListener('change', (e) => {
-    if (e.target.checked) map.addLayer(aoiLayer);
-    else map.removeLayer(aoiLayer);
-  });
-
-  toggleIip.addEventListener('change', (e) => {
-    if (e.target.checked) map.addLayer(iipLayer);
-    else map.removeLayer(iipLayer);
-  });
-
-  filterIipCorrelated.addEventListener('change', renderDetections);
-  detectorCfar.addEventListener('change', renderDetections);
-  detectorYolo.addEventListener('change', renderDetections);
-
-  drawerCloseBtn.addEventListener('click', () => {
-    targetDrawer.classList.add('hidden');
-    selectedTarget = null;
-    driftLayer.clearLayers();
-  });
-
-  btnValidateIceberg.addEventListener('click', () => submitValidation('CONFIRMED_ICEBERG', 'iceberg'));
-  btnValidateShip.addEventListener('click', () => submitValidation('VESSEL', 'ship'));
-  btnValidateClutter.addEventListener('click', () => submitValidation('REJECTED_CLUTTER', 'clutter'));
-
-  // Init
-  initMap();
-  checkHealth();
-  loadScenes();
-  loadIIPSightings();
+  }
+  initialize();
 });

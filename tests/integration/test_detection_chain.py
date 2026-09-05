@@ -97,8 +97,9 @@ class TestPhysicalUnits:
         assert -75.0 < float(scene.longitude.min()) < -40.0
 
     def test_assumptions_are_recorded(self, scene: AI4ArcticScene) -> None:
-        """Non-recoverable variables must carry their caveat on the scene."""
-        assert "incidence_angle" in scene.assumptions
+        """The reader exposes the normalization provenance used for these arrays."""
+        assert scene.assumptions.get("normalisation")
+        assert scene.assumptions.get("wind_speed")
 
 
 class TestMasking:

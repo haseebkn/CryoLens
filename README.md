@@ -1,276 +1,161 @@
-# CryoLens 🧊🛰️
+# CryoLens
 
-**Sentinel-1 SAR iceberg detection for the Newfoundland & Labrador shelf, measured against an operational false-alarm budget.**
+**Auditable satellite radar candidate screening for the Newfoundland and Labrador shelf.**
 
----
+CryoLens is a research portfolio project for maritime remote sensing. It uses
+Sentinel-1 HH/HV imagery to find bright radar targets, suppress common clutter,
+and show evidence for analyst review. A detected target is **unclassified and
+unverified** until reviewed. A detector score is not the probability of an iceberg.
 
-## The result
+The September 2026 audit found errors in preprocessing, geographic coverage,
+classification claims and evaluation. Earlier headline results are withdrawn;
+see [benchmark status](docs/BENCHMARK.md) and the [audit](docs/AUDIT.md).
+Precision, recall and a real-world false-positive rate have **not** been established.
 
-Gamma/K-distribution CFAR plus a multi-stage suppression chain, run over
-**39 real Sentinel-1 Extra Wide swath scenes** covering **4.6 million km² of
-analysed water** across the Labrador Shelf and Grand Banks:
+The corrected three-acquisition smoke run retained **35 unverified candidates**
+over **325,238.6 km²** of cumulative eligible coverage. This demonstrates a
+reproducible screening path, not a validated regional false-alarm budget.
 
-| Metric | Value |
-|---|---:|
-| Raw CFAR candidates per 1000 km² | 58.40 |
-| **After false-alarm suppression** | **1.27** |
-| **Open water only** | **0.26** |
-| Suppression factor | **45.9×** (111× over open water) |
+## Relevance to C-CORE
 
-Stratified, because a single blended number would hide the thing that matters:
+The design is informed by C-CORE's public work on SAR target detection,
+ship/iceberg discrimination and human quality control. This is an independent
+project, with no C-CORE affiliation, endorsement or certification. The
+[MDA alignment](docs/MDA_ALIGNMENT.md) maps public sources to implemented
+behavior and identifies the missing operational capabilities.
 
-| Sea ice regime | Scenes | Water (km²) | Per 1000 km² |
-|---|---:|---:|---:|
-| Open water | 6 | 862,502 | **0.26** |
-| Ice-affected | 30 | 3,409,999 | 1.53 |
-| Unknown (labels withheld) | 3 | 336,711 | 1.25 |
+## What you can inspect
 
-Ice-affected water runs ~6× higher than open water. That is physically expected
-— ridged ice and floe edges genuinely scatter like targets — and is exactly why
-the two are reported separately rather than averaged into one number.
+- CA-CFAR and Gamma-CFAR statistics in linear power, with explicit nodata handling.
+- A shared NL study polygon used for pixel-level analysis and API filtering.
+- Land/coast, border, seam and optional sea-ice exclusion; an auditable suppression ledger.
+- Unclassified candidate geometry and radiometry, source timestamps and review provenance.
+- A FastAPI/Leaflet analyst dashboard with bounded queries and protected review writes.
+- Tests, type checks, dependency locking, database migrations and real PostGIS checks in CI.
 
-Wind stratification (13 scenes per tercile) gives **1.14 / 1.37 / 1.31** per
-1000 km² for low / moderate / high. That is *not* a monotonic trend, and with
-relative rather than absolute wind units and only 13 scenes a bin, it is not a
-result worth leaning on. It is reported because it was measured.
-
-### Two detectors, one harness
-
-Cell-averaging and Gamma/K-distribution CFAR over the same 12-scene subset
-(1.49 million km²), identical suppression chain and Pfa:
-
-| Detector | raw per 1000 km² | after suppression | detections |
-|---|---:|---:|---:|
-| CA-CFAR | 2.69 | 0.179 | 267 |
-| Gamma-CFAR | 80.73 | 1.469 | 2,186 |
-
-**This does not say which is better, and it cannot.** CA-CFAR sets its threshold
-from the local *mean*, and over sea ice that mean is inflated by the very heavy
-tail it is trying to separate from, so the threshold climbs and targets fall
-below it. Gamma-CFAR estimates the tail's shape and adapts — which is why
-ADR-008 specifies it above sea state 3. Whether CA-CFAR's lower density means
-*fewer false alarms* or *fewer real detections* is undeterminable without
-verified positives. Calling it a win either way would be reading a result the
-data does not support.
-
-Full table, per-stage ledger, and the Pfa operating-point curve:
-**[docs/BENCHMARK.md](docs/BENCHMARK.md)**.
-
-### What that number is, and is not
-
-It is **detection density per 1000 km² of analysed water**. Over open water away
-from land and ice, genuine icebergs are sparse at EW resolution, so this figure
-is dominated by false alarms and serves as a defensible **upper bound on the
-false-alarm rate**.
-
-It is **not** precision, recall, or mAP. No verified iceberg positions exist for
-these scenes: AI4Arctic supplies ice charts, not iceberg point truth; IIP
-sightings cannot be intersected with SAR pixels (a 6-hour offset is 2–11 km of
-drift); xView3-SAR annotates vessels. Reporting precision without positives
-would be fabrication.
-
-**[docs/LIMITATIONS.md](docs/LIMITATIONS.md) states in full what this system does
-not do.** Read it before relying on any number here.
-
----
-
-## Why this is not another YOLO-on-satellite-images project
-
-Four things, each of which changes the result rather than the presentation:
-
-**1. Digital numbers are not backscatter.** Every scene passes orbit correction →
-thermal noise removal → radiometric calibration to σ⁰ → geocoding before any
-model sees it. `preprocess/safe_reader.py` implements calibration from the ESA
-product annotations directly: σ⁰ = DN²/A²σ, with the noise LUT subtracted in
-**linear power** (the noise floor is additive in power, not in decibels).
-
-**2. Dual-pol, not single-channel.** The feature stack is
-[σ⁰_HH, σ⁰_HV, HH/HV ratio, θ_inc]. Icebergs volume-scatter and show strong
-cross-pol return; open water collapses in HV. Detection runs on HV, and the
-co-pol ratio vetoes specular sea-surface returns.
-
-**3. CFAR is the measured baseline, not a strawman.** All statistics are computed
-in linear power via 2D integral images — O(1) per pixel with exact guard-band
-exclusion. The Gamma CFAR uses a method-of-moments shape estimate for
-heavy-tailed clutter at higher sea states.
-
-**4. The false-alarm budget is auditable.** Suppression is an ordered chain and
-every stage records what it removed:
-
-```
-stage              removed  remaining  % of raw
-min_size            261,468      7,687     97.1%
-max_size                  0      7,687      0.0%
-aspect_ratio              3      7,684      0.0%
-min_peak_hv             642      7,042      0.2%
-copol_dominance       1,096      5,946      0.4%
-clutter_contrast         82      5,864      0.0%
-```
-
-Published rather than summarised, because it shows what a single aggregate
-number would hide: **one stage does 97% of the work.** CFAR at this Pfa produces
-predominantly isolated single-pixel speckle hits, while genuine targets form
-multi-pixel clusters. The recall cost of that threshold is **not measured** —
-raising it discards small icebergs along with false alarms, and without ground
-truth the trade-off cannot be located. See LIMITATIONS §9.
-
----
-
-## Architecture
-
-```
-        Copernicus / ASF  ──►  SAFE product (EW GRD, HH+HV)
-                                       │
-                    ┌──────────────────▼──────────────────┐
-                    │  safe_reader.py                     │
-                    │  orbit · thermal noise · σ⁰ · geoloc │
-                    └──────────────────┬──────────────────┘
-                                       │  4-band COG, EPSG:3978
-                    ┌──────────────────▼──────────────────┐
-                    │  build_analysis_mask()              │
-                    │  GSHHG land + coastal buffer        │
-                    │  swath borders · subswath seams     │
-                    │  sea ice (flagged, not discarded)   │
-                    └──────────────────┬──────────────────┘
-                                       │  where CFAR may look
-                    ┌──────────────────▼──────────────────┐
-                    │  CA-CFAR  /  Gamma-CFAR             │
-                    │  linear power · integral images     │
-                    └──────────────────┬──────────────────┘
-                                       │  pixel hits
-                    ┌──────────────────▼──────────────────┐
-                    │  vectorise → filter_targets()       │
-                    │  size · aspect · contrast · co-pol  │
-                    │  cross-tile NMS in projected coords │
-                    └──────────────────┬──────────────────┘
-                                       │
-                          PostGIS  ──►  FastAPI  ──►  Leaflet
-                                       │
-                          eval/benchmark.py  ──►  BENCHMARK.md
-```
-
----
-
-## Area of interest
-
-Newfoundland and Labrador marine area: **64.5°W–44.0°W, 42.5°N–60.5°N**. That
-spans Iceberg Alley end to end — the Labrador Shelf transit corridor down to the
-Tail of the Grand Bank and Flemish Cap, taking in the offshore production fields
-(Hibernia, Terra Nova, White Rose) and the transatlantic lanes.
-
-Scene selection requires the scene **centre** inside the AOI, not merely an
-overlap. A Sentinel-1 EW swath is ~400 km across, so a scene can clip the corner
-of the box while lying almost entirely in Ungava Bay.
-
-Project CRS is **EPSG:3978** (NAD83 / Canada Atlas Lambert). Conformal, so local
-angles are preserved for drift vectors and target shape ratios, and it avoids
-the UTM zone seams at 54°W and 48°W that cut straight through the AOI.
-
----
+**Gamma-CFAR is not a K-distribution detector.** The historical `k_distribution`
+configuration value is retained only as a compatibility alias. The default is `gamma`.
 
 ## Quickstart
 
-```bash
-make dev              # editable install with dev dependencies
-make fetch-shorelines # GSHHG coastlines, 150 MB, no credentials needed
-make db-up            # PostGIS 16
-make test             # 139 tests (125 unit + 14 integration on real SAR)
-make lint             # ruff + mypy
+Python 3.11, [uv](https://docs.astral.sh/uv/) and Docker are needed for the full
+local app. Run from the repository root. These commands work in PowerShell
+and POSIX shells; use your shell's copy command for `.env.example`.
+
+```text
+uv sync --frozen --extra dev
 ```
 
-To reproduce the benchmark you need the AI4Arctic ready-to-train scenes (see
-[Data](#data)), then:
+Copy `.env.example` to `.env`, set a local `POSTGRES_PASSWORD`, then:
 
-```bash
-make scene-index
-make benchmark SWEEP=1
+```text
+docker compose up -d postgis
+uv run --frozen alembic upgrade head
+uv run --frozen uvicorn cryolens.api:app --host 127.0.0.1 --port 8000
 ```
 
-To run the API and dashboard:
+Open [the dashboard](http://localhost:8000) or [the API docs](http://localhost:8000/docs).
+An empty database is shown as empty; the app does not manufacture detections.
+For an interview walkthrough, use [PORTFOLIO.md](docs/PORTFOLIO.md).
 
-```bash
-make api   # http://localhost:8000  (docs at /docs)
+With the public archive downloaded, import the first labeled example:
+
+```text
+uv run --frozen python scripts/import_ai4arctic_scene.py --scene data/raw/ai4arctic/train/20180331T212355_cis_prep.nc
 ```
 
----
+This imports a historical 2018-03-31 observation, not a live feed. Select
+**Unverified SAR candidates** in the dashboard to inspect its six candidates;
+the default confirmed-only view correctly shows none until an analyst reviews
+the evidence. Re-importing preserves existing records and reviews.
 
-## Data
+Review writes are disabled until both `CRYOLENS_ANALYST_API_KEY` and
+`CRYOLENS_ANALYST_ID` are configured locally. Never put credentials in Git,
+screenshots or presentation materials. Bind locally for a demo; production
+hosting and identity management have not been assessed.
 
-| Dataset | Role | Access |
-|---|---|---|
-| **AI4Arctic Sea Ice Challenge** (ready-to-train) | Real S1 EW HH+HV with co-registered CIS ice charts, ERA5 forcing and land-distance zonation. The measured benchmark runs on this. | Direct download, DOI `10.11583/DTU.c.6244065` |
-| **GSHHG** full-resolution shorelines | Land masking, 6,404 polygons over the AOI | `make fetch-shorelines` |
-| **Copernicus / ASF** Sentinel-1 EW GRD | The live path via `safe_reader.py` | **Credentials required** |
-| **NSIDC G00807** (IIP sightings) | Weak-supervision search prior only, never labels | NASA Earthdata login |
-| **xView3-SAR**, **Statoil/C-CORE Kaggle** | Detector and classifier training | Terms acceptance |
+## Real data and evaluation
 
-Note on the AI4Arctic distribution: pixel values are **standardised, not
-physical**. For the two SAR channels the packagers preserved the
-pre-normalisation extremes in the `min`/`max` variable attributes, so σ⁰ in
-decibels is recovered exactly by inverting the linear map. Recovered open-water
-HV medians land near **−33 dB**, which is the correct regime and serves as the
-physical sanity check. The ERA5 winds carry no such attributes, so wind
-stratification is reported in **relative terciles**, not m/s (LIMITATIONS §3).
+The local evaluation uses the public
+[AI4Arctic ready-to-train dataset](https://data.dtu.dk/articles/dataset/Ready-To-Train_AI4Arctic_Sea_Ice_Challenge_Dataset/21316608),
+which contains Sentinel-1 scenes and **sea-ice charts, not iceberg truth**.
+The publisher's normalization must be inverted using its documented constants;
+scene extrema alone cannot establish physical units. All results depend on
+that data contract and the masking assumptions documented in the benchmark.
 
----
-
-## Repository layout
-
-```
-src/cryolens/
-├── config/       type-safe pydantic-settings + YAML loader
-├── ingest/       CDSE STAC, ASF, Planetary Computer, IIP, LRU cache
-├── preprocess/   safe_reader (σ⁰ calibration), s1denoise, masks, COG stack
-├── data/         AI4Arctic reader, unit restoration, scene indexing
-├── detect/       CFAR (CA + Gamma), suppression chain, scene runner
-├── geo/          vectorisation, affine and tie-point georeferencing
-├── eval/         benchmark harness, IIP spatiotemporal correlation
-├── drift/        OpenDrift openberg scaffold (see LIMITATIONS §8)
-├── api/          FastAPI + GeoJSON
-└── db/           PostGIS models, repositories, Alembic migrations
+```text
+uv run --frozen python -m cryolens.eval --help
+uv run --frozen python -m cryolens.detect --help
+uv run --frozen python -m cryolens.preprocess --help
 ```
 
----
+Raw imagery, credentials, trained weights and generated databases are excluded
+from Git. GSHHG shorelines are public and are required by the raw COG detection
+path (`make fetch-shorelines` on systems with Make). See
+[DATA.md](docs/DATA.md) for access and provenance.
 
-## Status
+The raw SAFE/COG path lacks aligned sea-ice context and requires explicit
+unknown-ice research opt-in (`--allow-unknown-ice` for the detection CLI,
+`PipelineRunner(allow_unknown_ice=True)` in Python). The charted public-scene
+import above uses conservative open-water screening by default.
 
-| Component | State |
+## Geographic scope
+
+The hand-defined study polygon covers the Labrador coastal corridor, Northeast
+Newfoundland Shelf and Grand Banks. It is stored in `configs/aoi.geojson` and
+bounded by 60.5°W–44°W, 42.5°N–60.5°N. It is **not a provincial boundary or EEZ**.
+Land and coastal exclusion are separate from this marine research area.
+Intersecting scenes may be loaded, but pixels and candidate centres outside
+the study area are excluded. Coverage is reported as analyzed area; masked
+water is not evidence that no icebergs are present.
+
+## Validation
+
+```text
+uv run --frozen pytest
+uv run --frozen ruff check .
+uv run --frozen ruff format --check .
+uv run --frozen mypy src tests
+uv run --frozen python scripts/check_postgis.py
+uv build
+```
+
+The PostGIS check requires the migrated local database and rolls back its
+fixtures. Unit tests also use SQLite substitutes; those alone do not verify
+PostGIS. Real-data integration tests skip explicitly when their source files
+are absent. CI uses locked dependencies and a real PostGIS service.
+
+## Capability boundaries
+
+| Capability | Honest status |
 |---|---|
-| SAR calibration from AI4Arctic | Measured, physically verified |
-| CFAR detection + suppression | Measured on real S1 EW scenes |
-| Detection density benchmark | Measured, stratified |
-| SAFE reader | Implemented, unit-tested, **unvalidated on a real product** |
-| Deep learning detector | **Not implemented** — interface raises |
-| Drift forecasting | **Scaffolded, not validated** |
-| QGIS analyst plugin | **Not started** |
-| Live AIS correlation | **Interface only** — no free point-level AIS for this region |
+| Statistical radar candidate screening | Implemented; thresholds require regional validation |
+| Analyst review and geographic API | Implemented; local API-key protection |
+| SAFE calibration and GCP geolocation | Research implementation; not operationally validated |
+| Precise-orbit correction in Python pipeline | Not applied; never claimed in provenance |
+| Trained ship/iceberg classifier | Not implemented |
+| Live AIS deconfliction | Not connected; no match does not establish iceberg identity |
+| Drift prediction / grounding | Disabled; verified forcing and skill assessment missing |
+| Navigational warnings / hazard advisories | Not produced |
 
----
+Reducing candidate counts can also remove real icebergs. The project does not
+claim that its thresholds minimize false positives or preserve recall.
+[Limitations](docs/LIMITATIONS.md) describe the evidence needed to make those claims.
 
-## Design decisions
+## Structure
 
-Twelve ADRs in [docs/DECISIONS.md](docs/DECISIONS.md) record the reasoning,
-including the ones that constrain what this project is allowed to claim:
+```text
+src/cryolens/
+  config/       validated settings; credentials remain local
+  ingest/       satellite catalogues, download/cache, IIP context
+  preprocess/   SAFE calibration, geolocation, coast masks, COG stack
+  data/         AI4Arctic data contract and scene index
+  detect/       CFAR, suppression, scene runner, training export
+  geo/          shared NL area and target geometry
+  eval/         candidate-density reports and contextual matching
+  api/ db/ web/ analyst interface, persistence and provenance
+  drift/        explicit unavailable interfaces
+```
 
-- **ADR-004** — CFAR in linear power space, as the reference baseline
-- **ADR-005** — why IIP sightings are a search prior and never a label
-- **ADR-009** — suppression as an auditable multi-stage chain
-- **ADR-011** — detection density per 1000 km² as the reportable metric
-- **ADR-012** — refusing to fabricate data in place of unimplemented components
-
-ADR-012 is the one worth reading. Three components previously returned synthetic
-data so the pipeline would appear to work end to end: the orchestrator generated
-random arrays with hardcoded bright rectangles instead of reading the downloaded
-product, the YOLO detector returned a fixed point regardless of input, and the
-chip extractor wrote zero-byte files. All three now fail loudly instead. The
-honest surface area of this project is smaller than the fabricated one was, and
-it is measured.
-
----
-
-## License & notices
-
-* **Software:** MIT
-* **CHS notice:** Bathymetry derived from CHS NONNA-100/NONNA-10 is for research
-  and modelling only. **Not to be used for navigation.**
-* No output of this system is a navigational product or an ice hazard advisory.
+Software: [MIT](LICENSE). Source datasets retain their own terms.
+No output is suitable for navigation or an ice-hazard advisory.

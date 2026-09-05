@@ -10,9 +10,7 @@ import pytest
 from cryolens.data.ai4arctic import (
     AI4ArcticScene,
     SceneExtent,
-    _denormalise_linear,
     _interpolate_tiepoint_grid,
-    _rescale_to_range,
     scenes_intersecting_aoi,
 )
 
@@ -37,69 +35,6 @@ def _extent(
         lon_min=lon_min,
         lon_max=lon_max,
     )
-
-
-class TestDenormalisation:
-    """Physical sigma-nought must be recoverable from the standardised arrays."""
-
-    def test_round_trip_recovers_physical_extremes(self) -> None:
-        physical = np.array([[-37.9551, -20.0, 6.81137], [-10.0, 0.0, -30.0]])
-        mean, std = -13.867, 6.2978
-        stored = (physical - mean) / std
-
-        recovered = _denormalise_linear(stored, -37.9551, 6.81137)
-        assert recovered == pytest.approx(physical, abs=1e-3)
-
-    def test_extremes_map_exactly(self) -> None:
-        stored = np.linspace(-3.8248, 3.2834, 50).reshape(5, 10)
-        out = _denormalise_linear(stored, -37.9551, 6.81137)
-        assert float(np.nanmin(out)) == pytest.approx(-37.9551, abs=1e-4)
-        assert float(np.nanmax(out)) == pytest.approx(6.81137, abs=1e-4)
-
-    def test_constant_array_is_rejected(self) -> None:
-        with pytest.raises(ValueError, match="degenerate"):
-            _denormalise_linear(np.ones((4, 4)), -30.0, 0.0)
-
-    def test_all_nan_returns_nan(self) -> None:
-        out = _denormalise_linear(np.full((3, 3), np.nan), -30.0, 0.0)
-        assert np.isnan(out).all()
-
-    def test_open_water_hv_is_physically_plausible(self) -> None:
-        """A recovered HV field must sit well below -25 dB over open water.
-
-        This is the physical sanity check from the project plan's Phase 1
-        acceptance criteria: if the de-normalisation were wrong, the values
-        would not land in the right decibel regime.
-        """
-        rng = np.random.default_rng(0)
-        physical = rng.normal(-33.0, 2.0, size=(64, 64))
-        physical[0, 0], physical[-1, -1] = -56.7, -8.0
-        stored = (physical - physical.mean()) / physical.std()
-
-        recovered = _denormalise_linear(stored, -56.7, -8.0)
-        assert float(np.median(recovered)) < -25.0
-
-
-class TestRescaleToRange:
-    """Variables without preserved extremes are mapped onto known physical ranges."""
-
-    def test_maps_onto_incidence_range(self) -> None:
-        stored = np.linspace(-1.73, 1.52, 20).reshape(4, 5)
-        out = _rescale_to_range(stored, 19.4, 47.0)
-        assert float(out.min()) == pytest.approx(19.4, abs=1e-4)
-        assert float(out.max()) == pytest.approx(47.0, abs=1e-4)
-
-    def test_land_distance_zones_are_integral(self) -> None:
-        zones = np.arange(42, dtype=np.float64)
-        stored = (zones - zones.mean()) / zones.std()
-        out = _rescale_to_range(stored, 0.0, 41.0)
-        assert np.abs(out - np.rint(out)).max() < 1e-4
-        assert int(np.rint(out).min()) == 0
-        assert int(np.rint(out).max()) == 41
-
-    def test_constant_input_returns_floor(self) -> None:
-        out = _rescale_to_range(np.zeros((3, 3)), 5.0, 10.0)
-        assert (out == 5.0).all()
 
 
 class TestTiepointInterpolation:
@@ -204,3 +139,83 @@ class TestIceChartAvailability:
         )
         # Six charted pixels, three of them at class 5 (50 percent ice).
         assert self._scene(sic).sea_ice_fraction() == pytest.approx(0.5)
+
+
+def test_publisher_standardisation_preserves_crop_values() -> None:
+    from cryolens.data.ai4arctic import PUBLISHER_MEAN_STD, _restore_standardised
+
+    mean, std = PUBLISHER_MEAN_STD["nersc_sar_secondary"]
+    physical = np.array([[-40.0, -30.0, -20.0, -10.0]])
+    stored = (physical - mean) / std
+    recovered_crop = _restore_standardised(stored[:, 1:3], "nersc_sar_secondary")
+    np.testing.assert_allclose(recovered_crop, physical[:, 1:3], atol=1e-5)
+
+
+def test_publisher_distance_scaling_does_not_stretch_missing_zones() -> None:
+    from cryolens.data.ai4arctic import PUBLISHER_MEAN_STD, _restore_standardised
+
+    mean, std = PUBLISHER_MEAN_STD["distance_map"]
+    zones = np.array([[5.0, 10.0, 36.0]])
+    np.testing.assert_allclose(
+        _restore_standardised((zones - mean) / std, "distance_map"), zones, atol=1e-5
+    )
+
+
+@pytest.fixture
+def ready_train_scene(tmp_path: Path) -> Path:
+    from netCDF4 import Dataset
+
+    from cryolens.data.ai4arctic import PUBLISHER_MEAN_STD
+
+    path = tmp_path / "scene_prep.nc"
+    with Dataset(path, "w") as ds:
+        ds.createDimension("row", 4)
+        ds.createDimension("col", 4)
+        ds.pixel_spacing = 80.0
+        for name, physical in {
+            "nersc_sar_primary": -20.0,
+            "nersc_sar_secondary": -32.0,
+            "distance_map": 10.0,
+            "sar_incidenceangle": 35.0,
+        }.items():
+            variable = ds.createVariable(name, "f4", ("row", "col"))
+            mean, std = PUBLISHER_MEAN_STD[name]
+            variable[:] = (physical - mean) / std
+            if name.startswith("nersc"):
+                variable.min, variable.max = -60.0, 20.0
+                variable.polarisation = "HH" if name.endswith("primary") else "HV"
+        for name, physical in {"sar_grid2d_latitude": 48.0, "sar_grid2d_longitude": -53.0}.items():
+            ds.createVariable(name, "f4", ("row", "col"))[:] = physical
+    return path
+
+
+def test_load_scene_uses_global_scaler_not_variable_extrema(ready_train_scene: Path) -> None:
+    from cryolens.data.ai4arctic import load_scene
+
+    scene = load_scene(ready_train_scene)
+    np.testing.assert_allclose(scene.sigma0_hh_db, -20.0, atol=1e-4)
+    np.testing.assert_allclose(scene.sigma0_hv_db, -32.0, atol=1e-4)
+    assert (scene.land_distance_zone == 10).all()
+    np.testing.assert_allclose(scene.incidence_angle_deg, 35.0, atol=1e-4)
+
+
+def test_unknown_distance_zone_is_excluded(ready_train_scene: Path) -> None:
+    from netCDF4 import Dataset
+
+    from cryolens.data.ai4arctic import load_scene
+
+    with Dataset(ready_train_scene, "a") as ds:
+        ds["distance_map"][0, 0] = np.nan
+    scene = load_scene(ready_train_scene)
+    assert scene.land_mask[0, 0]
+
+
+def test_mismatched_scaler_is_rejected(ready_train_scene: Path) -> None:
+    from netCDF4 import Dataset
+
+    from cryolens.data.ai4arctic import load_scene
+
+    with Dataset(ready_train_scene, "a") as ds:
+        ds["distance_map"][:] = 0.05
+    with pytest.raises(ValueError, match="unsupported dataset version"):
+        load_scene(ready_train_scene)

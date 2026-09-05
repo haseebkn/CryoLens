@@ -23,6 +23,7 @@ def synthetic_generator(tmp_path: Path) -> LandMaskGenerator:
         gshhg_root=tmp_path / "missing",
         cache_path=tmp_path / "cache.gpkg",
         coastal_buffer_m=0.0,
+        allow_custom_only=True,
     )
     # A land square covering the western half of the test window.
     gen.add_custom_polygon(box(-56.0, 46.0, -54.0, 50.0))
@@ -83,8 +84,8 @@ class TestSeaIceMask:
         sic = np.array([[0, 1, 2, 5, 10, 255]], dtype=np.uint8)
         mask = gen.from_sic_class(sic)
         # Class 2 (20 percent) is the first bin above the 15 percent ice edge;
-        # 255 is the fill value and must never be read as ice.
-        assert mask.tolist() == [[False, False, True, True, True, False]]
+        # 255 is unknown and must be excluded from low-false-positive screening.
+        assert mask.tolist() == [[False, False, True, True, True, True]]
 
     def test_fallback_defaults_to_open_water(self) -> None:
         gen = SeaIceMaskGenerator()
@@ -95,7 +96,19 @@ class TestSeaIceMask:
         with pytest.raises(ValueError, match=r"\[0, 1\]"):
             SeaIceMaskGenerator(concentration_threshold=1.5)
 
-    def test_nan_concentration_treated_as_water(self) -> None:
+    def test_nan_concentration_excluded(self) -> None:
         gen = SeaIceMaskGenerator()
         field = np.array([[np.nan, 0.9]])
-        assert gen.from_concentration(field).tolist() == [[False, True]]
+        assert gen.from_concentration(field).tolist() == [[True, True]]
+
+
+def test_missing_ice_context_fails() -> None:
+    with pytest.raises(ValueError, match="Measured ice concentration"):
+        SeaIceMaskGenerator().generate_ice_mask((2, 2))
+
+
+def test_empty_shoreline_fails(tmp_path: Path) -> None:
+    gen = LandMaskGenerator(cache_path=tmp_path / "absent.gpkg")
+    gen._geometries = []
+    with pytest.raises(ValueError, match="No shoreline geometry"):
+        gen.generate_land_mask((2, 2), from_bounds(0, 0, 1, 1, 2, 2))

@@ -33,8 +33,6 @@ def test_get_orbit_file_caching(tmp_path: Path) -> None:
     mgr = OrbitManager(cache_dir=tmp_path)
     acq_dt = datetime(2023, 5, 10, 12, 0, 0, tzinfo=UTC)
 
-    orbit_info = mgr.get_orbit_file("Sentinel-1A", acq_dt, orbit_type=OrbitType.POEORB)
-    assert orbit_info["orbit_type"] == "POEORB"
-    assert orbit_info["platform"] == "S1A"
-    assert orbit_info["is_precise"] is True
-    assert Path(orbit_info["orbit_file_path"]).exists()
+    with pytest.raises(FileNotFoundError, match="No valid cached"):
+        mgr.get_orbit_file("Sentinel-1A", acq_dt, orbit_type=OrbitType.POEORB)
+    assert not list(tmp_path.iterdir()), "An unavailable orbit must not create a fake EOF"

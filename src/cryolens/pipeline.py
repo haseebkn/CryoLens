@@ -1,10 +1,11 @@
 """End-to-end pipeline orchestrator: CDSE search -> calibrate -> detect -> PostGIS."""
 
+import hashlib
 import logging
 import time
-from datetime import datetime
+from dataclasses import asdict
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Literal, cast
 
 import numpy as np
 import pyproj
@@ -23,12 +24,12 @@ from cryolens.detect.filters import (
     deduplicate_across_tiles,
     filter_targets,
 )
+from cryolens.geo.aoi import contains_point, raster_aoi_mask, scene_intersects_aoi
 from cryolens.geo.vectorize import TargetVectorizer
 from cryolens.ingest.cdse import CDSEClient, SARSceneMetadata
 from cryolens.preprocess.masks import LandMaskGenerator
 from cryolens.preprocess.python_chain import PurePythonSARProcessor
 from cryolens.preprocess.safe_reader import SAFEProductReader
-from cryolens.preprocess.snap_chain import SNAPChainRunner
 from cryolens.preprocess.stack import COGStackBuilder
 
 logger = logging.getLogger(__name__)
@@ -37,8 +38,9 @@ logger = logging.getLogger(__name__)
 class PipelineRunner:
     """Orchestrates end-to-end processing of Sentinel-1 scenes."""
 
-    def __init__(self) -> None:
+    def __init__(self, allow_unknown_ice: bool = False) -> None:
         """Wire the CDSE client, database session factory, and output tree."""
+        self.allow_unknown_ice = allow_unknown_ice
         self.config = get_app_config()
         self.cdse_client = CDSEClient()
         self.session_factory = get_db_session_factory()
@@ -54,6 +56,11 @@ class PipelineRunner:
         limit: int = 5,
     ) -> int:
         """Run the pipeline on a batch of scenes from CDSE."""
+        if not self.allow_unknown_ice:
+            raise NotImplementedError(
+                "Raw batch screening lacks aligned sea-ice context; use charted AI4Arctic "
+                "screening or explicit allow_unknown_ice=True research mode."
+            )
         if not bbox:
             c_bbox = self.config.project.spatial.bbox
             bbox = [c_bbox.west, c_bbox.south, c_bbox.east, c_bbox.north]
@@ -80,6 +87,23 @@ class PipelineRunner:
 
     def process_scene(self, scene: SARSceneMetadata) -> None:
         """Process a single scene end-to-end."""
+        if not scene_intersects_aoi(scene.footprint_geojson):
+            raise ValueError("Scene is outside the Newfoundland and Labrador study area")
+        with self.session_factory() as session:
+            existing = SceneRepository.get_by_product_id(session, scene.scene_id)
+            if existing and existing.status == "DETECTED":
+                logger.info(
+                    "Scene %s is already detected; preserving detections and reviews",
+                    scene.scene_id,
+                )
+                return
+
+        if not self.allow_unknown_ice:
+            raise NotImplementedError(
+                "The raw SAFE pipeline has no aligned sea-ice context provider. "
+                "Use charted AI4Arctic open-water screening, or explicitly enable "
+                "PipelineRunner(allow_unknown_ice=True) for unvalidated research screening."
+            )
         logger.info(f"--- Processing Scene: {scene.scene_id} ---")
 
         # 1. Download
@@ -103,9 +127,12 @@ class PipelineRunner:
         logger.info("Preprocessing %s with engine '%s'...", safe_dir.name, engine)
 
         if engine == "snap":
-            runner = SNAPChainRunner()
-            runner.run_preprocessing(safe_dir)
-            logger.info("SNAP graph complete; reading calibrated output via the SAFE reader.")
+            raise NotImplementedError(
+                "SNAP output ingestion into the detection pipeline is not implemented; "
+                "use the python research engine."
+            )
+        if engine != "python":
+            raise ValueError(f"Unsupported preprocessing engine: {engine}")
 
         reader = SAFEProductReader(safe_dir)
         available = reader.available_polarisations()
@@ -128,7 +155,7 @@ class PipelineRunner:
             incidence_angle_deg=hh["incidence_angle_deg"],
             latitude=hh["latitude"],
             longitude=hh["longitude"],
-            apply_denoise=self.config.project.preprocessing.s1denoise.enabled,
+            apply_denoise=False,
         )
 
         stack_builder = COGStackBuilder(output_dir=self.output_dir / scene.scene_id)
@@ -148,24 +175,35 @@ class PipelineRunner:
         with rasterio.open(cog_path) as src:
             bounds = src.bounds
             transform = src.transform
-            crs = src.crs or CRS.from_epsg(3978)
+            if src.crs != CRS.from_epsg(3978):
+                raise ValueError("Detection requires an explicitly georeferenced EPSG:3978 COG")
+            if src.count != 4:
+                raise ValueError("Detection requires the four-band calibrated feature stack")
+            crs = src.crs
             hh_db = src.read(1)
             hv_db = src.read(2)
             inc_deg = src.read(4) if src.count >= 4 else None
+            raster_valid = (src.read_masks(1) > 0) & (src.read_masks(2) > 0)
 
-        distribution = cast(
-            'Literal["cell_averaging", "k_distribution", "gamma"]',
-            self.config.project.cfar.distribution,
-        )
+        if not getattr(self, "allow_unknown_ice", False):
+            raise NotImplementedError(
+                "Raw COG screening requires explicit unknown-ice research opt-in"
+            )
+
         detector = get_cfar_detector(
-            distribution=distribution,
+            distribution=self.config.project.cfar.distribution,
             pfa=self.config.project.cfar.default_pfa,
         )
 
         # Land, coastal buffer, swath borders and subswath seams are excluded
         # before detection so that they cannot contaminate the clutter estimate.
         suppression = SuppressionConfig()
-        valid = np.isfinite(hv_db) & (hv_db > -90.0)
+        valid = raster_valid & np.isfinite(hv_db) & np.isfinite(hh_db) & (hv_db > -90.0)
+        valid &= raster_aoi_mask(hv_db.shape, transform, crs)
+        if not valid.any():
+            raise ValueError(
+                "No valid calibrated pixels in the Newfoundland and Labrador study area"
+            )
         land_mask = LandMaskGenerator().generate_land_mask(hv_db.shape, transform, str(crs))
         # Convert the boolean land mask into the ordinal zone convention the
         # suppression chain expects: 0 is land, a large value is open ocean.
@@ -180,7 +218,10 @@ class PipelineRunner:
 
         t0 = time.perf_counter()
         cfar_result = detector.detect(
-            sigma0_hv_db=hv_db, valid_mask=analysis_mask, sigma0_hh_db=hh_db
+            sigma0_hv_db=hv_db,
+            valid_mask=analysis_mask,
+            sigma0_hh_db=hh_db,
+            max_hh_hv_ratio_db=None,
         )
         logger.info(
             "CFAR completed in %.2fs -> %d raw hits",
@@ -188,7 +229,7 @@ class PipelineRunner:
             int(cfar_result.detection_mask.sum()),
         )
 
-        vectorizer = TargetVectorizer(source_crs="EPSG:3978", target_crs="EPSG:4326")
+        vectorizer = TargetVectorizer(source_crs="EPSG:3978", target_crs="EPSG:4326", min_pixels=1)
         candidates = vectorizer.extract_targets(
             detection_mask=cfar_result.detection_mask,
             transform=transform,
@@ -202,6 +243,7 @@ class PipelineRunner:
             candidates, config=suppression, clutter_mean_db=cfar_result.clutter_mean_db
         )
         targets = deduplicate_across_tiles(targets)
+        targets = [t for t in targets if contains_point(t.centroid_wgs84.x, t.centroid_wgs84.y)]
 
         logger.info(
             "Extracted %d targets from %d candidates.\n%s",
@@ -210,9 +252,40 @@ class PipelineRunner:
             suppression_stats.format_table(),
         )
 
+        supported_mask = cfar_result.analysis_mask
+        if supported_mask is None or not supported_mask.any():
+            raise ValueError("No pixels have sufficient valid CFAR training support")
+        with cog_path.open("rb") as source:
+            source_sha256 = hashlib.file_digest(source, "sha256").hexdigest()
         with self.session_factory() as session:
             # Upsert Scene
             db_scene = SceneRepository.get_by_product_id(session, scene.scene_id)
+            if db_scene and db_scene.status == "DETECTED":
+                logger.info("Scene already stored; preserving previous detections and reviews")
+                return
+            provenance = {
+                "source_product_id": scene.scene_id,
+                "source_cog_sha256": source_sha256,
+                "acquisition_time": scene.acquisition_time.isoformat(),
+                "processed_at": datetime.now(UTC).isoformat(),
+                "analysed_area_km2": int(supported_mask.sum()) * abs(transform.determinant) / 1e6,
+                "area_method": "eligible pixels times projected affine determinant; approximate ground area",
+                "detector": detector.__class__.__name__,
+                "pfa": detector.pfa,
+                "guard_half_widths": self.config.project.cfar.guard_window,
+                "background_half_widths": self.config.project.cfar.background_window,
+                "suppression": asdict(suppression),
+                "mask_breakdown": mask_breakdown,
+                "suppression_ledger": suppression_stats.as_dict(),
+                "aoi": "newfoundland_labrador_marine",
+                "classification_status": "unverified",
+                "ais_status": "not_checked",
+                "sea_ice_status": "unknown",
+                "screening_mode": "research_unknown_ice_explicit_opt_in",
+                "geolocation_status": "annotation_gcps_unvalidated",
+                "orbit_correction_applied": False,
+                "preprocessing_engine": "python",
+            }
             if not db_scene:
                 poly_3978 = shapely.geometry.box(
                     bounds.left, bounds.bottom, bounds.right, bounds.top
@@ -230,12 +303,12 @@ class PipelineRunner:
                     cog_path=str(cog_path),
                     footprint_epsg3978=poly_3978,
                     footprint_wgs84=poly_4326,
-                    processing_provenance={
-                        "detector": detector.__class__.__name__,
-                        "pfa": detector.pfa,
-                    },
+                    processing_provenance=provenance,
                     status="DETECTED",
                 )
+            else:
+                db_scene.processing_provenance = provenance
+                db_scene.status = "DETECTED"
 
             # Insert Detections
             for t in targets:
@@ -257,7 +330,11 @@ class PipelineRunner:
                     hh_hv_ratio_db=t.hh_hv_ratio_db,
                     incidence_angle_deg=t.incidence_angle_deg,
                     detector_params={"pfa": detector.pfa, "pixel_bbox": list(t.pixel_bbox)},
-                    properties=t.properties,
+                    properties={
+                        **t.properties,
+                        "ais_status": "not_checked",
+                        "sea_ice_status": "unknown",
+                    },
                 )
 
             session.commit()

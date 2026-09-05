@@ -47,7 +47,7 @@ class ChipRecord:
     label_path: Path
     class_id: int
     scene_id: str
-    detection_id: int
+    detection_id: str
     centre_row: int
     centre_col: int
 
@@ -70,6 +70,8 @@ class DatasetBuilder:
         self.images_dir = self.output_dir / "images"
         self.labels_dir = self.output_dir / "labels"
         self.chip_size = chip_size
+        if not isinstance(chip_size, int) or chip_size < 1:
+            raise ValueError("chip_size must be a positive integer")
 
         self.images_dir.mkdir(parents=True, exist_ok=True)
         self.labels_dir.mkdir(parents=True, exist_ok=True)
@@ -87,11 +89,15 @@ class DatasetBuilder:
         teach a detector that the scene border is informative.
         """
         half = self.chip_size // 2
-        r0, r1 = centre_row - half, centre_row + half
-        c0, c1 = centre_col - half, centre_col + half
+        r0, c0 = centre_row - half, centre_col - half
+        r1, c1 = r0 + self.chip_size, c0 + self.chip_size
 
+        if not bands:
+            raise ValueError("At least one source band is required")
         first = next(iter(bands.values()))
         h, w = first.shape
+        if any(arr.shape != (h, w) for arr in bands.values()):
+            raise ValueError("Source bands must have matching 2D shapes")
         if r0 < 0 or c0 < 0 or r1 > h or c1 > w:
             return None
 
@@ -135,13 +141,35 @@ class DatasetBuilder:
         bw, bh = box_wh
         label_path.write_text(f"{class_id} {cx:.6f} {cy:.6f} {bw:.6f} {bh:.6f}\n", encoding="utf-8")
 
-    def write_data_yaml(self) -> Path:
-        """Write the Ultralytics dataset descriptor."""
+    def write_data_yaml(self, records: list[ChipRecord]) -> Path:
+        """Write disjoint scene-group splits, refusing same-scene validation leakage.
+
+        These partial candidate labels still require a completeness review;
+        nearby unreviewed objects are not certified negative examples.
+        """
+        scenes = sorted({record.scene_id for record in records})
+        if len(scenes) < 2:
+            raise ValueError(
+                "At least two independently acquired scenes are required for train/validation splitting"
+            )
+        validation_scenes = set(scenes[-max(1, int(np.ceil(len(scenes) * 0.2))) :])
+        for split, use_validation in (("train", False), ("val", True)):
+            images = sorted(
+                {
+                    record.image_path.resolve().as_posix()
+                    for record in records
+                    if (record.scene_id in validation_scenes) == use_validation
+                }
+            )
+            (self.output_dir / f"{split}.txt").write_text(
+                "\n".join(images) + "\n", encoding="utf-8"
+            )
         path = self.output_dir / "data.yaml"
         lines = [
             f"path: {self.output_dir.resolve().as_posix()}",
-            "train: images",
-            "val: images",
+            "# Partial candidate labels: analyst completeness review required before training.",
+            "train: train.txt",
+            "val: val.txt",
             f"nc: {len(CLASS_NAMES)}",
             "names:",
         ]
@@ -180,7 +208,18 @@ class DatasetBuilder:
         skipped_edge = 0
         band_cache: dict[str, dict[str, NDArray[np.floating]]] = {}
 
-        for val in validations:
+        latest: dict[str, ValidationModel] = {}
+        for val in sorted(validations, key=lambda value: (value.validated_at, str(value.id))):
+            latest[str(val.detection_id)] = val
+        for val in latest.values():
+            if str(val.analyst_verdict) not in VERDICT_TO_CLASS:
+                continue
+            if val.corrected_geom_wgs84 is not None:
+                logger.warning(
+                    "Skipping detection %s: corrected geometry requires updated pixel annotation",
+                    val.detection_id,
+                )
+                continue
             detection = val.detection
             scene_id = str(detection.scene_id)
 
@@ -203,9 +242,10 @@ class DatasetBuilder:
                 continue
             chip, (local_r, local_c) = cut
 
-            class_id = VERDICT_TO_CLASS.get(
-                str(val.analyst_verdict), VERDICT_TO_CLASS["REJECTED_CLUTTER"]
-            )
+            class_id = VERDICT_TO_CLASS[str(val.analyst_verdict)]
+            if max_c - min_c > self.chip_size or max_r - min_r > self.chip_size:
+                skipped_edge += 1
+                continue
 
             stem = f"{scene_id}_{detection.id}"
             image_path = self.images_dir / f"{stem}.tif"
@@ -215,7 +255,10 @@ class DatasetBuilder:
             self.write_label(
                 label_path,
                 class_id,
-                (local_c / self.chip_size, local_r / self.chip_size),
+                (
+                    (local_c + (min_c + max_c) / 2 - centre_col) / self.chip_size,
+                    (local_r + (min_r + max_r) / 2 - centre_row) / self.chip_size,
+                ),
                 (
                     max(max_c - min_c, 1) / self.chip_size,
                     max(max_r - min_r, 1) / self.chip_size,
@@ -228,13 +271,18 @@ class DatasetBuilder:
                     label_path=label_path,
                     class_id=class_id,
                     scene_id=scene_id,
-                    detection_id=int(detection.id),
+                    detection_id=str(detection.id),
                     centre_row=centre_row,
                     centre_col=centre_col,
                 )
             )
 
-        self.write_data_yaml()
+        if len({record.scene_id for record in records}) >= 2:
+            self.write_data_yaml(records)
+        else:
+            logger.warning(
+                "No train/validation descriptor written: at least two scene groups required"
+            )
 
         counts: dict[str, int] = {}
         for rec in records:

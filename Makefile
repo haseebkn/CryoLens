@@ -25,19 +25,18 @@ help:
 	@echo "  make clean       - Remove cached bytecode, test artifacts, and build directories"
 
 dev:
-	@mkdir -p data/raw data/interim data/processed data/cache configs/snap
-	$(UV) pip install -e ".[dev]"
+	$(UV) sync --frozen --extra dev
 
 dev-all:
-	@mkdir -p data/raw data/interim data/processed data/cache configs/snap
-	$(UV) pip install -e ".[dev,ml]"
+	$(UV) sync --frozen --extra dev --extra ml
 
 test:
-	pytest
+	$(UV) run --frozen pytest
 
 lint:
-	ruff check .
-	mypy src tests
+	$(UV) run --frozen ruff check .
+	$(UV) run --frozen ruff format --check .
+	$(UV) run --frozen mypy src tests
 
 format:
 	ruff format .
@@ -62,7 +61,7 @@ cfar:
 	$(UV) run python -m cryolens.detect $(if $(SCENE),--scene $(SCENE),) $(if $(PFA),--pfa $(PFA),) $(if $(DIST),--distribution $(DIST),)
 
 api:
-	$(UV) run uvicorn cryolens.api:app --host 0.0.0.0 --port 8000 --reload
+	$(UV) run --frozen uvicorn cryolens.api:app --host 127.0.0.1 --port 8000 --reload
 
 slice: db-migrate
 	$(UV) run python -m cryolens.detect $(if $(SCENE),--scene $(SCENE),)
@@ -87,7 +86,7 @@ train-yolo:
 	@exit 1
 
 benchmark:
-	$(UV) run python -m cryolens.eval $(if $(LIMIT),--limit $(LIMIT),) $(if $(PFA),--pfa $(PFA),) $(if $(DETECTOR),--detector $(DETECTOR),) $(if $(SWEEP),--sweep,)
+	$(UV) run --frozen python -m cryolens.eval $(if $(LIMIT),--limit $(LIMIT),) $(if $(PFA),--pfa $(PFA),) $(if $(DETECTOR),--detector $(DETECTOR),) $(if $(SWEEP),--sweep,) $(if $(OPEN_WATER),--open-water-only,)
 
 # GSHHG full-resolution shorelines. Public download, no credentials required.
 fetch-shorelines:

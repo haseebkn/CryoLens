@@ -43,7 +43,13 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Accept scenes that merely clip the AOI instead of requiring the centre inside it.",
     )
-    p.add_argument("--exclude-sea-ice", action="store_true")
+    p.add_argument(
+        "--open-water-only",
+        "--exclude-sea-ice",
+        dest="exclude_sea_ice",
+        action="store_true",
+        help="Conservative profile: exclude sea ice AND missing/unclassified ice charts; reports resulting coverage loss.",
+    )
     return p
 
 
@@ -77,7 +83,9 @@ def main(argv: list[str] | None = None) -> int:
 
     results = bench.run_scene_set(selected, args.detector, args.pfa, args.limit)
     if not results:
-        logger.error("Every scene failed to load; nothing to report.")
+        logger.error(
+            "No scenes have eligible analysis water; inspect benchmark_run_manifest.json for load failures and mask exclusions."
+        )
         return 1
 
     sweep = None

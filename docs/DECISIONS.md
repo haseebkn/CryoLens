@@ -1,3 +1,9 @@
+> **Historical decisions — superseded where noted by the 2026-09-05 audit.**
+> ADRs below record prior reasoning, including assumptions the audit found
+> incorrect. Old benchmark numbers, Gamma-as-K terminology, normalization
+> claims and successful fallback behavior must not be read as current evidence.
+> [AUDIT.md](AUDIT.md), [MDA_ALIGNMENT.md](MDA_ALIGNMENT.md) and
+> [LIMITATIONS.md](LIMITATIONS.md) define the current contract.
 # CryoLens Architecture Decision Records (ADRs)
 
 This document records the foundational architectural decisions, scientific constraints, and trade-offs for the CryoLens project.
@@ -161,3 +167,17 @@ This document records the foundational architectural decisions, scientific const
   * `preprocess/masks.py` logs a warning when it falls back to an assumed uniform ice field, so an absent ice product can never masquerade as measured ice cover.
 * **Rationale:** A detection produced from fabricated backscatter is worse than no detection, because it is indistinguishable from a real one downstream and silently corrupts any metric computed over it. For a system whose entire value proposition is a credible false-alarm rate, this is disqualifying.
 * **Consequences:** Fewer components "work" end to end without credentials or data. `make train-yolo` now exits non-zero with an explanation. This is the intended behaviour: the honest surface area of the project is smaller than the fabricated one was, and is measured.
+
+
+## ADR-013: Audited research scope and explicit uncertainty
+
+* Date: 2026-09-05
+* Status: Accepted; supersedes inconsistent claims in ADR-008 through ADR-012.
+* Decision: Treat CFAR output as unclassified radar candidates; separate detector
+  score, analyst verdict and identity. Enforce a shared NL study polygon at
+  pixel and API level. Use publisher-supported units; fail on missing required
+  evidence. Disable fabricated orbit/preprocessing/forecast successes and
+  protect analyst writes with configured identity. Preserve measured unknowns.
+* Consequences: Prior headline numbers are withdrawn. Reduced candidate density
+  is not proof of fewer false positives or maintained recall. No C-CORE or
+  MANICE certification is claimed. See the audit for executable verification.

@@ -38,9 +38,16 @@ class LocalCacheManager:
     def get_path(self, key: str, subdirectory: str | None = None) -> Path:
         """Resolve expected disk path for a given cache key."""
         target_dir = self.cache_dir if subdirectory is None else self.cache_dir / subdirectory
+        target_dir = target_dir.resolve()
+        if not target_dir.is_relative_to(self.cache_dir):
+            raise ValueError("Cache subdirectory must remain inside the configured cache root.")
         target_dir.mkdir(parents=True, exist_ok=True)
         # Sanitize key for filesystem
-        safe_key = key.replace("/", "_").replace(":", "_")
+        safe_key = key.replace("/", "_").replace("\\", "_").replace(":", "_")
+        if not safe_key or safe_key in {".", ".."}:
+            raise ValueError("Cache key must name an item.")
+        if not (target_dir / safe_key).resolve().is_relative_to(self.cache_dir):
+            raise ValueError("Cache path resolves outside the configured cache root.")
         return target_dir / safe_key
 
     def contains(self, key: str, subdirectory: str | None = None) -> bool:
@@ -100,6 +107,8 @@ class LocalCacheManager:
         for item in self.cache_dir.iterdir():
             if item.name.startswith(".") or item.name in self._pinned_keys:
                 continue
+            if item.is_symlink() or not item.resolve().is_relative_to(self.cache_dir):
+                continue
 
             try:
                 if item.is_file():
@@ -113,6 +122,8 @@ class LocalCacheManager:
                         )
                     )
                 elif item.is_dir():
+                    if any(p.name in self._pinned_keys for p in item.rglob("*")):
+                        continue
                     dir_size = sum(
                         os.path.getsize(os.path.join(r, f))
                         for r, _, files in os.walk(item)
@@ -141,6 +152,8 @@ class LocalCacheManager:
                 if entry.path.is_file():
                     entry.path.unlink()
                 elif entry.path.is_dir():
+                    if not entry.path.resolve().is_relative_to(self.cache_dir):
+                        raise ValueError("Eviction path escaped the cache root.")
                     shutil.rmtree(entry.path)
                 bytes_reclaimed += entry.size_bytes
                 logger.info(

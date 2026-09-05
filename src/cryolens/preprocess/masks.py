@@ -55,6 +55,7 @@ class LandMaskGenerator:
         cache_path: Path | str = DEFAULT_CACHE_PATH,
         aoi_bbox: tuple[float, float, float, float] = NL_AOI_BBOX,
         coastal_buffer_m: float = 500.0,
+        allow_custom_only: bool = False,
     ) -> None:
         """Configure the shoreline source and buffer.
 
@@ -70,6 +71,7 @@ class LandMaskGenerator:
         self.cache_path = Path(cache_path)
         self.aoi_bbox = aoi_bbox
         self.coastal_buffer_m = coastal_buffer_m
+        self.allow_custom_only = allow_custom_only
         self._geometries: list[Any] | None = None
         self._fallback_polygons: list[Polygon] = []
 
@@ -118,15 +120,22 @@ class LandMaskGenerator:
             if not self.cache_path.is_file():
                 self._build_regional_cache()
             gdf = gpd.read_file(self.cache_path)
+            if gdf.crs is None:
+                raise ValueError("Shoreline cache is missing its CRS.")
+            gdf = gdf.to_crs("EPSG:4326")
             geoms = list(gdf.geometry)
             logger.info("Loaded %d shoreline polygons from %s", len(geoms), self.cache_path.name)
         except (FileNotFoundError, ValueError) as exc:
-            if not self._fallback_polygons:
+            if not self._fallback_polygons or not self.allow_custom_only:
                 raise
             logger.warning("Falling back to custom polygons only: %s", exc)
             geoms = []
 
         geoms.extend(self._fallback_polygons)
+        if not geoms or any(g is None or g.is_empty or not g.is_valid for g in geoms):
+            raise ValueError(
+                "Shoreline geometry must be nonempty and valid; refusing an all-water fallback."
+            )
         self._geometries = geoms
         return geoms
 
@@ -151,11 +160,18 @@ class LandMaskGenerator:
 
         geoms = self.load_geometries()
         if not geoms:
-            logger.warning("No shoreline geometry available; returning an all-water mask.")
-            return np.zeros(shape, dtype=np.bool_)
+            raise ValueError("No shoreline geometry available; refusing an all-water mask.")
 
         project = pyproj.Transformer.from_crs("EPSG:4326", crs, always_xy=True).transform
         dilation = self.coastal_buffer_m if buffer_m is None else buffer_m
+        if not np.isfinite(dilation) or dilation < 0:
+            raise ValueError("Coastal buffer must be finite and nonnegative.")
+        target_crs = pyproj.CRS(crs)
+        if dilation > 0 and (
+            not target_crs.is_projected
+            or any(abs(axis.unit_conversion_factor - 1.0) > 1e-9 for axis in target_crs.axis_info)
+        ):
+            raise ValueError("Coastal buffering requires a projected CRS measured in metres.")
 
         shapes: list[dict[str, Any]] = []
         for poly in geoms:
@@ -166,11 +182,13 @@ class LandMaskGenerator:
                 if dilation > 0.0:
                     projected = projected.buffer(dilation)
                 shapes.append(mapping(projected))
-            except Exception as exc:  # noqa: BLE001 - individual polygon failures are non-fatal
-                logger.debug("Skipping unprojectable shoreline polygon: %s", exc)
+            except Exception as exc:
+                raise ValueError(
+                    "Cannot project a shoreline polygon; mask coverage is incomplete."
+                ) from exc
 
         if not shapes:
-            return np.zeros(shape, dtype=np.bool_)
+            raise ValueError("No projectable shoreline geometry; refusing an all-water mask.")
 
         mask_arr = rasterize(
             shapes=shapes,
@@ -179,6 +197,7 @@ class LandMaskGenerator:
             fill=0,
             default_value=1,
             dtype=np.uint8,
+            all_touched=True,
         )
         mask = np.asarray(mask_arr == 1, dtype=np.bool_)
         logger.info(
@@ -190,12 +209,10 @@ class LandMaskGenerator:
 
 
 class SeaIceMaskGenerator:
-    """Derives sea ice masks from a concentration field.
+    """Derive conservative screening exclusion masks for ice and unknown cover.
 
-    Sea ice is treated as a first-class regime rather than as noise: floe edges
-    and ridged ice produce genuine bright returns that CFAR will detect, and the
-    right response is to *report performance separately* in ice, not to silently
-    discard those detections. Masking is therefore opt-in.
+    True means excluded, including missing/invalid context. It must not be used
+    to report measured sea-ice extent or concentration.
     """
 
     ICE_EDGE_CONCENTRATION = 0.15
@@ -212,8 +229,12 @@ class SeaIceMaskGenerator:
         concentration: NDArray[np.floating],
     ) -> NDArray[np.bool_]:
         """Threshold a concentration field given as a fraction in [0, 1]."""
+        values = np.asarray(concentration)
         return np.asarray(
-            np.nan_to_num(concentration, nan=0.0) >= self.concentration_threshold,
+            ~np.isfinite(values)
+            | (values < 0)
+            | (values > 1)
+            | (values >= self.concentration_threshold),
             dtype=np.bool_,
         )
 
@@ -229,7 +250,7 @@ class SeaIceMaskGenerator:
         """
         min_class = int(np.ceil(self.concentration_threshold * 10.0))
         return np.asarray(
-            (sic_class >= max(min_class, 1)) & (sic_class != fill_value),
+            (sic_class >= max(min_class, 1)) | (sic_class == fill_value) | (sic_class < 0),
             dtype=np.bool_,
         )
 
@@ -237,16 +258,18 @@ class SeaIceMaskGenerator:
         self,
         shape: tuple[int, int],
         concentration: NDArray[np.floating] | None = None,
-        default_ice_fraction: float = 0.0,
+        default_ice_fraction: float | None = None,
     ) -> NDArray[np.bool_]:
-        """Generate a binary ice mask, falling back to a uniform field.
-
-        The fallback exists so that callers without an ice product still get a
-        well-defined mask; it defaults to open water and is logged, so an absent
-        ice source can never masquerade as measured ice cover.
-        """
+        """Generate an exclusion mask; uniform synthetic fields require explicit opt-in."""
         if concentration is not None:
+            if concentration.shape != shape:
+                raise ValueError("Ice concentration must match the requested raster shape.")
             return self.from_concentration(concentration)
+
+        if default_ice_fraction is None:
+            raise ValueError(
+                "Measured ice concentration is required; unknown ice cover is not open water."
+            )
 
         logger.warning(
             "No ice concentration supplied; assuming a uniform %.0f%% field. "

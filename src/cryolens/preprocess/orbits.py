@@ -2,6 +2,7 @@
 
 import logging
 import warnings
+import xml.etree.ElementTree as ET
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from pathlib import Path
@@ -61,36 +62,59 @@ class OrbitManager:
         acquisition_time: datetime,
         orbit_type: OrbitType | None = None,
     ) -> dict[str, Any]:
-        """Fetch or mock orbit file metadata and local cached path for a given acquisition."""
-        if orbit_type is None:
-            orbit_type = self.determine_orbit_type(acquisition_time)
+        """Find a real cached EOF with state vectors covering the acquisition.
 
-        plat_upper = platform.upper()
-        if "1A" in plat_upper or "S1A" in plat_upper:
-            sat_code = "S1A"
-        elif "1B" in plat_upper or "S1B" in plat_upper:
-            sat_code = "S1B"
-        else:
-            sat_code = "S1C"
-
-        dt_str = acquisition_time.strftime("%Y%m%dT%H%M%S")
-        filename = f"{sat_code}_OPER_AUX_{orbit_type.value}_OPOD_{dt_str}.EOF"
-        cached_path = self.cache_dir / filename
-
-        # If not on disk, create placeholder/mock EOF descriptor
-        if not cached_path.exists():
-            cached_path.write_text(
-                f"<Earth_Explorer_Header>\n  <Orbit_Type>{orbit_type.value}</Orbit_Type>\n"
-                f"  <Satellite>{sat_code}</Satellite>\n  <Acquisition>{dt_str}</Acquisition>\n"
-                f"</Earth_Explorer_Header>",
-                encoding="utf-8",
-            )
-            logger.info("Recorded %s orbit header in %s", orbit_type.value, cached_path.name)
-
-        return {
-            "orbit_type": orbit_type.value,
-            "platform": sat_code,
-            "acquisition_time": acquisition_time.isoformat(),
-            "orbit_file_path": str(cached_path),
-            "is_precise": orbit_type == OrbitType.POEORB,
+        Availability is not inferred from age. This reader does not download or
+        apply orbit corrections; callers must record application separately.
+        """
+        if acquisition_time.tzinfo is None:
+            acquisition_time = acquisition_time.replace(tzinfo=UTC)
+        orbit_type = orbit_type or self.determine_orbit_type(acquisition_time)
+        codes = {
+            "S1A": "S1A",
+            "SENTINEL-1A": "S1A",
+            "S1B": "S1B",
+            "SENTINEL-1B": "S1B",
+            "S1C": "S1C",
+            "SENTINEL-1C": "S1C",
         }
+        sat_code = codes.get(platform.upper())
+        if sat_code is None:
+            raise ValueError(f"Unknown Sentinel-1 platform: {platform}")
+        for path in sorted(
+            self.cache_dir.glob(f"{sat_code}_*{orbit_type.value}*.EOF"), reverse=True
+        ):
+            try:
+                root = ET.parse(path).getroot()
+                mission = root.findtext(".//Mission", "").upper().replace("SENTINEL-", "S")
+                file_type = root.findtext(".//File_Type", "")
+                if mission != sat_code or file_type != f"AUX_{orbit_type.value}":
+                    continue
+                vectors = root.findall(".//OSV")
+                times = []
+                for vector in vectors:
+                    utc = vector.findtext("UTC", "").removeprefix("UTC=")
+                    dt = datetime.fromisoformat(utc.replace("Z", "+00:00"))
+                    times.append(dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt)
+                    for tag in ("X", "Y", "Z", "VX", "VY", "VZ"):
+                        import math
+
+                        if not math.isfinite(float(vector.findtext(tag, "nan"))):
+                            raise ValueError("Invalid orbit state vector")
+                if len(times) < 2 or not min(times) <= acquisition_time <= max(times):
+                    continue
+            except (ET.ParseError, ValueError, OSError):
+                logger.warning("Ignoring invalid or incomplete orbit file %s", path.name)
+                continue
+            return {
+                "orbit_type": orbit_type.value,
+                "platform": sat_code,
+                "acquisition_time": acquisition_time.isoformat(),
+                "orbit_file_path": str(path),
+                "is_precise": orbit_type == OrbitType.POEORB,
+                "orbit_correction_applied": False,
+            }
+        raise FileNotFoundError(
+            f"No valid cached {orbit_type.value} orbit covers {sat_code} at {acquisition_time.isoformat()}. "
+            "Download an official EOF into the orbit cache or use SNAP orbit retrieval."
+        )

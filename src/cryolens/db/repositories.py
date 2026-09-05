@@ -9,7 +9,7 @@ from geoalchemy2.functions import ST_GeomFromGeoJSON, ST_MakeEnvelope
 from geoalchemy2.shape import from_shape
 from shapely.geometry.base import BaseGeometry
 from sqlalchemy import Select, and_, func, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from cryolens.db.models import (
     DetectionModel,
@@ -18,6 +18,12 @@ from cryolens.db.models import (
     SceneModel,
     ValidationModel,
 )
+from cryolens.geo.aoi import load_aoi
+
+
+def _aoi_filter(column: Any) -> Any:
+    """Apply the configured study polygon in the database before pagination."""
+    return func.ST_Intersects(column, func.ST_GeomFromText(load_aoi().wkt, 4326))
 
 
 class SceneRepository:
@@ -91,7 +97,11 @@ class SceneRepository:
         offset: int = 0,
     ) -> list[SceneModel]:
         """List scenes matching temporal or status criteria."""
-        stmt: Select[tuple[SceneModel]] = select(SceneModel)
+        stmt: Select[tuple[SceneModel]] = (
+            select(SceneModel)
+            .where(_aoi_filter(SceneModel.footprint_wgs84))
+            .options(selectinload(SceneModel.detections))
+        )
         filters = []
         if start_date:
             filters.append(SceneModel.acquisition_time >= start_date)
@@ -114,9 +124,9 @@ class DetectionRepository:
     def create_detection(
         session: Session,
         scene_id: str,
-        confidence: float,
+        confidence: float | None,
         detector_name: str,
-        predicted_class: str = "iceberg",
+        predicted_class: str = "unclassified",
         geom_epsg3978: BaseGeometry | None = None,
         geom_wgs84: BaseGeometry | None = None,
         centroid_wgs84: BaseGeometry | None = None,
@@ -179,7 +189,11 @@ class DetectionRepository:
         offset: int = 0,
     ) -> list[DetectionModel]:
         """Query detections with spatial bbox (min_lon, min_lat, max_lon, max_lat) and attribute filters."""
-        stmt: Select[tuple[DetectionModel]] = select(DetectionModel)
+        stmt: Select[tuple[DetectionModel]] = (
+            select(DetectionModel)
+            .where(_aoi_filter(DetectionModel.centroid_wgs84))
+            .options(selectinload(DetectionModel.validations), selectinload(DetectionModel.scene))
+        )
         filters = []
 
         if scene_id:
@@ -280,7 +294,9 @@ class IIPSightingRepository:
         offset: int = 0,
     ) -> list[IIPSightingModel]:
         """Query sightings with temporal and spatial filters."""
-        stmt: Select[tuple[IIPSightingModel]] = select(IIPSightingModel)
+        stmt: Select[tuple[IIPSightingModel]] = select(IIPSightingModel).where(
+            _aoi_filter(IIPSightingModel.geom_wgs84)
+        )
         filters = []
 
         if start_date:

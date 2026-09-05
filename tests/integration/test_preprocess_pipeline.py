@@ -39,7 +39,7 @@ def test_full_preprocessing_pipeline_end_to_end(tmp_path: Path) -> None:
     hv_dn = np.sqrt(raw_hv_linear * (100.0**2))
 
     # Grand Banks bounding coordinates (WGS84)
-    bounds = (-54.5, 47.5, -53.0, 48.8)
+    bounds = (-53.1, 47.9, -53.0, 48.0)
 
     # 2. Execute preprocessing chain
     result = processor.process_scene_arrays(
@@ -50,6 +50,7 @@ def test_full_preprocessing_pipeline_end_to_end(tmp_path: Path) -> None:
         calibration_lut_hh=100.0,
         calibration_lut_hv=100.0,
         apply_denoise=True,
+        noise_equivalent_sigma0_hv=np.tile(nesz_pattern, (h, 1)),
     )
 
     assert result["crs"] == "EPSG:3978"

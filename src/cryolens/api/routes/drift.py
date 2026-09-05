@@ -1,50 +1,16 @@
-"""FastAPI routes for iceberg drift forecasting."""
+"""Explicitly unavailable drift service until forcing and model validation exist."""
 
-from typing import Any
+from typing import NoReturn
 
-from fastapi import APIRouter, Depends
-from geoalchemy2.shape import to_shape
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, HTTPException
 
-from cryolens.db.repositories import DriftForecastRepository
-from cryolens.db.session import get_db_session
-
-router = APIRouter(prefix="/drift", tags=["drift"])
+router = APIRouter(prefix="/drift", tags=["Drift — unavailable"])
 
 
-@router.get("/{detection_id}")
-def get_drift_trajectory(
-    detection_id: str, db: Session = Depends(get_db_session)
-) -> dict[str, Any]:
-    """Get the forecasted drift trajectory for a specific detection as a GeoJSON FeatureCollection."""
-    repo = DriftForecastRepository()
-    forecasts = repo.get_trajectory(db, detection_id=detection_id)
-
-    if not forecasts:
-        return {"type": "FeatureCollection", "features": []}
-
-    coordinates = []
-    times: list[str] = []
-    properties: dict[str, Any] = {
-        "detection_id": detection_id,
-        "method": forecasts[0].method,
-        "times": times,
-    }
-
-    for f in forecasts:
-        if f.geom_wgs84 is not None:
-            pt = to_shape(f.geom_wgs84)
-            coordinates.append([pt.x, pt.y])
-            times.append(f.valid_time.isoformat())
-
-    if not coordinates:
-        return {"type": "FeatureCollection", "features": []}
-
-    # Return as a single LineString feature
-    feature = {
-        "type": "Feature",
-        "geometry": {"type": "LineString", "coordinates": coordinates},
-        "properties": properties,
-    }
-
-    return {"type": "FeatureCollection", "features": [feature]}
+@router.get("/{detection_id}", response_model=None)
+def get_drift_trajectory(detection_id: str) -> NoReturn:
+    """Do not publish legacy trajectories derived from synthetic fallback forcing."""
+    raise HTTPException(
+        501,
+        "Drift forecasting is unavailable: physical forcing, iceberg dimensions and forecast skill have not been validated.",
+    )

@@ -45,6 +45,8 @@ class SNAPChainRunner:
         input_safe = Path(safe_path).resolve()
         if not input_safe.exists():
             raise FileNotFoundError(f"Input Sentinel-1 SAFE directory not found: {input_safe}")
+        if output_format != "BEAM-DIMAP":
+            raise ValueError("The configured SNAP graph writes BEAM-DIMAP only.")
 
         out_root = Path(output_dir).resolve() / input_safe.stem
         out_root.mkdir(parents=True, exist_ok=True)
@@ -64,15 +66,14 @@ class SNAPChainRunner:
         elif self.is_local_gpt_available():
             self._run_via_local_gpt(input_safe, graph_xml_path, output_product)
         else:
-            logger.warning(
-                "Neither Docker nor local SNAP GPT was found. Simulating graph output for development."
-            )
-            # Create placeholder marker for dev workflows
-            dim_file = out_root / f"{input_safe.stem}_calibrated.dim"
-            dim_file.write_text(
-                f"<Dimap_Document name='{input_safe.stem}_calibrated'/>", encoding="utf-8"
+            raise RuntimeError(
+                "SNAP processing requires a working Docker daemon or local SNAP GPT."
             )
 
+        dim_file = output_product.with_suffix(".dim")
+        data_dir = output_product.with_suffix(".data")
+        if not dim_file.is_file() or not data_dir.is_dir() or not any(data_dir.glob("*.img")):
+            raise RuntimeError("SNAP returned without the expected DIMAP raster product.")
         logger.info("SNAP preprocessing completed: %s", output_product)
         return out_root
 
@@ -101,12 +102,15 @@ class SNAPChainRunner:
         container_out = f"/data/output/{output_product.name}"
         container_graph = f"/configs/snap/{graph_xml.name}"
 
-        cmd = (
-            f"gpt {container_graph} "
-            f"-Pinput_file={container_in} "
-            f"-Poutput_file={container_out} "
-            f"-q 4 -J-Xmx8G"
-        )
+        cmd = [
+            "gpt",
+            container_graph,
+            f"-Pinput_file={container_in}",
+            f"-Poutput_file={container_out}",
+            "-q",
+            "4",
+            "-J-Xmx8G",
+        ]
 
         try:
             container = client.containers.run(

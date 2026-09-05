@@ -2,10 +2,11 @@
 
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal, Self
+from urllib.parse import quote
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -23,12 +24,12 @@ class DatabaseSettings(BaseModel):
     @property
     def url(self) -> str:
         """Construct standard SQLAlchemy connection URI."""
-        return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.db}"
+        return f"postgresql://{quote(self.user, safe='')}:{quote(self.password, safe='')}@{self.host}:{self.port}/{quote(self.db, safe='')}"
 
     @property
     def async_url(self) -> str:
         """Construct async asyncpg connection URI."""
-        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.db}"
+        return self.url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
 
 class CDSESettings(BaseModel):
@@ -123,6 +124,10 @@ class Settings(BaseSettings):
     # Application
     env: str = Field(default="development", validation_alias="CRYOLENS_ENV")
     log_level: str = Field(default="INFO", validation_alias="CRYOLENS_LOG_LEVEL")
+    analyst_api_key: str = Field(
+        default="", validation_alias="CRYOLENS_ANALYST_API_KEY", repr=False
+    )
+    analyst_id: str = Field(default="", validation_alias="CRYOLENS_ANALYST_ID")
     data_dir: Path = Field(default=Path("./data"), validation_alias="CRYOLENS_DATA_DIR")
     cache_dir: Path = Field(default=Path("./data/cache"), validation_alias="CRYOLENS_CACHE_DIR")
 
@@ -216,10 +221,16 @@ class Settings(BaseSettings):
 
 
 class SpatialBBox(BaseModel):
-    west: float
-    south: float
-    east: float
-    north: float
+    west: float = Field(ge=-180, le=180)
+    south: float = Field(ge=-90, le=90)
+    east: float = Field(ge=-180, le=180)
+    north: float = Field(ge=-90, le=90)
+
+    @model_validator(mode="after")
+    def ordered(self) -> Self:
+        if self.west >= self.east or self.south >= self.north:
+            raise ValueError("Bounding box must have west < east and south < north")
+        return self
 
 
 class SpatialConfig(BaseModel):
@@ -237,9 +248,15 @@ class SeasonConfig(BaseModel):
 
 
 class TilingConfig(BaseModel):
-    tile_size_px: int
-    tile_overlap_px: int
-    min_object_dim_px: int
+    tile_size_px: int = Field(gt=0)
+    tile_overlap_px: int = Field(ge=0)
+    min_object_dim_px: int = Field(gt=0)
+
+    @model_validator(mode="after")
+    def positive_stride(self) -> Self:
+        if self.tile_overlap_px >= self.tile_size_px:
+            raise ValueError("Tile overlap must be smaller than tile size")
+        return self
 
 
 class IIPSizeClass(BaseModel):
@@ -281,14 +298,14 @@ class EndpointsConfig(BaseModel):
 
 
 class S1DenoiseConfig(BaseModel):
-    enabled: bool = True
+    enabled: bool = False
     subswaths: list[str] = ["EW1", "EW2", "EW3", "EW4", "EW5"]
     min_sigma0_db: float = -45.0
     max_sigma0_db: float = 15.0
 
 
 class PreprocessingConfig(BaseModel):
-    engine: str = "python"
+    engine: Literal["python", "snap"] = "python"
     snap_docker_image: str = "mundialis/esa-snap:latest"
     snap_graph: str = "configs/snap/s1_ew_grd_preprocessing.xml"
     orbit_preference: str = "POEORB"
@@ -297,10 +314,21 @@ class PreprocessingConfig(BaseModel):
 
 
 class CFARConfig(BaseModel):
-    default_pfa: float
+    default_pfa: float = Field(gt=0, lt=1)
     guard_window: list[int]
     background_window: list[int]
-    distribution: str
+    distribution: Literal["cell_averaging", "k_distribution", "gamma"]
+
+    @model_validator(mode="after")
+    def valid_windows(self) -> Self:
+        if any(
+            len(w) != 2 or any(v < 0 for v in w)
+            for w in (self.guard_window, self.background_window)
+        ):
+            raise ValueError("CFAR windows require two nonnegative half-widths")
+        if any(g >= b for g, b in zip(self.guard_window, self.background_window, strict=True)):
+            raise ValueError("Background window must exceed guard window on both axes")
+        return self
 
 
 class ProjectMetadata(BaseModel):
@@ -345,7 +373,11 @@ def get_project_config(config_path: str = "configs/project.yaml") -> ProjectConf
         if root_path.is_file():
             path = root_path
         else:
-            raise FileNotFoundError(f"Project configuration file not found at: {config_path}")
+            packaged_path = Path(__file__).resolve().parents[1] / "resources" / config_path
+            if packaged_path.is_file():
+                path = packaged_path
+            else:
+                raise FileNotFoundError(f"Project configuration file not found at: {config_path}")
 
     with open(path, encoding="utf-8") as f:
         data: dict[str, Any] = yaml.safe_load(f)

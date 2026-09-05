@@ -14,20 +14,23 @@ count.
 from __future__ import annotations
 
 import logging
+import re
 import time
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from typing import Any
 
 import numpy as np
 
 from cryolens.data.ai4arctic import AI4ArcticScene
-from cryolens.detect.cfar import BaseCFARDetector, CACFARDetector, GammaCFARDetector
+from cryolens.detect.cfar import BaseCFARDetector, get_cfar_detector
 from cryolens.detect.filters import (
     SuppressionConfig,
     SuppressionStats,
     build_analysis_mask,
     filter_targets,
 )
+from cryolens.geo.aoi import points_in_aoi
 from cryolens.geo.vectorize import ExtractedTarget, TargetVectorizer
 
 logger = logging.getLogger(__name__)
@@ -58,7 +61,7 @@ class SceneDetectionResult:
     """Assigned by :func:`assign_wind_regimes` once the whole cohort is known."""
 
     wind_statistic: float | None
-    """Scene median wind magnitude in standardised units; None when absent."""
+    """Scene median physical wind speed in m/s; None when absent."""
 
     runtime_s: float
     assumptions: dict[str, str] = field(default_factory=dict)
@@ -106,21 +109,21 @@ class SceneDetectionResult:
             "runtime_s": round(self.runtime_s, 2),
             "suppression": self.suppression.as_dict(),
             "mask_breakdown": {k: round(v, 5) for k, v in self.mask_breakdown.items()},
+            "assumptions": self.assumptions,
         }
 
 
 def scene_wind_statistic(scene: AI4ArcticScene) -> float | None:
     """Summarise a scene's wind field as a single scalar, or None if absent.
 
-    The ERA5 fields in the AI4Arctic ready-to-train distribution are
-    standardised with no recorded extremes, so absolute metres per second is not
-    recoverable (see docs/LIMITATIONS.md section 3). The median magnitude is
-    still a monotone function of the true wind speed, so it orders scenes
-    correctly even though its units are arbitrary.
+    Wind components are restored with the publisher's verified per-variable
+    mean and standard deviation before magnitude is computed. Values are m/s;
+    subsequent low/moderate/high categories remain relative cohort terciles,
+    not Beaufort classes or operational weather thresholds.
     """
-    if scene.wind_speed_normalised is None:
+    if scene.wind_speed_m_s is None:
         return None
-    values = scene.wind_speed_normalised[np.isfinite(scene.wind_speed_normalised)]
+    values = scene.wind_speed_m_s[np.isfinite(scene.wind_speed_m_s)]
     if values.size == 0:
         return None
     return float(np.median(values))
@@ -142,7 +145,13 @@ def assign_wind_regimes(
     Scenes with no wind field keep the "unknown" regime and are excluded from
     the tercile computation so they cannot shift the boundaries.
     """
-    measured = [r for r in results if r.wind_statistic is not None]
+    if not 0 <= low_quantile < high_quantile <= 1:
+        raise ValueError("Wind quantiles must be ordered between 0 and 1")
+    for r in results:
+        r.wind_regime = "unknown"
+    measured = [
+        r for r in results if r.wind_statistic is not None and np.isfinite(r.wind_statistic)
+    ]
     if len(measured) < 3:
         for r in measured:
             r.wind_regime = "unknown"
@@ -155,6 +164,8 @@ def assign_wind_regimes(
 
     stats = np.array([r.wind_statistic for r in measured], dtype=np.float64)
     lo, hi = np.quantile(stats, [low_quantile, high_quantile])
+    if lo == hi:
+        return
 
     for r in measured:
         assert r.wind_statistic is not None
@@ -167,7 +178,7 @@ def assign_wind_regimes(
 
     logger.info(
         "Wind terciles across %d scenes: low <= %.4f < moderate < %.4f <= high "
-        "(standardised units, not m/s)",
+        "(m/s; relative cohort bins)",
         len(measured),
         float(lo),
         float(hi),
@@ -193,9 +204,9 @@ def classify_ice_regime(scene: AI4ArcticScene) -> tuple[str, float | None]:
 def build_detector(kind: str, pfa: float) -> BaseCFARDetector:
     """Instantiate a CFAR detector by short name."""
     if kind in ("gamma", "k_distribution"):
-        return GammaCFARDetector(pfa=pfa)
+        return get_cfar_detector(distribution="gamma", pfa=pfa)
     if kind in ("ca", "cell_averaging"):
-        return CACFARDetector(pfa=pfa)
+        return get_cfar_detector(distribution="cell_averaging", pfa=pfa)
     raise ValueError(f"Unknown detector kind: {kind!r}")
 
 
@@ -217,6 +228,15 @@ class SceneDetectionRunner:
     def run(self, scene: AI4ArcticScene) -> SceneDetectionResult:
         """Detect targets in ``scene`` and return the result with its audit trail."""
         started = time.perf_counter()
+        provenance = dict(scene.assumptions)
+        provenance["source_product_id"] = scene.original_id
+        timestamp = re.search(r"S1[ABC]_EW_GRDM_1SDH_(\d{8}T\d{6})_", scene.original_id)
+        if timestamp:
+            provenance["source_acquisition_time"] = (
+                datetime.strptime(timestamp.group(1), "%Y%m%dT%H%M%S")
+                .replace(tzinfo=UTC)
+                .isoformat()
+            )
 
         mask, breakdown = build_analysis_mask(
             valid_mask=scene.valid_mask,
@@ -225,6 +245,28 @@ class SceneDetectionRunner:
             sigma0_hv_db=scene.sigma0_hv_db,
             config=self.suppression,
         )
+        before_aoi = int(mask.sum())
+        mask &= points_in_aoi(scene.longitude, scene.latitude)
+        breakdown["outside_nl_study_area"] = (before_aoi - int(mask.sum())) / mask.size
+        if not mask.any():
+            ice_regime, ice_fraction = classify_ice_regime(scene)
+            return SceneDetectionResult(
+                scene.scene_id,
+                self.detector_kind,
+                self.pfa,
+                [],
+                0,
+                0,
+                0.0,
+                SuppressionStats(),
+                breakdown,
+                ice_regime,
+                ice_fraction,
+                "unknown",
+                scene_wind_statistic(scene),
+                time.perf_counter() - started,
+                provenance,
+            )
 
         detector = build_detector(self.detector_kind, self.pfa)
         result = detector.detect(
@@ -254,7 +296,11 @@ class SceneDetectionRunner:
             clutter_mean_db=result.clutter_mean_db,
         )
 
-        analysed_area_km2 = float(mask.sum()) * scene.pixel_area_km2()
+        analysis_mask = result.analysis_mask if result.analysis_mask is not None else mask
+        breakdown["insufficient_training_support"] = (
+            int(mask.sum()) - int(analysis_mask.sum())
+        ) / mask.size
+        analysed_area_km2 = float(analysis_mask.sum()) * scene.pixel_area_km2()
         ice_regime, ice_fraction = classify_ice_regime(scene)
 
         outcome = SceneDetectionResult(
@@ -272,7 +318,7 @@ class SceneDetectionRunner:
             wind_regime="unknown",  # resolved by assign_wind_regimes over the cohort
             wind_statistic=scene_wind_statistic(scene),
             runtime_s=time.perf_counter() - started,
-            assumptions=dict(scene.assumptions),
+            assumptions=provenance,
         )
 
         logger.info(

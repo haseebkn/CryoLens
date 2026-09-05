@@ -7,7 +7,7 @@ produce on the order of 270 spurious pixel hits even over perfectly homogeneous
 clutter, before any of the structured artefacts that dominate in practice.
 
 This module implements the suppression stages that turn raw CFAR hits into an
-operationally usable candidate list, and — importantly for evaluation — records
+    analyst-review candidate list, and records
 how many candidates each stage removed, so the false-alarm budget is auditable
 rather than a single opaque number.
 
@@ -140,6 +140,20 @@ class SuppressionConfig:
     sea-surface returns and metallic point targets rather than the volume
     scattering of glacial ice."""
 
+    def __post_init__(self) -> None:
+        counts = (
+            self.coastal_buffer_zones,
+            self.border_exclusion_px,
+            self.seam_exclusion_px,
+            self.max_seam_groups,
+        )
+        if any(not isinstance(v, int) or v < 0 for v in counts):
+            raise ValueError("Mask margins and seam group count must be nonnegative integers")
+        if self.min_target_pixels < 1 or self.max_target_pixels < self.min_target_pixels:
+            raise ValueError("Target pixel limits must be positive and ordered")
+        if not np.isfinite(self.max_aspect_ratio) or self.max_aspect_ratio < 1:
+            raise ValueError("max_aspect_ratio must be finite and at least 1")
+
 
 def _robust_z(values: NDArray[np.floating]) -> NDArray[np.float64]:
     """Median-absolute-deviation z-score, resistant to the outliers being sought."""
@@ -149,7 +163,9 @@ def _robust_z(values: NDArray[np.floating]) -> NDArray[np.float64]:
     median = float(np.median(finite))
     mad = float(np.median(np.abs(finite - median)))
     if mad <= 0.0:
-        return np.zeros_like(values, dtype=np.float64)
+        # A noiseless step amid a constant profile has zero MAD but is still
+        # a seam. Retain its departure instead of returning all-zero scores.
+        mad = np.finfo(float).eps * max(1.0, abs(median))
     # 1.4826 scales MAD to a standard deviation for normal data.
     return np.asarray((values - median) / (1.4826 * mad), dtype=np.float64)
 
@@ -185,7 +201,7 @@ def detect_subswath_seams(
         warnings.simplefilter("ignore", RuntimeWarning)
         profile = np.nanmedian(data, axis=0)
 
-    if not np.isfinite(profile).any():
+    if data.shape[1] < 2 or not np.isfinite(profile).any() or max_groups == 0:
         return np.zeros(data.shape[1], dtype=np.bool_)
 
     gradient = np.gradient(profile)
@@ -268,6 +284,13 @@ def build_analysis_mask(
     """
     cfg = config or SuppressionConfig()
     mask = np.asarray(valid_mask, dtype=bool).copy()
+    if mask.ndim != 2 or mask.size == 0:
+        raise ValueError("valid_mask must be a nonempty 2D array")
+    for arr in (land_distance_zone, sic_class, sigma0_hv_db):
+        if arr is not None and np.shape(arr) != mask.shape:
+            raise ValueError("All masking inputs must have matching shapes")
+    if sigma0_hv_db is not None:
+        mask &= np.isfinite(sigma0_hv_db) & (sigma0_hv_db > -90.0)
     total = float(mask.size)
     breakdown: dict[str, float] = {}
 
@@ -275,7 +298,11 @@ def build_analysis_mask(
     breakdown["invalid_or_nodata"] = (total - start) / total
 
     if land_distance_zone is not None:
-        land_and_coast = land_distance_zone <= cfg.coastal_buffer_zones
+        land_and_coast = (
+            ~np.isfinite(land_distance_zone)
+            | (land_distance_zone <= cfg.coastal_buffer_zones)
+            | (land_distance_zone == 255)
+        )
         before = float(mask.sum())
         mask &= ~land_and_coast
         breakdown["land_and_coastal_buffer"] = (before - float(mask.sum())) / total
@@ -293,26 +320,31 @@ def build_analysis_mask(
 
     if cfg.seam_detection_enabled and sigma0_hv_db is not None:
         seams = detect_subswath_seams(
-            sigma0_hv_db, valid_mask, cfg.seam_gradient_sigma, cfg.max_seam_groups
+            sigma0_hv_db, mask, cfg.seam_gradient_sigma, cfg.max_seam_groups
         )
         if seams.any():
-            widened = (
-                np.convolve(
-                    seams.astype(np.float64),
-                    np.ones(2 * cfg.seam_exclusion_px + 1),
-                    mode="same",
-                )
-                > 0
-            )
+            from scipy.ndimage import maximum_filter1d
+
+            widened = maximum_filter1d(seams, size=2 * cfg.seam_exclusion_px + 1, mode="constant")
             before = float(mask.sum())
             mask &= ~widened[None, :]
             breakdown["subswath_seams"] = (before - float(mask.sum())) / total
 
-    if cfg.exclude_sea_ice and sic_class is not None:
-        ice = (sic_class > cfg.max_sic_class_for_open_water) & (sic_class != 255)
+    if cfg.exclude_sea_ice:
+        # Open-water-only analysis requires positive evidence of charted water.
+        # Withheld/unclassified charts must not silently become open water.
+        open_water = (
+            np.zeros_like(mask)
+            if sic_class is None
+            else (
+                np.isfinite(sic_class)
+                & (sic_class >= 0)
+                & (sic_class <= cfg.max_sic_class_for_open_water)
+            )
+        )
         before = float(mask.sum())
-        mask &= ~ice
-        breakdown["sea_ice"] = (before - float(mask.sum())) / total
+        mask &= open_water
+        breakdown["sea_ice_or_unknown"] = (before - float(mask.sum())) / total
 
     logger.info(
         "Analysis mask retains %.1f%% of the scene (%s)",
@@ -351,7 +383,14 @@ def filter_targets(
 
     apply("aspect_ratio", aspect_ok)
     apply("min_peak_hv", lambda t: t.peak_sigma0_hv_db >= cfg.min_peak_hv_db)
-    apply("copol_dominance", lambda t: t.hh_hv_ratio_db <= cfg.max_hh_hv_ratio_db)
+    apply(
+        "copol_dominance",
+        lambda t: (
+            t.hh_hv_ratio_db is not None
+            and np.isfinite(t.hh_hv_ratio_db)
+            and t.hh_hv_ratio_db <= cfg.max_hh_hv_ratio_db
+        ),
+    )
 
     if clutter_mean_db is not None:
 
@@ -361,7 +400,7 @@ def filter_targets(
             c1 = max(c1, c0 + 1)
             local = clutter_mean_db[r0:r1, c0:c1]
             if local.size == 0 or not np.isfinite(local).any():
-                return True
+                return False
             return (t.peak_sigma0_hv_db - float(np.nanmedian(local))) >= cfg.min_contrast_db
 
         apply("clutter_contrast", contrast_ok)

@@ -8,14 +8,10 @@ and land context needed to measure false-alarm behaviour honestly.
 
 Two properties of the distribution matter and are handled here:
 
-1. **The pixel values are standardised, not physical.** Each variable was
-   linearly rescaled at packaging time. For the two SAR channels the packagers
-   preserved the pre-normalisation extremes in the ``min``/``max`` variable
-   attributes, so the original sigma-nought in decibels is exactly recoverable
-   by inverting the linear map (see :func:`_denormalise_linear`). Variables
-   without those attributes (incidence angle, land distance, ERA5 winds) cannot
-   be inverted from metadata alone and are handled case by case, with the
-   assumption recorded on the returned scene.
+1. **The pixel values are standardised, not physical.** The publisher's
+   global mean/std coefficients are inverted, never the observed scene extrema.
+   The min/max attributes predate downsampling/masking and do not determine
+   the standardisation of a cropped or resampled scene.
 
 2. **The geolocation is a coarse 21x21 tie-point grid**, not an affine
    transform. It is bilinearly interpolated up to full raster size.
@@ -36,12 +32,6 @@ from numpy.typing import NDArray
 
 logger = logging.getLogger(__name__)
 
-# Sentinel-1 Extra Wide swath nominal incidence-angle limits (degrees).
-# Used to restore an approximate physical incidence ramp, because the
-# ready-to-train packaging does not preserve the true min/max for this variable.
-EW_NEAR_RANGE_INCIDENCE_DEG = 19.4
-EW_FAR_RANGE_INCIDENCE_DEG = 47.0
-
 # The land-distance variable is a zonation with integer ids 0..41, where 0 is
 # land (or the innermost coastal zone) and larger ids are progressively further
 # offshore. Documented in the variable's own ``long_name``.
@@ -54,6 +44,25 @@ SIC_FILL_VALUE = 255
 
 _SAR_PRIMARY = "nersc_sar_primary"
 _SAR_SECONDARY = "nersc_sar_secondary"
+
+# Publisher toolkit misc/global_meanstd.npy, retrieved 2026-09-05:
+# https://github.com/astokholm/AI4ArcticSeaIceChallenge/blob/main/misc/global_meanstd.npy
+# SHA256: 2f3f9188617a98c9e89158302efad8ffbc22ecc9d66d76019b54cdb5cbcfdeca
+# Numeric constants extracted with pickletools without executing its pickle.
+PUBLISHER_MEAN_STD = {
+    _SAR_PRIMARY: (-14.5082551552228, 5.6597459193818676),
+    _SAR_SECONDARY: (-24.701205147144236, 4.746759305258515),
+    "distance_map": (23.627669500714102, 14.99018630794473),
+    "sar_incidenceangle": (33.99801788456536, 8.322267212079046),
+    "u10m_rotated": (0.6747986162545088, 4.749646758314658),
+    "v10m_rotated": (0.6075565949388854, 5.196104947581429),
+}
+
+
+def _restore_standardised(values: NDArray[np.floating], variable: str) -> NDArray[np.float32]:
+    """Invert the published global standard scaler without scene-dependent fitting."""
+    mean, std = PUBLISHER_MEAN_STD[variable]
+    return np.asarray(np.where(np.isfinite(values), values * std + mean, np.nan), dtype=np.float32)
 
 
 @dataclass(frozen=True)
@@ -88,7 +97,7 @@ class SceneExtent:
 
         Stricter than :meth:`intersects`. A Sentinel-1 EW swath is roughly 400 km
         across, so a scene can clip the corner of the area of interest while
-        lying almost entirely outside it — for example an Ungava Bay acquisition
+        lying almost entirely outside it â€” for example an Ungava Bay acquisition
         touching the western edge of the Labrador box. Centre containment keeps
         the scene set genuinely regional.
         """
@@ -131,6 +140,7 @@ class AI4ArcticScene:
     sod_class: NDArray[np.uint8] | None = None
     floe_class: NDArray[np.uint8] | None = None
     wind_speed_normalised: NDArray[np.float32] | None = None
+    wind_speed_m_s: NDArray[np.float32] | None = None
 
     assumptions: dict[str, str] = field(default_factory=dict)
 
@@ -142,7 +152,15 @@ class AI4ArcticScene:
     @property
     def valid_mask(self) -> NDArray[np.bool_]:
         """Pixels with finite backscatter in both polarisations."""
-        return np.isfinite(self.sigma0_hh_db) & np.isfinite(self.sigma0_hv_db)
+        return (
+            np.isfinite(self.sigma0_hh_db)
+            & np.isfinite(self.sigma0_hv_db)
+            & np.isfinite(self.latitude)
+            & np.isfinite(self.longitude)
+            & np.isfinite(self.incidence_angle_deg)
+            & (self.incidence_angle_deg > 0)
+            & (self.incidence_angle_deg < 90)
+        )
 
     @property
     def land_mask(self) -> NDArray[np.bool_]:
@@ -152,7 +170,7 @@ class AI4ArcticScene:
     def sea_ice_fraction(self) -> float | None:
         """Fraction of charted pixels with sea ice concentration above the ice edge.
 
-        Returns ``None`` — not zero — when the scene carries no usable ice chart.
+        Returns ``None`` â€” not zero â€” when the scene carries no usable ice chart.
         The AI4Arctic *challenge test* scenes have their SIC/SOD/FLOE labels
         withheld (every pixel is the 255 fill value), and the withheld truth
         ships separately in the matching ``*_prep_reference.nc`` file. Returning
@@ -162,7 +180,7 @@ class AI4ArcticScene:
         """
         if self.sic_class is None:
             return None
-        charted = self.sic_class != SIC_FILL_VALUE
+        charted = self.sic_class <= 10
         if not charted.any():
             return None
         ice = (self.sic_class >= 2) & charted  # class 2 == 20 percent, first bin above 15
@@ -176,55 +194,6 @@ class AI4ArcticScene:
     def pixel_area_km2(self) -> float:
         """Ground area of one pixel in square kilometres."""
         return (self.pixel_spacing_m / 1000.0) ** 2
-
-
-def _denormalise_linear(
-    values: NDArray[np.floating],
-    physical_min: float,
-    physical_max: float,
-) -> NDArray[np.float32]:
-    """Invert the packagers' linear standardisation using preserved extremes.
-
-    The packaging applied ``stored = (physical - offset) / scale``. Because the
-    map is linear and monotone, the observed extremes of ``stored`` correspond to
-    the recorded physical extremes, which recovers scale and offset exactly.
-    """
-    finite = np.isfinite(values)
-    if not finite.any():
-        return np.full(values.shape, np.nan, dtype=np.float32)
-
-    stored_min = float(np.nanmin(values))
-    stored_max = float(np.nanmax(values))
-    if stored_max <= stored_min:
-        raise ValueError("Cannot de-normalise a constant array; extremes are degenerate.")
-
-    scale = (physical_max - physical_min) / (stored_max - stored_min)
-    offset = physical_max - scale * stored_max
-    return np.asarray(values * scale + offset, dtype=np.float32)
-
-
-def _rescale_to_range(
-    values: NDArray[np.floating],
-    target_min: float,
-    target_max: float,
-) -> NDArray[np.float32]:
-    """Linearly map observed extremes of ``values`` onto a known physical range.
-
-    Used where the packaging preserved no min/max attributes but the physical
-    range is known a priori from the sensor (incidence angle) or from the
-    variable's documented encoding (land-distance zone ids).
-    """
-    finite = np.isfinite(values)
-    if not finite.any():
-        return np.full(values.shape, np.nan, dtype=np.float32)
-
-    stored_min = float(np.nanmin(values))
-    stored_max = float(np.nanmax(values))
-    if stored_max <= stored_min:
-        return np.full(values.shape, target_min, dtype=np.float32)
-
-    scale = (target_max - target_min) / (stored_max - stored_min)
-    return np.asarray((values - stored_min) * scale + target_min, dtype=np.float32)
 
 
 def _interpolate_tiepoint_grid(
@@ -262,7 +231,11 @@ def _read_variable(dataset: Any, name: str) -> NDArray[np.float64] | None:
     if name not in dataset.variables:
         return None
     raw = dataset.variables[name][:]
-    return np.ma.filled(raw.astype(np.float64), np.nan)
+    values = np.ma.filled(raw.astype(np.float64), np.nan)
+    fill = getattr(dataset.variables[name], "variable_fill_value", None)
+    if fill is not None:
+        values[values == float(fill)] = np.nan
+    return values
 
 
 def _physical_extremes(dataset: Any, name: str) -> tuple[float, float] | None:
@@ -288,9 +261,8 @@ def load_scene(path: Path | str, load_context: bool = True) -> AI4ArcticScene:
 
     Raises:
         FileNotFoundError: If ``path`` does not exist.
-        ValueError: If the SAR channels lack the attributes needed to restore
-            physical decibels, which would silently corrupt every downstream
-            CFAR threshold.
+        ValueError: If required physical/geographic metadata are absent or the
+            land zonation is inconsistent with the publisher scaler.
     """
     from netCDF4 import Dataset  # imported lazily; heavy binary dependency
 
@@ -320,36 +292,59 @@ def load_scene(path: Path | str, load_context: bool = True) -> AI4ArcticScene:
                 "rather than run CFAR on standardised values."
             )
 
-        sigma0_hh_db = _denormalise_linear(hh_raw, *hh_extremes)
-        sigma0_hv_db = _denormalise_linear(hv_raw, *hv_extremes)
+        if hh_raw.ndim != 2 or hh_raw.shape != hv_raw.shape:
+            raise ValueError("SAR channels must share a 2-D shape.")
+        if (
+            str(getattr(ds.variables[_SAR_PRIMARY], "polarisation", "")) != "HH"
+            or str(getattr(ds.variables[_SAR_SECONDARY], "polarisation", "")) != "HV"
+        ):
+            raise ValueError("The screening pipeline requires verified HH and HV polarisations.")
+        if not np.isfinite(pixel_spacing) or pixel_spacing <= 0:
+            raise ValueError("Pixel spacing must be finite and positive.")
+        sigma0_hh_db = _restore_standardised(hh_raw, _SAR_PRIMARY)
+        sigma0_hv_db = _restore_standardised(hv_raw, _SAR_SECONDARY)
+        assumptions["normalisation"] = (
+            "Publisher global_meanstd.npy SHA256 "
+            "2f3f9188617a98c9e89158302efad8ffbc22ecc9d66d76019b54cdb5cbcfdeca; "
+            "physical = stored * global_std + global_mean."
+        )
         shape = (int(sigma0_hh_db.shape[0]), int(sigma0_hh_db.shape[1]))
 
         inc_raw = _read_variable(ds, "sar_incidenceangle")
         if inc_raw is not None:
-            incidence = _rescale_to_range(
-                inc_raw, EW_NEAR_RANGE_INCIDENCE_DEG, EW_FAR_RANGE_INCIDENCE_DEG
-            )
-            assumptions["incidence_angle"] = (
-                "Restored by mapping standardised extremes onto the nominal EW swath "
-                f"range {EW_NEAR_RANGE_INCIDENCE_DEG}-{EW_FAR_RANGE_INCIDENCE_DEG} deg; "
-                "the packaging preserved no true extremes. Approximate."
-            )
+            incidence = _restore_standardised(inc_raw, "sar_incidenceangle")
         else:
-            incidence = np.full(shape, 35.0, dtype=np.float32)
-            assumptions["incidence_angle"] = "Absent from file; filled with 35 deg constant."
+            raise ValueError(
+                "Incidence angle is required; a nominal ramp is not measured geometry."
+            )
 
         dist_raw = _read_variable(ds, "distance_map")
         if dist_raw is not None:
-            zones = _rescale_to_range(dist_raw, 0.0, float(LAND_DISTANCE_ZONE_MAX))
-            land_distance = np.asarray(np.rint(zones), dtype=np.int16)
+            zones = _restore_standardised(dist_raw, "distance_map")
+            finite = np.isfinite(zones)
+            if np.any(np.abs(zones[finite] - np.rint(zones[finite])) > 0.01):
+                raise ValueError(
+                    "Distance zones do not match the published scaler; unsupported dataset version."
+                )
+            if np.any((zones[finite] < -0.01) | (zones[finite] > 41.01)):
+                raise ValueError("Decoded land-distance zones are outside 0..41.")
+            land_distance = np.asarray(np.where(finite, np.rint(zones), -1), dtype=np.int16)
         else:
-            land_distance = np.full(shape, LAND_DISTANCE_ZONE_MAX, dtype=np.int16)
-            assumptions["land_distance"] = "Absent from file; assumed entirely offshore."
+            raise ValueError(
+                "Land-distance context is required; unknown coast must not be treated as water."
+            )
+
+        if incidence.shape != shape or land_distance.shape != shape:
+            raise ValueError("Incidence and land-distance grids must match the SAR raster.")
 
         lat_grid = _read_variable(ds, "sar_grid2d_latitude")
         lon_grid = _read_variable(ds, "sar_grid2d_longitude")
         if lat_grid is None or lon_grid is None:
             raise ValueError(f"{path.name} is missing its geolocation tie-point grid.")
+        if not np.isfinite(lat_grid).all() or not np.isfinite(lon_grid).all():
+            raise ValueError("Geolocation tie-points must be finite.")
+        if np.any(np.abs(lat_grid) > 90) or np.any(np.abs(lon_grid) > 180):
+            raise ValueError("Geolocation tie-points are outside WGS84 coordinate limits.")
         latitude = _interpolate_tiepoint_grid(lat_grid, shape)
         longitude = _interpolate_tiepoint_grid(lon_grid, shape)
 
@@ -363,12 +358,13 @@ def load_scene(path: Path | str, load_context: bool = True) -> AI4ArcticScene:
             u10 = _read_variable(ds, "u10m_rotated")
             v10 = _read_variable(ds, "v10m_rotated")
             if u10 is not None and v10 is not None:
-                speed_coarse = np.hypot(u10, v10)
+                speed_coarse = np.hypot(
+                    _restore_standardised(u10, "u10m_rotated"),
+                    _restore_standardised(v10, "v10m_rotated"),
+                )
                 wind_speed = _interpolate_tiepoint_grid(speed_coarse, shape)
                 assumptions["wind_speed"] = (
-                    "ERA5 10 m wind is standardised in this distribution with no "
-                    "recorded extremes, so absolute m/s is unrecoverable. Values are "
-                    "relative; stratify by quantile, not by absolute threshold."
+                    "ERA5 components restored with publisher mean/std before calculating speed in m/s."
                 )
 
     logger.info(
@@ -395,7 +391,7 @@ def load_scene(path: Path | str, load_context: bool = True) -> AI4ArcticScene:
         sic_class=sic,
         sod_class=sod,
         floe_class=floe,
-        wind_speed_normalised=wind_speed,
+        wind_speed_m_s=wind_speed,
         assumptions=assumptions,
     )
 
