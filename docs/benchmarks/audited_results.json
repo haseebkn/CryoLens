@@ -1,0 +1,350 @@
+{
+  "schema_version": 2,
+  "methodology": {
+    "metric": "unverified_candidate_density_per_1000km2",
+    "precision_recall_measured": false,
+    "design_pfa_is_measured_far": false,
+    "classification": "unclassified; radiometric heuristic stored separately",
+    "confidence_kind": "uncalibrated_heuristic_score",
+    "aoi": "configs/aoi.geojson newfoundland_labrador_marine; per-pixel centre clipping",
+    "area": "eligible pixel count times nominal spacing squared; exposure sum, not unique ocean area",
+    "suppression": {
+      "coastal_buffer_zones": 2,
+      "border_exclusion_px": 64,
+      "max_sic_class_for_open_water": 1,
+      "exclude_sea_ice": true,
+      "seam_detection_enabled": true,
+      "seam_exclusion_px": 8,
+      "seam_gradient_sigma": 6.0,
+      "max_seam_groups": 6,
+      "min_target_pixels": 4,
+      "max_target_pixels": 20000,
+      "max_aspect_ratio": 8.0,
+      "min_contrast_db": 3.0,
+      "min_peak_hv_db": -30.0,
+      "max_hh_hv_ratio_db": 18.0
+    },
+    "source_scaling": "See per-scene assumptions and source_sha256"
+  },
+  "run_manifests": [
+    {
+      "detector": "gamma",
+      "pfa": 1e-06,
+      "eligible_scenes": 25,
+      "selected_scenes": 3,
+      "processed_scenes": 3,
+      "failed_scenes": [],
+      "skipped_scenes": []
+    }
+  ],
+  "detector": "Gamma-CFAR",
+  "n_scenes": 3,
+  "overall": {
+    "stratum": "all",
+    "n_scenes": 3,
+    "area_km2": 325238.6,
+    "targets": 35,
+    "raw_candidates": 1361,
+    "density_per_1000km2": 0.108,
+    "raw_density_per_1000km2": 4.185,
+    "suppression_factor": 38.89
+  },
+  "by_ice_regime": [
+    {
+      "stratum": "ice_affected",
+      "n_scenes": 2,
+      "area_km2": 191675.4,
+      "targets": 7,
+      "raw_candidates": 1050,
+      "density_per_1000km2": 0.037,
+      "raw_density_per_1000km2": 5.478,
+      "suppression_factor": 150.0
+    },
+    {
+      "stratum": "open_water",
+      "n_scenes": 1,
+      "area_km2": 133563.2,
+      "targets": 28,
+      "raw_candidates": 311,
+      "density_per_1000km2": 0.21,
+      "raw_density_per_1000km2": 2.328,
+      "suppression_factor": 11.11
+    }
+  ],
+  "by_wind_regime": [
+    {
+      "stratum": "high",
+      "n_scenes": 1,
+      "area_km2": 113875.4,
+      "targets": 6,
+      "raw_candidates": 468,
+      "density_per_1000km2": 0.053,
+      "raw_density_per_1000km2": 4.11,
+      "suppression_factor": 78.0
+    },
+    {
+      "stratum": "low",
+      "n_scenes": 1,
+      "area_km2": 133563.2,
+      "targets": 28,
+      "raw_candidates": 311,
+      "density_per_1000km2": 0.21,
+      "raw_density_per_1000km2": 2.328,
+      "suppression_factor": 11.11
+    },
+    {
+      "stratum": "moderate",
+      "n_scenes": 1,
+      "area_km2": 77800.0,
+      "targets": 1,
+      "raw_candidates": 582,
+      "density_per_1000km2": 0.013,
+      "raw_density_per_1000km2": 7.481,
+      "suppression_factor": 582.0
+    }
+  ],
+  "suppression_ledger": [
+    {
+      "stage": "min_size",
+      "removed": 1326,
+      "remaining": 35,
+      "pct_of_raw": 97.43
+    },
+    {
+      "stage": "max_size",
+      "removed": 0,
+      "remaining": 35,
+      "pct_of_raw": 0.0
+    },
+    {
+      "stage": "aspect_ratio",
+      "removed": 0,
+      "remaining": 35,
+      "pct_of_raw": 0.0
+    },
+    {
+      "stage": "min_peak_hv",
+      "removed": 0,
+      "remaining": 35,
+      "pct_of_raw": 0.0
+    },
+    {
+      "stage": "copol_dominance",
+      "removed": 0,
+      "remaining": 35,
+      "pct_of_raw": 0.0
+    },
+    {
+      "stage": "clutter_contrast",
+      "removed": 0,
+      "remaining": 35,
+      "pct_of_raw": 0.0
+    }
+  ],
+  "scenes": [
+    {
+      "scene_id": "20180331T212355_cis_prep.nc",
+      "detector": "GammaCFARDetector",
+      "pfa": 1e-06,
+      "n_targets": 6,
+      "raw_pixel_hits": 524,
+      "raw_candidates": 468,
+      "analysed_area_km2": 113875.4,
+      "detections_per_1000km2": 0.053,
+      "raw_candidates_per_1000km2": 4.11,
+      "suppression_factor": 78.0,
+      "ice_regime": "ice_affected",
+      "sea_ice_fraction": 0.1921,
+      "wind_regime": "high",
+      "wind_statistic": 10.51192,
+      "runtime_s": 24.59,
+      "suppression": {
+        "stages": [
+          {
+            "stage": "min_size",
+            "removed": 462,
+            "remaining": 6
+          },
+          {
+            "stage": "max_size",
+            "removed": 0,
+            "remaining": 6
+          },
+          {
+            "stage": "aspect_ratio",
+            "removed": 0,
+            "remaining": 6
+          },
+          {
+            "stage": "min_peak_hv",
+            "removed": 0,
+            "remaining": 6
+          },
+          {
+            "stage": "copol_dominance",
+            "removed": 0,
+            "remaining": 6
+          },
+          {
+            "stage": "clutter_contrast",
+            "removed": 0,
+            "remaining": 6
+          }
+        ],
+        "total_removed": 462
+      },
+      "mask_breakdown": {
+        "invalid_or_nodata": 0.19485,
+        "land_and_coastal_buffer": 0.0,
+        "swath_border": 0.01074,
+        "subswath_seams": 0.00961,
+        "sea_ice_or_unknown": 0.14395,
+        "outside_nl_study_area": 0.05111,
+        "insufficient_training_support": 0.00022
+      },
+      "assumptions": {
+        "normalisation": "Publisher global_meanstd.npy SHA256 2f3f9188617a98c9e89158302efad8ffbc22ecc9d66d76019b54cdb5cbcfdeca; physical = stored * global_std + global_mean.",
+        "wind_speed": "ERA5 components restored with publisher mean/std before calculating speed in m/s.",
+        "source_product_id": "S1B_EW_GRDM_1SDH_20180331T212355_20180331T212504_010281_012B2B_BCBF_icechart_cis_SGRDINFLD_20180331T2122Z_pl_a.nc",
+        "source_acquisition_time": "2018-03-31T21:23:55+00:00",
+        "source_sha256": "ce7040b75c07ae4cc2752fc2071da83769f8dff3326b6137d3e05de8ac22e015"
+      }
+    },
+    {
+      "scene_id": "20180428T093937_cis_prep.nc",
+      "detector": "GammaCFARDetector",
+      "pfa": 1e-06,
+      "n_targets": 28,
+      "raw_pixel_hits": 550,
+      "raw_candidates": 311,
+      "analysed_area_km2": 133563.2,
+      "detections_per_1000km2": 0.21,
+      "raw_candidates_per_1000km2": 2.328,
+      "suppression_factor": 11.11,
+      "ice_regime": "open_water",
+      "sea_ice_fraction": 0.1131,
+      "wind_regime": "low",
+      "wind_statistic": 3.1222,
+      "runtime_s": 21.16,
+      "suppression": {
+        "stages": [
+          {
+            "stage": "min_size",
+            "removed": 283,
+            "remaining": 28
+          },
+          {
+            "stage": "max_size",
+            "removed": 0,
+            "remaining": 28
+          },
+          {
+            "stage": "aspect_ratio",
+            "removed": 0,
+            "remaining": 28
+          },
+          {
+            "stage": "min_peak_hv",
+            "removed": 0,
+            "remaining": 28
+          },
+          {
+            "stage": "copol_dominance",
+            "removed": 0,
+            "remaining": 28
+          },
+          {
+            "stage": "clutter_contrast",
+            "removed": 0,
+            "remaining": 28
+          }
+        ],
+        "total_removed": 283
+      },
+      "mask_breakdown": {
+        "invalid_or_nodata": 0.07605,
+        "land_and_coastal_buffer": 0.00158,
+        "swath_border": 0.02488,
+        "subswath_seams": 0.01626,
+        "sea_ice_or_unknown": 0.10293,
+        "outside_nl_study_area": 0.00162,
+        "insufficient_training_support": 0.0006
+      },
+      "assumptions": {
+        "normalisation": "Publisher global_meanstd.npy SHA256 2f3f9188617a98c9e89158302efad8ffbc22ecc9d66d76019b54cdb5cbcfdeca; physical = stored * global_std + global_mean.",
+        "wind_speed": "ERA5 components restored with publisher mean/std before calculating speed in m/s.",
+        "source_product_id": "S1B_EW_GRDM_1SDH_20180428T093937_20180428T094037_010682_013815_1FD8_icechart_cis_SGRDINFLD_20180428T0938Z_pl_a.nc",
+        "source_acquisition_time": "2018-04-28T09:39:37+00:00",
+        "source_sha256": "cf26a69f2d42ecca8c9ba5a11d4f19d22313d73b3a64e57b199a540c561ee58e"
+      }
+    },
+    {
+      "scene_id": "20190206T212401_cis_prep.nc",
+      "detector": "GammaCFARDetector",
+      "pfa": 1e-06,
+      "n_targets": 1,
+      "raw_pixel_hits": 612,
+      "raw_candidates": 582,
+      "analysed_area_km2": 77800.0,
+      "detections_per_1000km2": 0.013,
+      "raw_candidates_per_1000km2": 7.481,
+      "suppression_factor": 582.0,
+      "ice_regime": "ice_affected",
+      "sea_ice_fraction": 0.2741,
+      "wind_regime": "moderate",
+      "wind_statistic": 10.41339,
+      "runtime_s": 22.95,
+      "suppression": {
+        "stages": [
+          {
+            "stage": "min_size",
+            "removed": 581,
+            "remaining": 1
+          },
+          {
+            "stage": "max_size",
+            "removed": 0,
+            "remaining": 1
+          },
+          {
+            "stage": "aspect_ratio",
+            "removed": 0,
+            "remaining": 1
+          },
+          {
+            "stage": "min_peak_hv",
+            "removed": 0,
+            "remaining": 1
+          },
+          {
+            "stage": "copol_dominance",
+            "removed": 0,
+            "remaining": 1
+          },
+          {
+            "stage": "clutter_contrast",
+            "removed": 0,
+            "remaining": 1
+          }
+        ],
+        "total_removed": 581
+      },
+      "mask_breakdown": {
+        "invalid_or_nodata": 0.38065,
+        "land_and_coastal_buffer": 0.0,
+        "swath_border": 0.00255,
+        "subswath_seams": 0.00822,
+        "sea_ice_or_unknown": 0.16129,
+        "outside_nl_study_area": 0.01405,
+        "insufficient_training_support": 0.00018
+      },
+      "assumptions": {
+        "normalisation": "Publisher global_meanstd.npy SHA256 2f3f9188617a98c9e89158302efad8ffbc22ecc9d66d76019b54cdb5cbcfdeca; physical = stored * global_std + global_mean.",
+        "wind_speed": "ERA5 components restored with publisher mean/std before calculating speed in m/s.",
+        "source_product_id": "S1B_EW_GRDM_1SDH_20190206T212401_20190206T212506_014831_01BAD5_AFD5_icechart_cis_SGRDINFLD_20190206T2120Z_pl_a.nc",
+        "source_acquisition_time": "2019-02-06T21:24:01+00:00",
+        "source_sha256": "e8d048ba11302ccd073b5a2c892d20a61259c2f4614ac9d660acc835808547fc"
+      }
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CryoLens · Newfoundland &amp; Labrador SAR Research</title>
+  <meta name="description" content="Independent research portfolio for reviewing unverified SAR targets around Newfoundland and Labrador. No operational or C-CORE certification claims.">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <a class="brand" href="/" aria-label="CryoLens home"><span class="brand-mark" aria-hidden="true">C</span><span>CryoLens<small>NEWFOUNDLAND &amp; LABRADOR</small></span></a>
+    <div class="header-right"><span class="research-tag">RESEARCH PORTFOLIO</span><span id="api-status" role="status">Checking service…</span><a href="/docs" target="_blank" rel="noopener">API ↗</a></div>
+  </header>
+  <div class="workspace">
+    <aside class="sidebar" aria-label="Scene and review controls">
+      <div class="intro"><span class="eyebrow">SATELLITE OBSERVATION / SAR</span><h1>Evidence before<br>classification.</h1><p>Review radar candidates across the Newfoundland and Labrador shelf study area.</p></div>
+      <div class="research-note"><strong>Independent research prototype</strong><p>Not for navigation. No C-CORE affiliation or certification. Operational precision and recall have not been measured.</p></div>
+      <section>
+        <h2>01 <span>Observation</span></h2>
+        <label for="scene-select">Processed satellite scene</label>
+        <select id="scene-select"><option value="">Loading scenes…</option></select>
+        <dl class="scene-meta"><div><dt>Acquired (UTC)</dt><dd id="meta-time">—</dd></div><div><dt>Instrument</dt><dd id="meta-platform">—</dd></div><div><dt>Mode / polarization</dt><dd id="meta-mode">—</dd></div></dl>
+        <p class="helper">Stored observations are historical unless their timestamp shows otherwise. Footprints are clipped to the study area.</p>
+      </section>
+      <section>
+        <h2>02 <span>Review filter</span></h2>
+        <label for="assessment-filter">Display</label>
+        <select id="assessment-filter"><option value="confirmed">Analyst-confirmed icebergs only</option><option value="candidate">Unverified SAR candidates</option><option value="reviewed">All analyst-reviewed targets</option><option value="all">All targets</option></select>
+        <p class="helper">Unverified bright radar targets can be vessels, sea ice or clutter. A detector score is not an iceberg probability.</p>
+        <label for="score-filter">Minimum detector score <output id="score-value">0.00</output></label>
+        <input type="range" id="score-filter" min="0" max="1" step="0.05" value="0">
+        <p class="helper">Unknown scores remain visible at 0. Score thresholds do not establish an operational false-alarm rate.</p>
+        <div class="check-row"><input type="checkbox" id="toggle-footprint" checked><label for="toggle-footprint">Scene footprint</label></div>
+        <div class="check-row"><input type="checkbox" id="toggle-iip" checked><label for="toggle-iip">IIP observations within ±12 hours</label></div>
+      </section>
+      <section>
+        <h2>03 <span>Evidence availability</span></h2>
+        <dl class="availability"><div><dt>Vessel / AIS association</dt><dd>Unavailable</dd></div><div><dt>Validated drift forecast</dt><dd>Unavailable</dd></div><div><dt>Calibrated class probability</dt><dd>Unavailable</dd></div></dl>
+        <p class="helper">An IIP observation is context. Spatial proximity does not establish target identity.</p>
+      </section>
+      <footer class="sidebar-footer">WGS84 map · EPSG:3978 processing<br>Study polygon is not a jurisdictional boundary.</footer>
+    </aside>
+    <main class="map-viewport" aria-label="NL shelf observation map">
+      <div id="map"></div>
+      <div class="map-summary" aria-label="Current scene counts"><div><strong id="count-visible">—</strong><span>DISPLAYED</span></div><div><strong id="count-candidates">—</strong><span>UNVERIFIED</span></div><div><strong id="count-confirmed">—</strong><span>REVIEWED ICEBERGS</span></div></div>
+      <div class="map-message" id="map-message" role="status">Loading stored observations…</div>
+      <div class="map-legend"><span><i class="legend-dot confirmed"></i>Reviewed iceberg</span><span><i class="legend-dot candidate"></i>Unverified candidate</span><span><i class="legend-dot reference"></i>IIP observation</span></div>
+      <div class="data-status" id="data-status" role="status">IIP context: awaiting scene</div>
+      <aside id="target-drawer" class="target-drawer" aria-label="Target evidence inspector" hidden>
+        <div class="drawer-header"><div><span class="eyebrow">TARGET EVIDENCE</span><h2 id="drawer-id">—</h2></div><button id="drawer-close" class="close-button" aria-label="Close target inspector">×</button></div>
+        <div class="drawer-content">
+          <span class="assessment-badge" id="target-assessment">Unverified candidate</span>
+          <p id="target-observed" class="helper"></p>
+          <dl class="target-data"><div><dt>Detector / raw class</dt><dd id="target-detector">—</dd></div><div><dt>Uncalibrated score</dt><dd id="target-score">—</dd></div><div><dt>Peak / mean σ⁰ HV</dt><dd id="target-hv">—</dd></div><div><dt>Peak σ⁰ HH / HH:HV</dt><dd id="target-hh">—</dd></div><div><dt>Radar extent</dt><dd id="target-size">—</dd></div><div><dt>Radar area</dt><dd id="target-area">—</dd></div><div><dt>Position (WGS84)</dt><dd id="target-position">—</dd></div><div><dt>IIP association</dt><dd id="target-iip">—</dd></div></dl>
+          <p class="helper">Radar extent is not a measured iceberg length or draft. No validated drift track is available.</p>
+          <div class="review-block"><h3>Analyst review</h3><p id="review-history" class="helper">No review recorded.</p><p id="review-access" class="helper">Checking write access…</p><label for="analyst-key">Analyst API key</label><input type="password" id="analyst-key" autocomplete="off" spellcheck="false" placeholder="Held only in this page"><label for="review-notes">Evidence and rationale</label><textarea id="review-notes" rows="3" maxlength="4000" placeholder="Describe supporting evidence and its source. Radar brightness alone does not confirm an iceberg."></textarea><div class="review-actions"><button data-verdict="CONFIRMED_ICEBERG">Confirm iceberg</button><button data-verdict="VESSEL">Vessel</button><button data-verdict="REJECTED_CLUTTER">Reject clutter</button><button data-verdict="OFFSHORE_STRUCTURE">Structure</button><button data-verdict="SEA_ICE">Sea ice</button></div></div>
+        </div>
+      </aside>
+      <div id="toast" class="toast" role="status" hidden></div>
+    </main>
+  </div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+[
+  {
+    "detector": "gamma",
+    "pfa": 1e-06,
+    "eligible_scenes": 28,
+    "selected_scenes": 3,
+    "processed_scenes": 0,
+    "failed_scenes": [],
+    "skipped_scenes": [
+      {
+        "scene_id": "20190406T102029_cis_prep.nc",
+        "reason": "No eligible water after AOI, quality and training-support masks",
+        "mask_breakdown": {
+          "invalid_or_nodata": 0.4000474571849962,
+          "land_and_coastal_buffer": 0.07621915978375224,
+          "swath_border": 0.027935066950018978,
+          "subswath_seams": 1.9548465978560666e-05,
+          "sea_ice_or_unknown": 0.495778767615254,
+          "outside_nl_study_area": 0.0
+        }
+      },
+      {
+        "scene_id": "20200217T102731_cis_prep.nc",
+        "reason": "No eligible water after AOI, quality and training-support masks",
+        "mask_breakdown": {
+          "invalid_or_nodata": 0.13291702672126973,
+          "land_and_coastal_buffer": 0.010079851612776258,
+          "swath_border": 0.021896128048835034,
+          "sea_ice_or_unknown": 0.8351069936171189,
+          "outside_nl_study_area": 0.0
+        }
+      },
+      {
+        "scene_id": "20200319T101935_cis_prep.nc",
+        "reason": "No eligible water after AOI, quality and training-support masks",
+        "mask_breakdown": {
+          "invalid_or_nodata": 0.16992405154052737,
+          "land_and_coastal_buffer": 0.009392650694104502,
+          "swath_border": 0.018860511854515802,
+          "subswath_seams": 0.0015912429387688787,
+          "sea_ice_or_unknown": 0.8002315429720834,
+          "outside_nl_study_area": 0.0
+        }
+      }
+    ]
+  }
+]

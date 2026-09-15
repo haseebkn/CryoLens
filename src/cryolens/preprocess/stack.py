@@ -1,6 +1,7 @@
 """4-Band Cloud Optimized GeoTIFF (COG) generator with rio-cogeo validation."""
 
 import logging
+import re
 from pathlib import Path
 from typing import Any
 
@@ -36,7 +37,11 @@ class COGStackBuilder:
         nodata: float = -9999.0,
     ) -> Path:
         """Write calibrated bands to intermediate GeoTIFF and convert to validated COG."""
+        if not re.fullmatch(r"[A-Za-z0-9_.-]+", scene_id) or scene_id in {".", ".."}:
+            raise ValueError("Scene identifier must be a safe basename.")
         target_scene_dir = self.output_dir / scene_id
+        if not target_scene_dir.resolve().is_relative_to(self.output_dir):
+            raise ValueError("Output path must remain inside the configured output directory.")
         target_scene_dir.mkdir(parents=True, exist_ok=True)
 
         interim_tif = target_scene_dir / f"{scene_id}_interim.tif"
@@ -48,6 +53,11 @@ class COGStackBuilder:
                 raise ValueError(f"Missing required band: {name}. Available: {list(bands.keys())}")
 
         h, w = bands[BAND_NAMES[0]].shape
+        if min(h, w) < 1 or any(bands[name].shape != (h, w) for name in BAND_NAMES):
+            raise ValueError("All COG bands must share a nonempty 2-D shape.")
+        valid = np.ones((h, w), dtype=bool)
+        for name in BAND_NAMES:
+            valid &= np.isfinite(bands[name]) & (bands[name] != nodata)
 
         logger.info(
             "Writing interim 4-band raster for scene %s (size: %dx%d, CRS: %s)...",
@@ -73,7 +83,7 @@ class COGStackBuilder:
 
         with rasterio.open(interim_tif, "w", **profile) as dst:
             for idx, name in enumerate(BAND_NAMES, start=1):
-                dst.write(bands[name].astype(np.float32), idx)
+                dst.write(np.where(valid, bands[name], nodata).astype(np.float32), idx)
                 dst.set_band_description(idx, name)
 
         logger.info("Converting %s to Cloud Optimized GeoTIFF (COG)...", interim_tif.name)

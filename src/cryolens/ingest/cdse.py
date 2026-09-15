@@ -1,16 +1,20 @@
 """Copernicus Data Space Ecosystem (CDSE) STAC and OData catalog client."""
 
 import logging
+import re
+import tempfile
 import time
 import zipfile
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 import httpx
 from pydantic import BaseModel, Field
 
 from cryolens.config.settings import CDSESettings, EndpointsConfig, get_app_config
+from cryolens.geo.aoi import load_aoi, scene_intersects_aoi
 from cryolens.ingest.cache import LocalCacheManager
 
 logger = logging.getLogger(__name__)
@@ -120,13 +124,15 @@ class CDSEClient:
         elif start_date:
             s_str = start_date.isoformat() if isinstance(start_date, datetime) else start_date
             datetime_query = f"{s_str}/.."
+        elif end_date:
+            e_str = end_date.isoformat() if isinstance(end_date, datetime) else end_date
+            datetime_query = f"../{e_str}"
 
         query_payload: dict[str, Any] = {
             "collections": [collection_id],
             "limit": limit,
         }
-        if bbox:
-            query_payload["bbox"] = bbox
+        query_payload["bbox"] = bbox or list(load_aoi().bounds)
         if datetime_query:
             query_payload["datetime"] = datetime_query
 
@@ -158,7 +164,11 @@ class CDSEClient:
         results: list[SARSceneMetadata] = []
         for feature in feature_collection.get("features", []):
             parsed = self._parse_stac_feature(feature)
-            if parsed:
+            if (
+                parsed
+                and {p.upper() for p in pols}.issubset(set(parsed.polarizations))
+                and scene_intersects_aoi(parsed.footprint_geojson)
+            ):
                 results.append(parsed)
 
         logger.info("Found %d Sentinel-1 scenes matching criteria.", len(results))
@@ -170,13 +180,18 @@ class CDSEClient:
         output_dir: Path | str = "./data/raw",
         extract: bool = True,
     ) -> Path:
-        """Download scene archive (.SAFE.zip or OData product) with MD5 check and caching."""
+        """Download a SAFE archive atomically, checking ZIP CRCs and extraction paths."""
         scene_id = scene.scene_id if isinstance(scene, SARSceneMetadata) else scene
+        if not re.fullmatch(r"[A-Za-z0-9_-]+(?:\.SAFE)?", scene_id):
+            raise ValueError("Scene identifier must be a safe product basename.")
+        scene_id = scene_id.removesuffix(".SAFE")
         target_root = Path(output_dir).resolve() / scene_id
         target_root.mkdir(parents=True, exist_ok=True)
 
         expected_safe_dir = target_root / f"{scene_id}.SAFE"
-        if expected_safe_dir.is_dir() and any(expected_safe_dir.iterdir()):
+        if (expected_safe_dir / "manifest.safe").is_file() and (
+            expected_safe_dir / "measurement"
+        ).is_dir():
             logger.info("Scene %s already present in %s", scene_id, expected_safe_dir)
             return expected_safe_dir
 
@@ -198,27 +213,59 @@ class CDSEClient:
                 download_url = f"{self.endpoints.cdse.odata_url}/Products({product_id})/$value"
 
         zip_path = target_root / f"{scene_id}.zip"
+        parsed_url = urlsplit(download_url)
+        host = parsed_url.hostname or ""
+        if parsed_url.scheme != "https" or not (
+            host == "dataspace.copernicus.eu" or host.endswith(".dataspace.copernicus.eu")
+        ):
+            raise ValueError("Refusing to send CDSE credentials to a non-CDSE HTTPS download URL.")
+        partial_path = zip_path.with_suffix(".zip.part")
         logger.info("Downloading %s from CDSE...", scene_id)
 
         with httpx.Client(timeout=600.0, follow_redirects=True) as client:
             with client.stream("GET", download_url, headers=headers) as response:
                 response.raise_for_status()
                 bytes_downloaded = 0
-                with open(zip_path, "wb") as f:
+                with open(partial_path, "wb") as f:
                     for chunk in response.iter_bytes(chunk_size=1024 * 1024):
                         f.write(chunk)
                         bytes_downloaded += len(chunk)
 
                 self.cache.record_transfer(bytes_downloaded)
+        with zipfile.ZipFile(partial_path) as archive:
+            if archive.testzip() is not None:
+                raise ValueError("Downloaded archive failed ZIP CRC validation.")
+        partial_path.replace(zip_path)
 
         if extract:
             logger.info("Extracting %s...", zip_path.name)
-            with zipfile.ZipFile(zip_path, "r") as zip_ref:
-                zip_ref.extractall(target_root)
+            with tempfile.TemporaryDirectory(prefix="extract-", dir=target_root) as temp_dir:
+                extract_root = Path(temp_dir).resolve()
+                with zipfile.ZipFile(zip_path, "r") as zip_ref:
+                    for member in zip_ref.infolist():
+                        destination = (extract_root / member.filename).resolve()
+                        if not destination.is_relative_to(extract_root) or "\\" in member.filename:
+                            raise ValueError("Unsafe path in downloaded SAFE archive.")
+                        if (member.external_attr >> 16) & 0o170000 == 0o120000:
+                            raise ValueError("Symbolic links are not allowed in SAFE archives.")
+                    zip_ref.extractall(extract_root)
+                extracted = extract_root / expected_safe_dir.name
+                if (
+                    not (extracted / "manifest.safe").is_file()
+                    or not (extracted / "measurement").is_dir()
+                ):
+                    raise ValueError(
+                        "Downloaded archive does not contain the expected SAFE product."
+                    )
+                if expected_safe_dir.exists():
+                    raise ValueError(
+                        "Incomplete SAFE directory already exists; remove it before retrying."
+                    )
+                extracted.replace(expected_safe_dir)
             zip_path.unlink()  # Remove zip after extraction to save disk space
 
         self.cache.evict_if_needed()
-        return expected_safe_dir
+        return expected_safe_dir if extract else zip_path
 
     def _parse_stac_feature(self, feature: dict[str, Any]) -> SARSceneMetadata | None:
         """Parse raw STAC Feature JSON into typed SARSceneMetadata."""
@@ -228,16 +275,23 @@ class CDSEClient:
             return None
 
         # Parse datetime
-        dt_str = props.get("datetime") or props.get("start_datetime") or "2020-01-01T00:00:00Z"
+        dt_str = props.get("datetime") or props.get("start_datetime")
+        if not dt_str:
+            logger.warning("Skipping STAC scene without acquisition time: %s", scene_id)
+            return None
         start_str = props.get("start_datetime") or dt_str
         end_str = props.get("end_datetime") or dt_str
 
-        acq_time = self._parse_iso(dt_str)
-        start_time = self._parse_iso(start_str)
-        end_time = self._parse_iso(end_str)
+        try:
+            acq_time = self._parse_iso(dt_str)
+            start_time = self._parse_iso(start_str)
+            end_time = self._parse_iso(end_str)
+        except ValueError:
+            logger.warning("Skipping STAC scene with invalid time: %s", scene_id)
+            return None
 
         # Polarizations list
-        pols = props.get("sar:polarizations") or ["HH", "HV"]
+        pols = props.get("sar:polarizations") or []
         if isinstance(pols, str):
             pols = [pols]
 
@@ -269,7 +323,7 @@ class CDSEClient:
     def _parse_iso(self, dt_str: str) -> datetime:
         """Safely parse ISO datetime string."""
         clean_str = dt_str.replace("Z", "+00:00")
-        try:
-            return datetime.fromisoformat(clean_str)
-        except ValueError:
-            return datetime(2020, 1, 1)
+        parsed = datetime.fromisoformat(clean_str)
+        if parsed.tzinfo is None:
+            raise ValueError("Catalogue acquisition time must include a timezone.")
+        return parsed.astimezone(UTC)

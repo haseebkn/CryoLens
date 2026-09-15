@@ -1,6 +1,9 @@
 """Unit tests for pure-Python calibration and SNAP chain execution."""
 
+from pathlib import Path
+
 import numpy as np
+import pytest
 
 from cryolens.preprocess.python_chain import PurePythonSARProcessor
 from cryolens.preprocess.snap_chain import SNAPChainRunner
@@ -38,14 +41,16 @@ def test_process_scene_arrays_reprojection() -> None:
     h, w = 120, 150
     hh_dn = np.full((h, w), 50.0, dtype=np.float32)
     hv_dn = np.full((h, w), 10.0, dtype=np.float32)
-    bounds = (-55.0, 47.0, -53.0, 49.0)
+    bounds = (-53.01, 47.99, -53.0, 48.0)
 
     result = processor.process_scene_arrays(
         hh_dn=hh_dn,
         hv_dn=hv_dn,
         source_bounds=bounds,
         source_crs="EPSG:4326",
-        apply_denoise=True,
+        calibration_lut_hh=100.0,
+        calibration_lut_hv=100.0,
+        apply_denoise=False,
     )
 
     assert "bands" in result
@@ -64,3 +69,39 @@ def test_snap_chain_runner_checks() -> None:
     # Ensure helper methods return boolean without unhandled exceptions
     assert isinstance(runner.is_docker_available(), bool)
     assert isinstance(runner.is_local_gpt_available(), bool)
+
+
+def test_calibrated_geocoding_uses_gcps_and_preserves_nodata() -> None:
+    processor = PurePythonSARProcessor(pixel_spacing_m=100.0)
+    hh = np.full((8, 8), 0.01, dtype=np.float32)
+    hv = np.full((8, 8), 0.001, dtype=np.float32)
+    hh[0:3, 0:3] = np.nan
+    lat = np.tile(np.linspace(48.01, 48.0, 8)[:, None], (1, 8))
+    lon = np.tile(np.linspace(-53.01, -53.0, 8), (8, 1))
+    result = processor.process_calibrated_arrays(hh, hv, np.full((8, 8), 35.0), lat, lon)
+    values = result["bands"]["sigma0_hh_db"]
+    assert np.any(values == result["nodata"])
+    np.testing.assert_allclose(values[values != result["nodata"]], -20.0, atol=1e-4)
+    assert result["orbit_correction_applied"] is False
+
+
+def test_double_denoise_rejected() -> None:
+    a = np.ones((2, 2), dtype=np.float32)
+    with pytest.raises(ValueError, match="already noise corrected"):
+        PurePythonSARProcessor().process_calibrated_arrays(a, a, a, a, a, apply_denoise=True)
+
+
+def test_invalid_calibration_lut_rejected() -> None:
+    with pytest.raises(ValueError, match="positive"):
+        PurePythonSARProcessor().calibrate_dn_to_sigma0(np.ones((2, 2)), 0.0)
+
+
+def test_snap_missing_runtime_fails(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    safe = tmp_path / "test.SAFE"
+    safe.mkdir()
+    runner = SNAPChainRunner()
+    monkeypatch.setattr(runner, "is_docker_available", lambda: False)
+    monkeypatch.setattr(runner, "is_local_gpt_available", lambda: False)
+    with pytest.raises(RuntimeError, match="requires a working"):
+        runner.run_preprocessing(safe, tmp_path / "out")
+    assert not list(tmp_path.rglob("*.dim"))

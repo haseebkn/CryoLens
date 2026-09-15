@@ -1,3 +1,5 @@
-"""FastAPI application endpoints for scenes, detections, validations, and drift forecasts."""
+"""CryoLens REST API package."""
 
-__all__: list[str] = []
+from cryolens.api.main import app
+
+__all__ = ["app"]

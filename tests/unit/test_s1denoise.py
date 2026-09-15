@@ -1,6 +1,7 @@
 """Unit tests for Sentinel-1 subswath thermal noise balancing and scalloping removal."""
 
 import numpy as np
+import pytest
 
 from cryolens.preprocess.s1denoise import (
     S1SubswathDenoise,
@@ -39,11 +40,12 @@ def test_s1denoise_removes_nesz_scalloping() -> None:
     noisy_hv = ocean_bg + nesz_pattern
 
     denoiser = S1SubswathDenoise(min_linear_floor=1e-5)
-    denoised_hv, factors = denoiser.denoise(noisy_hv)
+    denoised_hv, factors = denoiser.denoise(noisy_hv, np.tile(nesz_pattern, (h, 1)))
 
     assert denoised_hv.shape == (h, w)
     assert np.all(denoised_hv >= 1e-5)
-    assert len(factors) == 5
+    assert factors == {}
+    np.testing.assert_allclose(denoised_hv, ocean_bg, atol=1e-8)
 
     # Mean signal across center should be lower after noise subtraction
     assert np.mean(denoised_hv) < np.mean(noisy_hv)
@@ -52,8 +54,13 @@ def test_s1denoise_removes_nesz_scalloping() -> None:
 def test_denoise_cross_pol_intensity_functional() -> None:
     """Test functional wrapper for s1denoise."""
     raw_hv = np.random.uniform(0.005, 0.02, size=(50, 200)).astype(np.float32)
-    denoised = denoise_cross_pol_intensity(raw_hv)
+    denoised = denoise_cross_pol_intensity(raw_hv, np.full(raw_hv.shape, 0.001))
 
     assert denoised.shape == (50, 200)
     assert np.all(np.isfinite(denoised))
     assert np.all(denoised >= 1e-5)
+
+
+def test_missing_nesz_rejected() -> None:
+    with pytest.raises(ValueError, match="measured noise field"):
+        S1SubswathDenoise().denoise(np.ones((8, 8)))

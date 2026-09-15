@@ -77,3 +77,32 @@ def test_cdse_client_feature_parsing() -> None:
     assert metadata.instrument_mode == "EW"
     assert metadata.polarizations == ["HH", "HV"]
     assert metadata.download_url == "https://dataspace.copernicus.eu/download/sample.zip"
+
+
+def test_missing_catalogue_time_is_not_fabricated() -> None:
+    assert CDSEClient()._parse_stac_feature({"id": "scene", "properties": {}}) is None
+
+
+def test_invalid_catalogue_time_is_not_fabricated() -> None:
+    assert (
+        CDSEClient()._parse_stac_feature({"id": "scene", "properties": {"datetime": "invalid"}})
+        is None
+    )
+
+
+def test_cache_paths_cannot_escape(tmp_path: Path) -> None:
+    import pytest
+
+    cache = LocalCacheManager(tmp_path / "cache")
+    with pytest.raises(ValueError, match="inside"):
+        cache.get_path("item", "../../outside")
+    with pytest.raises(ValueError, match="name an item"):
+        cache.get_path("..")
+    assert cache.get_path(r"..\outside").parent == cache.cache_dir
+
+
+def test_scene_download_rejects_path_traversal(tmp_path: Path) -> None:
+    import pytest
+
+    with pytest.raises(ValueError, match="safe product basename"):
+        CDSEClient().download_scene("../outside", tmp_path)

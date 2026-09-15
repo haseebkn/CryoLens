@@ -1,3 +1,17 @@
-"""Iceberg target detection algorithms (CFAR, CNN classifier, YOLOv8)."""
+"""Detection module for CryoLens."""
 
-__all__: list[str] = []
+from cryolens.detect.cfar import (
+    BaseCFARDetector,
+    CACFARDetector,
+    CFARResult,
+    GammaCFARDetector,
+    get_cfar_detector,
+)
+
+__all__ = [
+    "BaseCFARDetector",
+    "CACFARDetector",
+    "CFARResult",
+    "GammaCFARDetector",
+    "get_cfar_detector",
+]

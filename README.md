@@ -1,140 +1,161 @@
-# CryoLens 🧊🛰️
+# CryoLens
 
-**Autonomous SAR Iceberg Detection, Validation, and Drift Forecasting for the Grand Banks & NE Newfoundland Shelf.**
+**Auditable satellite radar candidate screening for the Newfoundland and Labrador shelf.**
 
-Targeting Maritime Domain Awareness (MDA), polarimetric radar signal processing, and operational MLOps standards.
+CryoLens is a research portfolio project for maritime remote sensing. It uses
+Sentinel-1 HH/HV imagery to find bright radar targets, suppress common clutter,
+and show evidence for analyst review. A detected target is **unclassified and
+unverified** until reviewed. A detector score is not the probability of an iceberg.
 
----
+The September 2026 audit found errors in preprocessing, geographic coverage,
+classification claims and evaluation. Earlier headline results are withdrawn;
+see [benchmark status](docs/BENCHMARK.md) and the [audit](docs/AUDIT.md).
+Precision, recall and a real-world false-positive rate have **not** been established.
 
-## 1. Overview & Core Mission
+The corrected three-acquisition smoke run retained **35 unverified candidates**
+over **325,238.6 km²** of cumulative eligible coverage. This demonstrates a
+reproducible screening path, not a validated regional false-alarm budget.
 
-The Grand Banks and the Northeast Newfoundland Shelf ("Iceberg Alley") present one of the most demanding operational environments in maritime remote sensing: persistent cloud cover, high sea states, dynamic sea ice margins, and intense vessel traffic around offshore oil fields (Hibernia, Terra Nova, White Rose) and shipping lanes.
+## Relevance to C-CORE
 
-CryoLens provides an end-to-end pipeline processing Sentinel-1 Extra Wide (EW) Swath SAR imagery to detect, classify, human-validate, and drift-forecast icebergs against ocean current and atmospheric forcing.
+The design is informed by C-CORE's public work on SAR target detection,
+ship/iceberg discrimination and human quality control. This is an independent
+project, with no C-CORE affiliation, endorsement or certification. The
+[MDA alignment](docs/MDA_ALIGNMENT.md) maps public sources to implemented
+behavior and identifies the missing operational capabilities.
 
-```
-                  ┌─────────────────────────────────────────┐
-                  │   Copernicus Sentinel-1 (EW GRD HH+HV)   │
-                  └────────────────────┬────────────────────┘
-                                       │
-                      [SAR Radiometric Preprocessing]
-                      • Precise Orbit Ephemerides (POEORB)
-                      • Thermal Noise Removal (s1denoise)
-                      • Radiometric Calibration to σ⁰
-                      • Ellipsoid Correction (EPSG:3978)
-                                       │
-                                       ▼
-                   ┌───────────────────────────────────────┐
-                   │    Polarimetric & Geometric Stack     │
-                   │  [σ⁰_HH, σ⁰_HV, σ⁰_HH/σ⁰_HV, θ_inc]   │
-                   └───────────────────┬───────────────────┘
-                                       │
-                    ┌──────────────────┴──────────────────┐
-                    ▼                                     ▼
-        ┌───────────────────────┐             ┌───────────────────────┐
-        │  Classical Baseline   │             │   Deep Learning (P2)  │
-        │   CA / K-dist CFAR    │             │   Custom YOLOv8 / CNN │
-        └───────────┬───────────┘             └───────────┬───────────┘
-                    │                                     │
-                    └──────────────────┬──────────────────┘
-                                       │
-                                       ▼
-                  ┌─────────────────────────────────────────┐
-                  │    Unified ROC / FAR Benchmark Suite    │
-                  │   (Stratified by Ice & Wind Regimes)    │
-                  └────────────────────┬────────────────────┘
-                                       │
-                                       ▼
-                  ┌─────────────────────────────────────────┐
-                  │        PostGIS Detection Registry       │
-                  └──────────────┬───────────────────┬──────┘
-                                 │                   │
-               [Analyst Feedback Loop]               ▼
-            QGIS PyQt5 Analyst Validation     [OpenDrift openberg]
-                         │                    • Multi-layer hydrodynamic drag
-                         ▼                    • NONNA-100 keel grounding
-             DVC-Versioned Retraining         • Residual ML displacement model
+## What you can inspect
+
+- CA-CFAR and Gamma-CFAR statistics in linear power, with explicit nodata handling.
+- A shared NL study polygon used for pixel-level analysis and API filtering.
+- Land/coast, border, seam and optional sea-ice exclusion; an auditable suppression ledger.
+- Unclassified candidate geometry and radiometry, source timestamps and review provenance.
+- A FastAPI/Leaflet analyst dashboard with bounded queries and protected review writes.
+- Tests, type checks, dependency locking, database migrations and real PostGIS checks in CI.
+
+**Gamma-CFAR is not a K-distribution detector.** The historical `k_distribution`
+configuration value is retained only as a compatibility alias. The default is `gamma`.
+
+## Quickstart
+
+Python 3.11, [uv](https://docs.astral.sh/uv/) and Docker are needed for the full
+local app. Run from the repository root. These commands work in PowerShell
+and POSIX shells; use your shell's copy command for `.env.example`.
+
+```text
+uv sync --frozen --extra dev
 ```
 
----
+Copy `.env.example` to `.env`, set a local `POSTGRES_PASSWORD`, then:
 
-## 2. Key Architectural Differentiators
-
-Unlike generic object detection pipelines, CryoLens implements the physical and statistical rigor demanded by radar oceanography:
-
-1. **True SAR Radiometric Processing:** Sentinel-1 Digital Numbers (DN) are strictly calibrated through orbit correction $\rightarrow$ thermal noise removal $\rightarrow$ radiometric calibration to $\sigma^0$ $\rightarrow$ geocoding. Raw DN values are never fed directly to models.
-2. **Subswath Scalloping Correction:** Extra Wide (EW) cross-pol (HV) imagery suffers from Noise Equivalent Sigma Zero (NESZ) scalloping. CryoLens integrates the NERSC `s1denoise` algorithm (Park et al.) alongside SNAP to prevent false-alarm stripes.
-3. **Polarimetric Feature Tensor:** 4-band input stack $[\sigma^0_{HH}, \sigma^0_{HV}, \text{Ratio}_{HH/HV}, \theta_{inc}]$.
-4. **CFAR Baseline First:** Statistical CFAR (Cell-Averaging and K-distribution) on linear intensity is tuned and evaluated on the exact same benchmark curves (False Alarms per $1000\text{ km}^2$) before deep learning models.
-5. **Sea Ice as a First-Class Regime:** Metrics are explicitly stratified across open water vs. sea ice regimes (CIS SIGRID-3 / AI4Arctic) and wind clutter speeds (ERA5).
-6. **Physics-First Drift Forecasting:** OpenDrift (`openberg`) multi-layer drag physics with CHS NONNA-100 bathymetry grounding detection + residual XGBoost corrections.
-7. **Analyst-in-the-Loop Workflow:** QGIS validation plugin writing directly to PostGIS, feeding analyst corrections back into DVC-versioned training manifests.
-
----
-
-## 3. Honest Data Constraints & AIS Notice
-
-* **Historical Point-Level AIS Availability:** High-resolution historical vessel AIS tracks over the Grand Banks are proprietary and not freely available in public datasets (unlike US waters in NOAA Marine Cadastre). Vessel training labels in CryoLens are sourced from the verified AIS-matched **xView3-SAR** dataset. Live correlation is architected as an extensible interface with clear hooks for commercial AIS feeds (Spire / exactEarth / MarineTraffic).
-* **IIP Ground Truth Semantics:** International Ice Patrol (IIP / NSIDC G00807) sightings record visual sightings with inherent temporal offsets ($\pm \Delta t$). Because icebergs drift at $0.1\text{–}0.5\text{ m/s}$, a 6-hour gap corresponds to $2\text{–}10\text{ km}$ of drift. IIP is used as a weak-supervision search prior, never naively intersected with SAR pixels.
-
----
-
-## 4. Quickstart & Development
-
-### Prerequisites
-* Python 3.11+
-* `uv` package manager (`curl -LsSf https://astral.sh/uv/install.sh | sh` or `winget install astral-sh.uv`)
-* Docker & Docker Compose (for local PostGIS 16 database)
-
-### Setup
-```bash
-# 1. Clone repository
-git clone https://github.com/your-org/CryoLens.git
-cd CryoLens
-
-# 2. Set up virtual environment and install dependencies
-make dev
-
-# 3. Configure credentials
-cp .env.example .env
-# Edit .env with your credentials (see .env.example for descriptions)
-
-# 4. Start PostGIS 16 database
-make db-up
-
-# 5. Run test suite and linters
-make test
-make lint
+```text
+docker compose up -d postgis
+uv run --frozen alembic upgrade head
+uv run --frozen uvicorn cryolens.api:app --host 127.0.0.1 --port 8000
 ```
 
----
+Open [the dashboard](http://localhost:8000) or [the API docs](http://localhost:8000/docs).
+An empty database is shown as empty; the app does not manufacture detections.
+For an interview walkthrough, use [PORTFOLIO.md](docs/PORTFOLIO.md).
 
-## 5. Repository Structure
+With the public archive downloaded, import the first labeled example:
 
-```
-CryoLens/
-├── configs/             # AOI GeoJSON, project.yaml, SNAP GPT graphs
-├── data/                # raw/, interim/, processed/ (strictly gitignored)
-├── docs/                # DECISIONS.md (Architecture Decision Records)
-├── src/cryolens/
-│   ├── config/          # Type-safe pydantic-settings & YAML loader
-│   ├── ingest/          # CDSE STAC, ASF DAAC, Planetary Computer
-│   ├── preprocess/      # SNAP GPT graphs, s1denoise, COG stack builder
-│   ├── detect/          # CA/K-dist CFAR, CNN classifier, YOLOv8
-│   ├── eval/            # Benchmark harness (ROC, FAR/1000km2, stratified metrics)
-│   ├── geo/             # Affine georeferencing, vectorization, CRS transforms
-│   ├── drift/           # OpenDrift openberg, CHS NONNA-100 grounding, XGBoost
-│   ├── api/             # FastAPI REST endpoints
-│   └── db/              # PostGIS models, migrations, and sessions
-├── tests/               # Unit and integration test suite
-├── docker-compose.yml   # PostGIS 16-3.4 service
-├── Makefile             # Development automation targets
-└── pyproject.toml       # Pinned dependencies & tooling configs
+```text
+uv run --frozen python scripts/import_ai4arctic_scene.py --scene data/raw/ai4arctic/train/20180331T212355_cis_prep.nc
 ```
 
----
+This imports a historical 2018-03-31 observation, not a live feed. Select
+**Unverified SAR candidates** in the dashboard to inspect its six candidates;
+the default confirmed-only view correctly shows none until an analyst reviews
+the evidence. Re-importing preserves existing records and reviews.
 
-## 6. License & Non-Navigational Notice
+Review writes are disabled until both `CRYOLENS_ANALYST_API_KEY` and
+`CRYOLENS_ANALYST_ID` are configured locally. Never put credentials in Git,
+screenshots or presentation materials. Bind locally for a demo; production
+hosting and identity management have not been assessed.
 
-* **Software:** MIT License
-* **Canadian Hydrographic Service (CHS) Notice:** Bathymetric data derived from CHS NONNA-100/NONNA-10 is for research and modeling purposes only. **Not to be used for navigation.**
+## Real data and evaluation
+
+The local evaluation uses the public
+[AI4Arctic ready-to-train dataset](https://data.dtu.dk/articles/dataset/Ready-To-Train_AI4Arctic_Sea_Ice_Challenge_Dataset/21316608),
+which contains Sentinel-1 scenes and **sea-ice charts, not iceberg truth**.
+The publisher's normalization must be inverted using its documented constants;
+scene extrema alone cannot establish physical units. All results depend on
+that data contract and the masking assumptions documented in the benchmark.
+
+```text
+uv run --frozen python -m cryolens.eval --help
+uv run --frozen python -m cryolens.detect --help
+uv run --frozen python -m cryolens.preprocess --help
+```
+
+Raw imagery, credentials, trained weights and generated databases are excluded
+from Git. GSHHG shorelines are public and are required by the raw COG detection
+path (`make fetch-shorelines` on systems with Make). See
+[DATA.md](docs/DATA.md) for access and provenance.
+
+The raw SAFE/COG path lacks aligned sea-ice context and requires explicit
+unknown-ice research opt-in (`--allow-unknown-ice` for the detection CLI,
+`PipelineRunner(allow_unknown_ice=True)` in Python). The charted public-scene
+import above uses conservative open-water screening by default.
+
+## Geographic scope
+
+The hand-defined study polygon covers the Labrador coastal corridor, Northeast
+Newfoundland Shelf and Grand Banks. It is stored in `configs/aoi.geojson` and
+bounded by 60.5°W–44°W, 42.5°N–60.5°N. It is **not a provincial boundary or EEZ**.
+Land and coastal exclusion are separate from this marine research area.
+Intersecting scenes may be loaded, but pixels and candidate centres outside
+the study area are excluded. Coverage is reported as analyzed area; masked
+water is not evidence that no icebergs are present.
+
+## Validation
+
+```text
+uv run --frozen pytest
+uv run --frozen ruff check .
+uv run --frozen ruff format --check .
+uv run --frozen mypy src tests
+uv run --frozen python scripts/check_postgis.py
+uv build
+```
+
+The PostGIS check requires the migrated local database and rolls back its
+fixtures. Unit tests also use SQLite substitutes; those alone do not verify
+PostGIS. Real-data integration tests skip explicitly when their source files
+are absent. CI uses locked dependencies and a real PostGIS service.
+
+## Capability boundaries
+
+| Capability | Honest status |
+|---|---|
+| Statistical radar candidate screening | Implemented; thresholds require regional validation |
+| Analyst review and geographic API | Implemented; local API-key protection |
+| SAFE calibration and GCP geolocation | Research implementation; not operationally validated |
+| Precise-orbit correction in Python pipeline | Not applied; never claimed in provenance |
+| Trained ship/iceberg classifier | Not implemented |
+| Live AIS deconfliction | Not connected; no match does not establish iceberg identity |
+| Drift prediction / grounding | Disabled; verified forcing and skill assessment missing |
+| Navigational warnings / hazard advisories | Not produced |
+
+Reducing candidate counts can also remove real icebergs. The project does not
+claim that its thresholds minimize false positives or preserve recall.
+[Limitations](docs/LIMITATIONS.md) describe the evidence needed to make those claims.
+
+## Structure
+
+```text
+src/cryolens/
+  config/       validated settings; credentials remain local
+  ingest/       satellite catalogues, download/cache, IIP context
+  preprocess/   SAFE calibration, geolocation, coast masks, COG stack
+  data/         AI4Arctic data contract and scene index
+  detect/       CFAR, suppression, scene runner, training export
+  geo/          shared NL area and target geometry
+  eval/         candidate-density reports and contextual matching
+  api/ db/ web/ analyst interface, persistence and provenance
+  drift/        explicit unavailable interfaces
+```
+
+Software: [MIT](LICENSE). Source datasets retain their own terms.
+No output is suitable for navigation or an ice-hazard advisory.
