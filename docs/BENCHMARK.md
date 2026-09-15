@@ -8,12 +8,12 @@ Detector: **Gamma-CFAR**. Region: **NL shelf study polygon**.
 
 | Quantity | Value |
 |---|---:|
-| Processed scenes | 3 |
-| Cumulative analyzed area (km², nominal spacing) | 325,238.6 |
-| Raw connected candidates | 1,361 |
-| Retained unverified candidates | 35 |
-| Raw candidates / 1,000 km² | 4.185 |
-| Retained candidates / 1,000 km² | 0.108 |
+| Processed scenes | 25 |
+| Cumulative analyzed area (km², nominal spacing) | 1,670,147.0 |
+| Raw connected candidates | 6,022 |
+| Retained unverified candidates | 311 |
+| Raw candidates / 1,000 km² | 3.606 |
+| Retained candidates / 1,000 km² | 0.186 |
 
 Candidate density counts all retained returns regardless of their true identity. Fewer returns can include missed real targets. Repeated observations accumulate coverage; this is not unique ocean area. Masked water was not surveyed by the detector.
 
@@ -55,62 +55,79 @@ Candidate density counts all retained returns regardless of their true identity.
   {
     "detector": "gamma",
     "pfa": 1e-06,
-    "eligible_scenes": 25,
-    "selected_scenes": 3,
-    "processed_scenes": 3,
+    "eligible_scenes": 28,
+    "selected_scenes": 28,
+    "processed_scenes": 25,
     "failed_scenes": [],
-    "skipped_scenes": []
+    "skipped_scenes": [
+      {
+        "scene_id": "20190406T102029_cis_prep.nc",
+        "reason": "No eligible water after AOI, quality and training-support masks",
+        "mask_breakdown": {
+          "invalid_or_nodata": 0.4000474571849962,
+          "land_and_coastal_buffer": 0.07621915978375224,
+          "swath_border": 0.027935066950018978,
+          "subswath_seams": 1.9548465978560666e-05,
+          "sea_ice_or_unknown": 0.495778767615254,
+          "outside_nl_study_area": 0.0
+        }
+      },
+      {
+        "scene_id": "20200217T102731_cis_prep.nc",
+        "reason": "No eligible water after AOI, quality and training-support masks",
+        "mask_breakdown": {
+          "invalid_or_nodata": 0.13291702672126973,
+          "land_and_coastal_buffer": 0.010079851612776258,
+          "swath_border": 0.021896128048835034,
+          "sea_ice_or_unknown": 0.8351069936171189,
+          "outside_nl_study_area": 0.0
+        }
+      },
+      {
+        "scene_id": "20200319T101935_cis_prep.nc",
+        "reason": "No eligible water after AOI, quality and training-support masks",
+        "mask_breakdown": {
+          "invalid_or_nodata": 0.16992405154052737,
+          "land_and_coastal_buffer": 0.009392650694104502,
+          "swath_border": 0.018860511854515802,
+          "subswath_seams": 0.0015912429387688787,
+          "sea_ice_or_unknown": 0.8002315429720834,
+          "outside_nl_study_area": 0.0
+        }
+      }
+    ]
   }
 ]
 ```
 
 ## Sea-ice strata
 
-| Stratum | Scenes | Area km² | Candidates | / 1,000 km² |
-|---|---:|---:|---:|---:|
-| ice_affected | 2 | 191,675.4 | 7 | 0.037 |
-| open_water | 1 | 133,563.2 | 28 | 0.210 |
+| Stratum | Scenes | Area km² | Candidates | / 1,000 km² | Interpretable |
+|---|---:|---:|---:|---:|---|
+| ice_affected | 19 | 1,065,212.6 | 223 | 0.209 | yes |
+| open_water | 6 | 604,934.4 | 88 | 0.145 | yes |
 
 ## Wind strata
 
-| Stratum | Scenes | Area km² | Candidates | / 1,000 km² |
-|---|---:|---:|---:|---:|
-| high | 1 | 113,875.4 | 6 | 0.053 |
-| low | 1 | 133,563.2 | 28 | 0.210 |
-| moderate | 1 | 77,800.0 | 1 | 0.013 |
+| Stratum | Scenes | Area km² | Candidates | / 1,000 km² | Interpretable |
+|---|---:|---:|---:|---:|---|
+| high | 9 | 524,616.7 | 57 | 0.109 | yes |
+| low | 9 | 652,618.1 | 130 | 0.199 | yes |
+| moderate | 7 | 492,912.2 | 124 | 0.252 | yes |
 
 ## Suppression ledger
 
 | Stage | Removed | Remaining |
 |---|---:|---:|
-| min_size | 1,326 | 35 |
-| max_size | 0 | 35 |
-| aspect_ratio | 0 | 35 |
-| min_peak_hv | 0 | 35 |
-| copol_dominance | 0 | 35 |
-| clutter_contrast | 0 | 35 |
+| min_size | 5,709 | 313 |
+| max_size | 0 | 313 |
+| aspect_ratio | 0 | 313 |
+| min_peak_hv | 0 | 313 |
+| copol_dominance | 1 | 312 |
+| clutter_contrast | 1 | 311 |
 
 ## Reproduction and evidence
 
 Machine-readable evidence with per-scene assumptions, source checksums and suppression ledgers: [audited_results.json](benchmarks/audited_results.json). See [DATA.md](DATA.md), [AUDIT.md](AUDIT.md) and [LIMITATIONS.md](LIMITATIONS.md).
 
 No certified C-CORE operating point, MANICE confidence code or navigational hazard assessment is established by this experiment.
-
-## Reproduce this small evaluation
-
-The first three geographically eligible labeled training scenes are selected
-in filename order, independently of detection counts:
-
-```text
-uv run --frozen python -m cryolens.eval --data-root data/raw/ai4arctic/train --limit 3 --pfa 1e-6 --open-water-only --output-dir data/processed/benchmarks-audit
-```
-
-This is a three-acquisition engineering check, not validation for all of NL or
-all seasons. Scene-level ice strata can be "ice_affected" even though only the
-charted open-water pixels within those scenes were analyzed. Wind bins are
-relative cohort terciles of restored ERA5 speed, not operational sea-state
-classes; three scenes cannot support a wind-response conclusion.
-
-The earlier challenge-test attempt had no eligible open-water coverage:
-[withheld-scene manifest](benchmarks/withheld_scene_manifest.json). Those skipped
-scenes are not interpreted as zero false positives.

@@ -12,9 +12,16 @@ classification claims and evaluation. Earlier headline results are withdrawn;
 see [benchmark status](docs/BENCHMARK.md) and the [audit](docs/AUDIT.md).
 Precision, recall and a real-world false-positive rate have **not** been established.
 
-The corrected three-acquisition smoke run retained **35 unverified candidates**
-over **325,238.6 km²** of cumulative eligible coverage. This demonstrates a
-reproducible screening path, not a validated regional false-alarm budget.
+Across **25 Sentinel-1 acquisitions** (28 eligible, 3 fully masked by the
+conservative open-water filter), the screening path retained **311 unverified
+candidates** over **1,670,147 km²** of cumulative eligible coverage, or 0.186
+per 1,000 km². This is a reproducible screening result, not a validated regional
+false-alarm budget.
+
+It supersedes an earlier three-acquisition smoke run, and is **worse**, not
+better: retained density rose from 0.108 to 0.186 per 1,000 km² and the
+suppression factor fell from 38.9x to 19.4x once coverage grew five-fold. Small
+samples flattered the result.
 
 ## Relevance to C-CORE
 
