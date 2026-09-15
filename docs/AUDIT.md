@@ -33,13 +33,28 @@ synthetic successful results.
 
 ## Evidence and interpretation
 
-The corrected smoke evaluation used the first three geographically eligible
-labeled training acquisitions in the local public AI4Arctic archive, in
-filename order, with Gamma-CFAR Pfa 1e-6 and open-water-only screening. It
-retained 35 unverified candidates from 1,361 raw connected components over
-325,238.6 km² of accumulated eligible coverage. This is a small engineering
-reproduction, not regional performance validation or an optimized operating
-point. No scene was selected based on its target count.
+The evaluation has since been extended from three acquisitions to every
+geographically eligible scene in the local public AI4Arctic archive, with the
+same settings (Gamma-CFAR, Pfa 1e-6, open-water-only screening). Of 28 eligible
+scenes, 25 were processed; 3 retained no eligible water after the AOI, quality
+and ice masks and are recorded in the run manifest with their mask breakdowns.
+The run retained 311 unverified candidates from 6,022 raw connected components
+over 1,670,147 km² of accumulated eligible coverage. No scene was selected on
+its target count, and no threshold was tuned against the outcome.
+
+The expanded result is worse than the smoke run it replaces: retained density
+rose from 0.108 to 0.186 per 1,000 km² and the suppression factor fell from
+38.9x to 19.4x across roughly five times the coverage. That direction is the
+point of expanding the sample. It remains a reproduction of a processing path,
+not regional performance validation or an optimized operating point.
+
+Two limits are now measurable rather than suspected. Four of the six suppression
+stages removed nothing across all 25 scenes, and a fifth removed one candidate;
+the minimum-component-size gate accounts for 94.8 percent of all removals, so
+the remaining stages are presently unexercised on real data rather than
+demonstrated. Candidate density by wind tercile is also not monotonic (0.199 low,
+0.252 moderate, 0.109 high per 1,000 km²), which does not support a wind-driven
+clutter narrative at this sample size.
 
 An earlier three-scene challenge-test attempt had no usable charted open-water
 coverage; all three were skipped and no density report was issued. Its
