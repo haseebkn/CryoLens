@@ -139,7 +139,8 @@ are absent. CI uses locked dependencies and a real PostGIS service.
 | Statistical radar candidate screening | Implemented; thresholds require regional validation |
 | Analyst review and geographic API | Implemented; local API-key protection |
 | SAFE calibration and GCP geolocation | Research implementation; not operationally validated |
-| Precise-orbit correction in Python pipeline | Not applied; never claimed in provenance |
+| Precise-orbit acquisition | Implemented; POEORB/RESORB fetched from public ESA/ASF mirrors, no credentials needed |
+| Precise-orbit **correction** in Python pipeline | Not applied; geolocation is still the product annotation's, and provenance says so |
 | Trained ship/iceberg classifier | Not implemented |
 | Live AIS deconfliction | Not connected; no match does not establish iceberg identity |
 | Drift prediction / grounding | Disabled; verified forcing and skill assessment missing |

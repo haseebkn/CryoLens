@@ -74,6 +74,17 @@ comparison with trusted processing on real SAFE products. Running SNAP and
 then ignoring its output is no longer presented as a successful SNAP pipeline.
 Unsupported engines and missing inputs fail explicitly.
 
+Precise and restituted orbit products (POEORB/RESORB) can be acquired without
+credentials from the public ESA STEP and ASF auxiliary-data mirrors, selected by
+the validity window encoded in the product filename, and validated as parseable
+XML carrying state vectors before they are cached. **Acquiring an orbit is not
+applying one.** Geolocation remains that recorded in the product annotation, no
+correction is computed, and `orbit_correction_applied` stays `False` in
+provenance. Applying a precise orbit means recomputing geolocation, which cannot
+responsibly be implemented until there is a real product to verify the result
+against; that is the same blocker as the comparison above, and it needs CDSE or
+Earthdata credentials.
+
 ## 7. Machine learning
 
 There is no trained YOLO or ship/iceberg classifier. Training chip export
