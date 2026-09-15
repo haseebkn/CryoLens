@@ -5,6 +5,12 @@ import json
 from pathlib import Path
 from typing import Any
 
+# Minimum acquisitions before a stratified row is treated as interpretable.
+# Below this a row is a single observation: the published three-scene run split
+# its wind terciles one scene per bin, which produced suppression factors
+# ranging from 11x to 582x that describe individual scenes, not regimes.
+MIN_SCENES_PER_STRATUM = 3
+
 
 def render(report: dict[str, Any], has_plot: bool = False) -> str:
     """Publish only versioned reports with explicit methodology and run accounting."""
@@ -62,16 +68,32 @@ def render(report: dict[str, Any], has_plot: bool = False) -> str:
             [
                 f"## {label}",
                 "",
-                "| Stratum | Scenes | Area km² | Candidates | / 1,000 km² |",
-                "|---|---:|---:|---:|---:|",
+                "| Stratum | Scenes | Area km² | Candidates | / 1,000 km² | Interpretable |",
+                "|---|---:|---:|---:|---:|---|",
             ]
         )
+        underpowered = []
         for row in rows:
+            adequate = row["n_scenes"] >= MIN_SCENES_PER_STRATUM
+            if not adequate:
+                underpowered.append(row["stratum"])
+            marker = "yes" if adequate else f"**no — n<{MIN_SCENES_PER_STRATUM}**"
             lines.append(
                 f"| {row['stratum']} | {row['n_scenes']} | {row['area_km2']:,.1f} | "
-                f"{row['targets']} | {row['density_per_1000km2']:.3f} |"
+                f"{row['targets']} | {row['density_per_1000km2']:.3f} | {marker} |"
             )
         lines.append("")
+        if underpowered:
+            lines.extend(
+                [
+                    f"Strata marked **no** ({', '.join(underpowered)}) contain fewer than "
+                    f"{MIN_SCENES_PER_STRATUM} acquisitions. Their densities and suppression "
+                    "factors are single-scene observations, not estimates of a regime, and a "
+                    "difference between them is not evidence of a trend. They are shown for "
+                    "completeness of accounting rather than for comparison.",
+                    "",
+                ]
+            )
     ledger = report.get("suppression_ledger", [])
     if ledger:
         lines.extend(
