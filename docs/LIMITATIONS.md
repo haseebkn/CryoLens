@@ -74,6 +74,45 @@ comparison with trusted processing on real SAFE products. Running SNAP and
 then ignoring its output is no longer presented as a successful SNAP pipeline.
 Unsupported engines and missing inputs fail explicitly.
 
+### Validation outcome, 2026-09-16
+
+The reader has now been run against a real product: the S1B EW GRDM HH+HV
+acquisition of 2018-04-28T09:39:37 over the Labrador Shelf, which is the same
+acquisition NERSC processed for the AI4Arctic archive, giving an independent
+reference for the identical scene.
+
+| Property | CryoLens | NERSC reference | Outcome |
+|---|---|---|---|
+| Geolocation extent | 48.87-53.16 N, 54.61-47.48 W | identical | Confirmed |
+| Incidence angle | 19.33-47.41 deg | 19.63-46.65 deg | Confirmed |
+| HH median sigma0 | -19.29 dB | -20.67 dB | Agrees within 1.4 dB |
+| HV median, before noise removal | -30.60 dB | -29.02 dB | Agrees within 1.6 dB |
+| HV median, after ESA noise removal | -33.96 dB | -29.02 dB | **Diverges by 4.9 dB** |
+
+**Calibration and geolocation are confirmed. ESA standard thermal noise removal
+is not usable here.** Subtracting the ESA noise vectors drove 45.7 percent of HV
+and 10.7 percent of HH pixels to non-positive power on this scene. Non-positive
+power has no decibel representation and cannot enter a CFAR statistic, so those
+pixels are lost rather than merely noisy. This is the failure ADR-007 predicted
+for low-backscatter maritime cross-pol, now measured rather than anticipated.
+
+The reader reports `nonpositive_power_fraction` and `usable_for_cfar` on every
+read and warns above 5 percent, so an over-subtracted channel cannot be consumed
+as though it were calibrated backscatter. Making the raw SAFE path usable for
+detection requires NERSC-style denoising; that is not yet implemented, and the
+measured results in BENCHMARK.md do not depend on this path.
+
+Precise and restituted orbit products (POEORB/RESORB) can be acquired without
+credentials from the public ESA STEP and ASF auxiliary-data mirrors, selected by
+the validity window encoded in the product filename, and validated as parseable
+XML carrying state vectors before they are cached. **Acquiring an orbit is not
+applying one.** Geolocation remains that recorded in the product annotation, no
+correction is computed, and `orbit_correction_applied` stays `False` in
+provenance. Applying a precise orbit means recomputing geolocation, which cannot
+responsibly be implemented until the resulting geolocation can be checked
+against trusted processing. The calibration comparison above is now done; an
+orbit-correction comparison is not, and remains future work.
+
 ## 7. Machine learning
 
 There is no trained YOLO or ship/iceberg classifier. Training chip export

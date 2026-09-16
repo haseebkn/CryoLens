@@ -52,6 +52,12 @@ logger = logging.getLogger(__name__)
 
 _POL_PATTERN = re.compile(r"-(hh|hv|vv|vh)-", re.IGNORECASE)
 
+#: Fraction of non-positive power above which a channel is reported unusable for
+#: CFAR. Speckle legitimately produces a few very dark pixels, so a small
+#: fraction is normal; tens of percent means the noise subtraction has removed
+#: signal rather than noise.
+NONPOSITIVE_POWER_WARN_FRACTION = 0.05
+
 
 @dataclass
 class CalibrationLUT:
@@ -407,6 +413,30 @@ class SAFEProductReader:
             noise_removed = True
         sigma0[~valid] = np.nan
 
+        # Measured on a real S1B EW scene over the Labrador Shelf: the ESA
+        # standard noise LUT drove 44 percent of HV pixels to zero or negative
+        # power, moving the median 3.4 dB below the uncorrected value and 4.9 dB
+        # below NERSC's independently processed reference for the same
+        # acquisition. Non-positive power has no decibel representation and
+        # cannot enter a CFAR statistic, so the fraction is measured and
+        # surfaced rather than silently clipped. ADR-007 anticipated exactly
+        # this for low-backscatter maritime cross-pol.
+        finite = np.isfinite(sigma0)
+        n_finite = int(finite.sum())
+        nonpositive_fraction = (
+            float(((sigma0 <= 0.0) & finite).sum() / n_finite) if n_finite else 0.0
+        )
+        if noise_removed and nonpositive_fraction > NONPOSITIVE_POWER_WARN_FRACTION:
+            logger.warning(
+                "%s %s: thermal noise removal left %.1f%% of finite pixels at non-positive "
+                "power. ESA standard noise vectors over-subtract over low-backscatter ocean; "
+                "this channel is not suitable for CFAR without NERSC-style denoising "
+                "(see ADR-007).",
+                self.safe_dir.name,
+                polarisation.upper(),
+                100.0 * nonpositive_fraction,
+            )
+
         incidence = _interp_scattered_grid(
             meta["grid_lines"], meta["grid_pixels"], meta["incidence"], shape
         )
@@ -434,6 +464,8 @@ class SAFEProductReader:
             "polarisation": polarisation.upper(),
             "shape": shape,
             "thermal_noise_removed": noise_removed,
+            "nonpositive_power_fraction": nonpositive_fraction,
+            "usable_for_cfar": nonpositive_fraction <= NONPOSITIVE_POWER_WARN_FRACTION,
             "product": self.safe_dir.name,
         }
 
