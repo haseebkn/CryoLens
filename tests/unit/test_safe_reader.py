@@ -14,6 +14,7 @@ import numpy as np
 import pytest
 
 from cryolens.preprocess.safe_reader import (
+    NONPOSITIVE_POWER_WARN_FRACTION,
     CalibrationLUT,
     SAFEProductReader,
     _parse_calibration,
@@ -276,3 +277,66 @@ def test_lut_irregular_pixel_coordinates_interpolate_physically() -> None:
         np.array([1.0, 11.0, 1.0, 3.0, 11.0]),
     )
     assert lut.interpolate((2, 11))[0, 2] == pytest.approx(3.0)
+
+
+class TestNonPositivePowerGuard:
+    """Over-subtracted noise must be reported, never passed off as backscatter.
+
+    Validating the reader against a real S1B EW acquisition over the Labrador
+    Shelf showed the ESA standard noise vectors driving 45.7 percent of HV and
+    10.7 percent of HH pixels to non-positive power. Non-positive power has no
+    decibel representation and cannot enter a CFAR statistic, so the reader
+    measures the fraction and marks the channel unusable rather than emitting a
+    field that looks calibrated and is not. ADR-007 anticipated this for
+    low-backscatter maritime cross-pol.
+    """
+
+    def test_clean_product_is_usable(self, safe_product: Path) -> None:
+        result = SAFEProductReader(safe_product).read_sigma0("HH", remove_thermal_noise=True)
+        assert result["nonpositive_power_fraction"] < NONPOSITIVE_POWER_WARN_FRACTION
+        assert result["usable_for_cfar"] is True
+
+    def test_fraction_is_reported_without_noise_removal(self, safe_product: Path) -> None:
+        result = SAFEProductReader(safe_product).read_sigma0("HH", remove_thermal_noise=False)
+        assert "nonpositive_power_fraction" in result
+        assert result["nonpositive_power_fraction"] == pytest.approx(0.0)
+
+    def test_over_subtraction_marks_channel_unusable(
+        self, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """A noise LUT exceeding the signal must fail loudly, not silently."""
+        import rasterio
+
+        safe = tmp_path / "S1A_EW_GRDM_1SDH_OVERSUB.SAFE"
+        (safe / "measurement").mkdir(parents=True)
+        (safe / "annotation" / "calibration").mkdir(parents=True)
+        stem = "s1a-ew-grd-hh-20200101t000000-20200101t000100-001"
+
+        # Dark scene: DN^2 far below the noise LUT, so subtraction goes negative.
+        dn = np.full((N_LINES, N_SAMPLES), 5.0, dtype=np.float32)
+        with rasterio.open(
+            safe / "measurement" / f"{stem}.tiff",
+            "w",
+            driver="GTiff",
+            height=N_LINES,
+            width=N_SAMPLES,
+            count=1,
+            dtype="uint16",
+        ) as dst:
+            dst.write(dn.astype(np.uint16), 1)
+
+        (safe / "annotation" / f"{stem}.xml").write_text(_annotation_xml(), encoding="utf-8")
+        (safe / "annotation" / "calibration" / f"calibration-{stem}.xml").write_text(
+            _calibration_xml(), encoding="utf-8"
+        )
+        (safe / "annotation" / "calibration" / f"noise-{stem}.xml").write_text(
+            _noise_xml(noise=10_000.0), encoding="utf-8"
+        )
+
+        with caplog.at_level("WARNING"):
+            result = SAFEProductReader(safe).read_sigma0("HH", remove_thermal_noise=True)
+
+        assert result["nonpositive_power_fraction"] > 0.9
+        assert result["usable_for_cfar"] is False
+        assert "non-positive power" in caplog.text
+        assert "ADR-007" in caplog.text

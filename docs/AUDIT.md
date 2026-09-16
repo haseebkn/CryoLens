@@ -82,8 +82,10 @@ performance measurements. Real-source tests skip explicitly when data is absent.
 A credible operational claim requires independently reviewed acquisition-matched
 iceberg and vessel truth, missed-target assessment, regional/seasonal held-out
 evaluation, AIS and infrastructure deconfliction, geolocation error checks and
-agreed false-alarm/recall criteria. Fresh satellite downloads need CDSE or
-Earthdata credentials configured locally. No private credentials were added to
+agreed false-alarm/recall criteria. Fresh satellite downloads need CDSE or Earthdata credentials configured
+locally; CDSE credentials were subsequently configured and the SAFE reader
+was cross-checked against NERSC processing of the same acquisition (see
+LIMITATIONS.md section 6). No private credentials were added to
 Git. No C-CORE internal procedures or proprietary interfaces were supplied.
 
 See [MDA_ALIGNMENT.md](MDA_ALIGNMENT.md), [DATA.md](DATA.md),

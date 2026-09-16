@@ -106,6 +106,28 @@ unknown-ice research opt-in (`--allow-unknown-ice` for the detection CLI,
 `PipelineRunner(allow_unknown_ice=True)` in Python). The charted public-scene
 import above uses conservative open-water screening by default.
 
+## Acquisition mode and coverage
+
+Measured against the CDSE catalogue on 2026-09-16, counting Sentinel-1 products
+intersecting each area across the 2020, 2024 and 2026 February-July seasons:
+
+| Area | EW GRDM HH+HV | IW GRDH |
+|---|---:|---:|
+| Grand Banks | **0** | 100+ |
+| NE Newfoundland Shelf | **0** | 100+ |
+| Labrador Shelf | 100+ | 100+ |
+| Labrador Sea (north) | 100+ | 100+ |
+
+**Extra Wide swath does not cover the southern half of the study area.** ESA's
+acquisition plan uses EW over ice-affected Labrador waters and IW further south.
+An earlier version of this project asserted the opposite. IW over the Grand Banks
+is roughly 76 percent dual-pol HH+HV, so the polarimetric basis survives, but the
+detection chain assumes EW geometry (five subswaths, 40 m spacing).
+
+Consequence: **the Grand Banks portion of the study area is not currently
+reachable by this pipeline**, and that is a data-availability and mode-support
+limit, not a credential or tuning problem. Covering it requires IW support.
+
 ## Geographic scope
 
 The hand-defined study polygon covers the Labrador coastal corridor, Northeast
@@ -138,7 +160,8 @@ are absent. CI uses locked dependencies and a real PostGIS service.
 |---|---|
 | Statistical radar candidate screening | Implemented; thresholds require regional validation |
 | Analyst review and geographic API | Implemented; local API-key protection |
-| SAFE calibration and GCP geolocation | Research implementation; not operationally validated |
+| SAFE calibration and geolocation | Cross-checked against NERSC processing of the same acquisition: geolocation exact, HH within 1.4 dB, HV within 1.6 dB before noise removal |
+| ESA standard thermal noise removal | **Not usable**; drove 45.7% of HV to non-positive power on a real scene. Reader reports it and marks the channel unusable |
 | Precise-orbit acquisition | Implemented; POEORB/RESORB fetched from public ESA/ASF mirrors, no credentials needed |
 | Precise-orbit **correction** in Python pipeline | Not applied; geolocation is still the product annotation's, and provenance says so |
 | Trained ship/iceberg classifier | Not implemented |

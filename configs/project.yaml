@@ -70,6 +70,17 @@ endpoints:
     token_url: "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
     odata_url: "https://catalogue.dataspace.copernicus.eu/odata/v1"
     collection: "sentinel-1-grd"  # Corrected CDSE STAC collection ID
+    # Measured against the CDSE catalogue on 2026-09-16 over the study area:
+    # EW HH+HV exists over the Labrador Shelf and Labrador Sea but is entirely
+    # absent over the Grand Banks and the NE Newfoundland Shelf (zero products
+    # across the 2020, 2024 and 2026 seasons). Those southern waters are covered
+    # by IW GRDH instead, about 76 percent of it dual-pol HH+HV.
+    #
+    # This default therefore restricts catalogue queries to the northern half of
+    # the study area. It is left as EW deliberately: the detection chain assumes
+    # EW geometry (five subswaths, 40 m spacing), so returning IW products here
+    # would hand the pipeline data it cannot correctly process. Covering the
+    # Grand Banks requires IW support, not a wider query.
     instrument_mode: "EW"
     polarizations: ["HH", "HV"]
     product_type: "GRD"
