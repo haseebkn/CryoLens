@@ -28,6 +28,8 @@ segmentation and identity have separate reference requirements and metrics.
 
 See the [sealed manifest](manifest.json), [coverage GeoJSON](coverage.geojson),
 [coverage map](coverage.png), and [complete protocol](../../EVALUATION_PROTOCOL.md).
+The [MLflow receipt](tracking_receipt.json) records the successful local scope
+run and its provenance artifacts; it contains no model-performance metrics.
 Footprint area includes land and quality exclusions not yet applied; it is not
 eligible surveyed water. Identical source aliases can be reconstructed as copies
 of the same verified bytes without adding acquisition exposure.

@@ -1,0 +1,32 @@
+{
+  "manifest_sha256": "fab81f3438142aedfcc01cce27b836412c9d29e82f85c294b48d7315521d60ee",
+  "records": 51,
+  "partitions": {
+    "train": 39,
+    "validation": 10,
+    "test": 2
+  },
+  "groups": 33,
+  "test_scene_ids": [
+    "20190119T101218_cis_prep.nc",
+    "S1C_EW_GRDM_1SDH_20260912T090816_20260912T090908_009412_012B82_FF9F_COG.SAFE"
+  ],
+  "mlflow_run_id": "8edb261bbc884dfab42117c7a668d283",
+  "status": "FINISHED",
+  "git_commit": "cb2730258c554119c535fbb98c071180e156f937",
+  "git_dirty": "true",
+  "preprocessing_sha256": "a8f4cb1cedccae83bdaae5fca4c36bb7f86af5b54512f8603b818b0152cc6cab",
+  "configuration_sha256": "bd2103804f28deee1db8127b219b8b6c63fd588ae6f3b64d1d1b8143bc9be903",
+  "code_sha256": "a2ffd0f8ecc970c9f08fb5400857bcd58c783037239382597f0cc5df58ec86d9",
+  "artifacts": [
+    "provenance/code_provenance.json",
+    "provenance/code_snapshot.zip",
+    "provenance/configuration.json",
+    "provenance/dataset_manifest.json",
+    "provenance/protocol.json",
+    "provenance/selection.json",
+    "provenance/test_release.json"
+  ],
+  "performance_metrics": {},
+  "purpose": "scope freeze only; no model evaluation"
+}
