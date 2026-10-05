@@ -42,6 +42,14 @@ For segmentation, chart SIC classes 0–1 map to open water, 2–10 to ice affec
 and other values to unknown. Unknown chart values are excluded, never inferred
 to be water. Chart labels have their own spatial and temporal uncertainty.
 
+**Actual coverage.** Measured as the union of frozen metadata footprints
+intersected with the study polygon, using equal-area EPSG:6931, before land,
+quality or survey masks: **42%** of the polygon overall, **78%** north of 52°N
+(Labrador), **24%** south of 52°N, and **2%** of a Grand Banks box (43–47°N,
+47–53°W). EW HH+HV is not acquired over the Grand Banks or the NE Newfoundland
+Shelf, so this inventory cannot support claims there; covering them requires
+validated IW support.
+
 ## Exposure and leakage control
 
 Existing AI4Arctic acquisitions are conservatively development-only because
@@ -66,6 +74,17 @@ one clean component per available source family is reserved; this may exceed
 the nominal 20% test fraction in a small inventory. Validation is selected from
 the remaining groups, retaining training capacity. Validation is development
 data and may be used for tuning.
+
+**What "metadata/integrity-only" read for the September 12 test SAFE.** The
+September 18 download verification did more than hash bytes: it decoded both
+measurement rasters and recorded raw digital-number sample statistics, which are
+min, max, unique-value count and non-zero fraction, for HH and HV
+(`data/processed/downloads-20260918/verification.json`). No calibration, sigma0
+conversion, CFAR, candidate extraction or visual inspection followed. These
+values say nothing about target locations or detector behaviour, so they offer
+nothing to tune on, and the scene remains admissible as a test. The ledger
+category name understates this, and the exposure reason text will say so
+explicitly in the next freeze version; v1 is not rewritten in place.
 
 The September 11 SAFE acquisition is grouped with the previously processed
 September 16 acquisition and therefore remains development-only. September 12
@@ -105,6 +124,16 @@ Uncertain or unreviewed regions are excluded from scored coverage and reported
 separately. Retained-only review cannot establish recall. Rejected-candidate
 sampling must retain inclusion probabilities; uncertainty estimates must account
 for sampling and scene/group dependence. Missing identity evidence stays unknown.
+
+**The six-hour window excludes dusk passes by orbit geometry.** Sentinel-1 EW
+passes near 06:00 or 18:00 local solar time and Sentinel-2 near 11:00, so the
+smallest achievable separation is about 5 h for dawn passes and about 7 h for
+dusk passes. Dusk-pass acquisitions can therefore never receive optical
+identity corroboration under this rule. In v1 that is **21 of 51 records**:
+17 of 39 train and 4 of 10 validation; both test records are dawn passes.
+Identity metrics will consequently describe a non-random, dawn-only subset of
+acquisitions, and must be reported as such. Detection and segmentation metrics
+are unaffected.
 
 Initial optical corroboration requires acquisitions within six hours, with
 visibility, resolution, displacement uncertainty and matching rationale recorded.
