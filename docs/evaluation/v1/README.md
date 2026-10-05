@@ -34,6 +34,10 @@ See the [sealed manifest](manifest.json), [coverage GeoJSON](coverage.geojson),
 [coverage map](coverage.png), and [complete protocol](../../EVALUATION_PROTOCOL.md).
 The [MLflow receipt](tracking_receipt.json) records the successful local scope
 run and its provenance artifacts; it contains no model-performance metrics.
+It records run `7987d9bc`, logged from a clean checkout of `e5e2db5`. It supersedes
+run `8edb261b`, which was logged with uncommitted preprocessing edits in the working
+tree, so its preprocessing digest matched no commit. Both runs carry the same
+manifest and partitions; the old run is tagged `superseded_by` in MLflow.
 Footprints cover 42% of the study polygon: 78% north of 52°N, 24% south of it,
 and 2% of the Grand Banks (equal-area, before masks). See the protocol.
 Footprint area includes land and quality exclusions not yet applied; it is not
