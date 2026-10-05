@@ -1,6 +1,6 @@
 # Known limitations
 
-Reviewed 2026-09-05. CryoLens is a research screening and review project, not an
+Reviewed 2026-10-05. CryoLens is a research screening and review project, not an
 operational iceberg surveillance service. The current benchmark evidence and
 its exclusions are described in [BENCHMARK.md](BENCHMARK.md).
 
@@ -74,33 +74,31 @@ comparison with trusted processing on real SAFE products. Running SNAP and
 then ignoring its output is no longer presented as a successful SNAP pipeline.
 Unsupported engines and missing inputs fail explicitly.
 
-### Validation outcome, 2026-09-16
+### Validation outcome, 2026-10-05
 
-The reader has now been run against a real product: the S1B EW GRDM HH+HV
-acquisition of 2018-04-28T09:39:37 over the Labrador Shelf, which is the same
-acquisition NERSC processed for the AI4Arctic archive, giving an independent
-reference for the identical scene.
+The [reproducible processing report](processing-validation/v1/README.md)
+supersedes the earlier scene-median comparison. Similar extents and medians
+did not confirm calibration or absolute geolocation accuracy.
 
-| Property | CryoLens | NERSC reference | Outcome |
-|---|---|---|---|
-| Geolocation extent | 48.87-53.16 N, 54.61-47.48 W | identical | Confirmed |
-| Incidence angle | 19.33-47.41 deg | 19.63-46.65 deg | Confirmed |
-| HH median sigma0 | -19.29 dB | -20.67 dB | Agrees within 1.4 dB |
-| HV median, before noise removal | -30.60 dB | -29.02 dB | Agrees within 1.6 dB |
-| HV median, after ESA noise removal | -33.96 dB | -29.02 dB | **Diverges by 4.9 dB** |
+Actual SNAP 14.0.0 comparisons use matched sensor pixels and systematic spatial
+windows on legacy EW, fresh EW and fresh IW products. Calibration and signed
+noise subtraction agree closely after two interpolation fixes. Full-footprint
+HV non-positive fractions nevertheless remain about 45.7%, 26.1% and 54.3%,
+respectively. All three fail the conservative project quality preset. Negative
+residuals are retained for diagnostics; no positive floor manufactures data.
 
-**Calibration and geolocation are confirmed. ESA standard thermal noise removal
-is not usable here.** Subtracting the ESA noise vectors drove 45.7 percent of HV
-and 10.7 percent of HH pixels to non-positive power on this scene. Non-positive
-power has no decibel representation and cannot enter a CFAR statistic, so those
-pixels are lost rather than merely noisy. This is the failure ADR-007 predicted
-for low-backscatter maritime cross-pol, now measured rather than anticipated.
+Fresh EW windows pass the tested geometric comparisons, but legacy EW and IW
+retain spatial/resampled-radiometry discrepancies. Common annotation agreement
+does not establish absolute accuracy. The fresh SAFE deployment gate remains
+closed, and rejected products write machine-readable reasons before detection.
+The 5% non-positive threshold is a research acceptance preset, not a published
+ESA or C-CORE requirement.
 
-The reader reports `nonpositive_power_fraction` and `usable_for_cfar` on every
-read and warns above 5 percent, so an over-subtracted channel cannot be consumed
-as though it were calibrated backscatter. Making the raw SAFE path usable for
-detection requires NERSC-style denoising; that is not yet implemented, and the
-measured results in BENCHMARK.md do not depend on this path.
+The published NERSC algorithm was evaluated on the legacy Sentinel-1B scene.
+With negative-gap filling disabled, 59.6% of HV remained non-positive. It is not
+adopted or assumed to solve this problem. Sentinel-1C/D coefficient qualification
+and a defensible noise workflow remain open. Benchmark results in BENCHMARK.md
+use the separate AI4Arctic processing path and do not depend on fresh SAFE data.
 
 Precise and restituted orbit products (POEORB/RESORB) can be acquired without
 credentials from the public ESA STEP and ASF auxiliary-data mirrors, selected by
@@ -110,7 +108,7 @@ applying one.** Geolocation remains that recorded in the product annotation, no
 correction is computed, and `orbit_correction_applied` stays `False` in
 provenance. Applying a precise orbit means recomputing geolocation, which cannot
 responsibly be implemented until the resulting geolocation can be checked
-against trusted processing. The calibration comparison above is now done; an
+against trusted processing. Matched calibration comparisons are now done; an
 orbit-correction comparison is not, and remains future work.
 
 ## 7. Machine learning

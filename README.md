@@ -121,12 +121,12 @@ intersecting each area across the 2020, 2024 and 2026 February-July seasons:
 **Extra Wide swath does not cover the southern half of the study area.** ESA's
 acquisition plan uses EW over ice-affected Labrador waters and IW further south.
 An earlier version of this project asserted the opposite. IW over the Grand Banks
-is roughly 76 percent dual-pol HH+HV, so the polarimetric basis survives, but the
-detection chain assumes EW geometry (five subswaths, 40 m spacing).
+is roughly 76 percent dual-pol HH+HV, so the polarimetric basis survives.
 
-Consequence: **the Grand Banks portion of the study area is not currently
-reachable by this pipeline**, and that is a data-availability and mode-support
-limit, not a credential or tuning problem. Covering it requires IW support.
+The reader now supports annotated IW GRD HH/HV measurements and has been tested
+on a real southern acquisition. Its noise usability and resampled-radiometry
+checks failed. **Operational southern NL coverage remains unvalidated**;
+successful downloading and mode parsing do not establish detection coverage.
 
 ## Geographic scope
 
@@ -145,6 +145,11 @@ detection, sea-ice segmentation and identification tasks, acquisition groups,
 development/test partitions and real MLflow tracking. Its
 [coverage map](docs/evaluation/v1/coverage.png) shows acquisition footprints;
 eligible surveyed water remains a separate measurement.
+
+The [real SAFE processing report](docs/processing-validation/v1/README.md)
+compares three EW/IW products against actual SNAP 14.0.0 at matched pixels.
+It records quality rejections and unresolved reprojection discrepancies.
+**Fresh SAFE detection deployment remains blocked.**
 
 ```text
 uv run --frozen pytest
@@ -166,8 +171,9 @@ are absent. CI uses locked dependencies and a real PostGIS service.
 |---|---|
 | Statistical radar candidate screening | Implemented; thresholds require regional validation |
 | Analyst review and geographic API | Implemented; local API-key protection |
-| SAFE calibration and geolocation | Cross-checked against NERSC processing of the same acquisition: geolocation exact, HH within 1.4 dB, HV within 1.6 dB before noise removal |
-| ESA standard thermal noise removal | **Not usable**; drove 45.7% of HV to non-positive power on a real scene. Reader reports it and marks the channel unusable |
+| SAFE EW/IW calibration and geolocation | Calibration matches SNAP on sampled pixels; legacy EW/IW reprojection discrepancies remain. Absolute geolocation accuracy is not established |
+| ESA standard thermal noise removal | Matches SNAP on sampled pixels, but full-scene HV non-positive fractions are 45.7%, 26.1% and 54.3%; all three tested products are rejected |
+| Fresh SAFE detection deployment | Blocked by separate processing-quality and scientific-release gates; no current producer grants a release |
 | Precise-orbit acquisition | Implemented; POEORB/RESORB fetched from public ESA/ASF mirrors, no credentials needed |
 | Precise-orbit **correction** in Python pipeline | Not applied; geolocation is still the product annotation's, and provenance says so |
 | Trained ship/iceberg classifier | Not implemented |

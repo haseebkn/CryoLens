@@ -1,0 +1,44 @@
+{
+  "window": [
+    949,
+    5122,
+    512,
+    512
+  ],
+  "image_id": "sha256:ac08abe1c070613c2336d9cfa06746ef9eb7d12b99373f28fe878f27a2a70fa7",
+  "graph_sha256": "b8e078eac0300e9161a5beaa8888fb5d5d3024d699f2ce480112814297796fe1",
+  "scratch_files_sha256": {
+    "annotation/calibration/calibration-s1b-ew-grd-hh-20180428t093937-20180428t094037-010682-013815-001-cog.xml": "68e5e267007dad58ecde3165cb7edd910f4b8c9d72ac8617dc8768b7192c3221",
+    "annotation/calibration/calibration-s1b-ew-grd-hv-20180428t093937-20180428t094037-010682-013815-002-cog.xml": "61c8e9e789350cacb7fd11b31a06bddb739aaa9b6bf123edc6e7085da1bf795a",
+    "annotation/calibration/noise-s1b-ew-grd-hh-20180428t093937-20180428t094037-010682-013815-001-cog.xml": "360a7a74fb372b0813b122ddd6b4fcbf92ab17da285c8ab642e4003fb4e80113",
+    "annotation/calibration/noise-s1b-ew-grd-hv-20180428t093937-20180428t094037-010682-013815-002-cog.xml": "dbdb25ac8f1de025186547b621df4f15eaa6c2974fb85faacb6d400222c3ffd8",
+    "annotation/s1b-ew-grd-hh-20180428t093937-20180428t094037-010682-013815-001-cog.xml": "e66fe2b49663a923380211a988bb5c83e5dbff4ca48627c002a3d38bc6901fb8",
+    "annotation/s1b-ew-grd-hv-20180428t093937-20180428t094037-010682-013815-002-cog.xml": "61842fea9f0ffab4a4669abbae18b57d72807f765c0e0fbe4dd77a05a5eff628",
+    "manifest.safe": "b02e1e79a38e7b64c7000583cac89639332983d269e016d38df0bbfdbc2681be",
+    "measurement/s1b-ew-grd-hh-20180428t093937-20180428t094037-010682-013815-001-cog.tiff": "a49db5124d3303e948be9e0c98fd145868777c85849632373753db74eacbaf94",
+    "measurement/s1b-ew-grd-hv-20180428t093937-20180428t094037-010682-013815-002-cog.tiff": "0fb1cfa1c3a39bfcd74b5373c443e677fa0ce52920006663298cf9be71ef169e"
+  },
+  "outputs_sha256": {
+    "old-ew-r0.1-c0.5_geo.tif": "39c0ecca1a5fba094fed42ec7b863d0be588d1d9074876927d7b4d5854d325d8",
+    "old-ew-r0.1-c0.5_raw.dim": "9fc255fb035fa1a4cedd78645da39f352bffed8f75f1037b0c89408b322202c5",
+    "old-ew-r0.1-c0.5_raw.data/Sigma0_HH.img": "2df1afcf8b1323e87d70e16ebf0fa6bc34ac1f6085610150d503aa453976779d",
+    "old-ew-r0.1-c0.5_raw.data/Sigma0_HV.img": "446a21cde69943ae42deb708a8945e703fae5290ad91707c926d9d376bca7ff6",
+    "old-ew-r0.1-c0.5_raw.data/tie_point_grids/elevation_angle.img": "dd72aab63a179fde85f5e192db36fdb24ff198a46d13b8a6361bc6c43f6caccb",
+    "old-ew-r0.1-c0.5_raw.data/tie_point_grids/incident_angle.img": "730ee46a311b968f6ca0a431c3f4ef8d62be0b98280e3b432c76ecb2b9943c00",
+    "old-ew-r0.1-c0.5_raw.data/tie_point_grids/latitude.img": "8e4b3c380c983c1cfb2d2afb939567fd62f60f7a31d91d951d74d39bad42576c",
+    "old-ew-r0.1-c0.5_raw.data/tie_point_grids/longitude.img": "f81cbc93c8fc4f1f0c6252f77da09002fefe7f054c7132f4b41617322e28a9fe",
+    "old-ew-r0.1-c0.5_raw.data/tie_point_grids/slant_range_time.img": "12d92c74854fef480b1e7d698b39a40be5e357033d41745e48e5fb310a7a0ebe",
+    "old-ew-r0.1-c0.5_den.dim": "fe43e63a3e301b0214d687f047b5aeff3d02fc879766ee13458bcb4fe5b18582",
+    "old-ew-r0.1-c0.5_den.data/incidence.img": "c204a635c79b38ce356997c284cfbf02de2c508c7fa98f077d2ecb202902d1e5",
+    "old-ew-r0.1-c0.5_den.data/latitude_band.img": "78d45e022bdcd8309096847350accc091f338fd1f579a9e91882b7be91d537ad",
+    "old-ew-r0.1-c0.5_den.data/longitude_band.img": "3444ce54f348a6fe81f494187802492cd8b3cd99b6fc73610fc0ce254fdde8f5",
+    "old-ew-r0.1-c0.5_den.data/sigma0_hh.img": "55f31f784c1cb853319223bd83034dba52e5b7b234ebf1f743b11511370a91a2",
+    "old-ew-r0.1-c0.5_den.data/sigma0_hv.img": "13d959d168f771ebc8ef9b5d5b9bcf0a7c0be59eec01bd6a476205426572e279",
+    "old-ew-r0.1-c0.5_den.data/tie_point_grids/elevation_angle.img": "dd72aab63a179fde85f5e192db36fdb24ff198a46d13b8a6361bc6c43f6caccb",
+    "old-ew-r0.1-c0.5_den.data/tie_point_grids/incident_angle.img": "730ee46a311b968f6ca0a431c3f4ef8d62be0b98280e3b432c76ecb2b9943c00",
+    "old-ew-r0.1-c0.5_den.data/tie_point_grids/latitude.img": "8e4b3c380c983c1cfb2d2afb939567fd62f60f7a31d91d951d74d39bad42576c",
+    "old-ew-r0.1-c0.5_den.data/tie_point_grids/longitude.img": "f81cbc93c8fc4f1f0c6252f77da09002fefe7f054c7132f4b41617322e28a9fe",
+    "old-ew-r0.1-c0.5_den.data/tie_point_grids/slant_range_time.img": "12d92c74854fef480b1e7d698b39a40be5e357033d41745e48e5fb310a7a0ebe"
+  },
+  "sealed_from_completed_run_report_sha256": "a00361f6e962e1bb030323630df0625df469c38b4754bdd547d6e861ee676c4c"
+}

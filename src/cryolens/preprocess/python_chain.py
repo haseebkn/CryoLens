@@ -59,6 +59,7 @@ class PurePythonSARProcessor:
         longitude: NDArray[np.floating],
         apply_denoise: bool = False,
         gcp_step: int = 64,
+        destination_grid: tuple[Any, int, int] | None = None,
     ) -> dict[str, Any]:
         """Build the 4-band stack from already-calibrated sigma-nought.
 
@@ -83,6 +84,13 @@ class PurePythonSARProcessor:
             raise ValueError(
                 "Calibrated SAFE arrays are already noise corrected; do not denoise twice."
             )
+        for label, power in (("HH", sigma0_hh_linear), ("HV", sigma0_hv_linear)):
+            finite = np.isfinite(power)
+            if (
+                not finite.any()
+                or float(np.count_nonzero(finite & (power <= 0)) / finite.sum()) > 0.05
+            ):
+                raise ValueError(f"{label}: calibrated power fails the non-positive quality gate")
         arrays = [sigma0_hh_linear, sigma0_hv_linear, incidence_angle_deg, latitude, longitude]
         if sigma0_hh_linear.ndim != 2 or any(a.shape != sigma0_hh_linear.shape for a in arrays):
             raise ValueError("All calibrated and geolocation arrays must share a 2-D shape.")
@@ -103,12 +111,9 @@ class PurePythonSARProcessor:
             & (incidence_angle_deg < 90)
         )
 
-        floor_linear = 1e-5  # -50 dB
-        sigma0_hh_db = 10.0 * np.log10(np.maximum(sigma0_hh_linear, floor_linear))
-        sigma0_hv_db = 10.0 * np.log10(np.maximum(hv_linear, floor_linear))
-        ratio_hh_hv = sigma0_hh_db - sigma0_hv_db
-
-        h, w = sigma0_hh_db.shape
+        if not valid.any():
+            raise ValueError("No valid positive calibrated observations to geocode.")
+        h, w = sigma0_hh_linear.shape
 
         gcps = []
         for r in sorted(set(range(0, h, gcp_step)) | {h - 1}):
@@ -128,19 +133,18 @@ class PurePythonSARProcessor:
 
         src_crs = "EPSG:4326"
 
-        dst_transform, dst_w, dst_h = calculate_default_transform(
-            src_crs,
-            self.target_crs,
-            w,
-            h,
-            gcps=gcps,
-            resolution=self.pixel_spacing,
-        )
+        if destination_grid is None:
+            dst_transform, dst_w, dst_h = calculate_default_transform(
+                src_crs, self.target_crs, w, h, gcps=gcps, resolution=self.pixel_spacing
+            )
+        else:
+            dst_transform, dst_w, dst_h = destination_grid
+            if min(dst_w, dst_h) < 1 or not np.isfinite(tuple(dst_transform)).all():
+                raise ValueError("Destination grid must be finite and nonempty.")
 
         raw_stack = {
-            "sigma0_hh_db": np.asarray(sigma0_hh_db, dtype=np.float32),
-            "sigma0_hv_db": np.asarray(sigma0_hv_db, dtype=np.float32),
-            "ratio_hh_hv": np.asarray(ratio_hh_hv, dtype=np.float32),
+            "hh_linear": np.asarray(sigma0_hh_linear, dtype=np.float32),
+            "hv_linear": hv_linear,
             "incidence_angle": np.asarray(incidence_angle_deg, dtype=np.float32),
         }
 
@@ -161,6 +165,34 @@ class PurePythonSARProcessor:
             )
             reprojected_bands[band_name] = dst_arr
 
+        # Preserve invalid source support even where bilinear warping would fill
+        # a hole from neighbouring observations. Never average logarithms.
+        support = np.zeros((dst_h, dst_w), dtype=np.uint8)
+        reproject(
+            source=valid.astype(np.uint8),
+            destination=support,
+            src_crs=src_crs,
+            gcps=gcps,
+            dst_transform=dst_transform,
+            dst_crs=self.target_crs,
+            resampling=Resampling.nearest,
+            dst_nodata=0,
+        )
+        output_valid = support > 0
+        for values in reprojected_bands.values():
+            output_valid &= np.isfinite(values) & (values != nodata_val)
+        output_valid &= (reprojected_bands["hh_linear"] > 0) & (reprojected_bands["hv_linear"] > 0)
+        if not output_valid.any():
+            raise ValueError("Reprojection produced no valid observations.")
+        hh_db = np.full((dst_h, dst_w), nodata_val, dtype=np.float32)
+        hv_db = hh_db.copy()
+        hh_db[output_valid] = 10 * np.log10(reprojected_bands.pop("hh_linear")[output_valid])
+        hv_db[output_valid] = 10 * np.log10(reprojected_bands.pop("hv_linear")[output_valid])
+        ratio = np.full((dst_h, dst_w), nodata_val, dtype=np.float32)
+        ratio[output_valid] = hh_db[output_valid] - hv_db[output_valid]
+        reprojected_bands["incidence_angle"][~output_valid] = nodata_val
+        reprojected_bands.update(sigma0_hh_db=hh_db, sigma0_hv_db=hv_db, ratio_hh_hv=ratio)
+
         return {
             "bands": reprojected_bands,
             "transform": dst_transform,
@@ -170,6 +202,7 @@ class PurePythonSARProcessor:
             "geolocation_method": "annotation_gcps",
             "orbit_correction_applied": False,
             "terrain_correction_applied": False,
+            "resampling_domain": "linear_power",
         }
 
     def process_scene_arrays(

@@ -1,0 +1,46 @@
+{
+  "window": [
+    8536,
+    5056,
+    512,
+    512
+  ],
+  "image_id": "sha256:ac08abe1c070613c2336d9cfa06746ef9eb7d12b99373f28fe878f27a2a70fa7",
+  "graph_sha256": "b8e078eac0300e9161a5beaa8888fb5d5d3024d699f2ce480112814297796fe1",
+  "scratch_files_sha256": {
+    "annotation/calibration/calibration-s1c-ew-grd-hh-20260916t212442-20260916t212542-009478-012da6-001-cog.xml": "83c8c3ef14d858e367b62a0a78eaa6f88d4b7d58d31d10a03900b4993ca29108",
+    "annotation/calibration/calibration-s1c-ew-grd-hv-20260916t212442-20260916t212542-009478-012da6-002-cog.xml": "e01195d842fe91ee2f72373cda38941475ac5e1c66a9fa1f3d441fb6726200a0",
+    "annotation/calibration/noise-s1c-ew-grd-hh-20260916t212442-20260916t212542-009478-012da6-001-cog.xml": "d2001a1ad3abcd6b13fc5eca36de4a1a27098eb14889e13b18ee8246c70ca25d",
+    "annotation/calibration/noise-s1c-ew-grd-hv-20260916t212442-20260916t212542-009478-012da6-002-cog.xml": "e004956eb7a0a8e1fbd520d287a026bfc2713f0f42e6af97408f5c94c50f3953",
+    "annotation/rfi/rfi-s1c-ew-grd-hh-20260916t212442-20260916t212542-009478-012da6-001-cog.xml": "b5b12d8ec699090a0fcf73ca8b218812b0236bff468bbfde09de6546901ed9f1",
+    "annotation/rfi/rfi-s1c-ew-grd-hv-20260916t212442-20260916t212542-009478-012da6-002-cog.xml": "93ab5559c1e1b3982d843fff77e8484452dbb0207b68426e334a0e76e112b1e2",
+    "annotation/s1c-ew-grd-hh-20260916t212442-20260916t212542-009478-012da6-001-cog.xml": "e0216fbe76e291425e220ff7c6df064c43e94d4333a95c0e8c2d73e6ae8cf47c",
+    "annotation/s1c-ew-grd-hv-20260916t212442-20260916t212542-009478-012da6-002-cog.xml": "facf1aa8157bcc62dbb7caa8d9472fa25da7d3d3ec821584c615c11cdb23747f",
+    "manifest.safe": "a97612c3c9ded94e29bd25906952b5895ca28474a94cc3c76fbd44e7cfbf33a1",
+    "measurement/s1c-ew-grd-hh-20260916t212442-20260916t212542-009478-012da6-001-cog.tiff": "6664ce6ba7ff9eafddc11402e024e4db0ec378346e6e66d1e428fe9ec73e87df",
+    "measurement/s1c-ew-grd-hv-20260916t212442-20260916t212542-009478-012da6-002-cog.tiff": "b3b0d2476964ff26c03aa2c0be36d23f262306644d2fa0c171d9051d6a25a5f1"
+  },
+  "outputs_sha256": {
+    "fresh-ew-r0.9-c0.5_geo.tif": "b9e90fcda737a81b5e8a2a267cea8c46374cd4df155c0eb0dc25ef0e66522796",
+    "fresh-ew-r0.9-c0.5_raw.dim": "b564ee7bd5db3e58f3db5fdf8082a155c1eba66c74d9b78f44b397f6a2d4dbaa",
+    "fresh-ew-r0.9-c0.5_raw.data/Sigma0_HH.img": "ec15f332d0aa8208d4a80fd8a5bce03295db8d814d4d25b35eccb19173d0e613",
+    "fresh-ew-r0.9-c0.5_raw.data/Sigma0_HV.img": "187e14ea8701760ec0c62cbd9440f2ce08122e09c800f59e0e31a28279ae5be7",
+    "fresh-ew-r0.9-c0.5_raw.data/tie_point_grids/elevation_angle.img": "a89f789a022a67e575d24442a01811c70e8fe5274e093eb483f2eccf66e7f782",
+    "fresh-ew-r0.9-c0.5_raw.data/tie_point_grids/incident_angle.img": "37441316113d71fffe22958f2958032a25afc395b59dbfecdbd95b867c79831d",
+    "fresh-ew-r0.9-c0.5_raw.data/tie_point_grids/latitude.img": "8b467bf32315c5f762dcf5f6b9f0623fc78870c0f810b432cfbb0605cdfc2843",
+    "fresh-ew-r0.9-c0.5_raw.data/tie_point_grids/longitude.img": "8fea03a427a0b393f34ec039adb67131f077f74611f293274c05501e906dc374",
+    "fresh-ew-r0.9-c0.5_raw.data/tie_point_grids/slant_range_time.img": "f15e64cb20e2cebcf8f977621c9d3df7e670dbc40cf9f5f48ee57c03b95132e3",
+    "fresh-ew-r0.9-c0.5_den.dim": "1162db2fa0753db636fbd4e488e7ae78a96612ed1c973dc747744d06e4be4753",
+    "fresh-ew-r0.9-c0.5_den.data/incidence.img": "bd7d0c6799be0c5c7391b0d00400ac5f0d8439e529e0f9346310dbc4dc050388",
+    "fresh-ew-r0.9-c0.5_den.data/latitude_band.img": "270316b0ba4fe3aa1d3d985fc11f4a4990b633b7c5ca906a0410a165bdce7793",
+    "fresh-ew-r0.9-c0.5_den.data/longitude_band.img": "4ec39f0e9bb1feb49fc90484a0f9792d7478a4862fcdd6936cd86c9bb6e3afb0",
+    "fresh-ew-r0.9-c0.5_den.data/sigma0_hh.img": "2001b88393b1674b427adb8bd5f48a6cefc15964c14e77e95899b755f09baa9d",
+    "fresh-ew-r0.9-c0.5_den.data/sigma0_hv.img": "b62544cf972bbad180395f84c1e529f945cd35ae98f4932dda483a8385bc960a",
+    "fresh-ew-r0.9-c0.5_den.data/tie_point_grids/elevation_angle.img": "a89f789a022a67e575d24442a01811c70e8fe5274e093eb483f2eccf66e7f782",
+    "fresh-ew-r0.9-c0.5_den.data/tie_point_grids/incident_angle.img": "37441316113d71fffe22958f2958032a25afc395b59dbfecdbd95b867c79831d",
+    "fresh-ew-r0.9-c0.5_den.data/tie_point_grids/latitude.img": "8b467bf32315c5f762dcf5f6b9f0623fc78870c0f810b432cfbb0605cdfc2843",
+    "fresh-ew-r0.9-c0.5_den.data/tie_point_grids/longitude.img": "8fea03a427a0b393f34ec039adb67131f077f74611f293274c05501e906dc374",
+    "fresh-ew-r0.9-c0.5_den.data/tie_point_grids/slant_range_time.img": "f15e64cb20e2cebcf8f977621c9d3df7e670dbc40cf9f5f48ee57c03b95132e3"
+  },
+  "sealed_from_completed_run_report_sha256": "a00361f6e962e1bb030323630df0625df469c38b4754bdd547d6e861ee676c4c"
+}

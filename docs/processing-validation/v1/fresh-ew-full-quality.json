@@ -1,0 +1,916 @@
+{
+  "schema_version": 1,
+  "policy": {
+    "version": "safe-quality-v1",
+    "max_nonpositive_fraction": 0.05,
+    "min_valid_fraction": 0.1,
+    "incidence_min_deg": 15.0,
+    "incidence_max_deg": 50.0,
+    "max_polarization_geolocation_error_m": 20.0
+  },
+  "product": "S1C_EW_GRDM_1SDH_20260916T212442_20260916T212542_009478_012DA6_90E4_COG.SAFE",
+  "instrument_mode": "EW",
+  "scope": "full_measurement_grid",
+  "channels": {
+    "HH": {
+      "finite_pixels": 103421651,
+      "nonpositive_pixels": 36355,
+      "invalid_incidence_pixels": 0,
+      "nonpositive_fraction": 0.00035152213920854926,
+      "valid_fraction": 0.973855660416472
+    },
+    "HV": {
+      "finite_pixels": 103421651,
+      "nonpositive_pixels": 26986914,
+      "invalid_incidence_pixels": 0,
+      "nonpositive_fraction": 0.26094066125476956,
+      "valid_fraction": 0.973855660416472
+    }
+  },
+  "stripes": [
+    {
+      "window": [
+        0,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2648327,
+          "nonpositive_fraction": 0.0,
+          "valid_fraction": 0.9738329420832157,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2648327,
+          "nonpositive_fraction": 0.13948390814276335,
+          "valid_fraction": 0.9738329420832157,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        256,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2648576,
+          "nonpositive_fraction": 0.0,
+          "valid_fraction": 0.9739245034359408,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2648576,
+          "nonpositive_fraction": 0.15015502670114053,
+          "valid_fraction": 0.9739245034359408,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        512,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2648799,
+          "nonpositive_fraction": 0.0,
+          "valid_fraction": 0.97400650416549,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2648799,
+          "nonpositive_fraction": 0.14969199248414092,
+          "valid_fraction": 0.97400650416549,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        768,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2649015,
+          "nonpositive_fraction": 3.7749880616002554e-07,
+          "valid_fraction": 0.9740859308811071,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2649015,
+          "nonpositive_fraction": 0.1608065639492415,
+          "valid_fraction": 0.9740859308811071,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        1024,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2649231,
+          "nonpositive_fraction": 0.0,
+          "valid_fraction": 0.9741653575967241,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2649231,
+          "nonpositive_fraction": 0.1811967321837922,
+          "valid_fraction": 0.9741653575967241,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        1280,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2649446,
+          "nonpositive_fraction": 3.7743739634625505e-07,
+          "valid_fraction": 0.9742444165960651,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2649446,
+          "nonpositive_fraction": 0.1824581440799322,
+          "valid_fraction": 0.9742444165960651,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        1536,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2649662,
+          "nonpositive_fraction": 7.548132554265412e-07,
+          "valid_fraction": 0.9743238433116822,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2649662,
+          "nonpositive_fraction": 0.18823532963827083,
+          "valid_fraction": 0.9743238433116822,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        1792,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2647320,
+          "nonpositive_fraction": 7.55481014762099e-07,
+          "valid_fraction": 0.9734626517932787,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2647320,
+          "nonpositive_fraction": 0.2098866022996842,
+          "valid_fraction": 0.9734626517932787,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        2048,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2645509,
+          "nonpositive_fraction": 0.0,
+          "valid_fraction": 0.9727967176174339,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2645509,
+          "nonpositive_fraction": 0.22221999622756905,
+          "valid_fraction": 0.9727967176174339,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        2304,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2647004,
+          "nonpositive_fraction": 0.0,
+          "valid_fraction": 0.9733464534500612,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2647004,
+          "nonpositive_fraction": 0.2238693254713631,
+          "valid_fraction": 0.9733464534500612,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        2560,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2647217,
+          "nonpositive_fraction": 0.0,
+          "valid_fraction": 0.9734247770168503,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2647217,
+          "nonpositive_fraction": 0.24287090933610656,
+          "valid_fraction": 0.9734247770168503,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        2816,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2647431,
+          "nonpositive_fraction": 6.043594715027511e-06,
+          "valid_fraction": 0.9735034682999153,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2647431,
+          "nonpositive_fraction": 0.2482946675475206,
+          "valid_fraction": 0.9735034682999153,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        3072,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2647645,
+          "nonpositive_fraction": 0.0001083982180390498,
+          "valid_fraction": 0.9735821595829803,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2647645,
+          "nonpositive_fraction": 0.2562148626420838,
+          "valid_fraction": 0.9735821595829803,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        3328,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2647858,
+          "nonpositive_fraction": 1.5106550275732308e-06,
+          "valid_fraction": 0.9736604831497694,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2647858,
+          "nonpositive_fraction": 0.260245828892637,
+          "valid_fraction": 0.9736604831497694,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        3584,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2648071,
+          "nonpositive_fraction": 0.00014236778394537003,
+          "valid_fraction": 0.9737388067165584,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2648071,
+          "nonpositive_fraction": 0.2941205126297595,
+          "valid_fraction": 0.9737388067165584,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        3840,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2648320,
+          "nonpositive_fraction": 0.0003035886901884969,
+          "valid_fraction": 0.9738303680692836,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2648320,
+          "nonpositive_fraction": 0.3443277247462542,
+          "valid_fraction": 0.9738303680692836,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        4096,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2648539,
+          "nonpositive_fraction": 0.002368475601076669,
+          "valid_fraction": 0.9739108979337286,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2648539,
+          "nonpositive_fraction": 0.3692911450426065,
+          "valid_fraction": 0.9739108979337286,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        4352,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2648751,
+          "nonpositive_fraction": 0.0014542703334515022,
+          "valid_fraction": 0.9739888537842417,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2648751,
+          "nonpositive_fraction": 0.35140902259215756,
+          "valid_fraction": 0.9739888537842417,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        4608,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2648962,
+          "nonpositive_fraction": 0.00799482967290584,
+          "valid_fraction": 0.9740664419184788,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2648962,
+          "nonpositive_fraction": 0.3447338995425378,
+          "valid_fraction": 0.9740664419184788,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        4864,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2649174,
+          "nonpositive_fraction": 0.00028612692107049217,
+          "valid_fraction": 0.9741443977689919,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2649174,
+          "nonpositive_fraction": 0.32818002894487114,
+          "valid_fraction": 0.9741443977689919,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        5120,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2649385,
+          "nonpositive_fraction": 5.661691298169198e-06,
+          "valid_fraction": 0.9742219859032288,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2649385,
+          "nonpositive_fraction": 0.3169252486897903,
+          "valid_fraction": 0.9742219859032288,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        5376,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2649600,
+          "nonpositive_fraction": 1.169987922705314e-05,
+          "valid_fraction": 0.9743010449025699,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2649600,
+          "nonpositive_fraction": 0.3069795440821256,
+          "valid_fraction": 0.9743010449025699,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        5632,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2649851,
+          "nonpositive_fraction": 0.0001294412402810573,
+          "valid_fraction": 0.9743933416878471,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2649851,
+          "nonpositive_fraction": 0.30163431830695386,
+          "valid_fraction": 0.9743933416878471,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        5888,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2646899,
+          "nonpositive_fraction": 0.00036873337441285065,
+          "valid_fraction": 0.9733078432410807,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2646899,
+          "nonpositive_fraction": 0.30668227234964385,
+          "valid_fraction": 0.9733078432410807,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        6144,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2646149,
+          "nonpositive_fraction": 0.0003597681007380915,
+          "valid_fraction": 0.973032056034077,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2646149,
+          "nonpositive_fraction": 0.3214452398561079,
+          "valid_fraction": 0.973032056034077,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        6400,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2647394,
+          "nonpositive_fraction": 1.662011774597963e-05,
+          "valid_fraction": 0.9734898627977031,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2647394,
+          "nonpositive_fraction": 0.3171658619759658,
+          "valid_fraction": 0.9734898627977031,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        6656,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2647602,
+          "nonpositive_fraction": 9.442506842040458e-06,
+          "valid_fraction": 0.9735663477831121,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2647602,
+          "nonpositive_fraction": 0.3187488149653913,
+          "valid_fraction": 0.9735663477831121,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        6912,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2647810,
+          "nonpositive_fraction": 1.4729153526876929e-05,
+          "valid_fraction": 0.9736428327685211,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2647810,
+          "nonpositive_fraction": 0.324570116435847,
+          "valid_fraction": 0.9736428327685211,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        7168,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2647818,
+          "nonpositive_fraction": 8.573096791395783e-05,
+          "valid_fraction": 0.9736457744987291,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2647818,
+          "nonpositive_fraction": 0.31903023546180287,
+          "valid_fraction": 0.9736457744987291,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        7424,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2648018,
+          "nonpositive_fraction": 1.9637328749275874e-05,
+          "valid_fraction": 0.9737193177539302,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2648018,
+          "nonpositive_fraction": 0.31038875113386694,
+          "valid_fraction": 0.9737193177539302,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        7680,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2648226,
+          "nonpositive_fraction": 9.817893185853473e-06,
+          "valid_fraction": 0.9737958027393392,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2648226,
+          "nonpositive_fraction": 0.29384652216238344,
+          "valid_fraction": 0.9737958027393392,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        7936,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2648433,
+          "nonpositive_fraction": 2.6430723374916413e-06,
+          "valid_fraction": 0.9738719200084722,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2648433,
+          "nonpositive_fraction": 0.2728519090345121,
+          "valid_fraction": 0.9738719200084722,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        8192,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2648640,
+          "nonpositive_fraction": 4.15307478555032e-06,
+          "valid_fraction": 0.9739480372776051,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2648640,
+          "nonpositive_fraction": 0.2526640086988039,
+          "valid_fraction": 0.9739480372776051,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        8448,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2648846,
+          "nonpositive_fraction": 7.550457822010038e-07,
+          "valid_fraction": 0.9740237868304622,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2648846,
+          "nonpositive_fraction": 0.23934573772880718,
+          "valid_fraction": 0.9740237868304622,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        8704,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2649088,
+          "nonpositive_fraction": 3.7748840355624273e-07,
+          "valid_fraction": 0.9741127741692553,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2649088,
+          "nonpositive_fraction": 0.22006403713277928,
+          "valid_fraction": 0.9741127741692553,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        8960,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2649308,
+          "nonpositive_fraction": 0.0,
+          "valid_fraction": 0.9741936717499765,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2649308,
+          "nonpositive_fraction": 0.22977660581555637,
+          "valid_fraction": 0.9741936717499765,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        9216,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2649513,
+          "nonpositive_fraction": 1.0945407703226971e-05,
+          "valid_fraction": 0.9742690535865575,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2649513,
+          "nonpositive_fraction": 0.23609584100927228,
+          "valid_fraction": 0.9742690535865575,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        9472,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2649717,
+          "nonpositive_fraction": 4.151386732998279e-06,
+          "valid_fraction": 0.9743440677068624,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2649717,
+          "nonpositive_fraction": 0.23189910469684122,
+          "valid_fraction": 0.9743440677068624,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        9728,
+        0,
+        256,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 2649921,
+          "nonpositive_fraction": 3.3963276641077227e-06,
+          "valid_fraction": 0.9744190818271675,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 2649921,
+          "nonpositive_fraction": 0.21163612047302544,
+          "valid_fraction": 0.9744190818271675,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    },
+    {
+      "window": [
+        9984,
+        0,
+        13,
+        10623
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 134576,
+          "nonpositive_fraction": 0.0,
+          "valid_fraction": 0.9744893156358844,
+          "invalid_incidence_pixels": 0
+        },
+        "HV": {
+          "finite_pixels": 134576,
+          "nonpositive_fraction": 0.2097699441207942,
+          "valid_fraction": 0.9744893156358844,
+          "invalid_incidence_pixels": 0
+        }
+      }
+    }
+  ],
+  "reasons": [
+    "HV: non-positive power fraction 0.260941 exceeds 0.05"
+  ],
+  "passed": false
+}
