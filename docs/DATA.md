@@ -9,7 +9,7 @@ AIS records in portfolio screenshots or Git without appropriate permission.
 | [AI4Arctic ready-to-train](https://data.dtu.dk/articles/dataset/Ready-To-Train_AI4Arctic_Sea_Ice_Challenge_Dataset/21316608) | Real SAR and sea-ice context | Public DTU download; local archive used for research evaluation |
 | [Publisher toolkit](https://github.com/astokholm/AI4ArcticSeaIceChallenge) | Normalization/data format contract | Public source; normalization provenance must accompany restored physical values |
 | [GSHHG](https://www.soest.hawaii.edu/pwessel/gshhg/) | Shoreline and coastal exclusion for COG processing | Public 2.3.7 shapefiles; download with `make fetch-shorelines` |
-| [Copernicus Data Space](https://dataspace.copernicus.eu/) | Fresh Sentinel-1 EW HH/HV SAFE imagery | Catalogue metadata is public; downloads require configured CDSE credentials |
+| [Copernicus Data Space](https://dataspace.copernicus.eu/) | Fresh Sentinel-1 EW/IW HH/HV SAFE imagery | Catalogue metadata is public; downloads require configured CDSE credentials. Authentic products are available; processing acceptance remains blocked ([report](processing-validation/v1/README.md)) |
 | [NASA Earthdata / ASF](https://search.asf.alaska.edu/) | Alternative Sentinel-1 access | Downloads require Earthdata credentials |
 | [NSIDC G00807](https://nsidc.org/data/g00807) | Historical IIP sightings as context | Follow source access terms; never substitute for matched iceberg labels |
 | Timestamped regional AIS | Potential vessel deconfliction | Not connected; a suitable licensed or authorized feed is still needed |

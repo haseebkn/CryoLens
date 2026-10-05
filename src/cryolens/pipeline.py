@@ -29,6 +29,11 @@ from cryolens.geo.vectorize import TargetVectorizer
 from cryolens.ingest.cdse import CDSEClient, SARSceneMetadata
 from cryolens.preprocess.masks import LandMaskGenerator
 from cryolens.preprocess.python_chain import PurePythonSARProcessor
+from cryolens.preprocess.quality import (
+    assess_safe_product,
+    require_channels,
+    require_detection_ready_cog,
+)
 from cryolens.preprocess.safe_reader import SAFEProductReader
 from cryolens.preprocess.stack import COGStackBuilder
 
@@ -135,6 +140,7 @@ class PipelineRunner:
             raise ValueError(f"Unsupported preprocessing engine: {engine}")
 
         reader = SAFEProductReader(safe_dir)
+        assess_safe_product(reader, self.output_dir / scene.scene_id / "processing-quality.json")
         available = reader.available_polarisations()
         if "HH" not in available or "HV" not in available:
             raise ValueError(
@@ -144,6 +150,7 @@ class PipelineRunner:
 
         hh = reader.read_sigma0("HH", remove_thermal_noise=True)
         hv = reader.read_sigma0("HV", remove_thermal_noise=True)
+        require_channels(hh, hv, self.output_dir / scene.scene_id / "processing-quality.json")
 
         processor = PurePythonSARProcessor(
             target_crs=self.config.project.spatial.target_crs,
@@ -164,6 +171,7 @@ class PipelineRunner:
             bands=result["bands"],
             transform=result["transform"],
             crs=result["crs"],
+            provenance={"source_kind": "sentinel1_safe", "processing_quality": "passed"},
         )
         logger.info("Wrote calibrated 4-band COG: %s", cog_path)
         return cog_path
@@ -179,6 +187,7 @@ class PipelineRunner:
                 raise ValueError("Detection requires an explicitly georeferenced EPSG:3978 COG")
             if src.count != 4:
                 raise ValueError("Detection requires the four-band calibrated feature stack")
+            require_detection_ready_cog(src)
             crs = src.crs
             hh_db = src.read(1)
             hv_db = src.read(2)

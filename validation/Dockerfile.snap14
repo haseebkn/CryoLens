@@ -1,0 +1,7 @@
+# Obtain the official installer with publisher-verified bytes. Build separately
+# from the application's runtime; no installation into the user's host OS.
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y --no-install-recommends fontconfig libfreetype6 libxext6 libxi6 libxrender1 libxtst6 && rm -rf /var/lib/apt/lists/*
+ADD --checksum=sha256:786ce26a464ce32aef133af25b81281ad1b0af320e3614c0b465939fffbb4ee6 https://download.esa.int/step/snap/14.0/installers/esa-snap_sentinel_linux-14.0.0.sh /tmp/snap.sh
+RUN chmod +x /tmp/snap.sh && /tmp/snap.sh -q -dir /opt/snap && rm /tmp/snap.sh
+ENTRYPOINT ["/opt/snap/bin/gpt"]

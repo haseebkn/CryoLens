@@ -63,6 +63,7 @@ def test_full_preprocessing_pipeline_end_to_end(tmp_path: Path) -> None:
         bands=result["bands"],
         transform=result["transform"],
         crs=result["crs"],
+        provenance={"source_kind": "synthetic"},
     )
 
     assert cog_path.exists()

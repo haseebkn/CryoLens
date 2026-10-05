@@ -1,0 +1,25 @@
+<graph id="SAFE_Matched_Pixel_Reference">
+  <version>1.0</version>
+  <node id="Read"><operator>Read</operator><sources/><parameters><file>${input_file}</file></parameters></node>
+  <node id="RawCalibration"><operator>Calibration</operator><sources><sourceProduct refid="Read"/></sources><parameters><selectedPolarisations>HH,HV</selectedPolarisations><outputSigmaBand>true</outputSigmaBand><outputImageScaleInDb>false</outputImageScaleInDb></parameters></node>
+  <node id="Noise"><operator>ThermalNoiseRemoval</operator><sources><sourceProduct refid="Read"/></sources><parameters><selectedPolarisations>HH,HV</selectedPolarisations><removeThermalNoise>true</removeThermalNoise><clipNegativeValues>false</clipNegativeValues></parameters></node>
+  <node id="Calibration"><operator>Calibration</operator><sources><sourceProduct refid="Noise"/></sources><parameters><selectedPolarisations>HH,HV</selectedPolarisations><outputSigmaBand>true</outputSigmaBand><outputImageScaleInDb>false</outputImageScaleInDb></parameters></node>
+  <node id="RawSubset"><operator>Subset</operator><sources><sourceProduct refid="RawCalibration"/></sources><parameters><region>${region}</region><copyMetadata>true</copyMetadata></parameters></node>
+  <node id="Subset"><operator>Subset</operator><sources><sourceProduct refid="Calibration"/></sources><parameters><region>${region}</region><copyMetadata>true</copyMetadata></parameters></node>
+  <node id="Coordinates"><operator>BandMaths</operator><sources><sourceProduct refid="Subset"/></sources><parameters><targetBands>
+    <targetBand><name>sigma0_hh</name><type>float32</type><expression>Sigma0_HH</expression><noDataValue>NaN</noDataValue></targetBand>
+    <targetBand><name>sigma0_hv</name><type>float32</type><expression>Sigma0_HV</expression><noDataValue>NaN</noDataValue></targetBand>
+    <targetBand><name>incidence</name><type>float32</type><expression>incident_angle</expression><noDataValue>NaN</noDataValue></targetBand>
+    <targetBand><name>latitude_band</name><type>float32</type><expression>latitude</expression><noDataValue>NaN</noDataValue></targetBand>
+    <targetBand><name>longitude_band</name><type>float32</type><expression>longitude</expression><noDataValue>NaN</noDataValue></targetBand>
+  </targetBands></parameters></node>
+  <node id="RawCoordinates"><operator>BandMaths</operator><sources><sourceProduct refid="RawSubset"/></sources><parameters><targetBands>
+    <targetBand><name>sigma0_hh</name><type>float32</type><expression>Sigma0_HH</expression><noDataValue>NaN</noDataValue></targetBand>
+    <targetBand><name>sigma0_hv</name><type>float32</type><expression>Sigma0_HV</expression><noDataValue>NaN</noDataValue></targetBand>
+    <targetBand><name>incidence</name><type>float32</type><expression>incident_angle</expression><noDataValue>NaN</noDataValue></targetBand>
+  </targetBands></parameters></node>
+  <node id="Geocode"><operator>Ellipsoid-Correction-RD</operator><sources><sourceProduct refid="RawSubset"/></sources><parameters><sourceBands>Sigma0_HH,Sigma0_HV</sourceBands><imgResamplingMethod>BILINEAR_INTERPOLATION</imgResamplingMethod><mapProjection>EPSG:3978</mapProjection><pixelSpacingInMeter>40.0</pixelSpacingInMeter><nodataValueAtSea>false</nodataValueAtSea><applyRadiometricNormalization>false</applyRadiometricNormalization><saveSelectedSourceBand>true</saveSelectedSourceBand></parameters></node>
+  <node id="WriteRaw"><operator>Write</operator><sources><sourceProduct refid="RawSubset"/></sources><parameters><file>${output_prefix}_raw</file><formatName>BEAM-DIMAP</formatName></parameters></node>
+  <node id="WriteDenoised"><operator>Write</operator><sources><sourceProduct refid="Coordinates"/></sources><parameters><file>${output_prefix}_den</file><formatName>BEAM-DIMAP</formatName></parameters></node>
+  <node id="WriteGeocode"><operator>Write</operator><sources><sourceProduct refid="Geocode"/></sources><parameters><file>${output_prefix}_geo.tif</file><formatName>GeoTIFF</formatName></parameters></node>
+</graph>

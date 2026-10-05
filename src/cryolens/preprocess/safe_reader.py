@@ -40,6 +40,7 @@ from __future__ import annotations
 
 import logging
 import re
+import sys
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
@@ -52,10 +53,33 @@ logger = logging.getLogger(__name__)
 
 _POL_PATTERN = re.compile(r"-(hh|hv|vv|vh)-", re.IGNORECASE)
 
+
+def _interp_extrapolate_1d(target: NDArray, coordinates: NDArray, values: NDArray) -> NDArray:
+    """ESA linear interpolation continues the edge segment outside LUT knots."""
+    result = np.asarray(np.interp(target, coordinates, values))
+    if coordinates.size > 1:
+        before, after = target < coordinates[0], target > coordinates[-1]
+        result[before] = values[0] + (target[before] - coordinates[0]) * (values[1] - values[0]) / (
+            coordinates[1] - coordinates[0]
+        )
+        result[after] = values[-1] + (target[after] - coordinates[-1]) * (
+            values[-1] - values[-2]
+        ) / (coordinates[-1] - coordinates[-2])
+    return result
+
+
+def _open_path(path: Path | str) -> str:
+    """Format path with Windows extended-length prefix if needed."""
+    resolved = str(Path(path).resolve())
+    if sys.platform == "win32" and not resolved.startswith(("\\\\?\\", "//?/")):
+        return f"\\\\?\\{resolved}"
+    return resolved
+
+
 #: Fraction of non-positive power above which a channel is reported unusable for
 #: CFAR. Speckle legitimately produces a few very dark pixels, so a small
-#: fraction is normal; tens of percent means the noise subtraction has removed
-#: signal rather than noise.
+#: fraction is normal; tens of percent is a processing-quality rejection under
+#: this research policy. It does not by itself establish the cause.
 NONPOSITIVE_POWER_WARN_FRACTION = 0.05
 
 
@@ -67,7 +91,12 @@ class CalibrationLUT:
     pixels: NDArray[np.int64]
     values: NDArray[np.float64]
 
-    def interpolate(self, shape: tuple[int, int]) -> NDArray[np.float32]:
+    def interpolate(
+        self,
+        shape: tuple[int, int],
+        offset: tuple[int, int] = (0, 0),
+        extrapolate_lines: bool = False,
+    ) -> NDArray[np.float32]:
         """Bilinearly expand the LUT onto a full raster of ``shape``.
 
         The annotation grid is regular in line but the pixel axis is shared
@@ -93,8 +122,8 @@ class CalibrationLUT:
             if ok.any() and not ok.all():
                 grid[r] = np.interp(unique_pixels, unique_pixels[ok], row[ok])
 
-        target_lines = np.arange(n_lines, dtype=np.float64)
-        target_pixels = np.arange(n_samples, dtype=np.float64)
+        target_lines = np.arange(n_lines, dtype=np.float64) + offset[0]
+        target_pixels = np.arange(n_samples, dtype=np.float64) + offset[1]
 
         # Interpolate along pixels for each annotated line.
         by_line = np.empty((unique_lines.size, n_samples), dtype=np.float64)
@@ -104,11 +133,18 @@ class CalibrationLUT:
         # Then along lines for every output row, chunked to bound peak memory.
         src_lines = unique_lines.astype(np.float64)
         idx = np.interp(target_lines, src_lines, np.arange(src_lines.size, dtype=np.float64))
-        lo = np.clip(np.floor(idx).astype(int), 0, src_lines.size - 1)
-        hi = np.clip(lo + 1, 0, src_lines.size - 1)
-        w = (idx - lo)[:, None]
+        if extrapolate_lines and src_lines.size > 1:
+            lo = np.clip(
+                np.searchsorted(src_lines, target_lines, side="right") - 1, 0, src_lines.size - 2
+            )
+            hi = lo + 1
+            w = ((target_lines - src_lines[lo]) / (src_lines[hi] - src_lines[lo]))[:, None]
+        else:
+            lo = np.clip(np.floor(idx).astype(int), 0, src_lines.size - 1)
+            hi = np.clip(lo + 1, 0, src_lines.size - 1)
+            w = (idx - lo)[:, None]
 
-        out = np.empty((n_lines, n_samples), dtype=np.float64)
+        out = np.empty((n_lines, n_samples), dtype=np.float32)
         for c_start in range(0, n_samples, 4096):
             c_end = min(c_start + 4096, n_samples)
             block = by_line[:, c_start:c_end]
@@ -136,7 +172,7 @@ class SwathAnnotation:
 
 def _parse_calibration(path: Path) -> tuple[CalibrationLUT, int, int]:
     """Parse a calibration annotation into a sigmaNought LUT."""
-    root = ET.parse(path).getroot()
+    root = ET.parse(_open_path(path)).getroot()
     lines: list[int] = []
     pixels: list[int] = []
     values: list[float] = []
@@ -178,7 +214,7 @@ def _parse_noise(path: Path) -> CalibrationLUT | None:
     Handles both the pre-IPF-2.90 ``noiseVector`` element and the later
     ``noiseRangeVector`` naming.
     """
-    root = ET.parse(path).getroot()
+    root = ET.parse(_open_path(path)).getroot()
     lines: list[int] = []
     pixels: list[int] = []
     values: list[float] = []
@@ -213,7 +249,12 @@ def _parse_noise(path: Path) -> CalibrationLUT | None:
     )
 
 
-def _noise_power_grid(path: Path, shape: tuple[int, int]) -> NDArray[np.float32]:
+def _noise_power_grid(
+    path: Path,
+    shape: tuple[int, int],
+    offset: tuple[int, int] = (0, 0),
+    full_shape: tuple[int, int] | None = None,
+) -> NDArray[np.float32]:
     """Multiply ESA range noise by the annotated azimuth factors (IPF >= 2.90).
 
     Older products supply a single range-only noise field. See ESA MPC-0392,
@@ -222,13 +263,14 @@ def _noise_power_grid(path: Path, shape: tuple[int, int]) -> NDArray[np.float32]
     lut = _parse_noise(path)
     if lut is None:
         raise ValueError("Noise annotation is empty.")
-    power = lut.interpolate(shape)
-    if np.any(power < 0):
-        raise ValueError("Noise power must be nonnegative.")
-    root = ET.parse(path).getroot()
+    root = ET.parse(_open_path(path)).getroot()
     vectors = list(root.iter("noiseAzimuthVector"))
     if not vectors:
+        power = lut.interpolate(shape, offset)
+        if np.any(power < 0):
+            raise ValueError("Noise power must be nonnegative.")
         return power
+    power = np.full(shape, np.nan, dtype=np.float32)
     factors = np.full(shape, np.nan, dtype=np.float32)
     for vector in vectors:
 
@@ -243,8 +285,8 @@ def _noise_power_grid(path: Path, shape: tuple[int, int]) -> NDArray[np.float32]
         lines = np.fromstring(required("line"), sep=" ", dtype=np.float64)
         values = np.fromstring(required("noiseAzimuthLut"), sep=" ", dtype=np.float64)
         if (
-            not 0 <= r0 < r1 <= shape[0]
-            or not 0 <= c0 < c1 <= shape[1]
+            not 0 <= r0 < r1 <= (full_shape or shape)[0]
+            or not 0 <= c0 < c1 <= (full_shape or shape)[1]
             or lines.size != values.size
             or not lines.size
             or not np.isfinite(values).all()
@@ -252,15 +294,35 @@ def _noise_power_grid(path: Path, shape: tuple[int, int]) -> NDArray[np.float32]
             or np.any(np.diff(lines) <= 0)
         ):
             raise ValueError("Invalid azimuth noise vector.")
-        factors[r0:r1, c0:c1] = np.interp(np.arange(r0, r1), lines, values)[:, None]
-    if not np.isfinite(factors).all():
+        wr0, wc0 = offset
+        rr0, rr1 = max(r0, wr0), min(r1, wr0 + shape[0])
+        cc0, cc1 = max(c0, wc0), min(c1, wc0 + shape[1])
+        if rr1 > rr0 and cc1 > cc0:
+            # ESA TOPS GRD selects range vectors belonging to this annotated
+            # azimuth block, then extrapolates the bracketing vectors at the
+            # block edges. Interpolating globally blends different blocks.
+            in_block = (lut.lines >= r0) & (lut.lines < r1)
+            if not in_block.any():
+                raise ValueError("Azimuth block has no qualified range noise vectors.")
+            block_lut = CalibrationLUT(
+                lut.lines[in_block], lut.pixels[in_block], lut.values[in_block]
+            )
+            power[rr0 - wr0 : rr1 - wr0, cc0 - wc0 : cc1 - wc0] = block_lut.interpolate(
+                (rr1 - rr0, cc1 - cc0), (rr0, cc0), extrapolate_lines=True
+            )
+            factors[rr0 - wr0 : rr1 - wr0, cc0 - wc0 : cc1 - wc0] = _interp_extrapolate_1d(
+                np.arange(rr0, rr1), lines, values
+            )[:, None]
+    if not np.isfinite(factors).all() or np.any(factors < 0):
         raise ValueError("Azimuth noise annotation does not cover the full measurement grid.")
+    if np.any(power < 0) or not np.isfinite(power).all():
+        raise ValueError("Noise power must be finite and nonnegative across the measurement.")
     return np.asarray(power * factors, dtype=np.float32)
 
 
 def _parse_product_annotation(path: Path) -> dict[str, Any]:
     """Parse raster dimensions and the geolocation grid from a product annotation."""
-    root = ET.parse(path).getroot()
+    root = ET.parse(_open_path(path)).getroot()
 
     n_lines_el = root.find(".//imageAnnotation/imageInformation/numberOfLines")
     n_samples_el = root.find(".//imageAnnotation/imageInformation/numberOfSamples")
@@ -330,6 +392,10 @@ class SAFEProductReader:
                 f"{self.safe_dir.name} does not look like a SAFE product "
                 "(missing measurement/ or annotation/)."
             )
+        match = re.search(r"S1[A-D]_(EW|IW)_GRD", self.safe_dir.name)
+        if match is None:
+            raise ValueError("Only Sentinel-1 EW/IW Level-1 GRD SAFE products are supported.")
+        self.instrument_mode = match.group(1)
 
     def available_polarisations(self) -> list[str]:
         """List polarisations present in the product."""
@@ -345,10 +411,10 @@ class SAFEProductReader:
         pol = polarisation.lower()
 
         def pick(paths: list[Path]) -> Path | None:
-            for p in paths:
-                if f"-{pol}-" in p.name.lower():
-                    return p
-            return None
+            matches = [p for p in paths if f"-{pol}-" in p.name.lower()]
+            if len(matches) > 1:
+                raise ValueError(f"Ambiguous {polarisation} SAFE component files")
+            return matches[0] if matches else None
 
         measurement = pick(sorted(self.measurement_dir.glob("*.tiff")))
         annotation = pick(sorted(self.annotation_dir.glob("*.xml")))
@@ -369,6 +435,7 @@ class SAFEProductReader:
         self,
         polarisation: str,
         remove_thermal_noise: bool = True,
+        window: tuple[int, int, int, int] | None = None,
     ) -> dict[str, Any]:
         """Read one polarisation and return calibrated sigma-nought in linear power.
 
@@ -387,16 +454,24 @@ class SAFEProductReader:
         )
 
         meta = _parse_product_annotation(annotation)
-        shape = (meta["n_lines"], meta["n_samples"])
+        full_shape = (meta["n_lines"], meta["n_samples"])
+        r0, c0, height, width = window or (0, 0, *full_shape)
+        if not (0 <= r0 < r0 + height <= full_shape[0] and 0 <= c0 < c0 + width <= full_shape[1]):
+            raise ValueError("Window must lie within the measurement grid.")
+        shape = (height, width)
+        offset = (r0, c0)
 
-        with rasterio.open(measurement) as src:
-            dn = src.read(1).astype(np.float64)
-            valid = (src.read_masks(1) > 0) & np.isfinite(dn) & (dn > 0)
-        if dn.shape != shape:
-            raise ValueError(f"Annotation dimensions {shape} differ from raster {dn.shape}.")
+        with rasterio.open(_open_path(measurement)) as src:
+            if (src.height, src.width) != full_shape:
+                raise ValueError("Annotation dimensions differ from measurement raster.")
+            from rasterio.windows import Window
+
+            raster_window = Window(c0, r0, width, height)
+            dn = src.read(1, window=raster_window).astype(np.float64)
+            valid = (src.read_masks(1, window=raster_window) > 0) & np.isfinite(dn) & (dn > 0)
 
         sigma_lut, _, _ = _parse_calibration(calibration_path)
-        a_sigma = sigma_lut.interpolate(shape).astype(np.float64)
+        a_sigma = sigma_lut.interpolate(shape, offset).astype(np.float64)
         if not np.isfinite(a_sigma).all() or np.any(a_sigma <= 0):
             raise ValueError("Calibration LUT must be finite and positive.")
 
@@ -406,31 +481,31 @@ class SAFEProductReader:
         if remove_thermal_noise and not noise_removed:
             if noise_path is None:
                 raise ValueError("Thermal noise removal requested but noise annotation is missing.")
-            noise_power = _noise_power_grid(noise_path, shape).astype(np.float64)
+            noise_power = _noise_power_grid(noise_path, shape, offset, full_shape).astype(
+                np.float64
+            )
             # The noise LUT is expressed in DN^2, so it is divided by the same
             # calibration constant to reach sigma-nought power units.
             sigma0 = sigma0 - (noise_power / (a_sigma**2))
             noise_removed = True
         sigma0[~valid] = np.nan
 
-        # Measured on a real S1B EW scene over the Labrador Shelf: the ESA
-        # standard noise LUT drove 44 percent of HV pixels to zero or negative
-        # power, moving the median 3.4 dB below the uncorrected value and 4.9 dB
-        # below NERSC's independently processed reference for the same
-        # acquisition. Non-positive power has no decibel representation and
-        # cannot enter a CFAR statistic, so the fraction is measured and
-        # surfaced rather than silently clipped. ADR-007 anticipated exactly
-        # this for low-backscatter maritime cross-pol.
+        # Signed residual power diagnoses weak signal and model mismatch.
+        # Never infer successful denoising from clipping it to a positive floor.
         finite = np.isfinite(sigma0)
         n_finite = int(finite.sum())
         nonpositive_fraction = (
-            float(((sigma0 <= 0.0) & finite).sum() / n_finite) if n_finite else 0.0
+            float(((sigma0 <= 0.0) & finite).sum() / n_finite) if n_finite else 1.0
         )
-        if noise_removed and nonpositive_fraction > NONPOSITIVE_POWER_WARN_FRACTION:
+        if (
+            window is None
+            and noise_removed
+            and nonpositive_fraction > NONPOSITIVE_POWER_WARN_FRACTION
+        ):
             logger.warning(
                 "%s %s: thermal noise removal left %.1f%% of finite pixels at non-positive "
-                "power. ESA standard noise vectors over-subtract over low-backscatter ocean; "
-                "this channel is not suitable for CFAR without NERSC-style denoising "
+                "power. The cause requires matched reference investigation; "
+                "this channel is rejected for CFAR under the research quality policy "
                 "(see ADR-007).",
                 self.safe_dir.name,
                 polarisation.upper(),
@@ -438,13 +513,13 @@ class SAFEProductReader:
             )
 
         incidence = _interp_scattered_grid(
-            meta["grid_lines"], meta["grid_pixels"], meta["incidence"], shape
+            meta["grid_lines"], meta["grid_pixels"], meta["incidence"], shape, offset
         )
         latitude = _interp_scattered_grid(
-            meta["grid_lines"], meta["grid_pixels"], meta["latitude"], shape
+            meta["grid_lines"], meta["grid_pixels"], meta["latitude"], shape, offset
         )
         longitude = _interp_scattered_grid(
-            meta["grid_lines"], meta["grid_pixels"], meta["longitude"], shape
+            meta["grid_lines"], meta["grid_pixels"], meta["longitude"], shape, offset
         )
 
         logger.info(
@@ -463,10 +538,15 @@ class SAFEProductReader:
             "longitude": longitude,
             "polarisation": polarisation.upper(),
             "shape": shape,
+            "window": (r0, c0, height, width),
+            "full_shape": full_shape,
             "thermal_noise_removed": noise_removed,
             "nonpositive_power_fraction": nonpositive_fraction,
-            "usable_for_cfar": nonpositive_fraction <= NONPOSITIVE_POWER_WARN_FRACTION,
+            "usable_for_cfar": noise_removed
+            and n_finite > 0
+            and nonpositive_fraction <= NONPOSITIVE_POWER_WARN_FRACTION,
             "product": self.safe_dir.name,
+            "instrument_mode": self.instrument_mode,
         }
 
 
@@ -475,40 +555,11 @@ def _interp_scattered_grid(
     pixels: NDArray[np.int64],
     values: NDArray[np.float64],
     shape: tuple[int, int],
+    offset: tuple[int, int] = (0, 0),
 ) -> NDArray[np.float32]:
     """Interpolate a scattered annotation grid onto a full raster.
 
     The Sentinel-1 geolocation grid is rectangular in (line, pixel) even though
     it is stored as a flat list, so it is reshaped and interpolated separably.
     """
-    unique_lines = np.unique(lines)
-    unique_pixels = np.unique(pixels)
-
-    grid = np.full((unique_lines.size, unique_pixels.size), np.nan, dtype=np.float64)
-    li = {v: i for i, v in enumerate(unique_lines)}
-    pi = {v: i for i, v in enumerate(unique_pixels)}
-    for ln, px, val in zip(lines, pixels, values, strict=True):
-        grid[li[int(ln)], pi[int(px)]] = val
-
-    for r in range(grid.shape[0]):
-        row = grid[r]
-        ok = np.isfinite(row)
-        if ok.any() and not ok.all():
-            grid[r] = np.interp(unique_pixels, unique_pixels[ok], row[ok])
-
-    n_lines, n_samples = shape
-    target_pixels = np.arange(n_samples, dtype=np.float64)
-    by_line = np.empty((unique_lines.size, n_samples), dtype=np.float64)
-    for r in range(unique_lines.size):
-        by_line[r] = np.interp(target_pixels, unique_pixels.astype(np.float64), grid[r])
-
-    idx = np.interp(
-        np.arange(n_lines, dtype=np.float64),
-        unique_lines.astype(np.float64),
-        np.arange(unique_lines.size, dtype=np.float64),
-    )
-    lo = np.clip(np.floor(idx).astype(int), 0, unique_lines.size - 1)
-    hi = np.clip(lo + 1, 0, unique_lines.size - 1)
-    w = (idx - lo)[:, None]
-    out = by_line[lo] * (1.0 - w) + by_line[hi] * w
-    return np.asarray(out, dtype=np.float32)
+    return CalibrationLUT(lines, pixels, values).interpolate(shape, offset)

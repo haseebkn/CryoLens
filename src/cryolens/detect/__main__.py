@@ -21,6 +21,7 @@ from cryolens.detect.filters import SuppressionConfig, build_analysis_mask, filt
 from cryolens.geo.aoi import raster_aoi_mask
 from cryolens.geo.vectorize import TargetVectorizer
 from cryolens.preprocess.masks import LandMaskGenerator
+from cryolens.preprocess.quality import require_detection_ready_cog
 
 
 def parse_args() -> argparse.Namespace:
@@ -106,6 +107,7 @@ def main() -> None:
             raise ValueError(
                 "Detection requires a calibrated four-band EPSG:3978 COG with explicit CRS"
             )
+        require_detection_ready_cog(src)
         crs = src.crs
         width = src.width
         height = src.height
