@@ -49,8 +49,10 @@ def main() -> None:
             )
         for path in sorted(args.report_dir.rglob("*")):
             if path.is_file() and path.name != "tracking_receipt.json":
+                relative = path.parent.relative_to(args.report_dir).as_posix()
                 run.log_artifact(
-                    path, "processing_report/" + path.parent.relative_to(args.report_dir).as_posix()
+                    path,
+                    "processing_report" if relative == "." else "processing_report/" + relative,
                 )
         for path in sorted(Path("validation").iterdir()):
             if path.is_file():
@@ -61,6 +63,8 @@ def main() -> None:
             "experiment": "cryolens-processing-v1",
             "report_sha256": file_digest(report_path),
             "purpose": "Completed processing investigation; no precision, recall or false-alarm measurement",
+            "git_commit": run.client.get_run(run.run_id).data.tags["git_commit"],
+            "git_dirty": run.client.get_run(run.run_id).data.tags["git_dirty"],
         }
     (args.report_dir / "tracking_receipt.json").write_text(
         json.dumps(receipt, indent=2), encoding="utf-8"
