@@ -51,6 +51,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+tracking = ["mlflow-skinny>=3.0,<4"]
 ml = [
     "torch>=2.2.0",
     "torchvision>=0.17.0",
