@@ -33,7 +33,7 @@ jobs:
         with:
           version: '0.8.19'
       - name: Install locked dependencies
-        run: uv sync --frozen --extra dev
+        run: uv sync --frozen --extra dev --extra tracking
       - name: Lint and formatting
         run: |
           uv run --frozen ruff check .

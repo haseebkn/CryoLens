@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "protocol_id": "nl-mda-v1",
+  "frozen_on": "2026-10-05",
+  "aoi_feature_id": "newfoundland_labrador_marine",
+  "scope": "Hand-defined NL shelf research polygon; not a provincial jurisdiction, EEZ or navigation boundary. Land and coastal exclusions are applied separately at pixel centres.",
+  "season_scope": "Available acquisition inventory spans several seasons. Reserved pilot acquisitions include winter chart context and September SAFE imagery; this does not establish February-July peak-season performance.",
+  "tasks": {
+    "target_detection": {
+      "labels": ["target", "non_target", "uncertain", "unreviewed"],
+      "reference": "Independent search of surveyed areas plus candidate review; target means a compact localized return judged to represent a discrete object at sensor resolution, non_target means diffuse/background clutter or a processing artefact, and ambiguous returns remain uncertain. Independent search must not apply the detector's min_size threshold. Rejected-candidate strata retain inclusion probabilities. SAR visibility does not establish iceberg identity.",
+      "metrics": ["precision", "recall", "per_stage_recall", "false_detections_per_1000km2", "candidate_density_per_1000km2"]
+    },
+    "sea_ice_segmentation": {
+      "labels": ["open_water", "ice_affected", "unknown"],
+      "reference": "AI4Arctic chart-derived SIC: classes 0 and 1 are open_water, classes 2 through 10 are ice_affected, all other values are unknown. These are chart proxies, not pixel-level field truth. Unknown pixels are excluded, never converted to open water.",
+      "metrics": ["per_class_precision", "per_class_recall", "per_class_f1", "per_class_iou"]
+    },
+    "target_identification": {
+      "labels": ["ship", "iceberg", "other", "unknown"],
+      "reference": "Identity requires acquisition-matched independent evidence. AIS absence, an IIP association, a radar score, or optical non-detection alone cannot establish identity.",
+      "metrics": ["per_class_precision", "per_class_recall", "unknown_fraction"]
+    }
+  },
+  "grouping": {
+    "temporal_gap_days": 7,
+    "spatial_buffer_m": 10000,
+    "projection": "EPSG:3978",
+    "rule": "Connected components: same original acquisition or same source hash, or acquisition starts within seven days and footprint distance at most 10 km. Transitive links remain in one group. All chips, polarizations, processing derivatives and future optical pairs inherit the parent group. Different seasons at the same site may span partitions; this does not establish unseen-geography generalization."
+  },
+  "partitioning": {
+    "seed": "cryolens-nl-v1",
+    "test_fraction": 0.2,
+    "validation_fraction": 0.2,
+    "family_coverage_rule": "Reserve at least one metadata/integrity-only connected component per available source family, using the same deterministic hash rank. This may exceed the nominal test fraction in a small inventory; never select by chart values or detector outcomes.",
+    "exposure_rule": "Test selection is restricted to groups with metadata/integrity-only exposure. Analytical or unknown exposure makes the entire group development-only. Previously published benchmark scenes cannot become untouched tests.",
+    "release_rule": "Development may use train/validation only. Test execution requires a separate release JSON binding this manifest hash, protocol hash, task, exact test scene IDs and locked model/configuration hashes. A release records access; no tuning is allowed afterward. No software mechanism prevents a human from reading raw files."
+  },
+  "matching": {
+    "distance_m": 200,
+    "rule": "Within the same acquisition and surveyed eligible area, use maximum-cardinality one-to-one matching with WGS84 geodesic distance <= 200 m. Duplicate predictions remain unmatched. Freeze sensitivity reports at 100, 200 and 400 m; do not select the best tolerance after seeing test results.",
+    "uncertainty_rule": "Uncertain/unreviewed regions are excluded from scored coverage and reported separately. Retained-only review cannot establish recall; unknown target identity cannot be scored as ship or iceberg.",
+    "optical_rule": "For initial corroboration, optical acquisitions must be within six hours. Record visibility, resolution, time offset, geolocation uncertainty and analyst matching rationale; unresolved motion or identity remains uncertain. Never score an optical absence as a false radar target automatically."
+  },
+  "area": {
+    "detection": "Count independently surveyed pixel centres inside the frozen AOI that pass valid-radiometry, land/coastal, border, seam, selected ice-context and CFAR-support masks. Persist the exact mask and spacing/grid metadata before scoring. Sum scene exposure areas; report unique footprint area separately. Post-detection suppression never changes the denominator.",
+    "segmentation": "Valid SAR, geolocation and chart-label pixels inside the AOI outside land/coastal exclusions. Retain both water and ice; do not reuse an open-water-only detection mask.",
+    "units": "km2",
+    "pixel_area": "AI4Arctic uses declared nominal spacing squared, explicitly labelled approximate. Projected rasters require a documented ground-area method; EPSG:3978 affine area is not assumed equal-area. Acquisition footprint intersections are not eligible evaluated coverage."
+  },
+  "annotation_requirements": ["scene_id", "task", "label", "reviewer_id", "reviewed_utc", "evidence", "surveyed_area_id", "stage", "sampling_stratum", "inclusion_probability"],
+  "reporting": "Report counts, eligible surveyed area, unknown/excluded coverage and scene/group counts alongside metrics. Confidence intervals must account for rejected-candidate sampling and scene/group dependence. One held-out acquisition is a pilot, not a regional operating claim."
+}

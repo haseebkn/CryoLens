@@ -140,6 +140,12 @@ water is not evidence that no icebergs are present.
 
 ## Validation
 
+The [frozen evaluation protocol](docs/EVALUATION_PROTOCOL.md) defines separate
+detection, sea-ice segmentation and identification tasks, acquisition groups,
+development/test partitions and real MLflow tracking. Its
+[coverage map](docs/evaluation/v1/coverage.png) shows acquisition footprints;
+eligible surveyed water remains a separate measurement.
+
 ```text
 uv run --frozen pytest
 uv run --frozen ruff check .

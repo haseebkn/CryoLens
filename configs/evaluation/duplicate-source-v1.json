@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_url": "https://api.figshare.com/v2/articles/21316608",
+  "publisher_doi": "10.11583/DTU.21316608.v3",
+  "publisher_article_version": 3,
+  "scene_id": "20210407T101941_cis_prep.nc",
+  "source_path": "evaluation_holdout/ai4arctic/20210407T101941_cis_prep.nc",
+  "acquisition_id": "S1A_EW_GRDM_1SDH_20210407T101941_20210407T102041_037343_046676",
+  "download_url": "https://ndownloader.figshare.com/files/38621387",
+  "source_bytes": 174270040,
+  "publisher_md5": "0992fcf8f767c74cd0b24197bf8eba46",
+  "source_sha256": "a305b644accfb6931e5aff384cb4c4d70882f76c6cb02ca60bb3f863b291ed20",
+  "copy_exposure": "metadata_integrity_only",
+  "exposure": "unknown",
+  "reason": "Replacement download duplicates an existing development archive acquisition. Exposure of the original cannot be ruled out; this copy is rejected as an untouched source and is not admitted separately."
+}

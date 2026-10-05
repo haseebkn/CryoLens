@@ -947,6 +947,9 @@ ml = [
     { name = "xgboost", version = "3.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "xgboost", version = "3.4.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
+tracking = [
+    { name = "mlflow-skinny" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -961,6 +964,7 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.27.0" },
     { name = "matplotlib", specifier = ">=3.11.1" },
     { name = "mlflow", marker = "extra == 'ml'", specifier = ">=2.11.0" },
+    { name = "mlflow-skinny", marker = "extra == 'tracking'", specifier = ">=3.0,<4" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.10.0" },
     { name = "netcdf4", specifier = ">=1.7.4" },
     { name = "numpy", specifier = ">=1.26.0" },
@@ -994,7 +998,7 @@ requires-dist = [
     { name = "xarray-sentinel", specifier = ">=0.9.0" },
     { name = "xgboost", marker = "extra == 'ml'", specifier = ">=2.0.0" },
 ]
-provides-extras = ["ml", "dev"]
+provides-extras = ["tracking", "ml", "dev"]
 
 [[package]]
 name = "cryptography"
