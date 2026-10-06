@@ -38,6 +38,7 @@ behavior and identifies the missing operational capabilities.
 - Land/coast, border, seam and optional sea-ice exclusion; an auditable suppression ledger.
 - Unclassified candidate geometry and radiometry, source timestamps and review provenance.
 - A FastAPI/Leaflet analyst dashboard with bounded queries and protected review writes.
+- Real Sentinel-2 RGB/NIR/SCL native crops, paired radar/optical review and separate optical evidence history.
 - Tests, type checks, dependency locking, database migrations and real PostGIS checks in CI.
 
 **Gamma-CFAR is not a K-distribution detector.** The historical `k_distribution`
@@ -151,6 +152,14 @@ compares three EW/IW products against actual SNAP 14.0.0 at matched pixels.
 It records quality rejections and unresolved reprojection discrepancies.
 **Fresh SAFE detection deployment remains blocked.**
 
+The [Sentinel-2 paired-review report](docs/optical-review/v1/README.md) records
+live searches of all 25 evaluated development acquisitions: 15 have optical
+footprint overlap within ±12 hours. A selected two-scene pilot has downloaded
+optical pixels for 1 of 34 candidates; none passes the conservative visibility
+screen. These are availability measurements, not iceberg labels or regional
+coverage estimates. Missing optical evidence never automatically rejects a
+radar candidate.
+
 ```text
 uv run --frozen pytest
 uv run --frozen ruff check .
@@ -171,6 +180,7 @@ are absent. CI uses locked dependencies and a real PostGIS service.
 |---|---|
 | Statistical radar candidate screening | Implemented; thresholds require regional validation |
 | Analyst review and geographic API | Implemented; local API-key protection |
+| Sentinel-2 paired review | Implemented with real native crops, cloud/shadow/valid-data screening and separate attributed evidence; pilot coverage is limited |
 | SAFE EW/IW calibration and geolocation | Calibration matches SNAP on sampled pixels; legacy EW/IW reprojection discrepancies remain. Absolute geolocation accuracy is not established |
 | ESA standard thermal noise removal | Matches SNAP on sampled pixels, but full-scene HV non-positive fractions are 45.7%, 26.1% and 54.3%; all three tested products are rejected |
 | Fresh SAFE detection deployment | Blocked by separate processing-quality and scientific-release gates; no current producer grants a release |
@@ -196,6 +206,7 @@ src/cryolens/
   detect/       CFAR, suppression, scene runner, training export
   geo/          shared NL area and target geometry
   eval/         candidate-density reports and contextual matching
+  review/       Sentinel-1/Sentinel-2 pairs, native crops and optical visibility
   api/ db/ web/ analyst interface, persistence and provenance
   drift/        explicit unavailable interfaces
 ```

@@ -33,6 +33,17 @@ calibrated iceberg confidence and is not a MANICE confidence code. Analyst
 judgments are attributed review evidence, not automatically independent
 physical ground truth.
 
+Sentinel-2 paired review now supplies real RGB/NIR/SCL crops and independent
+optical evidence records ([availability report](optical-review/v1/README.md)).
+The two-scene pilot has no candidate passing the visibility screen. Tile
+footprints can contain extensive nodata; a catalogue match is not clear imagery.
+The 20 m SCL layer can confuse ice and clouds and cannot resolve every small
+object visible in 10 m bands. Time-separated moving targets are not expected
+at the same pixel. The default movement and geolocation allowances are research
+assumptions, not measured accuracy or a validated vessel/iceberg drift bound.
+Chips are capped at 6 km radius and explicitly flag larger assumed envelopes.
+An absent counterpart never automatically changes the radar verdict.
+
 ## 3. Data units and labels
 
 Ready-to-train AI4Arctic fields have been standardized by the publisher.

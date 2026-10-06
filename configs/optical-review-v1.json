@@ -1,0 +1,13 @@
+{
+  "version": "s1-s2-review-v1",
+  "search_hours": 12,
+  "motion_speed_m_s": 0.5,
+  "sar_geolocation_allowance_m": 100,
+  "optical_geolocation_allowance_m": 20,
+  "minimum_review_radius_m": 1000,
+  "maximum_review_radius_m": 6000,
+  "review_grid_spacing_m": 10,
+  "cloud_buffer_m": 60,
+  "useful_visible_fraction": 0.8,
+  "max_items_per_candidate": 3
+}

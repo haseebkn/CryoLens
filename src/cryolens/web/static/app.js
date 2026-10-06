@@ -109,6 +109,15 @@ document.addEventListener('DOMContentLoaded', () => {
       marker.bindTooltip(tooltip);
       marker.on('click', () => inspect(feature));
       marker.addTo(targets);
+      const element = marker.getElement();
+      if (element) {
+        element.setAttribute('role', 'button');
+        element.setAttribute('tabindex', '0');
+        element.setAttribute('aria-label', `Inspect ${assessment(p)} ${String(p.id).slice(0, 8)}`);
+        element.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); inspect(feature); }
+        });
+      }
       visible++;
       if (selectedTarget?.properties.id === p.id) selectionVisible = true;
     }
@@ -198,6 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('review-notes').value = '';
     updateReviewAccess();
     drawer.hidden = false;
+    loadOpticalPairs(p.id);
     $('drawer-close').focus({ preventScroll: true });
   }
 
@@ -206,7 +216,81 @@ document.addEventListener('DOMContentLoaded', () => {
     reviewButtons.forEach((button) => { button.disabled = !writeEnabled || reviewBusy; });
     $('analyst-key').disabled = !writeEnabled || reviewBusy;
     $('review-notes').disabled = !writeEnabled || reviewBusy;
+    for (const id of ['optical-save', 'optical-assessment', 'optical-inspection', 'optical-lon', 'optical-lat', 'optical-notes']) $(id).disabled = !writeEnabled || reviewBusy;
   }
+
+  let opticalPairs = [];
+  async function loadOpticalPairs(id, preferredPairId = null) {
+    opticalPairs = [];
+    $('optical-pair-content').hidden = true;
+    $('optical-pair-select').disabled = true;
+    $('optical-status').textContent = 'Loading generated radar / optical pairs…';
+    try {
+      const data = await request(`/api/v1/detections/${encodeURIComponent(id)}/optical-pairs`);
+      if (selectedTarget?.properties.id !== id) return;
+      opticalPairs = data.pairs;
+      const select = $('optical-pair-select');
+      select.replaceChildren();
+      for (const pair of opticalPairs) {
+        const tile = pair.optical_item_id?.match(/_T(\d{2}[A-Z]{3})_/)?.[1] || '';
+        select.append(new Option(pair.optical_item_id ? `${when(pair.optical_acquired_utc)} · ${tile} · ${pair.visibility.status.replaceAll('_', ' ')} · ${pair.id.slice(0, 6)}` : `Optical unavailable · ${pair.id.slice(0, 6)}`, pair.id));
+      }
+      if (!opticalPairs.length) {
+        select.append(new Option('No generated pairs', ''));
+        $('optical-status').textContent = 'Optical pairs have not been generated for this candidate. This is unavailable evidence, not a false-target label.';
+        return;
+      }
+      select.disabled = false;
+      if (preferredPairId && opticalPairs.some((p) => p.id === preferredPairId)) select.value = preferredPairId;
+      $('optical-status').textContent = `${opticalPairs.length} reproducible pair(s). Select an observation and open the image to inspect at full display size.`;
+      showOpticalPair();
+    } catch (error) {
+      if (selectedTarget?.properties.id === id) $('optical-status').textContent = `Optical evidence unavailable: ${error.message}`;
+    }
+  }
+
+  function showOpticalPair() {
+    const pair = opticalPairs.find((p) => p.id === $('optical-pair-select').value);
+    if (!pair) return;
+    $('optical-pair-content').hidden = false;
+    $('optical-image-link').href = pair.image_url;
+    $('optical-pair-image').src = pair.image_url;
+    $('optical-pair-image').onerror = () => { $('optical-status').textContent = 'Pair image unavailable or changed. Regenerate and verify the recorded artifacts.'; };
+    const separation = pair.signed_time_separation_seconds === null ? 'unavailable' : `${(pair.signed_time_separation_seconds / 3600).toFixed(2)} h (optical − radar)`;
+    $('optical-metadata').textContent = `Radar: ${when(pair.sar_acquired_utc)}. Optical: ${when(pair.optical_acquired_utc)}. Separation: ${separation}. Assumed movement/geolocation radius: ${(pair.matching_radius_m / 1000).toFixed(2)} km. ${pair.full_movement_envelope_in_chip ? 'Full assumed envelope shown.' : 'Envelope extends beyond this chip; absence elsewhere is unassessed.'}`;
+    const visibility = pair.visibility;
+    $('optical-visibility').textContent = `Automated visibility: ${visibility.status.replaceAll('_', ' ')}${typeof visibility.visible_fraction === 'number' ? `; ${(visibility.visible_fraction * 100).toFixed(1)}% screened visible, ${(visibility.valid_fraction * 100).toFixed(1)}% valid coverage in the inspected region` : ''}. ${visibility.reason || 'SCL cloud/ice confusion and small objects require analyst inspection.'}`;
+    const links = $('optical-native-links'); links.replaceChildren();
+    for (const name of ['radar-native.tif', 'B04-native.tif', 'B03-native.tif', 'B02-native.tif', 'B08-native.tif', 'SCL-native.tif', 'optical-aligned.tif']) {
+      if (!pair.files[name]) continue;
+      const link = document.createElement('a'); link.textContent = name === 'radar-native.tif' ? 'Native radar HH/HV' : name === 'optical-aligned.tif' ? 'Aligned optical (QGIS)' : `Native ${name.split('-')[0]}`;
+      link.href = `/api/v1/detections/${encodeURIComponent(selectedTarget.properties.id)}/optical-pairs/${pair.id}/assets/${name}`;
+      link.download = name; links.append(link);
+    }
+    $('optical-history').textContent = pair.evidence_history.length ? pair.evidence_history.map((e) => `${e.assessment.replaceAll('_', ' ')} · ${e.visibility} · ${e.analyst_id} · ${when(e.created_at)}: ${e.notes}`).join('\n') : 'No analyst optical evidence recorded.';
+    $('optical-notes').value = ''; $('optical-lon').value = ''; $('optical-lat').value = '';
+    $('optical-assessment').value = 'ambiguous'; $('optical-inspection').value = 'uncertain';
+    updateReviewAccess();
+  }
+
+  $('optical-pair-select').addEventListener('change', showOpticalPair);
+  $('optical-save').addEventListener('click', async () => {
+    if (!selectedTarget || reviewBusy || !writeEnabled) return;
+    const id = selectedTarget.properties.id;
+    const pair = opticalPairs.find((p) => p.id === $('optical-pair-select').value);
+    if (!pair) return;
+    const key = $('analyst-key').value, notes = $('optical-notes').value.trim();
+    if (!key || notes.length < 10) { toast('Provide the analyst key and evidence notes of at least 10 characters.'); return; }
+    const body = { assessment: $('optical-assessment').value, visibility: $('optical-inspection').value, notes };
+    if ($('optical-lon').value !== '' && $('optical-lat').value !== '') body.observed_lonlat = [Number($('optical-lon').value), Number($('optical-lat').value)];
+    reviewBusy = true; updateReviewAccess();
+    try {
+      await request(`/api/v1/detections/${encodeURIComponent(id)}/optical-pairs/${pair.id}/evidence`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Analyst-Key': key }, body: JSON.stringify(body) });
+      if (selectedTarget?.properties.id === id) await loadOpticalPairs(id, pair.id);
+      toast('Optical evidence saved separately. Radar verdict unchanged.');
+    } catch (error) { toast(`Optical evidence could not be saved: ${error.message}`); }
+    finally { reviewBusy = false; updateReviewAccess(); }
+  });
 
   async function review(verdict) {
     if (!selectedTarget || reviewBusy || !writeEnabled) return;

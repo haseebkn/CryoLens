@@ -1,0 +1,438 @@
+{
+  "checked_at": "2026-10-06T00:08:11.046537+00:00",
+  "method": "Independent direct provider reads compared with stored native crops; five matched sensor pixels per asset, including nonzero valid samples where present",
+  "assets": [
+    {
+      "item_id": "S2B_MSIL2A_20180428T145729_R082_T21UYT_20201013T035446",
+      "band": "B02",
+      "source_href": "https://sentinel2l2a01.blob.core.windows.net/sentinel2-l2/21/U/YT/2018/04/28/S2B_MSIL2A_20180428T145729_N0212_R082_T21UYT_20201013T035446.SAFE/GRANULE/L2A_T21UYT_A005971_20180428T145728/IMG_DATA/R10m/T21UYT_20180428T145729_B02_10m.tif",
+      "native_crop_sha256": "d026ea43d7483bec5e7a7a8cc9a39f9abb4ba443a5966d8b0b7bdcc0ac66ab2a",
+      "samples": [
+        {
+          "source_row": 1870,
+          "source_col": 2160,
+          "dn": 3110,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3558,
+          "source_col": 3847,
+          "dn": 0,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 1870,
+          "source_col": 2160,
+          "dn": 3110,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 2471,
+          "source_col": 2261,
+          "dn": 1030,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3558,
+          "source_col": 2301,
+          "dn": 1,
+          "mask": 255,
+          "exact_match": true
+        }
+      ]
+    },
+    {
+      "item_id": "S2B_MSIL2A_20180428T145729_R082_T21UYT_20201013T035446",
+      "band": "B03",
+      "source_href": "https://sentinel2l2a01.blob.core.windows.net/sentinel2-l2/21/U/YT/2018/04/28/S2B_MSIL2A_20180428T145729_N0212_R082_T21UYT_20201013T035446.SAFE/GRANULE/L2A_T21UYT_A005971_20180428T145728/IMG_DATA/R10m/T21UYT_20180428T145729_B03_10m.tif",
+      "native_crop_sha256": "990cf1f860916216663e60cf29077ba93aa8744be2e8f8e9b68fcd8a086fda08",
+      "samples": [
+        {
+          "source_row": 1870,
+          "source_col": 2160,
+          "dn": 2990,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3558,
+          "source_col": 3847,
+          "dn": 0,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 1870,
+          "source_col": 2160,
+          "dn": 2990,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 2471,
+          "source_col": 2261,
+          "dn": 908,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3558,
+          "source_col": 2301,
+          "dn": 1,
+          "mask": 255,
+          "exact_match": true
+        }
+      ]
+    },
+    {
+      "item_id": "S2B_MSIL2A_20180428T145729_R082_T21UYT_20201013T035446",
+      "band": "B04",
+      "source_href": "https://sentinel2l2a01.blob.core.windows.net/sentinel2-l2/21/U/YT/2018/04/28/S2B_MSIL2A_20180428T145729_N0212_R082_T21UYT_20201013T035446.SAFE/GRANULE/L2A_T21UYT_A005971_20180428T145728/IMG_DATA/R10m/T21UYT_20180428T145729_B04_10m.tif",
+      "native_crop_sha256": "bcfb9c8e8f080371e645a6c9eea7bbce8b299bcefbcae712682a5e346747942a",
+      "samples": [
+        {
+          "source_row": 1870,
+          "source_col": 2160,
+          "dn": 2922,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3558,
+          "source_col": 3847,
+          "dn": 0,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 1870,
+          "source_col": 2160,
+          "dn": 2922,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 2471,
+          "source_col": 2261,
+          "dn": 843,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3558,
+          "source_col": 2301,
+          "dn": 2342,
+          "mask": 255,
+          "exact_match": true
+        }
+      ]
+    },
+    {
+      "item_id": "S2B_MSIL2A_20180428T145729_R082_T21UYT_20201013T035446",
+      "band": "B08",
+      "source_href": "https://sentinel2l2a01.blob.core.windows.net/sentinel2-l2/21/U/YT/2018/04/28/S2B_MSIL2A_20180428T145729_N0212_R082_T21UYT_20201013T035446.SAFE/GRANULE/L2A_T21UYT_A005971_20180428T145728/IMG_DATA/R10m/T21UYT_20180428T145729_B08_10m.tif",
+      "native_crop_sha256": "31f0ed4ad04ccfb535dec1df5b7cdf1708ff51d6810e3778fa5528e74c0173b9",
+      "samples": [
+        {
+          "source_row": 1870,
+          "source_col": 2160,
+          "dn": 2918,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3558,
+          "source_col": 3847,
+          "dn": 0,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 1870,
+          "source_col": 2160,
+          "dn": 2918,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 2471,
+          "source_col": 2261,
+          "dn": 878,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3558,
+          "source_col": 2301,
+          "dn": 1,
+          "mask": 255,
+          "exact_match": true
+        }
+      ]
+    },
+    {
+      "item_id": "S2B_MSIL2A_20180428T145729_R082_T21UYT_20201013T035446",
+      "band": "SCL",
+      "source_href": "https://sentinel2l2a01.blob.core.windows.net/sentinel2-l2/21/U/YT/2018/04/28/S2B_MSIL2A_20180428T145729_N0212_R082_T21UYT_20201013T035446.SAFE/GRANULE/L2A_T21UYT_A005971_20180428T145728/IMG_DATA/R20m/T21UYT_20180428T145729_SCL_20m.tif",
+      "native_crop_sha256": "7e15d4f2734fe547d800b7328bfc7192e0cb5353fe8778e95e949c628da85b3c",
+      "samples": [
+        {
+          "source_row": 935,
+          "source_col": 1080,
+          "dn": 9,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 1779,
+          "source_col": 1923,
+          "dn": 0,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 935,
+          "source_col": 1080,
+          "dn": 9,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 1235,
+          "source_col": 1233,
+          "dn": 6,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 1779,
+          "source_col": 1150,
+          "dn": 5,
+          "mask": 255,
+          "exact_match": true
+        }
+      ]
+    },
+    {
+      "item_id": "S2B_MSIL2A_20180428T145729_R082_T22UCC_20201013T035444",
+      "band": "B02",
+      "source_href": "https://sentinel2l2a01.blob.core.windows.net/sentinel2-l2/22/U/CC/2018/04/28/S2B_MSIL2A_20180428T145729_N0212_R082_T22UCC_20201013T035444.SAFE/GRANULE/L2A_T22UCC_A005971_20180428T145728/IMG_DATA/R10m/T22UCC_20180428T145729_B02_10m.tif",
+      "native_crop_sha256": "c93b84331d21658a6ed843333fccef6e605c72a71a4a3f5c0b31d70141e79aec",
+      "samples": [
+        {
+          "source_row": 2062,
+          "source_col": 1014,
+          "dn": 2564,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3769,
+          "source_col": 2721,
+          "dn": 0,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 2062,
+          "source_col": 1014,
+          "dn": 2564,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 2601,
+          "source_col": 1322,
+          "dn": 798,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3769,
+          "source_col": 1071,
+          "dn": 1,
+          "mask": 255,
+          "exact_match": true
+        }
+      ]
+    },
+    {
+      "item_id": "S2B_MSIL2A_20180428T145729_R082_T22UCC_20201013T035444",
+      "band": "B03",
+      "source_href": "https://sentinel2l2a01.blob.core.windows.net/sentinel2-l2/22/U/CC/2018/04/28/S2B_MSIL2A_20180428T145729_N0212_R082_T22UCC_20201013T035444.SAFE/GRANULE/L2A_T22UCC_A005971_20180428T145728/IMG_DATA/R10m/T22UCC_20180428T145729_B03_10m.tif",
+      "native_crop_sha256": "9e4ae8356d9ae0f186024c0076472c47f9aa94bda0e21f80da63c703e5d56b44",
+      "samples": [
+        {
+          "source_row": 2062,
+          "source_col": 1014,
+          "dn": 2272,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3769,
+          "source_col": 2721,
+          "dn": 0,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 2062,
+          "source_col": 1014,
+          "dn": 2272,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 2601,
+          "source_col": 1322,
+          "dn": 756,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3769,
+          "source_col": 1071,
+          "dn": 1,
+          "mask": 255,
+          "exact_match": true
+        }
+      ]
+    },
+    {
+      "item_id": "S2B_MSIL2A_20180428T145729_R082_T22UCC_20201013T035444",
+      "band": "B04",
+      "source_href": "https://sentinel2l2a01.blob.core.windows.net/sentinel2-l2/22/U/CC/2018/04/28/S2B_MSIL2A_20180428T145729_N0212_R082_T22UCC_20201013T035444.SAFE/GRANULE/L2A_T22UCC_A005971_20180428T145728/IMG_DATA/R10m/T22UCC_20180428T145729_B04_10m.tif",
+      "native_crop_sha256": "d8b67118fc3d239cb0ef3ed19082ab0d13d6426267ee7fe16333fa0458c036f7",
+      "samples": [
+        {
+          "source_row": 2062,
+          "source_col": 1014,
+          "dn": 2120,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3769,
+          "source_col": 2721,
+          "dn": 0,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 2062,
+          "source_col": 1014,
+          "dn": 2120,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 2601,
+          "source_col": 1322,
+          "dn": 725,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3769,
+          "source_col": 1071,
+          "dn": 2918,
+          "mask": 255,
+          "exact_match": true
+        }
+      ]
+    },
+    {
+      "item_id": "S2B_MSIL2A_20180428T145729_R082_T22UCC_20201013T035444",
+      "band": "B08",
+      "source_href": "https://sentinel2l2a01.blob.core.windows.net/sentinel2-l2/22/U/CC/2018/04/28/S2B_MSIL2A_20180428T145729_N0212_R082_T22UCC_20201013T035444.SAFE/GRANULE/L2A_T22UCC_A005971_20180428T145728/IMG_DATA/R10m/T22UCC_20180428T145729_B08_10m.tif",
+      "native_crop_sha256": "9e3f4b039346320be567dd80c39c655f837985767e23eddc87f3eb546f27372b",
+      "samples": [
+        {
+          "source_row": 2062,
+          "source_col": 1014,
+          "dn": 2374,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3769,
+          "source_col": 2721,
+          "dn": 0,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 2062,
+          "source_col": 1014,
+          "dn": 2374,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 2601,
+          "source_col": 1322,
+          "dn": 666,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 3769,
+          "source_col": 1071,
+          "dn": 1,
+          "mask": 255,
+          "exact_match": true
+        }
+      ]
+    },
+    {
+      "item_id": "S2B_MSIL2A_20180428T145729_R082_T22UCC_20201013T035444",
+      "band": "SCL",
+      "source_href": "https://sentinel2l2a01.blob.core.windows.net/sentinel2-l2/22/U/CC/2018/04/28/S2B_MSIL2A_20180428T145729_N0212_R082_T22UCC_20201013T035444.SAFE/GRANULE/L2A_T22UCC_A005971_20180428T145728/IMG_DATA/R20m/T22UCC_20180428T145729_SCL_20m.tif",
+      "native_crop_sha256": "35f47bf1bb29fc8ef1396071f34067687d9eba91bb17501ae83def069192ae50",
+      "samples": [
+        {
+          "source_row": 1031,
+          "source_col": 507,
+          "dn": 8,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 1884,
+          "source_col": 1360,
+          "dn": 0,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 1031,
+          "source_col": 507,
+          "dn": 8,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 1300,
+          "source_col": 706,
+          "dn": 6,
+          "mask": 255,
+          "exact_match": true
+        },
+        {
+          "source_row": 1884,
+          "source_col": 535,
+          "dn": 5,
+          "mask": 255,
+          "exact_match": true
+        }
+      ]
+    }
+  ],
+  "matched_pixels": 50,
+  "all_values_and_masks_match": true
+}
