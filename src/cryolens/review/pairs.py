@@ -25,7 +25,7 @@ from cryolens.data.ai4arctic import AI4ArcticScene, load_scene
 from cryolens.db.models import DetectionModel
 from cryolens.eval.cohort import acquisition_id, digest, file_digest, load_manifest
 from cryolens.geo.aoi import contains_point, load_aoi, raster_aoi_mask
-from cryolens.ingest.sentinel2 import Sentinel2Client, utc
+from cryolens.ingest.sentinel2 import Sentinel2Provider, utc
 from cryolens.review.policy import PairingPolicy
 
 matplotlib.use("Agg")
@@ -176,7 +176,7 @@ def build_pair(
     detection: DetectionModel,
     radar: RadarChip,
     item: dict[str, Any] | None,
-    client: Sentinel2Client,
+    client: Sentinel2Provider,
     root: Path,
     policy: PairingPolicy,
     search_receipt: dict[str, Any],
@@ -204,6 +204,8 @@ def build_pair(
         "pairs.py": file_digest(Path(__file__)),
         "policy.py": file_digest(Path(__file__).with_name("policy.py")),
         "sentinel2.py": file_digest(Path(__file__).parents[1] / "ingest/sentinel2.py"),
+        "sentinel2_cdse.py": file_digest(Path(__file__).parents[1] / "ingest/sentinel2_cdse.py"),
+        "sentinel2_safe.py": file_digest(Path(__file__).parents[1] / "ingest/sentinel2_safe.py"),
         "ai4arctic.py": file_digest(Path(__file__).parents[1] / "data/ai4arctic.py"),
     }
     aoi_hash = digest(load_aoi().__geo_interface__)
@@ -276,7 +278,11 @@ def build_pair(
         domain &= raster_aoi_mask((size, size), transform, "EPSG:3978")
         visibility = assess_visibility(arrays["SCL"], common_valid, domain, policy)
         # A fixed DN display stretch is never presented as quantitative reflectance.
-        rgb = np.clip(np.stack([arrays[b] for b in ("B04", "B03", "B02")], axis=-1) / 3000, 0, 1)
+        display_channels = [
+            arrays[b] + assets[b].get("reflectance_encoding", {}).get("boa_add_offset_dn", 0)
+            for b in ("B04", "B03", "B02")
+        ]
+        rgb = np.clip(np.stack(display_channels, axis=-1) / 3000, 0, 1)
         rgb[~common_valid] = 0.15  # Grey is explicitly labelled missing data, not dark ocean.
         aligned = output / "optical-aligned.tif"
         with rasterio.open(
@@ -305,7 +311,7 @@ def build_pair(
     if rgb is not None:
         axes[1].imshow(rgb, extent=extent, interpolation="nearest")
         axes[1].set_title(
-            "Sentinel-2 RGB (DN stretch; grey = no data)\n"
+            "Sentinel-2 RGB (offset-adjusted DN stretch; grey = no data)\n"
             + str(optical_time.isoformat() if optical_time else "")
         )
     else:
@@ -346,6 +352,7 @@ def build_pair(
         "sar_product_id": detection.scene.product_id,
         "sar_acquired_utc": sar_time.isoformat(),
         "optical_item_id": item["id"] if item else None,
+        "optical_provider": item.get("provider", client.provider) if item else client.provider,
         "optical_acquired_utc": optical_time.isoformat() if optical_time else None,
         "signed_time_separation_seconds": seconds,
         "candidate_lonlat": [point.x, point.y],
@@ -364,6 +371,7 @@ def build_pair(
             "shape": [size, size],
             "display_spacing_m": policy.review_grid_spacing_m,
             "rgb_resampling": "bilinear DN",
+            "rgb_display": "source BOA offset applied when available, fixed DN display stretch; native/aligned data remain raw DN",
             "radar_resampling": "nearest dB, display only; no new SAR resolution",
             "quality_resampling": "nearest; 20 m source preserved",
             "valid_data": "nearest source masks intersected across RGB and SCL; invalid display pixels zeroed",

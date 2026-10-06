@@ -233,7 +233,8 @@ document.addEventListener('DOMContentLoaded', () => {
       select.replaceChildren();
       for (const pair of opticalPairs) {
         const tile = pair.optical_item_id?.match(/_T(\d{2}[A-Z]{3})_/)?.[1] || '';
-        select.append(new Option(pair.optical_item_id ? `${when(pair.optical_acquired_utc)} · ${tile} · ${pair.visibility.status.replaceAll('_', ' ')} · ${pair.id.slice(0, 6)}` : `Optical unavailable · ${pair.id.slice(0, 6)}`, pair.id));
+        const provider = pair.optical_provider === 'cdse' ? 'CDSE' : 'Planetary Computer';
+        select.append(new Option(pair.optical_item_id ? `${provider} · ${when(pair.optical_acquired_utc)} · ${tile} · ${pair.visibility.status.replaceAll('_', ' ')} · ${pair.id.slice(0, 6)}` : `${provider} unavailable · ${pair.id.slice(0, 6)}`, pair.id));
       }
       if (!opticalPairs.length) {
         select.append(new Option('No generated pairs', ''));
@@ -257,13 +258,15 @@ document.addEventListener('DOMContentLoaded', () => {
     $('optical-pair-image').src = pair.image_url;
     $('optical-pair-image').onerror = () => { $('optical-status').textContent = 'Pair image unavailable or changed. Regenerate and verify the recorded artifacts.'; };
     const separation = pair.signed_time_separation_seconds === null ? 'unavailable' : `${(pair.signed_time_separation_seconds / 3600).toFixed(2)} h (optical − radar)`;
-    $('optical-metadata').textContent = `Radar: ${when(pair.sar_acquired_utc)}. Optical: ${when(pair.optical_acquired_utc)}. Separation: ${separation}. Assumed movement/geolocation radius: ${(pair.matching_radius_m / 1000).toFixed(2)} km. ${pair.full_movement_envelope_in_chip ? 'Full assumed envelope shown.' : 'Envelope extends beyond this chip; absence elsewhere is unassessed.'}`;
+    const product = pair.optical_assets?.B04;
+    const provider = pair.optical_provider === 'cdse' ? 'Copernicus Data Space' : 'Microsoft Planetary Computer';
+    $('optical-metadata').textContent = `Optical source: ${provider}${product?.processing_baseline ? `; processing baseline ${product.processing_baseline}` : ''}. Radar: ${when(pair.sar_acquired_utc)}. Optical: ${when(pair.optical_acquired_utc)}. Separation: ${separation}. Assumed movement/geolocation radius: ${(pair.matching_radius_m / 1000).toFixed(2)} km. ${pair.full_movement_envelope_in_chip ? 'Full assumed envelope shown.' : 'Envelope extends beyond this chip; absence elsewhere is unassessed.'}`;
     const visibility = pair.visibility;
     $('optical-visibility').textContent = `Automated visibility: ${visibility.status.replaceAll('_', ' ')}${typeof visibility.visible_fraction === 'number' ? `; ${(visibility.visible_fraction * 100).toFixed(1)}% screened visible, ${(visibility.valid_fraction * 100).toFixed(1)}% valid coverage in the inspected region` : ''}. ${visibility.reason || 'SCL cloud/ice confusion and small objects require analyst inspection.'}`;
     const links = $('optical-native-links'); links.replaceChildren();
-    for (const name of ['radar-native.tif', 'B04-native.tif', 'B03-native.tif', 'B02-native.tif', 'B08-native.tif', 'SCL-native.tif', 'optical-aligned.tif']) {
+    for (const name of ['radar-native.tif', 'B04-native.tif', 'B03-native.tif', 'B02-native.tif', 'B08-native.tif', 'SCL-native.tif', 'optical-aligned.tif', 'cdse-verification.json']) {
       if (!pair.files[name]) continue;
-      const link = document.createElement('a'); link.textContent = name === 'radar-native.tif' ? 'Native radar HH/HV' : name === 'optical-aligned.tif' ? 'Aligned optical (QGIS)' : `Native ${name.split('-')[0]}`;
+      const link = document.createElement('a'); link.textContent = name === 'radar-native.tif' ? 'Native radar HH/HV' : name === 'optical-aligned.tif' ? 'Aligned optical (QGIS)' : name === 'cdse-verification.json' ? 'Original product verification' : `Native ${name.split('-')[0]}`;
       link.href = `/api/v1/detections/${encodeURIComponent(selectedTarget.properties.id)}/optical-pairs/${pair.id}/assets/${name}`;
       link.download = name; links.append(link);
     }

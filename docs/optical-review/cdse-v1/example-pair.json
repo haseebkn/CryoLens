@@ -1,0 +1,3311 @@
+{
+  "schema_version": 1,
+  "generation_code_sha256": {
+    "pairs.py": "ed13fc3b85e6cb1f6bfe1c2349df2e2cfa4e0f541a126a45c73839d4b2769bae",
+    "policy.py": "bd8a39fce437763947d0fe9f56e1a879fa5d7667113a1e65b671d8dbfe22e15d",
+    "sentinel2.py": "8e324f485bdc83c0e8f1e0f86a6b80b667f5b37d9e9fa1970119216e07bda87d",
+    "sentinel2_cdse.py": "9b1fa7547d286864f8a5a86bcec5bf43d7fe15bc0192ee0a204c5f59fd34ac21",
+    "sentinel2_safe.py": "c03bd0fdab661f213074b63536e421ecbb9ee866f778bc1704eae76c73eaeaad",
+    "ai4arctic.py": "02b6efa7bb2a8f24122721421618f11968bb22b01cb137974f684557f42ccf0c"
+  },
+  "aoi_sha256": "9be1920124921cbf7d9fe7bbc558ec6d701a3dc79404ea2ef7f971e6ef09b78a",
+  "id": "f9e9f28c13b778048524b9cf6e09a8ba22b4c60b42859eb8cc5dace330577779",
+  "detection_id": "c2fcafc4-30b9-4763-9012-d8ac8d1b63d5",
+  "sar_product_id": "AI4ARCTIC_20180428T093937_cis_prep.nc",
+  "sar_acquired_utc": "2018-04-28T09:39:37+00:00",
+  "optical_item_id": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYT_20230705T144556",
+  "optical_provider": "cdse",
+  "optical_acquired_utc": "2018-04-28T14:57:29.027000+00:00",
+  "signed_time_separation_seconds": 19072.027,
+  "candidate_lonlat": [
+    -53.644866943359375,
+    52.05863571166992
+  ],
+  "policy": {
+    "version": "s1-s2-review-v1",
+    "search_hours": 12.0,
+    "motion_speed_m_s": 0.5,
+    "sar_geolocation_allowance_m": 100.0,
+    "optical_geolocation_allowance_m": 20.0,
+    "minimum_review_radius_m": 1000.0,
+    "maximum_review_radius_m": 6000.0,
+    "review_grid_spacing_m": 10.0,
+    "cloud_buffer_m": 60.0,
+    "useful_visible_fraction": 0.8,
+    "max_items_per_candidate": 3
+  },
+  "matching_radius_m": 9779.9635,
+  "review_radius_m": 6000.0,
+  "full_movement_envelope_in_chip": false,
+  "movement_assumption_is_not_a_drift_forecast": true,
+  "radar": {
+    "source_product_id": "S1B_EW_GRDM_1SDH_20180428T093937_20180428T094037_010682_013815_1FD8_icechart_cis_SGRDINFLD_20180428T0938Z_pl_a.nc",
+    "source_filename": "20180428T093937_cis_prep.nc",
+    "source_sha256": "cf26a69f2d42ecca8c9ba5a11d4f19d22313d73b3a64e57b199a540c561ee58e",
+    "native_pixel_window": [
+      1405,
+      4974,
+      1576,
+      5145
+    ],
+    "native_pixel_spacing_m": 80.0,
+    "units": "sigma0_db",
+    "normalization": "Publisher global_meanstd.npy SHA256 2f3f9188617a98c9e89158302efad8ffbc22ecc9d66d76019b54cdb5cbcfdeca; physical = stored * global_std + global_mean.",
+    "geolocation": "publisher tie-point grid; interpolated annotation GCPs, not surveyed absolute accuracy"
+  },
+  "optical_assets": {
+    "B02": {
+      "filename": "B02-native.tif",
+      "source_href": "https://download.dataspace.copernicus.eu/odata/v1/Products(b84aee26-fde4-47f9-a376-33d52ec2a14c)/$value",
+      "sha256": "23e721e732a94189b84228c511efad6a5986563d4bf4f13bfd52ffd0677fd9cf",
+      "native_pixel_spacing_m": 10,
+      "native_crs": "EPSG:32621",
+      "source_window": [
+        1870,
+        2160,
+        1689,
+        1688
+      ],
+      "source_shape": [
+        10980,
+        10980
+      ],
+      "transform": [
+        10.0,
+        0.0,
+        721560.0,
+        0.0,
+        -10.0,
+        5781320.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "download_kind": "lossless_native_window",
+      "source_resampling": "none",
+      "provider": "cdse",
+      "source_member": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYT_20230705T144556.SAFE/GRANULE/L2A_T21UYT_A005971_20180428T145728/IMG_DATA/R10m/T21UYT_20180428T145729_B02_10m.jp2",
+      "publisher_file_checksum": {
+        "algorithm": "SHA3-256",
+        "value": "74ad97b1901624201379b07570873e66e8c8c9b8d11d5e612780dfa03b1bb776",
+        "bytes": 17846335
+      },
+      "source_file_sha256": "c1e042169063494549d4f433181b130f31248b3e9756d41c620f1239aed252b8",
+      "archive_sha256": "85d11f4785cf0341e51a934590810d040d99d17873ac6a4afedeb2a0f97dd0d3",
+      "processing_baseline": "05.00",
+      "reflectance_encoding": {
+        "quantification_value": 10000.0,
+        "boa_add_offset_dn": -1000.0
+      }
+    },
+    "B03": {
+      "filename": "B03-native.tif",
+      "source_href": "https://download.dataspace.copernicus.eu/odata/v1/Products(b84aee26-fde4-47f9-a376-33d52ec2a14c)/$value",
+      "sha256": "5571fddf5db5ec0a82a5f1bb91920308444720edf38ba5da73d1baf3b4ae6ff2",
+      "native_pixel_spacing_m": 10,
+      "native_crs": "EPSG:32621",
+      "source_window": [
+        1870,
+        2160,
+        1689,
+        1688
+      ],
+      "source_shape": [
+        10980,
+        10980
+      ],
+      "transform": [
+        10.0,
+        0.0,
+        721560.0,
+        0.0,
+        -10.0,
+        5781320.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "download_kind": "lossless_native_window",
+      "source_resampling": "none",
+      "provider": "cdse",
+      "source_member": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYT_20230705T144556.SAFE/GRANULE/L2A_T21UYT_A005971_20180428T145728/IMG_DATA/R10m/T21UYT_20180428T145729_B03_10m.jp2",
+      "publisher_file_checksum": {
+        "algorithm": "SHA3-256",
+        "value": "5dc754cb718bf0d826d93056a85784e764f540da7af243706120cd584a6e9ba3",
+        "bytes": 17485247
+      },
+      "source_file_sha256": "37bfbbcbbbac2cdebdfde884432465443c9747f3f031eec6bf47dd0a45068b20",
+      "archive_sha256": "85d11f4785cf0341e51a934590810d040d99d17873ac6a4afedeb2a0f97dd0d3",
+      "processing_baseline": "05.00",
+      "reflectance_encoding": {
+        "quantification_value": 10000.0,
+        "boa_add_offset_dn": -1000.0
+      }
+    },
+    "B04": {
+      "filename": "B04-native.tif",
+      "source_href": "https://download.dataspace.copernicus.eu/odata/v1/Products(b84aee26-fde4-47f9-a376-33d52ec2a14c)/$value",
+      "sha256": "50ca9453ae3e06393cb5cf06c19a501685286cf970069288e0cb2c3ceb77726b",
+      "native_pixel_spacing_m": 10,
+      "native_crs": "EPSG:32621",
+      "source_window": [
+        1870,
+        2160,
+        1689,
+        1688
+      ],
+      "source_shape": [
+        10980,
+        10980
+      ],
+      "transform": [
+        10.0,
+        0.0,
+        721560.0,
+        0.0,
+        -10.0,
+        5781320.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "download_kind": "lossless_native_window",
+      "source_resampling": "none",
+      "provider": "cdse",
+      "source_member": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYT_20230705T144556.SAFE/GRANULE/L2A_T21UYT_A005971_20180428T145728/IMG_DATA/R10m/T21UYT_20180428T145729_B04_10m.jp2",
+      "publisher_file_checksum": {
+        "algorithm": "SHA3-256",
+        "value": "bb2b94ccdee29c3434032bab1f4ff306c9240b0dd5db9dc213dc05b9f84cce1b",
+        "bytes": 17321653
+      },
+      "source_file_sha256": "9c8c07fa1a58341b1aecc8c5a33e0ee7bb0715fc61f0c0098a3ab088aaf99c99",
+      "archive_sha256": "85d11f4785cf0341e51a934590810d040d99d17873ac6a4afedeb2a0f97dd0d3",
+      "processing_baseline": "05.00",
+      "reflectance_encoding": {
+        "quantification_value": 10000.0,
+        "boa_add_offset_dn": -1000.0
+      }
+    },
+    "B08": {
+      "filename": "B08-native.tif",
+      "source_href": "https://download.dataspace.copernicus.eu/odata/v1/Products(b84aee26-fde4-47f9-a376-33d52ec2a14c)/$value",
+      "sha256": "9ae279a1f55ac9a654bd70c9a9fd424fca49d36d000cec89b4a7100a86b78a56",
+      "native_pixel_spacing_m": 10,
+      "native_crs": "EPSG:32621",
+      "source_window": [
+        1870,
+        2160,
+        1689,
+        1688
+      ],
+      "source_shape": [
+        10980,
+        10980
+      ],
+      "transform": [
+        10.0,
+        0.0,
+        721560.0,
+        0.0,
+        -10.0,
+        5781320.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "download_kind": "lossless_native_window",
+      "source_resampling": "none",
+      "provider": "cdse",
+      "source_member": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYT_20230705T144556.SAFE/GRANULE/L2A_T21UYT_A005971_20180428T145728/IMG_DATA/R10m/T21UYT_20180428T145729_B08_10m.jp2",
+      "publisher_file_checksum": {
+        "algorithm": "SHA3-256",
+        "value": "92c99235426c31042fd4bb0b66555b8eb807da5ba0cd127d6c7acb4d33ef77ea",
+        "bytes": 17561981
+      },
+      "source_file_sha256": "a9dd0c276455d0a1f4fc78a9ed90ed5ddacb1628ee369bb3e05ab636ffb4b3ad",
+      "archive_sha256": "85d11f4785cf0341e51a934590810d040d99d17873ac6a4afedeb2a0f97dd0d3",
+      "processing_baseline": "05.00",
+      "reflectance_encoding": {
+        "quantification_value": 10000.0,
+        "boa_add_offset_dn": -1000.0
+      }
+    },
+    "SCL": {
+      "filename": "SCL-native.tif",
+      "source_href": "https://download.dataspace.copernicus.eu/odata/v1/Products(b84aee26-fde4-47f9-a376-33d52ec2a14c)/$value",
+      "sha256": "1a600c6245ba8a2a0337f16ce63880c4f1dce641344bf3909e570151533f6f51",
+      "native_pixel_spacing_m": 20,
+      "native_crs": "EPSG:32621",
+      "source_window": [
+        935,
+        1080,
+        845,
+        844
+      ],
+      "source_shape": [
+        5490,
+        5490
+      ],
+      "transform": [
+        20.0,
+        0.0,
+        721560.0,
+        0.0,
+        -20.0,
+        5781320.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "download_kind": "lossless_native_window",
+      "source_resampling": "none",
+      "provider": "cdse",
+      "source_member": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYT_20230705T144556.SAFE/GRANULE/L2A_T21UYT_A005971_20180428T145728/IMG_DATA/R20m/T21UYT_20180428T145729_SCL_20m.jp2",
+      "publisher_file_checksum": {
+        "algorithm": "SHA3-256",
+        "value": "a8313fdc4aa7438b9207f764fe5a3c5f4f1e9cc30ba0054f41d079ae978037c5",
+        "bytes": 285395
+      },
+      "source_file_sha256": "eac7ebf4b9f5b13260d723116d7138da19e84817153dc9a8833cc70677fea9f0",
+      "archive_sha256": "85d11f4785cf0341e51a934590810d040d99d17873ac6a4afedeb2a0f97dd0d3",
+      "processing_baseline": "05.00"
+    }
+  },
+  "visibility": {
+    "status": "limited_visibility",
+    "useful_for_review": false,
+    "visible_fraction": 0.033060540257609086,
+    "valid_fraction": 0.05671537803178735,
+    "cloud_or_shadow_buffered_fraction": 0.0263665589169384,
+    "ambiguous_scl_fraction": 0.0,
+    "snow_ice_fraction": 0.0,
+    "inspected_pixels": 1131016,
+    "quality_native_spacing_m": 20,
+    "analyst_inspection_required": true,
+    "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+  },
+  "search": {
+    "endpoint": "https://catalogue.dataspace.copernicus.eu/odata/v1/Products",
+    "query": {
+      "$filter": "Collection/Name eq 'SENTINEL-2' and contains(Name,'_MSIL2A_') and ContentDate/Start ge 2018-04-27T21:39:37+00:00 and ContentDate/Start le 2018-04-28T21:39:37+00:00 and OData.CSC.Intersects(area=geography'SRID=4326;POLYGON ((-47.47515869140625 48.87139892578125, -54.60504913330078 48.87139892578125, -54.60504913330078 53.16246032714844, -49.16246032714844 53.16246032714844, -48 52, -47.47515869140625 51.47515869140625, -47.47515869140625 48.87139892578125))')",
+      "$expand": "Attributes",
+      "$orderby": "ContentDate/Start asc,Name asc",
+      "$top": 100
+    },
+    "queried_at": "2026-10-06T00:42:15.470671+00:00",
+    "complete": true,
+    "provider": "cdse",
+    "items": [
+      {
+        "id": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UXR_20230705T144556",
+        "provider": "cdse",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -54.50348,
+                50.523361855798385
+              ],
+              [
+                -55.588654,
+                50.543739174288454
+              ],
+              [
+                -55.61731,
+                49.55649445196309
+              ],
+              [
+                -54.981964,
+                49.544733272806646
+              ],
+              [
+                -54.93158,
+                49.64959655686969
+              ],
+              [
+                -54.861633,
+                49.79416461875384
+              ],
+              [
+                -54.79126,
+                49.93867338017555
+              ],
+              [
+                -54.72058,
+                50.08315740359544
+              ],
+              [
+                -54.64972,
+                50.227574099113006
+              ],
+              [
+                -54.578583,
+                50.371893023928166
+              ],
+              [
+                -54.50708,
+                50.51612644856085
+              ],
+              [
+                -54.50348,
+                50.523361855798385
+              ]
+            ]
+          ]
+        },
+        "properties": {
+          "datetime": "2018-04-28T14:57:29.027000Z",
+          "platform": "S2B",
+          "s2:product_uri": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UXR_20230705T144556.SAFE",
+          "s2:processing_baseline": "05.00"
+        },
+        "assets": {},
+        "cdse_product": {
+          "@odata.mediaContentType": "application/octet-stream",
+          "Id": "ad39bebd-7421-4f60-aba3-4134f6501156",
+          "Name": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UXR_20230705T144556.SAFE",
+          "ContentType": "application/octet-stream",
+          "ContentLength": 443150208,
+          "OriginDate": "2024-03-18T04:59:27.098000Z",
+          "PublicationDate": "2024-03-18T05:05:37.029196Z",
+          "ModificationDate": "2026-09-29T05:44:52.626033Z",
+          "Online": true,
+          "EvictionDate": "9999-12-31T23:59:59.999999Z",
+          "S3Path": "/eodata/Sentinel-2/MSI/L2A_N0500/2018/04/28/S2B_MSIL2A_20180428T145729_N0500_R082_T21UXR_20230705T144556.SAFE",
+          "Checksum": [
+            {
+              "Value": "7a848f2932fefde6642b3aa221c5a2b7",
+              "Algorithm": "MD5",
+              "ChecksumDate": "2025-07-04T10:52:40.221084Z"
+            },
+            {
+              "Value": "4e129c6f58d23bbcc46b59bec3541aa1f2afd8f21bc933417f33dd025bc0bd97",
+              "Algorithm": "BLAKE3",
+              "ChecksumDate": "2025-07-04T10:52:41.091869Z"
+            }
+          ],
+          "ContentDate": {
+            "Start": "2018-04-28T14:57:29.027000Z",
+            "End": "2018-04-28T14:57:29.027000Z"
+          },
+          "Footprint": "geography'SRID=4326;POLYGON ((-54.50348 50.523361855798385, -55.588654 50.543739174288454, -55.61731 49.55649445196309, -54.981964 49.544733272806646, -54.93158 49.64959655686969, -54.861633 49.79416461875384, -54.79126 49.93867338017555, -54.72058 50.08315740359544, -54.64972 50.227574099113006, -54.578583 50.371893023928166, -54.50708 50.51612644856085, -54.50348 50.523361855798385))'",
+          "GeoFootprint": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -54.50348,
+                  50.523361855798385
+                ],
+                [
+                  -55.588654,
+                  50.543739174288454
+                ],
+                [
+                  -55.61731,
+                  49.55649445196309
+                ],
+                [
+                  -54.981964,
+                  49.544733272806646
+                ],
+                [
+                  -54.93158,
+                  49.64959655686969
+                ],
+                [
+                  -54.861633,
+                  49.79416461875384
+                ],
+                [
+                  -54.79126,
+                  49.93867338017555
+                ],
+                [
+                  -54.72058,
+                  50.08315740359544
+                ],
+                [
+                  -54.64972,
+                  50.227574099113006
+                ],
+                [
+                  -54.578583,
+                  50.371893023928166
+                ],
+                [
+                  -54.50708,
+                  50.51612644856085
+                ],
+                [
+                  -54.50348,
+                  50.523361855798385
+                ]
+              ]
+            ]
+          },
+          "Attributes": [
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "origin",
+              "Value": "ESA",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "tileId",
+              "Value": "21UXR",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DoubleAttribute",
+              "Name": "cloudCover",
+              "Value": 99.392259,
+              "ValueType": "Double"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "datastripId",
+              "Value": "S2B_OPER_MSI_L2A_DS_S2RP_20230705T144556_S20180428T145728_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "orbitNumber",
+              "Value": 5971,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "processingDate",
+              "Value": "2023-07-05T14:45:56.000000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productGroupId",
+              "Value": "GS2B_20180428T145729_005971_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "operationalMode",
+              "Value": "INS-NOBS",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processingLevel",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processorVersion",
+              "Value": "05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "granuleIdentifier",
+              "Value": "S2B_OPER_MSI_L2A_TL_S2RP_20230705T144556_A005971_T21UXR_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformShortName",
+              "Value": "SENTINEL-2",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "instrumentShortName",
+              "Value": "MSI",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "relativeOrbitNumber",
+              "Value": 82,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformSerialIdentifier",
+              "Value": "B",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productType",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "beginningDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "endingDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            }
+          ]
+        }
+      },
+      {
+        "id": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UXS_20230705T144556",
+        "provider": "cdse",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -54.051727,
+                51.41365001251328
+              ],
+              [
+                -55.561127,
+                51.44235231685392
+              ],
+              [
+                -55.591278,
+                50.45527216066188
+              ],
+              [
+                -54.546967,
+                50.435686656253814
+              ],
+              [
+                -54.50708,
+                50.51612644856085
+              ],
+              [
+                -54.43518,
+                50.6603195459485
+              ],
+              [
+                -54.362823,
+                50.804496501068414
+              ],
+              [
+                -54.289978,
+                50.94864692979107
+              ],
+              [
+                -54.27716,
+                50.97385742747915
+              ],
+              [
+                -54.217224,
+                51.09180550695273
+              ],
+              [
+                -54.143494,
+                51.235934240369545
+              ],
+              [
+                -54.08316,
+                51.35283313818417
+              ],
+              [
+                -54.068665,
+                51.38097519118202
+              ],
+              [
+                -54.051727,
+                51.41365001251328
+              ]
+            ]
+          ]
+        },
+        "properties": {
+          "datetime": "2018-04-28T14:57:29.027000Z",
+          "platform": "S2B",
+          "s2:product_uri": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UXS_20230705T144556.SAFE",
+          "s2:processing_baseline": "05.00"
+        },
+        "assets": {},
+        "cdse_product": {
+          "@odata.mediaContentType": "application/octet-stream",
+          "Id": "46725e51-91dc-431c-b6cd-0242e8534c60",
+          "Name": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UXS_20230705T144556.SAFE",
+          "ContentType": "application/octet-stream",
+          "ContentLength": 753958222,
+          "OriginDate": "2024-03-18T05:14:10.167000Z",
+          "PublicationDate": "2024-03-18T05:24:21.929985Z",
+          "ModificationDate": "2026-09-20T05:51:34.455356Z",
+          "Online": true,
+          "EvictionDate": "9999-12-31T23:59:59.999999Z",
+          "S3Path": "/eodata/Sentinel-2/MSI/L2A_N0500/2018/04/28/S2B_MSIL2A_20180428T145729_N0500_R082_T21UXS_20230705T144556.SAFE",
+          "Checksum": [
+            {
+              "Value": "77d98484a4c654fee3c5667d4f427532",
+              "Algorithm": "MD5",
+              "ChecksumDate": "2025-07-04T10:52:44.837132Z"
+            },
+            {
+              "Value": "0367e19b972af22f22f7f2d8f364cf1e3d41e20c07ecf429a1ef4e9840bb8e90",
+              "Algorithm": "BLAKE3",
+              "ChecksumDate": "2025-07-04T10:52:46.266320Z"
+            }
+          ],
+          "ContentDate": {
+            "Start": "2018-04-28T14:57:29.027000Z",
+            "End": "2018-04-28T14:57:29.027000Z"
+          },
+          "Footprint": "geography'SRID=4326;POLYGON ((-54.051727 51.41365001251328, -55.561127 51.44235231685392, -55.591278 50.45527216066188, -54.546967 50.435686656253814, -54.50708 50.51612644856085, -54.43518 50.6603195459485, -54.362823 50.804496501068414, -54.289978 50.94864692979107, -54.27716 50.97385742747915, -54.217224 51.09180550695273, -54.143494 51.235934240369545, -54.08316 51.35283313818417, -54.068665 51.38097519118202, -54.051727 51.41365001251328))'",
+          "GeoFootprint": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -54.051727,
+                  51.41365001251328
+                ],
+                [
+                  -55.561127,
+                  51.44235231685392
+                ],
+                [
+                  -55.591278,
+                  50.45527216066188
+                ],
+                [
+                  -54.546967,
+                  50.435686656253814
+                ],
+                [
+                  -54.50708,
+                  50.51612644856085
+                ],
+                [
+                  -54.43518,
+                  50.6603195459485
+                ],
+                [
+                  -54.362823,
+                  50.804496501068414
+                ],
+                [
+                  -54.289978,
+                  50.94864692979107
+                ],
+                [
+                  -54.27716,
+                  50.97385742747915
+                ],
+                [
+                  -54.217224,
+                  51.09180550695273
+                ],
+                [
+                  -54.143494,
+                  51.235934240369545
+                ],
+                [
+                  -54.08316,
+                  51.35283313818417
+                ],
+                [
+                  -54.068665,
+                  51.38097519118202
+                ],
+                [
+                  -54.051727,
+                  51.41365001251328
+                ]
+              ]
+            ]
+          },
+          "Attributes": [
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "origin",
+              "Value": "ESA",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "tileId",
+              "Value": "21UXS",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DoubleAttribute",
+              "Name": "cloudCover",
+              "Value": 90.523303,
+              "ValueType": "Double"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "datastripId",
+              "Value": "S2B_OPER_MSI_L2A_DS_S2RP_20230705T144556_S20180428T145728_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "orbitNumber",
+              "Value": 5971,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "processingDate",
+              "Value": "2023-07-05T14:45:56.000000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productGroupId",
+              "Value": "GS2B_20180428T145729_005971_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "operationalMode",
+              "Value": "INS-NOBS",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processingLevel",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processorVersion",
+              "Value": "05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "granuleIdentifier",
+              "Value": "S2B_OPER_MSI_L2A_TL_S2RP_20230705T144556_A005971_T21UXS_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformShortName",
+              "Value": "SENTINEL-2",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "instrumentShortName",
+              "Value": "MSI",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "relativeOrbitNumber",
+              "Value": 82,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformSerialIdentifier",
+              "Value": "B",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productType",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "beginningDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "endingDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            }
+          ]
+        }
+      },
+      {
+        "id": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UXT_20230705T144556",
+        "provider": "cdse",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -53.972443,
+                51.56637440818552
+              ],
+              [
+                -53.92224,
+                52.31036691499413
+              ],
+              [
+                -55.532104,
+                52.34135509726958
+              ],
+              [
+                -55.563873,
+                51.354439390266904
+              ],
+              [
+                -54.09671,
+                51.32657389541575
+              ],
+              [
+                -54.08316,
+                51.35283313818417
+              ],
+              [
+                -54.068665,
+                51.38097519118202
+              ],
+              [
+                -53.993988,
+                51.52502895907856
+              ],
+              [
+                -53.972443,
+                51.56637440818552
+              ]
+            ]
+          ]
+        },
+        "properties": {
+          "datetime": "2018-04-28T14:57:29.027000Z",
+          "platform": "S2B",
+          "s2:product_uri": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UXT_20230705T144556.SAFE",
+          "s2:processing_baseline": "05.00"
+        },
+        "assets": {},
+        "cdse_product": {
+          "@odata.mediaContentType": "application/octet-stream",
+          "Id": "df659caa-1b88-4a4a-a7dc-e2ab703c425c",
+          "Name": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UXT_20230705T144556.SAFE",
+          "ContentType": "application/octet-stream",
+          "ContentLength": 830866986,
+          "OriginDate": "2024-03-18T05:02:07.941000Z",
+          "PublicationDate": "2024-03-18T05:14:51.202189Z",
+          "ModificationDate": "2026-10-04T18:09:16.741002Z",
+          "Online": true,
+          "EvictionDate": "9999-12-31T23:59:59.999999Z",
+          "S3Path": "/eodata/Sentinel-2/MSI/L2A_N0500/2018/04/28/S2B_MSIL2A_20180428T145729_N0500_R082_T21UXT_20230705T144556.SAFE",
+          "Checksum": [
+            {
+              "Value": "bc02222b3ef79dc1881c1a87b9453eaf",
+              "Algorithm": "MD5",
+              "ChecksumDate": "2025-07-04T10:53:36.731891Z"
+            },
+            {
+              "Value": "75976fbb63c079cfa33491e9eba449fe28eb3ba8630b5d2884bb705a5f515dbd",
+              "Algorithm": "BLAKE3",
+              "ChecksumDate": "2025-07-04T10:53:37.956941Z"
+            }
+          ],
+          "ContentDate": {
+            "Start": "2018-04-28T14:57:29.027000Z",
+            "End": "2018-04-28T14:57:29.027000Z"
+          },
+          "Footprint": "geography'SRID=4326;POLYGON ((-53.972443 51.56637440818552, -53.92224 52.31036691499413, -55.532104 52.34135509726958, -55.563873 51.354439390266904, -54.09671 51.32657389541575, -54.08316 51.35283313818417, -54.068665 51.38097519118202, -53.993988 51.52502895907856, -53.972443 51.56637440818552))'",
+          "GeoFootprint": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -53.972443,
+                  51.56637440818552
+                ],
+                [
+                  -53.92224,
+                  52.31036691499413
+                ],
+                [
+                  -55.532104,
+                  52.34135509726958
+                ],
+                [
+                  -55.563873,
+                  51.354439390266904
+                ],
+                [
+                  -54.09671,
+                  51.32657389541575
+                ],
+                [
+                  -54.08316,
+                  51.35283313818417
+                ],
+                [
+                  -54.068665,
+                  51.38097519118202
+                ],
+                [
+                  -53.993988,
+                  51.52502895907856
+                ],
+                [
+                  -53.972443,
+                  51.56637440818552
+                ]
+              ]
+            ]
+          },
+          "Attributes": [
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "origin",
+              "Value": "ESA",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "tileId",
+              "Value": "21UXT",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DoubleAttribute",
+              "Name": "cloudCover",
+              "Value": 93.47145,
+              "ValueType": "Double"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "datastripId",
+              "Value": "S2B_OPER_MSI_L2A_DS_S2RP_20230705T144556_S20180428T145728_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "orbitNumber",
+              "Value": 5971,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "processingDate",
+              "Value": "2023-07-05T14:45:56.000000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productGroupId",
+              "Value": "GS2B_20180428T145729_005971_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "operationalMode",
+              "Value": "INS-NOBS",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processingLevel",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processorVersion",
+              "Value": "05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "granuleIdentifier",
+              "Value": "S2B_OPER_MSI_L2A_TL_S2RP_20230705T144556_A005971_T21UXT_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformShortName",
+              "Value": "SENTINEL-2",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "instrumentShortName",
+              "Value": "MSI",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "relativeOrbitNumber",
+              "Value": 82,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformSerialIdentifier",
+              "Value": "B",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productType",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "beginningDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "endingDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            }
+          ]
+        }
+      },
+      {
+        "id": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UXU_20230705T144556",
+        "provider": "cdse",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -55.501526,
+                53.24020834947074
+              ],
+              [
+                -55.535034,
+                52.25345680664421
+              ],
+              [
+                -53.928314,
+                52.22256603361336
+              ],
+              [
+                -53.858215,
+                53.20820137275637
+              ],
+              [
+                -55.501526,
+                53.24020834947074
+              ]
+            ]
+          ]
+        },
+        "properties": {
+          "datetime": "2018-04-28T14:57:29.027000Z",
+          "platform": "S2B",
+          "s2:product_uri": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UXU_20230705T144556.SAFE",
+          "s2:processing_baseline": "05.00"
+        },
+        "assets": {},
+        "cdse_product": {
+          "@odata.mediaContentType": "application/octet-stream",
+          "Id": "0bc67d39-4421-478f-bf6c-80e7b696e80e",
+          "Name": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UXU_20230705T144556.SAFE",
+          "ContentType": "application/octet-stream",
+          "ContentLength": 789793919,
+          "OriginDate": "2024-03-18T05:00:11.913000Z",
+          "PublicationDate": "2024-03-18T05:17:01.120369Z",
+          "ModificationDate": "2026-09-15T06:11:51.639223Z",
+          "Online": true,
+          "EvictionDate": "9999-12-31T23:59:59.999999Z",
+          "S3Path": "/eodata/Sentinel-2/MSI/L2A_N0500/2018/04/28/S2B_MSIL2A_20180428T145729_N0500_R082_T21UXU_20230705T144556.SAFE",
+          "Checksum": [
+            {
+              "Value": "7721aadc92efb4af27cd6668e2e6fff4",
+              "Algorithm": "MD5",
+              "ChecksumDate": "2025-07-04T10:52:36.586196Z"
+            },
+            {
+              "Value": "e8e1c0d754873201363d4e92a7f7b441130c129f812e74198c5656f27b06f9c7",
+              "Algorithm": "BLAKE3",
+              "ChecksumDate": "2025-07-04T10:52:38.142379Z"
+            }
+          ],
+          "ContentDate": {
+            "Start": "2018-04-28T14:57:29.027000Z",
+            "End": "2018-04-28T14:57:29.027000Z"
+          },
+          "Footprint": "geography'SRID=4326;POLYGON ((-55.501526 53.24020834947074, -55.535034 52.25345680664421, -53.928314 52.22256603361336, -53.858215 53.20820137275637, -55.501526 53.24020834947074))'",
+          "GeoFootprint": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -55.501526,
+                  53.24020834947074
+                ],
+                [
+                  -55.535034,
+                  52.25345680664421
+                ],
+                [
+                  -53.928314,
+                  52.22256603361336
+                ],
+                [
+                  -53.858215,
+                  53.20820137275637
+                ],
+                [
+                  -55.501526,
+                  53.24020834947074
+                ]
+              ]
+            ]
+          },
+          "Attributes": [
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "origin",
+              "Value": "ESA",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "tileId",
+              "Value": "21UXU",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DoubleAttribute",
+              "Name": "cloudCover",
+              "Value": 99.957955,
+              "ValueType": "Double"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "datastripId",
+              "Value": "S2B_OPER_MSI_L2A_DS_S2RP_20230705T144556_S20180428T145728_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "orbitNumber",
+              "Value": 5971,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "processingDate",
+              "Value": "2023-07-05T14:45:56.000000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productGroupId",
+              "Value": "GS2B_20180428T145729_005971_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "operationalMode",
+              "Value": "INS-NOBS",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processingLevel",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processorVersion",
+              "Value": "05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "granuleIdentifier",
+              "Value": "S2B_OPER_MSI_L2A_TL_S2RP_20230705T144556_A005971_T21UXU_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformShortName",
+              "Value": "SENTINEL-2",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "instrumentShortName",
+              "Value": "MSI",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "relativeOrbitNumber",
+              "Value": 82,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformSerialIdentifier",
+              "Value": "B",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productType",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "beginningDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "endingDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            }
+          ]
+        }
+      },
+      {
+        "id": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UXV_20230705T144556",
+        "provider": "cdse",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -55.4693,
+                54.138373318280884
+              ],
+              [
+                -55.50461,
+                53.15178549855093
+              ],
+              [
+                -53.864685,
+                53.119880621881606
+              ],
+              [
+                -53.79074,
+                54.10530483528773
+              ],
+              [
+                -55.4693,
+                54.138373318280884
+              ]
+            ]
+          ]
+        },
+        "properties": {
+          "datetime": "2018-04-28T14:57:29.027000Z",
+          "platform": "S2B",
+          "s2:product_uri": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UXV_20230705T144556.SAFE",
+          "s2:processing_baseline": "05.00"
+        },
+        "assets": {},
+        "cdse_product": {
+          "@odata.mediaContentType": "application/octet-stream",
+          "Id": "3a3a22d2-5928-4972-8629-d7dc2160e850",
+          "Name": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UXV_20230705T144556.SAFE",
+          "ContentType": "application/octet-stream",
+          "ContentLength": 785633171,
+          "OriginDate": "2024-03-18T05:01:55.522000Z",
+          "PublicationDate": "2024-03-18T05:09:17.464009Z",
+          "ModificationDate": "2026-09-18T22:07:57.474089Z",
+          "Online": true,
+          "EvictionDate": "9999-12-31T23:59:59.999999Z",
+          "S3Path": "/eodata/Sentinel-2/MSI/L2A_N0500/2018/04/28/S2B_MSIL2A_20180428T145729_N0500_R082_T21UXV_20230705T144556.SAFE",
+          "Checksum": [
+            {
+              "Value": "7745b6982e2c2f10c77b8341700a8ea3",
+              "Algorithm": "MD5",
+              "ChecksumDate": "2025-07-04T10:52:56.514889Z"
+            },
+            {
+              "Value": "a2f4c9f0dd8d5dfcfbc545d581ce31ab0c89bda249e5ccca377c64e01890f51b",
+              "Algorithm": "BLAKE3",
+              "ChecksumDate": "2025-07-04T10:52:58.142724Z"
+            }
+          ],
+          "ContentDate": {
+            "Start": "2018-04-28T14:57:29.027000Z",
+            "End": "2018-04-28T14:57:29.027000Z"
+          },
+          "Footprint": "geography'SRID=4326;POLYGON ((-55.4693 54.138373318280884, -55.50461 53.15178549855093, -53.864685 53.119880621881606, -53.79074 54.10530483528773, -55.4693 54.138373318280884))'",
+          "GeoFootprint": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -55.4693,
+                  54.138373318280884
+                ],
+                [
+                  -55.50461,
+                  53.15178549855093
+                ],
+                [
+                  -53.864685,
+                  53.119880621881606
+                ],
+                [
+                  -53.79074,
+                  54.10530483528773
+                ],
+                [
+                  -55.4693,
+                  54.138373318280884
+                ]
+              ]
+            ]
+          },
+          "Attributes": [
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "origin",
+              "Value": "ESA",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "tileId",
+              "Value": "21UXV",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DoubleAttribute",
+              "Name": "cloudCover",
+              "Value": 99.970269,
+              "ValueType": "Double"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "datastripId",
+              "Value": "S2B_OPER_MSI_L2A_DS_S2RP_20230705T144556_S20180428T145728_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "orbitNumber",
+              "Value": 5971,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "processingDate",
+              "Value": "2023-07-05T14:45:56.000000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productGroupId",
+              "Value": "GS2B_20180428T145729_005971_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "operationalMode",
+              "Value": "INS-NOBS",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processingLevel",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processorVersion",
+              "Value": "05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "granuleIdentifier",
+              "Value": "S2B_OPER_MSI_L2A_TL_S2RP_20230705T144556_A005971_T21UXV_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformShortName",
+              "Value": "SENTINEL-2",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "instrumentShortName",
+              "Value": "MSI",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "relativeOrbitNumber",
+              "Value": 82,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformSerialIdentifier",
+              "Value": "B",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productType",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "beginningDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "endingDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            }
+          ]
+        }
+      },
+      {
+        "id": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYS_20230705T144556",
+        "provider": "cdse",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -54.051727,
+                51.41362695481486
+              ],
+              [
+                -54.124268,
+                51.41589769639834
+              ],
+              [
+                -54.134155,
+                51.2539790534755
+              ],
+              [
+                -54.08316,
+                51.35283313818417
+              ],
+              [
+                -54.068665,
+                51.38097519118202
+              ],
+              [
+                -54.051727,
+                51.41362695481486
+              ]
+            ]
+          ]
+        },
+        "properties": {
+          "datetime": "2018-04-28T14:57:29.027000Z",
+          "platform": "S2B",
+          "s2:product_uri": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYS_20230705T144556.SAFE",
+          "s2:processing_baseline": "05.00"
+        },
+        "assets": {},
+        "cdse_product": {
+          "@odata.mediaContentType": "application/octet-stream",
+          "Id": "5982767a-ef34-4891-8516-755c21d54dc4",
+          "Name": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYS_20230705T144556.SAFE",
+          "ContentType": "application/octet-stream",
+          "ContentLength": 13561556,
+          "OriginDate": "2024-03-18T05:01:50.286000Z",
+          "PublicationDate": "2024-03-18T05:19:12.965899Z",
+          "ModificationDate": "2026-09-19T19:45:53.254480Z",
+          "Online": true,
+          "EvictionDate": "9999-12-31T23:59:59.999999Z",
+          "S3Path": "/eodata/Sentinel-2/MSI/L2A_N0500/2018/04/28/S2B_MSIL2A_20180428T145729_N0500_R082_T21UYS_20230705T144556.SAFE",
+          "Checksum": [
+            {
+              "Value": "1b8d4a96eda76b9643b57a7297c74be8",
+              "Algorithm": "MD5",
+              "ChecksumDate": "2025-07-04T10:52:55.403040Z"
+            },
+            {
+              "Value": "a7ef64c0328b3c9805ce5649886ce8b6d2833181a729c014a4c282f2fd3dbf18",
+              "Algorithm": "BLAKE3",
+              "ChecksumDate": "2025-07-04T10:52:55.452887Z"
+            }
+          ],
+          "ContentDate": {
+            "Start": "2018-04-28T14:57:29.027000Z",
+            "End": "2018-04-28T14:57:29.027000Z"
+          },
+          "Footprint": "geography'SRID=4326;POLYGON ((-54.051727 51.41362695481486, -54.124268 51.41589769639834, -54.134155 51.2539790534755, -54.08316 51.35283313818417, -54.068665 51.38097519118202, -54.051727 51.41362695481486))'",
+          "GeoFootprint": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -54.051727,
+                  51.41362695481486
+                ],
+                [
+                  -54.124268,
+                  51.41589769639834
+                ],
+                [
+                  -54.134155,
+                  51.2539790534755
+                ],
+                [
+                  -54.08316,
+                  51.35283313818417
+                ],
+                [
+                  -54.068665,
+                  51.38097519118202
+                ],
+                [
+                  -54.051727,
+                  51.41362695481486
+                ]
+              ]
+            ]
+          },
+          "Attributes": [
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "origin",
+              "Value": "ESA",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "tileId",
+              "Value": "21UYS",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DoubleAttribute",
+              "Name": "cloudCover",
+              "Value": 57.725811,
+              "ValueType": "Double"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "datastripId",
+              "Value": "S2B_OPER_MSI_L2A_DS_S2RP_20230705T144556_S20180428T145728_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "orbitNumber",
+              "Value": 5971,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "processingDate",
+              "Value": "2023-07-05T14:45:56.000000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productGroupId",
+              "Value": "GS2B_20180428T145729_005971_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "operationalMode",
+              "Value": "INS-NOBS",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processingLevel",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processorVersion",
+              "Value": "05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "granuleIdentifier",
+              "Value": "S2B_OPER_MSI_L2A_TL_S2RP_20230705T144556_A005971_T21UYS_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformShortName",
+              "Value": "SENTINEL-2",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "instrumentShortName",
+              "Value": "MSI",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "relativeOrbitNumber",
+              "Value": 82,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformSerialIdentifier",
+              "Value": "B",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productType",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "beginningDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "endingDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            }
+          ]
+        }
+      },
+      {
+        "id": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYT_20230705T144556",
+        "provider": "cdse",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -53.586426,
+                52.29882940020754
+              ],
+              [
+                -54.066376,
+                52.31403780479302
+              ],
+              [
+                -54.12979,
+                51.32806731121396
+              ],
+              [
+                -54.096466,
+                51.327026025692604
+              ],
+              [
+                -54.08316,
+                51.35283313818417
+              ],
+              [
+                -54.068665,
+                51.38097519118202
+              ],
+              [
+                -53.993988,
+                51.52502895907856
+              ],
+              [
+                -53.918884,
+                51.669040452920605
+              ],
+              [
+                -53.843384,
+                51.81301089893905
+              ],
+              [
+                -53.76764,
+                51.95692965713939
+              ],
+              [
+                -53.691742,
+                52.100748281407135
+              ],
+              [
+                -53.615448,
+                52.24449947794479
+              ],
+              [
+                -53.586426,
+                52.29882940020754
+              ]
+            ]
+          ]
+        },
+        "properties": {
+          "datetime": "2018-04-28T14:57:29.027000Z",
+          "platform": "S2B",
+          "s2:product_uri": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYT_20230705T144556.SAFE",
+          "s2:processing_baseline": "05.00"
+        },
+        "assets": {},
+        "cdse_product": {
+          "@odata.mediaContentType": "application/octet-stream",
+          "Id": "b84aee26-fde4-47f9-a376-33d52ec2a14c",
+          "Name": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYT_20230705T144556.SAFE",
+          "ContentType": "application/octet-stream",
+          "ContentLength": 150011773,
+          "OriginDate": "2024-03-18T05:01:46.475000Z",
+          "PublicationDate": "2024-03-18T05:18:21.102210Z",
+          "ModificationDate": "2026-09-29T21:59:24.196203Z",
+          "Online": true,
+          "EvictionDate": "9999-12-31T23:59:59.999999Z",
+          "S3Path": "/eodata/Sentinel-2/MSI/L2A_N0500/2018/04/28/S2B_MSIL2A_20180428T145729_N0500_R082_T21UYT_20230705T144556.SAFE",
+          "Checksum": [
+            {
+              "Value": "926cb5abbce6ed3d6ffcd5a1b3236bae",
+              "Algorithm": "MD5",
+              "ChecksumDate": "2025-07-04T10:53:03.487167Z"
+            },
+            {
+              "Value": "540bca3d2ece0e5ed8f35b8b5fd0a7d85233fd02df337430d95f8e5a26b71d5f",
+              "Algorithm": "BLAKE3",
+              "ChecksumDate": "2025-07-04T10:53:03.815342Z"
+            }
+          ],
+          "ContentDate": {
+            "Start": "2018-04-28T14:57:29.027000Z",
+            "End": "2018-04-28T14:57:29.027000Z"
+          },
+          "Footprint": "geography'SRID=4326;POLYGON ((-53.586426 52.29882940020754, -54.066376 52.31403780479302, -54.12979 51.32806731121396, -54.096466 51.327026025692604, -54.08316 51.35283313818417, -54.068665 51.38097519118202, -53.993988 51.52502895907856, -53.918884 51.669040452920605, -53.843384 51.81301089893905, -53.76764 51.95692965713939, -53.691742 52.100748281407135, -53.615448 52.24449947794479, -53.586426 52.29882940020754))'",
+          "GeoFootprint": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -53.586426,
+                  52.29882940020754
+                ],
+                [
+                  -54.066376,
+                  52.31403780479302
+                ],
+                [
+                  -54.12979,
+                  51.32806731121396
+                ],
+                [
+                  -54.096466,
+                  51.327026025692604
+                ],
+                [
+                  -54.08316,
+                  51.35283313818417
+                ],
+                [
+                  -54.068665,
+                  51.38097519118202
+                ],
+                [
+                  -53.993988,
+                  51.52502895907856
+                ],
+                [
+                  -53.918884,
+                  51.669040452920605
+                ],
+                [
+                  -53.843384,
+                  51.81301089893905
+                ],
+                [
+                  -53.76764,
+                  51.95692965713939
+                ],
+                [
+                  -53.691742,
+                  52.100748281407135
+                ],
+                [
+                  -53.615448,
+                  52.24449947794479
+                ],
+                [
+                  -53.586426,
+                  52.29882940020754
+                ]
+              ]
+            ]
+          },
+          "Attributes": [
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "origin",
+              "Value": "ESA",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "tileId",
+              "Value": "21UYT",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DoubleAttribute",
+              "Name": "cloudCover",
+              "Value": 92.486006,
+              "ValueType": "Double"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "datastripId",
+              "Value": "S2B_OPER_MSI_L2A_DS_S2RP_20230705T144556_S20180428T145728_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "orbitNumber",
+              "Value": 5971,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "processingDate",
+              "Value": "2023-07-05T14:45:56.000000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productGroupId",
+              "Value": "GS2B_20180428T145729_005971_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "operationalMode",
+              "Value": "INS-NOBS",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processingLevel",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processorVersion",
+              "Value": "05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "granuleIdentifier",
+              "Value": "S2B_OPER_MSI_L2A_TL_S2RP_20230705T144556_A005971_T21UYT_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformShortName",
+              "Value": "SENTINEL-2",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "instrumentShortName",
+              "Value": "MSI",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "relativeOrbitNumber",
+              "Value": 82,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformSerialIdentifier",
+              "Value": "B",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productType",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "beginningDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "endingDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            }
+          ]
+        }
+      },
+      {
+        "id": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYU_20230705T144556",
+        "provider": "cdse",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -53.103546,
+                53.18307682700074
+              ],
+              [
+                -54.00537,
+                53.21199287188401
+              ],
+              [
+                -54.072174,
+                52.226225391291045
+              ],
+              [
+                -53.632538,
+                52.212310836108934
+              ],
+              [
+                -53.615448,
+                52.24449947794479
+              ],
+              [
+                -53.538666,
+                52.3882057677897
+              ],
+              [
+                -53.461365,
+                52.53188591373259
+              ],
+              [
+                -53.383514,
+                52.675519865363775
+              ],
+              [
+                -53.305054,
+                52.819090847164034
+              ],
+              [
+                -53.226044,
+                52.96267761771608
+              ],
+              [
+                -53.146423,
+                53.10626739468564
+              ],
+              [
+                -53.103546,
+                53.18307682700074
+              ]
+            ]
+          ]
+        },
+        "properties": {
+          "datetime": "2018-04-28T14:57:29.027000Z",
+          "platform": "S2B",
+          "s2:product_uri": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYU_20230705T144556.SAFE",
+          "s2:processing_baseline": "05.00"
+        },
+        "assets": {},
+        "cdse_product": {
+          "@odata.mediaContentType": "application/octet-stream",
+          "Id": "a22eefec-8427-4e2a-9963-c154cfb84b14",
+          "Name": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYU_20230705T144556.SAFE",
+          "ContentType": "application/octet-stream",
+          "ContentLength": 343363042,
+          "OriginDate": "2024-03-18T05:01:24.578000Z",
+          "PublicationDate": "2024-03-18T05:07:34.812810Z",
+          "ModificationDate": "2026-09-28T10:38:33.578589Z",
+          "Online": true,
+          "EvictionDate": "9999-12-31T23:59:59.999999Z",
+          "S3Path": "/eodata/Sentinel-2/MSI/L2A_N0500/2018/04/28/S2B_MSIL2A_20180428T145729_N0500_R082_T21UYU_20230705T144556.SAFE",
+          "Checksum": [
+            {
+              "Value": "c59604762c268dafd6d6438a45f83d4f",
+              "Algorithm": "MD5",
+              "ChecksumDate": "2025-07-04T10:52:39.174630Z"
+            },
+            {
+              "Value": "b274d5a06eadc6fead23e3faeb56afedcb6e303534bc3330427440d6f46c1bbe",
+              "Algorithm": "BLAKE3",
+              "ChecksumDate": "2025-07-04T10:52:39.747919Z"
+            }
+          ],
+          "ContentDate": {
+            "Start": "2018-04-28T14:57:29.027000Z",
+            "End": "2018-04-28T14:57:29.027000Z"
+          },
+          "Footprint": "geography'SRID=4326;POLYGON ((-53.103546 53.18307682700074, -54.00537 53.21199287188401, -54.072174 52.226225391291045, -53.632538 52.212310836108934, -53.615448 52.24449947794479, -53.538666 52.3882057677897, -53.461365 52.53188591373259, -53.383514 52.675519865363775, -53.305054 52.819090847164034, -53.226044 52.96267761771608, -53.146423 53.10626739468564, -53.103546 53.18307682700074))'",
+          "GeoFootprint": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -53.103546,
+                  53.18307682700074
+                ],
+                [
+                  -54.00537,
+                  53.21199287188401
+                ],
+                [
+                  -54.072174,
+                  52.226225391291045
+                ],
+                [
+                  -53.632538,
+                  52.212310836108934
+                ],
+                [
+                  -53.615448,
+                  52.24449947794479
+                ],
+                [
+                  -53.538666,
+                  52.3882057677897
+                ],
+                [
+                  -53.461365,
+                  52.53188591373259
+                ],
+                [
+                  -53.383514,
+                  52.675519865363775
+                ],
+                [
+                  -53.305054,
+                  52.819090847164034
+                ],
+                [
+                  -53.226044,
+                  52.96267761771608
+                ],
+                [
+                  -53.146423,
+                  53.10626739468564
+                ],
+                [
+                  -53.103546,
+                  53.18307682700074
+                ]
+              ]
+            ]
+          },
+          "Attributes": [
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "origin",
+              "Value": "ESA",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "tileId",
+              "Value": "21UYU",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DoubleAttribute",
+              "Name": "cloudCover",
+              "Value": 99.37806700000002,
+              "ValueType": "Double"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "datastripId",
+              "Value": "S2B_OPER_MSI_L2A_DS_S2RP_20230705T144556_S20180428T145728_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "orbitNumber",
+              "Value": 5971,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "processingDate",
+              "Value": "2023-07-05T14:45:56.000000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productGroupId",
+              "Value": "GS2B_20180428T145729_005971_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "operationalMode",
+              "Value": "INS-NOBS",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processingLevel",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processorVersion",
+              "Value": "05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "granuleIdentifier",
+              "Value": "S2B_OPER_MSI_L2A_TL_S2RP_20230705T144556_A005971_T21UYU_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformShortName",
+              "Value": "SENTINEL-2",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "instrumentShortName",
+              "Value": "MSI",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "relativeOrbitNumber",
+              "Value": 82,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformSerialIdentifier",
+              "Value": "B",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productType",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "beginningDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "endingDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            }
+          ]
+        }
+      },
+      {
+        "id": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYV_20230705T144556",
+        "provider": "cdse",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -52.602386,
+                54.06580438473852
+              ],
+              [
+                -53.94101,
+                54.10922199205192
+              ],
+              [
+                -54.011505,
+                53.12366003430004
+              ],
+              [
+                -53.15204,
+                53.09613380130216
+              ],
+              [
+                -53.146423,
+                53.10626739468564
+              ],
+              [
+                -53.066284,
+                53.249811809918455
+              ],
+              [
+                -52.985687,
+                53.39331108158026
+              ],
+              [
+                -52.95813,
+                53.44205227818746
+              ],
+              [
+                -52.905212,
+                53.53576740517892
+              ],
+              [
+                -52.823822,
+                53.679109610153056
+              ],
+              [
+                -52.742126,
+                53.82232926473783
+              ],
+              [
+                -52.68814,
+                53.91646737430885
+              ],
+              [
+                -52.659515,
+                53.96650156415464
+              ],
+              [
+                -52.602386,
+                54.06580438473852
+              ]
+            ]
+          ]
+        },
+        "properties": {
+          "datetime": "2018-04-28T14:57:29.027000Z",
+          "platform": "S2B",
+          "s2:product_uri": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYV_20230705T144556.SAFE",
+          "s2:processing_baseline": "05.00"
+        },
+        "assets": {},
+        "cdse_product": {
+          "@odata.mediaContentType": "application/octet-stream",
+          "Id": "921ad0d2-3565-4ddc-893c-c499bf2a8ed9",
+          "Name": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYV_20230705T144556.SAFE",
+          "ContentType": "application/octet-stream",
+          "ContentLength": 536689861,
+          "OriginDate": "2024-03-18T05:13:17.237000Z",
+          "PublicationDate": "2024-03-18T05:31:25.208801Z",
+          "ModificationDate": "2026-09-25T06:11:15.578768Z",
+          "Online": true,
+          "EvictionDate": "9999-12-31T23:59:59.999999Z",
+          "S3Path": "/eodata/Sentinel-2/MSI/L2A_N0500/2018/04/28/S2B_MSIL2A_20180428T145729_N0500_R082_T21UYV_20230705T144556.SAFE",
+          "Checksum": [
+            {
+              "Value": "4fd65e297a179fd27e68076556fd4239",
+              "Algorithm": "MD5",
+              "ChecksumDate": "2025-07-04T10:52:42.185136Z"
+            },
+            {
+              "Value": "f0bb02c6983f900b04b70140077315ee1077bbe355ed36624e413fc3ebed83d5",
+              "Algorithm": "BLAKE3",
+              "ChecksumDate": "2025-07-04T10:52:43.050042Z"
+            }
+          ],
+          "ContentDate": {
+            "Start": "2018-04-28T14:57:29.027000Z",
+            "End": "2018-04-28T14:57:29.027000Z"
+          },
+          "Footprint": "geography'SRID=4326;POLYGON ((-52.602386 54.06580438473852, -53.94101 54.10922199205192, -54.011505 53.12366003430004, -53.15204 53.09613380130216, -53.146423 53.10626739468564, -53.066284 53.249811809918455, -52.985687 53.39331108158026, -52.95813 53.44205227818746, -52.905212 53.53576740517892, -52.823822 53.679109610153056, -52.742126 53.82232926473783, -52.68814 53.91646737430885, -52.659515 53.96650156415464, -52.602386 54.06580438473852))'",
+          "GeoFootprint": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -52.602386,
+                  54.06580438473852
+                ],
+                [
+                  -53.94101,
+                  54.10922199205192
+                ],
+                [
+                  -54.011505,
+                  53.12366003430004
+                ],
+                [
+                  -53.15204,
+                  53.09613380130216
+                ],
+                [
+                  -53.146423,
+                  53.10626739468564
+                ],
+                [
+                  -53.066284,
+                  53.249811809918455
+                ],
+                [
+                  -52.985687,
+                  53.39331108158026
+                ],
+                [
+                  -52.95813,
+                  53.44205227818746
+                ],
+                [
+                  -52.905212,
+                  53.53576740517892
+                ],
+                [
+                  -52.823822,
+                  53.679109610153056
+                ],
+                [
+                  -52.742126,
+                  53.82232926473783
+                ],
+                [
+                  -52.68814,
+                  53.91646737430885
+                ],
+                [
+                  -52.659515,
+                  53.96650156415464
+                ],
+                [
+                  -52.602386,
+                  54.06580438473852
+                ]
+              ]
+            ]
+          },
+          "Attributes": [
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "origin",
+              "Value": "ESA",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "tileId",
+              "Value": "21UYV",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DoubleAttribute",
+              "Name": "cloudCover",
+              "Value": 99.999857,
+              "ValueType": "Double"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "datastripId",
+              "Value": "S2B_OPER_MSI_L2A_DS_S2RP_20230705T144556_S20180428T145728_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "orbitNumber",
+              "Value": 5971,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "processingDate",
+              "Value": "2023-07-05T14:45:56.000000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productGroupId",
+              "Value": "GS2B_20180428T145729_005971_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "operationalMode",
+              "Value": "INS-NOBS",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processingLevel",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processorVersion",
+              "Value": "05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "granuleIdentifier",
+              "Value": "S2B_OPER_MSI_L2A_TL_S2RP_20230705T144556_A005971_T21UYV_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformShortName",
+              "Value": "SENTINEL-2",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "instrumentShortName",
+              "Value": "MSI",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "relativeOrbitNumber",
+              "Value": 82,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformSerialIdentifier",
+              "Value": "B",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productType",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "beginningDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "endingDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            }
+          ]
+        }
+      },
+      {
+        "id": "S2B_MSIL2A_20180428T145729_N0500_R082_T22UCC_20230705T144556",
+        "provider": "cdse",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -53.57483,
+                52.320502625679104
+              ],
+              [
+                -53.934204,
+                52.31402323817268
+              ],
+              [
+                -53.89557,
+                51.713479713696714
+              ],
+              [
+                -53.843384,
+                51.81301089893905
+              ],
+              [
+                -53.76764,
+                51.95692965713939
+              ],
+              [
+                -53.691742,
+                52.100748281407135
+              ],
+              [
+                -53.615448,
+                52.24449947794479
+              ],
+              [
+                -53.57483,
+                52.320502625679104
+              ]
+            ]
+          ]
+        },
+        "properties": {
+          "datetime": "2018-04-28T14:57:29.027000Z",
+          "platform": "S2B",
+          "s2:product_uri": "S2B_MSIL2A_20180428T145729_N0500_R082_T22UCC_20230705T144556.SAFE",
+          "s2:processing_baseline": "05.00"
+        },
+        "assets": {},
+        "cdse_product": {
+          "@odata.mediaContentType": "application/octet-stream",
+          "Id": "72992850-4572-4415-93a8-bfda0f33463e",
+          "Name": "S2B_MSIL2A_20180428T145729_N0500_R082_T22UCC_20230705T144556.SAFE",
+          "ContentType": "application/octet-stream",
+          "ContentLength": 71211558,
+          "OriginDate": "2024-03-18T04:58:39.753000Z",
+          "PublicationDate": "2024-03-18T05:05:11.693938Z",
+          "ModificationDate": "2026-09-25T09:58:42.003767Z",
+          "Online": true,
+          "EvictionDate": "9999-12-31T23:59:59.999999Z",
+          "S3Path": "/eodata/Sentinel-2/MSI/L2A_N0500/2018/04/28/S2B_MSIL2A_20180428T145729_N0500_R082_T22UCC_20230705T144556.SAFE",
+          "Checksum": [
+            {
+              "Value": "107a442a37ea98be126bcab42961d91a",
+              "Algorithm": "MD5",
+              "ChecksumDate": "2025-07-04T10:52:39.043964Z"
+            },
+            {
+              "Value": "0bb7c0e938a26c5dd8c54f733dea2b4a7ff62da69e759d3a8c74af0e115ad505",
+              "Algorithm": "BLAKE3",
+              "ChecksumDate": "2025-07-04T10:52:39.171588Z"
+            }
+          ],
+          "ContentDate": {
+            "Start": "2018-04-28T14:57:29.027000Z",
+            "End": "2018-04-28T14:57:29.027000Z"
+          },
+          "Footprint": "geography'SRID=4326;POLYGON ((-53.57483 52.320502625679104, -53.934204 52.31402323817268, -53.89557 51.713479713696714, -53.843384 51.81301089893905, -53.76764 51.95692965713939, -53.691742 52.100748281407135, -53.615448 52.24449947794479, -53.57483 52.320502625679104))'",
+          "GeoFootprint": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -53.57483,
+                  52.320502625679104
+                ],
+                [
+                  -53.934204,
+                  52.31402323817268
+                ],
+                [
+                  -53.89557,
+                  51.713479713696714
+                ],
+                [
+                  -53.843384,
+                  51.81301089893905
+                ],
+                [
+                  -53.76764,
+                  51.95692965713939
+                ],
+                [
+                  -53.691742,
+                  52.100748281407135
+                ],
+                [
+                  -53.615448,
+                  52.24449947794479
+                ],
+                [
+                  -53.57483,
+                  52.320502625679104
+                ]
+              ]
+            ]
+          },
+          "Attributes": [
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "origin",
+              "Value": "ESA",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "tileId",
+              "Value": "22UCC",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DoubleAttribute",
+              "Name": "cloudCover",
+              "Value": 83.827227,
+              "ValueType": "Double"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "datastripId",
+              "Value": "S2B_OPER_MSI_L2A_DS_S2RP_20230705T144556_S20180428T145728_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "orbitNumber",
+              "Value": 5971,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "processingDate",
+              "Value": "2023-07-05T14:45:56.000000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productGroupId",
+              "Value": "GS2B_20180428T145729_005971_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "operationalMode",
+              "Value": "INS-NOBS",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processingLevel",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processorVersion",
+              "Value": "05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "granuleIdentifier",
+              "Value": "S2B_OPER_MSI_L2A_TL_S2RP_20230705T144556_A005971_T22UCC_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformShortName",
+              "Value": "SENTINEL-2",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "instrumentShortName",
+              "Value": "MSI",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "relativeOrbitNumber",
+              "Value": 82,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformSerialIdentifier",
+              "Value": "B",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productType",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "beginningDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "endingDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            }
+          ]
+        }
+      },
+      {
+        "id": "S2B_MSIL2A_20180428T145729_N0500_R082_T22UCD_20230705T144556",
+        "provider": "cdse",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -53.078064,
+                53.228710866384766
+              ],
+              [
+                -53.99524,
+                53.21197782662703
+              ],
+              [
+                -53.928406,
+                52.22621087043558
+              ],
+              [
+                -53.622223,
+                52.23172480176233
+              ],
+              [
+                -53.615448,
+                52.24449947794479
+              ],
+              [
+                -53.538666,
+                52.3882057677897
+              ],
+              [
+                -53.461365,
+                52.53188591373259
+              ],
+              [
+                -53.383514,
+                52.675519865363775
+              ],
+              [
+                -53.305054,
+                52.819090847164034
+              ],
+              [
+                -53.226044,
+                52.96267761771608
+              ],
+              [
+                -53.146423,
+                53.10626739468564
+              ],
+              [
+                -53.078064,
+                53.228710866384766
+              ]
+            ]
+          ]
+        },
+        "properties": {
+          "datetime": "2018-04-28T14:57:29.027000Z",
+          "platform": "S2B",
+          "s2:product_uri": "S2B_MSIL2A_20180428T145729_N0500_R082_T22UCD_20230705T144556.SAFE",
+          "s2:processing_baseline": "05.00"
+        },
+        "assets": {},
+        "cdse_product": {
+          "@odata.mediaContentType": "application/octet-stream",
+          "Id": "ef7019f6-b809-4e2c-a630-1acf60357acb",
+          "Name": "S2B_MSIL2A_20180428T145729_N0500_R082_T22UCD_20230705T144556.SAFE",
+          "ContentType": "application/octet-stream",
+          "ContentLength": 311922356,
+          "OriginDate": "2024-03-18T04:58:58.518000Z",
+          "PublicationDate": "2024-03-18T05:10:35.706856Z",
+          "ModificationDate": "2026-10-04T09:20:41.608923Z",
+          "Online": true,
+          "EvictionDate": "9999-12-31T23:59:59.999999Z",
+          "S3Path": "/eodata/Sentinel-2/MSI/L2A_N0500/2018/04/28/S2B_MSIL2A_20180428T145729_N0500_R082_T22UCD_20230705T144556.SAFE",
+          "Checksum": [
+            {
+              "Value": "fb56e1d5e1155940c5403fe391096686",
+              "Algorithm": "MD5",
+              "ChecksumDate": "2025-07-04T10:52:56.196204Z"
+            },
+            {
+              "Value": "ef5ca8c52f000301aa98f93c97fe8f6f02dddfd9b2274f67809c0b17819d751c",
+              "Algorithm": "BLAKE3",
+              "ChecksumDate": "2025-07-04T10:52:56.785125Z"
+            }
+          ],
+          "ContentDate": {
+            "Start": "2018-04-28T14:57:29.027000Z",
+            "End": "2018-04-28T14:57:29.027000Z"
+          },
+          "Footprint": "geography'SRID=4326;POLYGON ((-53.078064 53.228710866384766, -53.99524 53.21197782662703, -53.928406 52.22621087043558, -53.622223 52.23172480176233, -53.615448 52.24449947794479, -53.538666 52.3882057677897, -53.461365 52.53188591373259, -53.383514 52.675519865363775, -53.305054 52.819090847164034, -53.226044 52.96267761771608, -53.146423 53.10626739468564, -53.078064 53.228710866384766))'",
+          "GeoFootprint": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -53.078064,
+                  53.228710866384766
+                ],
+                [
+                  -53.99524,
+                  53.21197782662703
+                ],
+                [
+                  -53.928406,
+                  52.22621087043558
+                ],
+                [
+                  -53.622223,
+                  52.23172480176233
+                ],
+                [
+                  -53.615448,
+                  52.24449947794479
+                ],
+                [
+                  -53.538666,
+                  52.3882057677897
+                ],
+                [
+                  -53.461365,
+                  52.53188591373259
+                ],
+                [
+                  -53.383514,
+                  52.675519865363775
+                ],
+                [
+                  -53.305054,
+                  52.819090847164034
+                ],
+                [
+                  -53.226044,
+                  52.96267761771608
+                ],
+                [
+                  -53.146423,
+                  53.10626739468564
+                ],
+                [
+                  -53.078064,
+                  53.228710866384766
+                ]
+              ]
+            ]
+          },
+          "Attributes": [
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "origin",
+              "Value": "ESA",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "tileId",
+              "Value": "22UCD",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DoubleAttribute",
+              "Name": "cloudCover",
+              "Value": 99.466479,
+              "ValueType": "Double"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "datastripId",
+              "Value": "S2B_OPER_MSI_L2A_DS_S2RP_20230705T144556_S20180428T145728_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "orbitNumber",
+              "Value": 5971,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "processingDate",
+              "Value": "2023-07-05T14:45:56.000000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productGroupId",
+              "Value": "GS2B_20180428T145729_005971_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "operationalMode",
+              "Value": "INS-NOBS",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processingLevel",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processorVersion",
+              "Value": "05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "granuleIdentifier",
+              "Value": "S2B_OPER_MSI_L2A_TL_S2RP_20230705T144556_A005971_T22UCD_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformShortName",
+              "Value": "SENTINEL-2",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "instrumentShortName",
+              "Value": "MSI",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "relativeOrbitNumber",
+              "Value": 82,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformSerialIdentifier",
+              "Value": "B",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productType",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "beginningDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "endingDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            }
+          ]
+        }
+      },
+      {
+        "id": "S2B_MSIL2A_20180428T145729_N0500_R082_T22UCE_20230705T144556",
+        "provider": "cdse",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -52.691986,
+                54.1344430776389
+              ],
+              [
+                -54.0596,
+                54.109206448119856
+              ],
+              [
+                -53.989075,
+                53.123645037009204
+              ],
+              [
+                -53.12796,
+                53.13933747487
+              ],
+              [
+                -53.066284,
+                53.249811809918455
+              ],
+              [
+                -52.985687,
+                53.39331108158026
+              ],
+              [
+                -52.95813,
+                53.44205227818746
+              ],
+              [
+                -52.905212,
+                53.53576740517892
+              ],
+              [
+                -52.823822,
+                53.679109610153056
+              ],
+              [
+                -52.742126,
+                53.82232926473783
+              ],
+              [
+                -52.68814,
+                53.91646737430885
+              ],
+              [
+                -52.659515,
+                53.96650156415464
+              ],
+              [
+                -52.578186,
+                54.10786202964261
+              ],
+              [
+                -52.691986,
+                54.1344430776389
+              ]
+            ]
+          ]
+        },
+        "properties": {
+          "datetime": "2018-04-28T14:57:29.027000Z",
+          "platform": "S2B",
+          "s2:product_uri": "S2B_MSIL2A_20180428T145729_N0500_R082_T22UCE_20230705T144556.SAFE",
+          "s2:processing_baseline": "05.00"
+        },
+        "assets": {},
+        "cdse_product": {
+          "@odata.mediaContentType": "application/octet-stream",
+          "Id": "01dc699c-1ae6-4283-8e47-8eec9d14c93f",
+          "Name": "S2B_MSIL2A_20180428T145729_N0500_R082_T22UCE_20230705T144556.SAFE",
+          "ContentType": "application/octet-stream",
+          "ContentLength": 572042981,
+          "OriginDate": "2024-03-18T05:01:43.593000Z",
+          "PublicationDate": "2024-03-18T05:16:21.507349Z",
+          "ModificationDate": "2026-09-14T15:34:47.218638Z",
+          "Online": true,
+          "EvictionDate": "9999-12-31T23:59:59.999999Z",
+          "S3Path": "/eodata/Sentinel-2/MSI/L2A_N0500/2018/04/28/S2B_MSIL2A_20180428T145729_N0500_R082_T22UCE_20230705T144556.SAFE",
+          "Checksum": [
+            {
+              "Value": "1608ab6845244ffe992be6b7f401c391",
+              "Algorithm": "MD5",
+              "ChecksumDate": "2025-07-04T10:52:32.190435Z"
+            },
+            {
+              "Value": "422c71ed0c5930e51b6e9682e60f3d62d9389b99d283da4a624bd019febf5310",
+              "Algorithm": "BLAKE3",
+              "ChecksumDate": "2025-07-04T10:52:33.345223Z"
+            }
+          ],
+          "ContentDate": {
+            "Start": "2018-04-28T14:57:29.027000Z",
+            "End": "2018-04-28T14:57:29.027000Z"
+          },
+          "Footprint": "geography'SRID=4326;POLYGON ((-52.691986 54.1344430776389, -54.0596 54.109206448119856, -53.989075 53.123645037009204, -53.12796 53.13933747487, -53.066284 53.249811809918455, -52.985687 53.39331108158026, -52.95813 53.44205227818746, -52.905212 53.53576740517892, -52.823822 53.679109610153056, -52.742126 53.82232926473783, -52.68814 53.91646737430885, -52.659515 53.96650156415464, -52.578186 54.10786202964261, -52.691986 54.1344430776389))'",
+          "GeoFootprint": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -52.691986,
+                  54.1344430776389
+                ],
+                [
+                  -54.0596,
+                  54.109206448119856
+                ],
+                [
+                  -53.989075,
+                  53.123645037009204
+                ],
+                [
+                  -53.12796,
+                  53.13933747487
+                ],
+                [
+                  -53.066284,
+                  53.249811809918455
+                ],
+                [
+                  -52.985687,
+                  53.39331108158026
+                ],
+                [
+                  -52.95813,
+                  53.44205227818746
+                ],
+                [
+                  -52.905212,
+                  53.53576740517892
+                ],
+                [
+                  -52.823822,
+                  53.679109610153056
+                ],
+                [
+                  -52.742126,
+                  53.82232926473783
+                ],
+                [
+                  -52.68814,
+                  53.91646737430885
+                ],
+                [
+                  -52.659515,
+                  53.96650156415464
+                ],
+                [
+                  -52.578186,
+                  54.10786202964261
+                ],
+                [
+                  -52.691986,
+                  54.1344430776389
+                ]
+              ]
+            ]
+          },
+          "Attributes": [
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "origin",
+              "Value": "ESA",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "tileId",
+              "Value": "22UCE",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DoubleAttribute",
+              "Name": "cloudCover",
+              "Value": 99.999869,
+              "ValueType": "Double"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "datastripId",
+              "Value": "S2B_OPER_MSI_L2A_DS_S2RP_20230705T144556_S20180428T145728_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "orbitNumber",
+              "Value": 5971,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "processingDate",
+              "Value": "2023-07-05T14:45:56.000000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productGroupId",
+              "Value": "GS2B_20180428T145729_005971_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "operationalMode",
+              "Value": "INS-NOBS",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processingLevel",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "processorVersion",
+              "Value": "05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "granuleIdentifier",
+              "Value": "S2B_OPER_MSI_L2A_TL_S2RP_20230705T144556_A005971_T22UCE_N05.00",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformShortName",
+              "Value": "SENTINEL-2",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "instrumentShortName",
+              "Value": "MSI",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.IntegerAttribute",
+              "Name": "relativeOrbitNumber",
+              "Value": 82,
+              "ValueType": "Integer"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "platformSerialIdentifier",
+              "Value": "B",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.StringAttribute",
+              "Name": "productType",
+              "Value": "S2MSI2A",
+              "ValueType": "String"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "beginningDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            },
+            {
+              "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+              "Name": "endingDateTime",
+              "Value": "2018-04-28T14:57:29.027000Z",
+              "ValueType": "DateTimeOffset"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "alignment": {
+    "crs": "EPSG:3978",
+    "transform": [
+      10.0,
+      0.0,
+      2606479.960937075,
+      0.0,
+      -10.0,
+      1224875.1716315742,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "shape": [
+      1200,
+      1200
+    ],
+    "display_spacing_m": 10.0,
+    "rgb_resampling": "bilinear DN",
+    "rgb_display": "source BOA offset applied when available, fixed DN display stretch; native/aligned data remain raw DN",
+    "radar_resampling": "nearest dB, display only; no new SAR resolution",
+    "quality_resampling": "nearest; 20 m source preserved",
+    "valid_data": "nearest source masks intersected across RGB and SCL; invalid display pixels zeroed"
+  },
+  "generated_at": "2026-10-06T00:42:19.836610+00:00",
+  "automated_target_verdict": null,
+  "files": {
+    "B02-native.tif": "23e721e732a94189b84228c511efad6a5986563d4bf4f13bfd52ffd0677fd9cf",
+    "B03-native.tif": "5571fddf5db5ec0a82a5f1bb91920308444720edf38ba5da73d1baf3b4ae6ff2",
+    "B04-native.tif": "50ca9453ae3e06393cb5cf06c19a501685286cf970069288e0cb2c3ceb77726b",
+    "B08-native.tif": "9ae279a1f55ac9a654bd70c9a9fd424fca49d36d000cec89b4a7100a86b78a56",
+    "cdse-verification.json": "fa143068e587a6ad0699c3781a0f4da09098c926f1e2f9392c0285d8d8acdef8",
+    "item.json": "4c37c4feef72b07d590844a2e76069ae3f54a4239d10b1d68e91ab69aab0bb33",
+    "optical-aligned.tif": "20bb19098c09db20c1290ee3aa779bb2bf2cdce14e16bf6d1faee286dab1aeb7",
+    "paired.png": "637164cf311ea74aaa65b30afbec1810c88f4b22b6576fa393e6e5c547daf959",
+    "radar-native.tif": "db5fa53d4bd9d4e3d3f5a16b364d908f5de84a4ca6c298cead59732d2d7d6168",
+    "SCL-native.tif": "1a600c6245ba8a2a0337f16ce63880c4f1dce641344bf3909e570151533f6f51"
+  }
+}
