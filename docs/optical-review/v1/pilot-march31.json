@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-06T00:02:57.327733+00:00",
+  "policy": {
+    "version": "s1-s2-review-v1",
+    "search_hours": 12.0,
+    "motion_speed_m_s": 0.5,
+    "sar_geolocation_allowance_m": 100.0,
+    "optical_geolocation_allowance_m": 20.0,
+    "minimum_review_radius_m": 1000.0,
+    "maximum_review_radius_m": 6000.0,
+    "review_grid_spacing_m": 10.0,
+    "cloud_buffer_m": 60.0,
+    "useful_visible_fraction": 0.8,
+    "max_items_per_candidate": 3
+  },
+  "selection": "stored candidate IDs ordered by scene/id; bounded pilot, not a regional sample",
+  "candidate_limit": 6,
+  "selection_truncated": false,
+  "candidates": [
+    {
+      "detection_id": "06232a14-cc5e-42a2-8b90-eee6364ca618",
+      "sar_scene_id": "516aa181-a456-4cc0-a289-b43c8735b4f6",
+      "sar_source_filename": "20180331T212355_cis_prep.nc",
+      "candidate_lonlat": [
+        -55.704891204833984,
+        55.5731201171875
+      ],
+      "catalogue_complete": true,
+      "candidate_overlapping_items": 0,
+      "item_selection_truncated": false,
+      "asset_failures": [],
+      "pair_ids": [
+        "ccd51fcb5ff16e7deeab17e51f6f3d48858b2cea28a54de9e479c09f930826ec"
+      ],
+      "optical_downloaded": false,
+      "screened_useful_optical": false
+    },
+    {
+      "detection_id": "075bba6a-80a4-476c-8dcf-a2e9bb03e71b",
+      "sar_scene_id": "516aa181-a456-4cc0-a289-b43c8735b4f6",
+      "sar_source_filename": "20180331T212355_cis_prep.nc",
+      "candidate_lonlat": [
+        -56.09033203125,
+        55.73067092895508
+      ],
+      "catalogue_complete": true,
+      "candidate_overlapping_items": 0,
+      "item_selection_truncated": false,
+      "asset_failures": [],
+      "pair_ids": [
+        "47692af9c09f19c0d67ff2a988ffb87dd2f69ee34421e965075de1ef95c7dd4a"
+      ],
+      "optical_downloaded": false,
+      "screened_useful_optical": false
+    },
+    {
+      "detection_id": "1c870a27-8da0-4b34-b957-57475ca8c487",
+      "sar_scene_id": "516aa181-a456-4cc0-a289-b43c8735b4f6",
+      "sar_source_filename": "20180331T212355_cis_prep.nc",
+      "candidate_lonlat": [
+        -56.92724609375,
+        56.04542922973633
+      ],
+      "catalogue_complete": true,
+      "candidate_overlapping_items": 0,
+      "item_selection_truncated": false,
+      "asset_failures": [],
+      "pair_ids": [
+        "829c6acedfad506afb741871bfb5edd90ed9a65d8ff73762177a8639526b88e8"
+      ],
+      "optical_downloaded": false,
+      "screened_useful_optical": false
+    },
+    {
+      "detection_id": "4fde44a6-351e-42be-b06d-201d3100b4ea",
+      "sar_scene_id": "516aa181-a456-4cc0-a289-b43c8735b4f6",
+      "sar_source_filename": "20180331T212355_cis_prep.nc",
+      "candidate_lonlat": [
+        -59.215492248535156,
+        58.393863677978516
+      ],
+      "catalogue_complete": true,
+      "candidate_overlapping_items": 0,
+      "item_selection_truncated": false,
+      "asset_failures": [],
+      "pair_ids": [
+        "8632a5ca05ed5d38958116f9e4c921f9e5cd211bb3b68e0ccf2528bf299e995f"
+      ],
+      "optical_downloaded": false,
+      "screened_useful_optical": false
+    },
+    {
+      "detection_id": "d54405f9-7ee7-4cda-be82-5364c98d5bf5",
+      "sar_scene_id": "516aa181-a456-4cc0-a289-b43c8735b4f6",
+      "sar_source_filename": "20180331T212355_cis_prep.nc",
+      "candidate_lonlat": [
+        -56.869956970214844,
+        55.89122772216797
+      ],
+      "catalogue_complete": true,
+      "candidate_overlapping_items": 0,
+      "item_selection_truncated": false,
+      "asset_failures": [],
+      "pair_ids": [
+        "6a6069b6691a171ad80fa2f61acc1892960b4e3884ad0f87e154c39b592020f9"
+      ],
+      "optical_downloaded": false,
+      "screened_useful_optical": false
+    },
+    {
+      "detection_id": "f367897d-a2ba-45ef-ad65-bdf2239d3b4a",
+      "sar_scene_id": "516aa181-a456-4cc0-a289-b43c8735b4f6",
+      "sar_source_filename": "20180331T212355_cis_prep.nc",
+      "candidate_lonlat": [
+        -56.03345489501953,
+        55.73537826538086
+      ],
+      "catalogue_complete": true,
+      "candidate_overlapping_items": 0,
+      "item_selection_truncated": false,
+      "asset_failures": [],
+      "pair_ids": [
+        "b7296f79f891a0249d5a8e0092234be2636fcf1b4c1f3515b2eb13cfe1ed69fe"
+      ],
+      "optical_downloaded": false,
+      "screened_useful_optical": false
+    }
+  ],
+  "total_candidates": 6,
+  "candidates_with_downloaded_optical": 0,
+  "candidates_with_screened_useful_optical": 0,
+  "finished_at": "2026-10-06T00:03:06.281265+00:00",
+  "analyst_corroboration_measured": false,
+  "missing_optical_is_false_target": false
+}

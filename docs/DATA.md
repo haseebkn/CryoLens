@@ -10,6 +10,7 @@ AIS records in portfolio screenshots or Git without appropriate permission.
 | [Publisher toolkit](https://github.com/astokholm/AI4ArcticSeaIceChallenge) | Normalization/data format contract | Public source; normalization provenance must accompany restored physical values |
 | [GSHHG](https://www.soest.hawaii.edu/pwessel/gshhg/) | Shoreline and coastal exclusion for COG processing | Public 2.3.7 shapefiles; download with `make fetch-shorelines` |
 | [Copernicus Data Space](https://dataspace.copernicus.eu/) | Fresh Sentinel-1 EW/IW HH/HV SAFE imagery | Catalogue metadata is public; downloads require configured CDSE credentials. Authentic products are available; processing acceptance remains blocked ([report](processing-validation/v1/README.md)) |
+| [Planetary Computer Sentinel-2 L2A](https://planetarycomputer.microsoft.com/dataset/sentinel-2-l2a) | Paired optical review | Public STAC and real COG range reads; no new account credentials. B02/B03/B04/B08 at 10 m and SCL at 20 m are preserved as native crops with unsigned source URLs, timestamps and crop hashes ([report](optical-review/v1/README.md)) |
 | [NASA Earthdata / ASF](https://search.asf.alaska.edu/) | Alternative Sentinel-1 access | Downloads require Earthdata credentials |
 | [NSIDC G00807](https://nsidc.org/data/g00807) | Historical IIP sightings as context | Follow source access terms; never substitute for matched iceberg labels |
 | Timestamped regional AIS | Potential vessel deconfliction | Not connected; a suitable licensed or authorized feed is still needed |
@@ -30,8 +31,9 @@ scene named `DEMO_SCENE` is not evidence and should not be presented.
 
 ## Credentials
 
-The audit found local database credentials configured; CDSE, Earthdata and
-Kaggle credentials were absent. The public archive supports research work
-without adding those credentials. For fresh downloads, populate one supported
-provider's values locally in `.env`; do not send passwords in chat. Credentials
-alone do not resolve missing ground truth or make a detector operational.
+CDSE credentials are configured locally and have been used for authentic
+Sentinel-1 downloads. Sentinel-2 paired review uses public Planetary Computer
+access with temporary signatures kept in memory. Analyst evidence writes need
+`CRYOLENS_ANALYST_ID` and `CRYOLENS_ANALYST_API_KEY` configured locally; otherwise
+the dashboard is read-only. Do not send passwords or keys in chat. Credentials
+do not resolve missing ground truth or make a detector operational.
