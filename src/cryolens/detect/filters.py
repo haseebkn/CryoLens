@@ -358,6 +358,7 @@ def filter_targets(
     targets: list[ExtractedTarget],
     config: SuppressionConfig | None = None,
     clutter_mean_db: NDArray[np.floating] | None = None,
+    candidate_decisions: list[dict[str, Any]] | None = None,
 ) -> tuple[list[ExtractedTarget], SuppressionStats]:
     """Apply post-detection gating to vectorised candidates.
 
@@ -367,11 +368,29 @@ def filter_targets(
     cfg = config or SuppressionConfig()
     stats = SuppressionStats()
     kept = list(targets)
+    decisions: dict[int, dict[str, Any]] = {}
+    if candidate_decisions is not None:
+        if len({t.target_id for t in targets}) != len(targets):
+            raise ValueError("Candidate IDs must be unique for an auditable suppression trace")
+        decisions = {
+            t.target_id: {"target_id": t.target_id, "passed_stages": [], "first_rejection": None}
+            for t in targets
+        }
 
     def apply(stage: str, predicate: Any) -> None:
         nonlocal kept
         before = len(kept)
-        kept = [t for t in kept if predicate(t)]
+        remaining = []
+        for target in kept:
+            passed = bool(predicate(target))
+            if candidate_decisions is not None:
+                if passed:
+                    decisions[target.target_id]["passed_stages"].append(stage)
+                else:
+                    decisions[target.target_id]["first_rejection"] = stage
+            if passed:
+                remaining.append(target)
+        kept = remaining
         stats.record(stage, before - len(kept), len(kept))
 
     apply("min_size", lambda t: t.pixel_area >= cfg.min_target_pixels)
@@ -411,6 +430,8 @@ def filter_targets(
         len(targets),
         100.0 * stats.total_removed / max(len(targets), 1),
     )
+    if candidate_decisions is not None:
+        candidate_decisions.extend(decisions[t.target_id] for t in targets)
     return kept, stats
 
 

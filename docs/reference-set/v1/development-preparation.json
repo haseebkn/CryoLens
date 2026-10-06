@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "purpose": "preparation_receipt_not_human_reference",
+  "workspace_id": "a2b7dc7e5cfc43456b17b78b0a9825a1d9b12c8f748715ab012d0b191472317f",
+  "created_at": "2026-10-05T22:55:27.167741-02:30",
+  "scene_id": "20180428T093937_cis_prep.nc",
+  "acquisition_id": "S1B_EW_GRDM_1SDH_20180428T093937_20180428T094037_010682_013815",
+  "acquired_utc": "2018-04-28T07:09:37-02:30",
+  "source_sha256": "cf26a69f2d42ecca8c9ba5a11d4f19d22313d73b3a64e57b199a540c561ee58e",
+  "source_bytes": 167698264,
+  "group_id": "1110a65cf5e812147e597813ad16959f67c16169c66fc84d4fe199897cca6ec3",
+  "partition": "validation",
+  "parent_manifest_sha256": "fab81f3438142aedfcc01cce27b836412c9d29e82f85c294b48d7315521d60ee",
+  "reference_policy_sha256": "bcf377d2ce4f735ff0a7856d7a2c7399af43d4e5f115a61e96505a3ceb13cef0",
+  "source_shape": [
+    5001,
+    5377
+  ],
+  "survey_task_count": 193,
+  "available_survey_pixels": 24731337,
+  "approximate_available_survey_area_km2": 158280.55680000002,
+  "nominal_pixel_area_km2": 0.0064,
+  "candidate_task_count": 96,
+  "detection": {
+    "raw_components": 311,
+    "retained_components": 28,
+    "raw_pixel_hits": 550,
+    "eligible_pixels": 20869250,
+    "approximate_eligible_area_km2": 133563.2,
+    "suppression": {
+      "stages": [
+        {
+          "stage": "min_size",
+          "removed": 283,
+          "remaining": 28
+        },
+        {
+          "stage": "max_size",
+          "removed": 0,
+          "remaining": 28
+        },
+        {
+          "stage": "aspect_ratio",
+          "removed": 0,
+          "remaining": 28
+        },
+        {
+          "stage": "min_peak_hv",
+          "removed": 0,
+          "remaining": 28
+        },
+        {
+          "stage": "copol_dominance",
+          "removed": 0,
+          "remaining": 28
+        },
+        {
+          "stage": "clutter_contrast",
+          "removed": 0,
+          "remaining": 28
+        }
+      ],
+      "total_removed": 283
+    },
+    "mask_breakdown": {
+      "invalid_or_nodata": 0.07605129522728521,
+      "land_and_coastal_buffer": 0.0015821645044247613,
+      "swath_border": 0.02487648276556331,
+      "subswath_seams": 0.01625763744405666,
+      "sea_ice_or_unknown": 0.10292607649197331
+    },
+    "cfar_core_pixels": 512,
+    "cfar_halo_pixels": [
+      15,
+      15
+    ],
+    "component_connectivity": 8,
+    "components_assembled_before_suppression": true
+  },
+  "chart_label_access": true,
+  "reference_only_test_access": false,
+  "human_responses": 0,
+  "completed_survey_pixels": 0,
+  "reference_set_complete": false,
+  "independent_reviewer_obtained": false,
+  "raw_frame_sha256": "b4b752c30b5d7e724da2cec5cbb06acab85080c972f05a38857494d708604835",
+  "private_code_snapshot_sha256": "082f5a4e3648c3f9aaf50429373622bac84b96f5427547ad97181fdfceeab824",
+  "workspace_manifest_file_sha256": "4895c91f699c78c8c6c776655bc2b1a886c4332d933eb82f2e7ad1094b8583ee",
+  "precision": null,
+  "recall": null,
+  "empirical_false_alarms_per_1000km2": null,
+  "iceberg_identification_accuracy": null,
+  "claim_boundary": "Available imagery and raw candidates are not surveyed coverage or adjudicated labels. Detection metrics await actual frozen references and locked evaluation."
+}

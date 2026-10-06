@@ -74,6 +74,16 @@ AI4Arctic acquisition was downloaded solely for the freeze; see its
 [publisher checksum and provenance receipt](../configs/evaluation/new-source-v1.json).
 No SAR or chart arrays from this new source were inspected during setup.
 
+Subsequent Step 4 reference preparation is governed by the additive
+[independent reference protocol](REFERENCE_SET.md) and source-bound
+[access receipt](reference-set/v1/reference-access-release.json). January SAR
+arrays are now decoded solely for human survey images/masks/geolocation, with
+chart context disabled and no detector execution. This is recorded reference
+exposure, not an untouched-pixels claim. Chart labels and model evaluation
+remain sealed; using test images or annotations for tuning requires recording
+that exposure and replacing the test cohort. Original grouping and manifest
+hashes are unchanged.
+
 The initial May 30, 2021 download was inadvertently selected by a legacy
 integration fixture during regression testing. Its detection chain ran, so it
 is explicitly analytical/development data. The replacement is stored under

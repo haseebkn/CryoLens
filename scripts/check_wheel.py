@@ -28,11 +28,16 @@ def main() -> None:
             "from cryolens.config.settings import get_project_config; "
             "from cryolens.geo.aoi import contains_point; "
             "from cryolens.api.main import app; "
+            "from cryolens.reference.design import ReferencePolicy; "
+            "from importlib.resources import files; "
             "from fastapi.testclient import TestClient; "
             'assert get_project_config().project.name == "CryoLens"; '
             "assert contains_point(-52, 48); "
             'assert TestClient(app).get("/").status_code == 200; '
-            'print("Built wheel works outside repository cwd: config, AOI, dashboard.")'
+            'policy = files("cryolens").joinpath("resources/configs/reference/protocol-v1.json"); '
+            "assert ReferencePolicy.model_validate_json(policy.read_text()).repeat_delay_days == 7; "
+            'assert files("cryolens").joinpath("web/static/reference.js").is_file(); '
+            'print("Built wheel works outside repository cwd: config, AOI, dashboard, reference policy and viewer.")'
         )
         subprocess.run([sys.executable, "-c", check], cwd=target, env=environment, check=True)
 

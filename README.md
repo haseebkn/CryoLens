@@ -147,6 +147,15 @@ development/test partitions and real MLflow tracking. Its
 [coverage map](docs/evaluation/v1/coverage.png) shows acquisition footprints;
 eligible surveyed water remains a separate measurement.
 
+The [independent reference workflow](docs/REFERENCE_SET.md) prepares whole-area
+surveys before retained/rejected candidate review, records sampling probabilities,
+and supports concealed repeats, adjudication and exact coverage masks. The
+[real pilot](docs/reference-set/v1/README.md) has 193 development survey tiles,
+28 retained and 68 sampled rejected reviews, and 64 held-out survey tiles.
+**Human review is pending; no reference-derived precision, recall or false-alarm
+rate is available.** January test SAR was prepared for human reference review
+only; its chart labels and model evaluation remain sealed.
+
 The [real SAFE processing report](docs/processing-validation/v1/README.md)
 compares three EW/IW products against actual SNAP 14.0.0 at matched pixels.
 It records quality rejections and unresolved reprojection discrepancies.
@@ -187,6 +196,7 @@ are absent. CI uses locked dependencies and a real PostGIS service.
 |---|---|
 | Statistical radar candidate screening | Implemented; thresholds require regional validation |
 | Analyst review and geographic API | Implemented; local API-key protection |
+| Independent target references | Real survey and stratified candidate packets prepared; human annotation, repeat review and adjudication pending |
 | Sentinel-2 paired review | Planetary Computer and CDSE providers; verified original SAFE alternative, native crops, cloud/shadow/valid-data screening and separate attributed evidence; pilot coverage is limited |
 | SAFE EW/IW calibration and geolocation | Calibration matches SNAP on sampled pixels; legacy EW/IW reprojection discrepancies remain. Absolute geolocation accuracy is not established |
 | ESA standard thermal noise removal | Matches SNAP on sampled pixels, but full-scene HV non-positive fractions are 45.7%, 26.1% and 54.3%; all three tested products are rejected |

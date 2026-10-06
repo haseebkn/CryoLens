@@ -1,0 +1,23 @@
+{
+  "protocol_id": "nl-independent-reference-v1",
+  "schema_version": 1,
+  "parent_protocol": "nl-mda-v1",
+  "seed": 4162026,
+  "survey_core_pixels": 384,
+  "survey_context_pixels": 24,
+  "candidate_context_pixels": 48,
+  "cfar_core_pixels": 512,
+  "min_size_samples_per_stratum": 20,
+  "other_rejection_samples_per_stratum": 8,
+  "repeat_fraction": 0.2,
+  "repeat_delay_days": 7,
+  "uncertain_buffer_pixels": 3,
+  "brightness_edges_db": [-30, -24],
+  "scope": "Independent SAR observable-target references in the frozen NL marine study polygon. Identity is a separate independently corroborated label. Unknowns stay explicit.",
+  "strata": "Scene x first failed suppression stage x component pixel-count class (1, 2, 3, 4-15, 16+) x peak-HV class (<-30, -30 to <-24, >=-24 dB). Retained candidates are a census. Rejected candidates use seeded simple random sampling without replacement inside every nonempty stratum. First rejection is conditional on passing previous stages.",
+  "independence": "Complete survey packets show all valid NL offshore SAR pixels without candidate locations, detector output, chart labels, min_size gating or prior responses. Survey must be completed before the same reviewer receives candidate packets for that acquisition. Development pilot estimates effort; held-out survey-only access needs an explicit source-bound reference release and is logged separately from model evaluation.",
+  "blinding": "Candidate status, strata, sampling weights and earlier responses remain in the controller workspace, outside the served reviewer folder. Repeats use fresh opaque task IDs and shuffled order. Recognizing an image remains possible; this is answer/status concealment, not guaranteed psychological blinding or an OS security boundary.",
+  "area": "Survey domain: finite dual-pol SAR, valid incidence/geolocation, frozen AOI pixel centres and publisher land-distance zones >2. No ice, border, seam, CFAR-support or component-size filter is used in independent survey. Exact core masks and geolocation are persisted. Completed coverage excludes annotated uncertain regions; partial/unusable tasks are unscored. Detection eligibility is stored separately for development and must later be intersected with independently surveyed coverage. Nominal 80 m pixel areas are approximate exposure, not unique regional water area.",
+  "identity": "Resolved ship/iceberg/other identity requires a positive optical, AIS or field observation within six hours, explicit source hash, observed location, matching radius and rationale. Optical evidence additionally requires an inspected clear view, valid source pixels and stated resolution. Optical absence, SAR appearance, IIP context and AIS absence never establish identity.",
+  "reporting": "No empirical precision, recall, false-alarm rate or iceberg-identification accuracy is produced by unreviewed packets. Weighted sampled-candidate totals concern the saved raw component frame, not missed generation or mask-excluded targets. Report nonresponse, uncertain labels, survey completion, reviewer counts and measured timing before extrapolating effort. Regional uncertainty requires more independently surveyed acquisitions."
+}
