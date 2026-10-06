@@ -16,8 +16,11 @@ acquisition time, footprint provenance, exposure status and group assignment.
 Reserved test inputs:
 
 - `20190119T101218_cis_prep.nc`: newly acquired publisher-labelled winter
-  scene, stored outside routine archive discovery. SAR/chart values remain
-  uninspected. Valid chart coverage must be checked at locked evaluation time.
+  scene, stored outside routine archive discovery. At the original freeze,
+  SAR/chart values were uninspected. The subsequent reference-only amendment
+  prepares SAR survey imagery for human annotation; chart labels and model
+  evaluation remain sealed. Valid chart coverage must be checked at locked
+  evaluation time.
 - `S1C_EW_GRDM_1SDH_20260912T090816_20260912T090908_009412_012B82_FF9F_COG.SAFE`:
   authentic downloaded SAFE archive with metadata/integrity-only exposure;
   calibrated processing and independent target/identity annotations remain pending.
@@ -33,6 +36,12 @@ run and its provenance artifacts; it contains no model-performance metrics.
 Footprint area includes land and quality exclusions not yet applied; it is not
 eligible surveyed water. Identical source aliases can be reconstructed as copies
 of the same verified bytes without adding acquisition exposure.
+
+Current reference-only exposure is recorded separately in
+[the pilot receipts](../../reference-set/v1/README.md) and governed by
+[the reference protocol](../../REFERENCE_SET.md). The original sealed manifest,
+acquisition groups and initial exposure ledger are unchanged. Preparing test
+references does not authorize tuning or a test detector run.
 
 The exposure ledger records the initial download inadvertently selected by a
 legacy regression fixture and the rejected duplicate replacement. Neither is

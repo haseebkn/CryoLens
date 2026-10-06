@@ -1,0 +1,83 @@
+{
+  "workspace_id": "a2b7dc7e5cfc43456b17b78b0a9825a1d9b12c8f748715ab012d0b191472317f",
+  "source_sha256": "cf26a69f2d42ecca8c9ba5a11d4f19d22313d73b3a64e57b199a540c561ee58e",
+  "policy_sha256": "bcf377d2ce4f735ff0a7856d7a2c7399af43d4e5f115a61e96505a3ceb13cef0",
+  "seed": 4162026,
+  "frame_sha256": "b4b752c30b5d7e724da2cec5cbb06acab85080c972f05a38857494d708604835",
+  "sample_strata": [
+    {
+      "stratum": "20180428T093937_cis_prep.nc|min_size|1|high",
+      "first_rejection": "min_size",
+      "population_count": 9,
+      "selected_count": 9,
+      "inclusion_probability": 1.0,
+      "method": "census"
+    },
+    {
+      "stratum": "20180428T093937_cis_prep.nc|min_size|1|mid",
+      "first_rejection": "min_size",
+      "population_count": 234,
+      "selected_count": 20,
+      "inclusion_probability": 0.08547008547008547,
+      "method": "simple_random_without_replacement"
+    },
+    {
+      "stratum": "20180428T093937_cis_prep.nc|min_size|2|high",
+      "first_rejection": "min_size",
+      "population_count": 8,
+      "selected_count": 8,
+      "inclusion_probability": 1.0,
+      "method": "census"
+    },
+    {
+      "stratum": "20180428T093937_cis_prep.nc|min_size|2|mid",
+      "first_rejection": "min_size",
+      "population_count": 21,
+      "selected_count": 20,
+      "inclusion_probability": 0.9523809523809523,
+      "method": "simple_random_without_replacement"
+    },
+    {
+      "stratum": "20180428T093937_cis_prep.nc|min_size|3|high",
+      "first_rejection": "min_size",
+      "population_count": 3,
+      "selected_count": 3,
+      "inclusion_probability": 1.0,
+      "method": "census"
+    },
+    {
+      "stratum": "20180428T093937_cis_prep.nc|min_size|3|mid",
+      "first_rejection": "min_size",
+      "population_count": 8,
+      "selected_count": 8,
+      "inclusion_probability": 1.0,
+      "method": "census"
+    },
+    {
+      "stratum": "20180428T093937_cis_prep.nc|retained|16+|high",
+      "first_rejection": "retained",
+      "population_count": 1,
+      "selected_count": 1,
+      "inclusion_probability": 1.0,
+      "method": "census"
+    },
+    {
+      "stratum": "20180428T093937_cis_prep.nc|retained|4-15|high",
+      "first_rejection": "retained",
+      "population_count": 23,
+      "selected_count": 23,
+      "inclusion_probability": 1.0,
+      "method": "census"
+    },
+    {
+      "stratum": "20180428T093937_cis_prep.nc|retained|4-15|mid",
+      "first_rejection": "retained",
+      "population_count": 4,
+      "selected_count": 4,
+      "inclusion_probability": 1.0,
+      "method": "census"
+    }
+  ],
+  "human_responses": 0,
+  "method": "Retained census and stratified simple random sampling without replacement; probability n/N; private task/status mapping withheld from reviewer folder"
+}

@@ -1,0 +1,8 @@
+{
+  "reviewer_id": "REPLACE_WITH_ACTUAL_ADJUDICATOR",
+  "adjudicated_utc": "REPLACE_WITH_ACTUAL_UTC_TIMESTAMP",
+  "notes": "REPLACE: uncertainty, evidence limitations, scope and how disagreements were resolved",
+  "target_ownership_at_core_boundaries_reviewed": false,
+  "independent_reviewer_status": "not_available",
+  "case_resolutions": []
+}

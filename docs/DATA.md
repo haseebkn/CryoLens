@@ -1,5 +1,11 @@
 # Data access and provenance
 
+The [reference pilot](reference-set/v1/README.md) uses verified real AI4Arctic
+source bytes and existing hash-checked optical pairs. January held-out SAR is
+prepared for human reference annotation only; sea-ice chart arrays and model
+evaluation remain sealed. Native grids, imagery and human-response ledgers stay
+outside Git; source hashes, sampling design and preparation receipts are versioned.
+
 Use public data under its own terms; this repository's MIT license covers
 software only. Do not redistribute licensed raw satellite imagery or private
 AIS records in portfolio screenshots or Git without appropriate permission.
