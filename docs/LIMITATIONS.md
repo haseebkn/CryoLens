@@ -44,6 +44,14 @@ assumptions, not measured accuracy or a validated vessel/iceberg drift bound.
 Chips are capped at 6 km radius and explicitly flag larger assumed envelopes.
 An absent counterpart never automatically changes the radar verdict.
 
+The [CDSE alternative-provider verification](optical-review/cdse-v1/README.md)
+verifies original SAFE bytes, but the available acquisition is reprocessed
+from baseline 02.12 to 05.00. Matching acquisition, orbit and tile does not
+establish product or pixel equivalence. BOA offsets are read from each original
+product's XML, and radiometric/SCL differences remain after offset correction.
+The CDSE one-candidate pilot also fails the useful-visibility screen. Alternative
+access does not supply missing target truth or validate fresh SAR processing.
+
 ## 3. Data units and labels
 
 Ready-to-train AI4Arctic fields have been standardized by the publisher.

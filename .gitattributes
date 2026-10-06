@@ -1,2 +1,3 @@
 # Generated catalogue/provenance receipts remain downloadable, with code emphasized in reviews.
 docs/optical-review/v1/*.json linguist-generated=true
+docs/optical-review/cdse-v1/*.json linguist-generated=true

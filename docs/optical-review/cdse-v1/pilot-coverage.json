@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "provider": "cdse",
+  "started_at": "2026-10-06T00:42:06.548189+00:00",
+  "policy": {
+    "version": "s1-s2-review-v1",
+    "search_hours": 12.0,
+    "motion_speed_m_s": 0.5,
+    "sar_geolocation_allowance_m": 100.0,
+    "optical_geolocation_allowance_m": 20.0,
+    "minimum_review_radius_m": 1000.0,
+    "maximum_review_radius_m": 6000.0,
+    "review_grid_spacing_m": 10.0,
+    "cloud_buffer_m": 60.0,
+    "useful_visible_fraction": 0.8,
+    "max_items_per_candidate": 3
+  },
+  "selection": "stored candidate IDs ordered by scene/id; bounded pilot, not a regional sample",
+  "candidate_limit": 1,
+  "selection_truncated": false,
+  "candidates": [
+    {
+      "detection_id": "c2fcafc4-30b9-4763-9012-d8ac8d1b63d5",
+      "sar_scene_id": "3a39ab5d-c6b3-46db-a6d6-bf44578b949f",
+      "sar_source_filename": "20180428T093937_cis_prep.nc",
+      "candidate_lonlat": [
+        -53.644866943359375,
+        52.05863571166992
+      ],
+      "catalogue_complete": true,
+      "candidate_overlapping_items": 2,
+      "item_selection_truncated": false,
+      "asset_failures": [],
+      "pair_ids": [
+        "f9e9f28c13b778048524b9cf6e09a8ba22b4c60b42859eb8cc5dace330577779",
+        "0d6274ea8821e7920717a35484c7a06fc99c971c161829973c8feba895c2c66e"
+      ],
+      "optical_downloaded": true,
+      "screened_useful_optical": false
+    }
+  ],
+  "total_candidates": 1,
+  "candidates_with_downloaded_optical": 1,
+  "candidates_with_screened_useful_optical": 0,
+  "finished_at": "2026-10-06T00:42:32.110791+00:00",
+  "analyst_corroboration_measured": false,
+  "missing_optical_is_false_target": false
+}

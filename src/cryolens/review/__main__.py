@@ -17,13 +17,14 @@ from cryolens.db.models import DetectionModel, OpticalPairModel
 from cryolens.db.session import get_db_session_factory
 from cryolens.eval.cohort import digest, file_digest, load_manifest
 from cryolens.geo.aoi import contains_point
-from cryolens.ingest.sentinel2 import Sentinel2Client, utc
+from cryolens.ingest.sentinel2 import Sentinel2Client, Sentinel2Provider, utc
+from cryolens.ingest.sentinel2_cdse import CDSESentinel2Client
 from cryolens.review.pairs import build_pair, radar_chip
 from cryolens.review.policy import PairingPolicy
 
 
 def catalogue_evaluated(
-    client: Sentinel2Client, output: Path, policy: PairingPolicy
+    client: Sentinel2Provider, output: Path, policy: PairingPolicy
 ) -> dict[str, Any]:
     benchmark = json.loads(Path("docs/benchmarks/audited_results.json").read_text())
     cohort = load_manifest(Path("docs/evaluation/v1/manifest.json"))
@@ -33,6 +34,7 @@ def catalogue_evaluated(
         raise ValueError("Every evaluated scene must have an eligible frozen development record")
     report: dict[str, Any] = {
         "schema_version": 1,
+        "provider": client.provider,
         "policy": policy.model_dump(),
         "denominator": "evaluated development SAR acquisitions",
         "benchmark_sha256": file_digest(Path("docs/benchmarks/audited_results.json")),
@@ -78,6 +80,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--catalogue-evaluated", action="store_true")
     parser.add_argument("--scene-id")
+    parser.add_argument("--candidate-id", help="Inspect one stored development candidate")
+    parser.add_argument(
+        "--provider", choices=["planetary-computer", "cdse"], default="planetary-computer"
+    )
     parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--policy", type=Path, default=Path("configs/optical-review-v1.json"))
     args = parser.parse_args()
@@ -87,19 +93,36 @@ def main() -> int:
     root = settings.data_dir / "processed/optical-review"
     root.mkdir(parents=True, exist_ok=True)
     policy = PairingPolicy.model_validate_json(args.policy.read_text())
-    client = Sentinel2Client()
+    client: Sentinel2Provider = (
+        CDSESentinel2Client() if args.provider == "cdse" else Sentinel2Client()
+    )
+    catalogue_filename = (
+        "catalogue-coverage.json"
+        if args.provider == "planetary-computer"
+        else "catalogue-coverage-cdse.json"
+    )
+    candidate_filename = (
+        "candidate-coverage.json"
+        if args.provider == "planetary-computer"
+        else "candidate-coverage-cdse.json"
+    )
     if args.catalogue_evaluated:
-        report = catalogue_evaluated(client, root / "catalogue-coverage.json", policy)
+        report = catalogue_evaluated(client, root / catalogue_filename, policy)
         return 1 if report["query_failures"] else 0
     with get_db_session_factory()() as session:
         query = select(DetectionModel).order_by(DetectionModel.scene_id, DetectionModel.id)
         if args.scene_id:
             query = query.where(DetectionModel.scene_id == args.scene_id)
+        if args.candidate_id:
+            query = query.where(DetectionModel.id == args.candidate_id)
         candidates = list(session.scalars(query.limit(args.limit + 1)))
+        if args.candidate_id and not candidates:
+            raise ValueError("Requested candidate was not found")
         truncated = len(candidates) > args.limit
         candidates = candidates[: args.limit]
         report = {
             "schema_version": 1,
+            "provider": client.provider,
             "started_at": datetime.now(UTC).isoformat(),
             "policy": policy.model_dump(),
             "selection": "stored candidate IDs ordered by scene/id; bounded pilot, not a regional sample",
@@ -211,9 +234,7 @@ def main() -> int:
                 "screened_useful_optical": any(p["visibility"]["useful_for_review"] for p in pairs),
             }
             report["candidates"].append(entry)
-            (root / "candidate-coverage.json").write_text(
-                json.dumps(report, indent=2), encoding="utf-8"
-            )
+            (root / candidate_filename).write_text(json.dumps(report, indent=2), encoding="utf-8")
             print(
                 candidate.id,
                 entry["optical_downloaded"],
@@ -233,9 +254,7 @@ def main() -> int:
             analyst_corroboration_measured=False,
             missing_optical_is_false_target=False,
         )
-        (root / "candidate-coverage.json").write_text(
-            json.dumps(report, indent=2), encoding="utf-8"
-        )
+        (root / candidate_filename).write_text(json.dumps(report, indent=2), encoding="utf-8")
     return 0
 
 

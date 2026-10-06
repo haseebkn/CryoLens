@@ -160,6 +160,13 @@ screen. These are availability measurements, not iceberg labels or regional
 coverage estimates. Missing optical evidence never automatically rejects a
 radar candidate.
 
+The [CDSE alternative-provider report](docs/optical-review/cdse-v1/README.md)
+adds authenticated original Sentinel-2 SAFE downloads and whole-product
+verification alongside the default Planetary Computer window reads. Two real
+products pass catalogue MD5, ZIP CRC and all 86 manifest file checks each.
+The matched acquisition is a newer processing baseline; it is explicitly
+reported as reprocessed, with baseline-aware native-pixel comparisons.
+
 ```text
 uv run --frozen pytest
 uv run --frozen ruff check .
@@ -180,7 +187,7 @@ are absent. CI uses locked dependencies and a real PostGIS service.
 |---|---|
 | Statistical radar candidate screening | Implemented; thresholds require regional validation |
 | Analyst review and geographic API | Implemented; local API-key protection |
-| Sentinel-2 paired review | Implemented with real native crops, cloud/shadow/valid-data screening and separate attributed evidence; pilot coverage is limited |
+| Sentinel-2 paired review | Planetary Computer and CDSE providers; verified original SAFE alternative, native crops, cloud/shadow/valid-data screening and separate attributed evidence; pilot coverage is limited |
 | SAFE EW/IW calibration and geolocation | Calibration matches SNAP on sampled pixels; legacy EW/IW reprojection discrepancies remain. Absolute geolocation accuracy is not established |
 | ESA standard thermal noise removal | Matches SNAP on sampled pixels, but full-scene HV non-positive fractions are 45.7%, 26.1% and 54.3%; all three tested products are rejected |
 | Fresh SAFE detection deployment | Blocked by separate processing-quality and scientific-release gates; no current producer grants a release |
