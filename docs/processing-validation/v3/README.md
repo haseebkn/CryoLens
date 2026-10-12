@@ -194,7 +194,7 @@ false-alarm rate. Those still require the independent reference reviews.
 
 ## Local code verification
 
-The final full suite passed **419 tests**; 14 archive-dependent detection tests
+The final full suite passed **420 tests**; 14 archive-dependent detection tests
 were skipped in the isolated checkout. Mypy passed 125 source/test files and the
 five evidence drivers; Ruff and formatting passed 170 Python files. New regressions
 exercise real long-path annotation reads, lossless overview preservation, measured
