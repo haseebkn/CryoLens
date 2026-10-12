@@ -146,3 +146,17 @@ The [additional-scene report](short-block-report.json) records the tested short
 noise block, original and adapted scratch provenance, signed comparisons and
 full-product quality. Its independently generated reference remains bound by
 [the short-block receipt](reference-receipts/short-block-receipt.json).
+
+The [MLflow receipt](tracking_receipt.json) records real completed run
+`9f59fb74ce6c42c1aed5c1fabefc9d56` in `cryolens-processing-v2`, logged from the
+clean `4ee9a50` checkout. This is post-hoc evidence logging, with the frozen scope,
+configuration, source snapshot, reference recipes, measured quality diagnostics
+and report hash. It does not claim that `4ee9a50` generated the earlier execution
+receipts, and logs no detector/model performance.
+
+Local verification: 344 portable tests passed (14 archive-dependent tests skipped
+in the isolated checkout), mypy passed 120 files, Ruff and formatting passed,
+and the built wheel decoded its packaged pinned geoid outside the repository.
+Analytic geometry, sampling/nodata and malformed-metadata tests exercise real
+functions. Short-block and padding regressions failed before their fixes. The
+27 real SNAP comparisons provide separate scientific processing evidence.

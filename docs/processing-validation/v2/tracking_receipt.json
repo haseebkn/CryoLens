@@ -1,0 +1,8 @@
+{
+  "run_id": "9f59fb74ce6c42c1aed5c1fabefc9d56",
+  "experiment": "cryolens-processing-v2",
+  "report_sha256": "0f751b184096728675c69a58ef6b7425f5c1e63a96fb46eecff6042990ea9545",
+  "purpose": "Completed processing investigation; no precision, recall or false-alarm measurement",
+  "git_commit": "4ee9a503cc27bc92ab08f79ace26a39a2b586d94",
+  "git_dirty": "false"
+}
