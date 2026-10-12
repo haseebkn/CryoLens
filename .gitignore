@@ -8,8 +8,15 @@ build/
 develop-eggs/
 dist/
 downloads/
-!docs/processing-validation/**/downloads/
-!docs/processing-validation/**/downloads/*.json
+!docs/processing-validation/v3/downloads/
+docs/processing-validation/v3/downloads/*
+!docs/processing-validation/v3/downloads/*.json
+!docs/processing-validation/v3/continuation/downloads/
+docs/processing-validation/v3/continuation/downloads/*
+!docs/processing-validation/v3/continuation/downloads/*.json
+!docs/processing-validation/v3/source-bound-approval/continuation/downloads/
+docs/processing-validation/v3/source-bound-approval/continuation/downloads/*
+!docs/processing-validation/v3/source-bound-approval/continuation/downloads/*.json
 eggs/
 .eggs/
 lib/

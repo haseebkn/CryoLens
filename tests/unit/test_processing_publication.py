@@ -13,6 +13,108 @@ from cryolens.preprocess.quality import QualityPolicy
 from validation.finalise_acquisition_report import main
 
 
+def test_replay_published_source_bound_acquisition_evidence(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import shutil
+
+    published = (
+        Path(__file__).resolve().parents[2] / "docs/processing-validation/v3/source-bound-approval"
+    )
+    inputs = [
+        "report.json",
+        "continuation/report.json",
+        "ew-northern-qualified/report.json",
+        "ew-northern-qualified/marine-quality.json",
+        "iw-northern-reference/report.json",
+    ]
+    inputs.extend(
+        path.relative_to(published).as_posix()
+        for path in (published / "continuation/downloads").glob("*.json")
+    )
+    original_status = (published / "current-status.json").read_bytes()
+    for name in inputs:
+        target = tmp_path / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(published / name, target)
+    monkeypatch.setattr(sys, "argv", ["finalise", "--report-dir", str(tmp_path)])
+    main()
+    status = json.loads((tmp_path / "current-status.json").read_bytes())
+    assert status["downloaded_products"] == 10
+    assert status["qualified_modes"] == ["EW"]
+    assert sum(row["passing_product_checks"] for row in status["products"]) == 1
+    iw = [row for row in status["products"] if row["mode"] == "IW"]
+    assert len(iw) == 7
+    assert all(not row["quality_passed"] and not row["passing_product_checks"] for row in iw)
+    for gate in ("step2_complete", "scientific_release_granted", "deployment_gate_open"):
+        assert status[gate] is False
+    coverage = json.loads((tmp_path / "current-coverage.geojson").read_bytes())
+    assert len(coverage["features"]) == 10
+    assert (tmp_path / "current-coverage.png").is_file()
+    assert (published / "current-status.json").read_bytes() == original_status
+
+
+@pytest.mark.parametrize("autocrlf", ["true", "false"])
+def test_download_receipt_byte_contract_survives_git_checkout(
+    tmp_path: Path, autocrlf: str
+) -> None:
+    import hashlib
+    import subprocess
+
+    from cryolens.preprocess.safe_reader import _open_path
+
+    root = Path(__file__).resolve().parents[2]
+    base = Path("docs/processing-validation/v3")
+    contracts = {}
+    for folder, count in [(base, 9), (base / "continuation", 10)]:
+        report = json.loads((root / folder / "report.json").read_bytes())
+        products = [p for p in report["products"] if "download_receipt_sha256" in p]
+        assert len(products) == count
+        for product in products:
+            path = folder / "downloads" / (product["product"] + ".json")
+            contracts[path] = product["download_receipt_sha256"]
+    bound = base / "source-bound-approval"
+    search = json.loads((root / bound / "continuation/report.json").read_bytes())
+    compared = {
+        json.loads((root / bound / folder / "report.json").read_bytes())["products"][0]["product"]
+        for folder in ("ew-northern-qualified", "iw-northern-reference")
+    }
+    for product in search["products"]:
+        if product["product"] in compared:
+            path = bound / "continuation/downloads" / (product["product"] + ".json")
+            contracts[path] = product["download_receipt_sha256"]
+    assert len(contracts) == 21
+    for name in (".gitattributes", ".gitignore"):
+        (tmp_path / name).write_bytes((root / name).read_bytes())
+
+    def git(*args: str) -> bytes:
+        return subprocess.check_output(
+            [
+                "git", "-C", str(tmp_path), "-c", f"core.autocrlf={autocrlf}",
+                "-c", "core.longpaths=true", *args,
+            ]
+        )
+
+    git("init", "--quiet")
+    for path, expected in contracts.items():
+        content = (root / path).read_bytes()
+        assert hashlib.sha256(content).hexdigest() == expected
+        target = Path(_open_path(tmp_path / path))
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(content)
+    git("add", ".gitattributes", ".gitignore", *(p.as_posix() for p in contracts))
+    for path, expected in contracts.items():
+        assert hashlib.sha256(git("show", ":" + path.as_posix())).hexdigest() == expected
+        target = Path(_open_path(tmp_path / path))
+        target.unlink()
+        git("checkout-index", "--force", path.as_posix())
+        assert hashlib.sha256(target.read_bytes()).hexdigest() == expected
+    for folder in {path.parent for path in contracts}:
+        ignored = folder / "raw-data.bin"
+        assert git("check-ignore", ignored.as_posix()).decode().strip() == ignored.as_posix()
+    assert git("check-ignore", "unrelated/downloads/receipt.json").decode().strip()
+
+
 @pytest.mark.parametrize("autocrlf", ["true", "false"])
 def test_git_preserves_archived_execution_graph_bytes(tmp_path: Path, autocrlf: str) -> None:
     import hashlib

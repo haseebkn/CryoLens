@@ -253,10 +253,12 @@ original source inventory to match processing provenance. Processing failures
 with no HV statistics remain rejections with their reasons and null measurements.
 Partial existing aggregation outputs are refused before any writes.
 
-Published acquisition download-receipt directories are absent from this
-worktree; the broad `downloads/` ignore rule previously excluded them. Scoped
-exceptions now permit processing-validation JSON download receipts to be
-committed in future publications. Existing scientific status snapshots remain
-unchanged. Fresh aggregation requiring a missing receipt rejects explicitly;
-restore only authentic originals matching the already recorded receipt hashes,
-never reconstructed substitutes. No new numerical processing was performed.
+The broad `downloads/` ignore rule previously excluded published acquisition
+receipts. The nine v3 and ten continuation receipts are now restored byte-for-byte
+from ten authentic raw originals, verified against every recorded SHA256.
+The two receipts required for source-bound aggregation are also preserved under
+`v3/source-bound-approval/continuation/downloads`. Scoped JSON-only ignore
+exceptions and the existing `-text` byte contract protect these publications.
+Fresh aggregation verifies one qualified EW, rejected IW and closed release gates;
+existing scientific status snapshots and recorded hashes remain unchanged.
+No new numerical processing was performed.
