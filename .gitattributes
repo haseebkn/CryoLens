@@ -8,3 +8,5 @@ docs/processing-validation/v1/*.json linguist-generated=true
 docs/processing-validation/v1/reference-receipts/*.json linguist-generated=true
 docs/audits/pr6-9/*.json linguist-generated=true
 docs/audits/pr6-9/reference-receipts/*.json linguist-generated=true
+docs/processing-validation/v2/*.json linguist-generated=true
+docs/processing-validation/v2/reference-receipts/*.json linguist-generated=true

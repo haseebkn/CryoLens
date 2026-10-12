@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from cryolens.config.settings import get_app_config
+from cryolens.preprocess.marine_geocoding import MarineGeocoder
 from cryolens.preprocess.python_chain import PurePythonSARProcessor
 from cryolens.preprocess.quality import (
     ProcessingQualityError,
@@ -58,6 +59,7 @@ def main() -> int:
             hh["latitude"],
             hh["longitude"],
             apply_denoise=False,
+            marine_geocoder=MarineGeocoder(reader._find_for_polarisation("HH")[1]),
         )
         output = COGStackBuilder(args.output_dir).build_and_export_cog(
             scene_id=safe.stem,
@@ -65,10 +67,14 @@ def main() -> int:
             transform=result["transform"],
             crs=result["crs"],
             nodata=result["nodata"],
-            provenance={"source_kind": "sentinel1_safe", "processing_quality": "passed"},
+            provenance={
+                "source_kind": "sentinel1_safe",
+                "processing_quality": "passed",
+                **result["geocoding_provenance"],
+            },
         )
         logger.info(
-            "Wrote %s using annotation GCPs; precise orbit and terrain correction are not applied.",
+            "Wrote %s using marine range-Doppler geocoding with EGM96 sea-surface height.",
             output,
         )
         return 0

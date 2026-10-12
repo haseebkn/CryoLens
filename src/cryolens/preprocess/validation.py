@@ -21,6 +21,7 @@ from rio_cogeo.cogeo import cog_validate
 from skimage.registration import phase_cross_correlation
 
 from cryolens.eval.cohort import acquisition_id, file_digest, load_manifest
+from cryolens.preprocess.marine_geocoding import MarineGeocoder
 from cryolens.preprocess.python_chain import PurePythonSARProcessor
 from cryolens.preprocess.quality import ProcessingQualityError, assess_safe_product
 from cryolens.preprocess.safe_reader import SAFEProductReader, _open_path, _parse_product_annotation
@@ -240,6 +241,8 @@ def compare_window(
         hh["latitude"],
         hh["longitude"],
         destination_grid=destination_grid,
+        marine_geocoder=MarineGeocoder(reader._find_for_polarisation("HH")[1]),
+        source_window=window,
     )
     cog = COGStackBuilder(output).build_and_export_cog(
         prefix.name,
@@ -249,6 +252,7 @@ def compare_window(
             "source_kind": "sentinel1_safe",
             "processing_quality": "rejected",
             "purpose": "uncorrected-power geocoding diagnostic; never detection",
+            **result["geocoding_provenance"],
         },
     )
     is_valid, errors, warnings = cog_validate(str(cog))
@@ -333,6 +337,9 @@ def run_reference(
         "512M",
         "-J-Xmx4G",
     ]
+    geo_region = reference_geo_region(scratch, graph, window)
+    if geo_region is not None:
+        command.append("-Pgeo_region=" + geo_region)
     result = subprocess.run(
         command, capture_output=True, text=True, encoding="utf-8", errors="replace"
     )
@@ -341,6 +348,19 @@ def run_reference(
     if result.returncode or "Error:" in log or "StackOverflowError" in log:
         raise RuntimeError("Independent SNAP run failed; see " + str(prefix) + ".log")
     write_reference_receipt(scratch, graph, prefix, window, image)
+
+
+def reference_geo_region(
+    scratch: Path, graph: Path, window: tuple[int, int, int, int]
+) -> str | None:
+    """Clip after range-Doppler processing, retaining original timing/range geometry."""
+    if ET.parse(graph).find("node[@id='GeoSubset']/parameters/geoRegion") is None:
+        return None
+    hh = SAFEProductReader(scratch).read_sigma0("HH", False, window=window)
+    lat, lon = hh["latitude"], hh["longitude"]
+    west, east = float(lon.min()) - 0.002, float(lon.max()) + 0.002
+    south, north = float(lat.min()) - 0.002, float(lat.max()) + 0.002
+    return f"POLYGON(({west} {south},{east} {south},{east} {north},{west} {north},{west} {south}))"
 
 
 def reference_identity(
@@ -352,6 +372,7 @@ def reference_identity(
     ).strip()
     return {
         "window": list(window),
+        "geographic_subset": reference_geo_region(scratch, graph, window),
         "image_id": runtime,
         "graph_sha256": file_digest(graph),
         "scratch_files_sha256": {
@@ -452,7 +473,7 @@ def validate_configuration(config: dict[str, Any]) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", type=Path, default=Path("configs/sentinel1-validation-v1.json"))
+    parser.add_argument("--config", type=Path, default=Path("configs/sentinel1-validation-v2.json"))
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--scratch-dir", type=Path, required=True)
     parser.add_argument("--reference-image", default="cryolens-snap-reference:14.0.0")
@@ -496,6 +517,7 @@ def main() -> int:
                 "quality.py",
                 "safe_reader.py",
                 "python_chain.py",
+                "marine_geocoding.py",
                 "stack.py",
             )
         },

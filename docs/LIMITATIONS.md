@@ -101,9 +101,9 @@ comparison with trusted processing on real SAFE products. Running SNAP and
 then ignoring its output is no longer presented as a successful SNAP pipeline.
 Unsupported engines and missing inputs fail explicitly.
 
-### Validation outcome, 2026-10-05
+### Validation outcome, 2026-10-12
 
-The [reproducible processing report](processing-validation/v1/README.md)
+The [reproducible processing report](processing-validation/v2/README.md)
 supersedes the earlier scene-median comparison. Similar extents and medians
 did not confirm calibration or absolute geolocation accuracy.
 
@@ -114,9 +114,10 @@ HV non-positive fractions nevertheless remain about 45.7%, 26.1% and 54.3%,
 respectively. All three fail the conservative project quality preset. Negative
 residuals are retained for diagnostics; no positive floor manufactures data.
 
-Fresh EW windows pass the tested geometric comparisons, but legacy EW and IW
-retain spatial/resampled-radiometry discrepancies. Common annotation agreement
-does not establish absolute accuracy. The fresh SAFE deployment gate remains
+V2 corrects the marine height datum, range-dependent timing and resampling,
+and preserves full acquisition geometry in the reference before cropping output.
+The earlier cropped-reference geometric decisions are superseded. Comparisons
+against SNAP do not establish surveyed absolute accuracy. The fresh SAFE deployment gate remains
 closed, and rejected products write machine-readable reasons before detection.
 The 5% non-positive threshold is a research acceptance preset, not a published
 ESA or C-CORE requirement.

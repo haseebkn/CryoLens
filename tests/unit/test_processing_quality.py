@@ -58,6 +58,59 @@ def test_azimuth_noise_extrapolates_to_declared_block_edge(safe_product: Path) -
     assert power[39, 0] == pytest.approx(100 - 4 * 4.25 / 10000, abs=1e-5)
 
 
+def test_short_azimuth_block_uses_nearest_qualified_swath_range_vector(safe_product: Path) -> None:
+    from cryolens.preprocess.safe_reader import _noise_power_grid
+
+    path = next((safe_product / "annotation/calibration").glob("noise-*hv*.xml"))
+    vectors = "".join(
+        f"<noiseAzimuthVector><swath>EW1</swath><firstAzimuthLine>{lo}</firstAzimuthLine>"
+        f"<lastAzimuthLine>{hi}</lastAzimuthLine><firstRangeSample>0</firstRangeSample>"
+        f"<lastRangeSample>59</lastRangeSample><line>{lo} {hi}</line>"
+        "<noiseAzimuthLut>1 1</noiseAzimuthLut></noiseAzimuthVector>"
+        for lo, hi in [(0, 9), (10, 19), (20, 39)]
+    )
+    path.write_text(
+        path.read_text().replace(
+            "</noise>", f"<noiseAzimuthVectorList>{vectors}</noiseAzimuthVectorList></noise>"
+        )
+    )
+    power = _noise_power_grid(path, (40, 60), full_shape=(40, 60))
+    np.testing.assert_allclose(power, 4)
+    # The fallback is annotation-derived, and must not invent a profile when
+    # the nearest vectors contain no valid noise within this swath's range.
+    path.write_text(path.read_text().replace("<noiseRangeLut>4.0 4.0", "<noiseRangeLut>0.0 0.0"))
+    with pytest.raises(ValueError, match="qualified"):
+        _noise_power_grid(path, (40, 60), full_shape=(40, 60))
+
+
+def test_unannotated_noise_padding_is_allowed_only_for_actual_nodata(safe_product: Path) -> None:
+    reader = SAFEProductReader(safe_product)
+    measurement = reader._find_for_polarisation("HV")[0]
+    with rasterio.open(measurement, "r+") as raster:
+        data = raster.read(1)
+        data[:, :10] = data[:, 50:] = 0
+        raster.write(data, 1)
+    noise = next((safe_product / "annotation/calibration").glob("noise-*hv*.xml"))
+    noise.write_text(
+        noise.read_text().replace(
+            "</noise>",
+            "<noiseAzimuthVectorList><noiseAzimuthVector><firstAzimuthLine>0</firstAzimuthLine><lastAzimuthLine>39</lastAzimuthLine><firstRangeSample>10</firstRangeSample><lastRangeSample>49</lastRangeSample><line>0 39</line><noiseAzimuthLut>1 1</noiseAzimuthLut></noiseAzimuthVector></noiseAzimuthVectorList></noise>",
+        )
+    )
+    result = reader.read_sigma0("HV")
+    assert np.isnan(result["sigma0_linear"][:, :10]).all()
+    np.testing.assert_allclose(
+        result["sigma0_linear"][:, 10:50],
+        (data[:, 10:50].astype(float) ** 2 - 4) / 10000,
+        rtol=1e-6,
+    )
+    with rasterio.open(measurement, "r+") as raster:
+        data[:, 0] = 1000
+        raster.write(data, 1)
+    with pytest.raises(ValueError, match="cover"):
+        reader.read_sigma0("HV")
+
+
 def test_iw_uses_actual_annotation_not_nominal_ew_ramp(safe_product: Path) -> None:
     iw = safe_product.with_name("S1A_IW_GRDH_1SDH_TEST.SAFE")
     safe_product.rename(iw)

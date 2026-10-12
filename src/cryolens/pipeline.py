@@ -156,6 +156,8 @@ class PipelineRunner:
             target_crs=self.config.project.spatial.target_crs,
             pixel_spacing_m=self.config.project.spatial.pixel_spacing_m,
         )
+        from cryolens.preprocess.marine_geocoding import MarineGeocoder
+
         result = processor.process_calibrated_arrays(
             sigma0_hh_linear=hh["sigma0_linear"],
             sigma0_hv_linear=hv["sigma0_linear"],
@@ -163,6 +165,7 @@ class PipelineRunner:
             latitude=hh["latitude"],
             longitude=hh["longitude"],
             apply_denoise=False,
+            marine_geocoder=MarineGeocoder(reader._find_for_polarisation("HH")[1]),
         )
 
         stack_builder = COGStackBuilder(output_dir=self.output_dir / scene.scene_id)
@@ -171,7 +174,11 @@ class PipelineRunner:
             bands=result["bands"],
             transform=result["transform"],
             crs=result["crs"],
-            provenance={"source_kind": "sentinel1_safe", "processing_quality": "passed"},
+            provenance={
+                "source_kind": "sentinel1_safe",
+                "processing_quality": "passed",
+                **result["geocoding_provenance"],
+            },
         )
         logger.info("Wrote calibrated 4-band COG: %s", cog_path)
         return cog_path

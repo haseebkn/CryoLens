@@ -29,6 +29,7 @@ def main() -> None:
             "from cryolens.geo.aoi import contains_point; "
             "from cryolens.api.main import app; "
             "from cryolens.reference.design import ReferencePolicy; "
+            "from cryolens.preprocess.marine_geocoding import geoid_archive_path, _geoid_grid; "
             "from importlib.resources import files; "
             "from fastapi.testclient import TestClient; "
             'assert get_project_config().project.name == "CryoLens"; '
@@ -37,6 +38,7 @@ def main() -> None:
             'policy = files("cryolens").joinpath("resources/configs/reference/protocol-v1.json"); '
             "assert ReferencePolicy.model_validate_json(policy.read_text()).repeat_delay_days == 7; "
             'assert files("cryolens").joinpath("web/static/reference.js").is_file(); '
+            "assert _geoid_grid(geoid_archive_path().read_bytes()).shape == (721, 1441); "
             'print("Built wheel works outside repository cwd: config, AOI, dashboard, reference policy and viewer.")'
         )
         subprocess.run([sys.executable, "-c", check], cwd=target, env=environment, check=True)

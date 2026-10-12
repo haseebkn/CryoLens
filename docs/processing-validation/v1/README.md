@@ -1,5 +1,10 @@
 # Real Sentinel-1 processing validation v1
 
+**Historical investigation, superseded by [v2](../v2/README.md).** Its raw
+calibration/noise evidence remains useful, but the geocoding graph cropped before
+range-Doppler processing and changed the timing reference metadata. The v1
+geometric pass/fail decisions cannot qualify the current marine processor.
+
 **Fresh SAFE deployment gate: CLOSED.** No tested product passes the combined
 radiometric usability and scientific comparison gate. This work implements the
 investigation, IW reader support, rejection handling and reproducible checks;

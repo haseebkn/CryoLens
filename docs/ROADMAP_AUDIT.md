@@ -1,5 +1,10 @@
 # Roadmap audit: PRs #6–#9
 
+Later processing investigation: [v2](processing-validation/v2/README.md) corrects
+the reference cropping, height/timing assumptions, resampling and short-block
+noise handling. The geometric conclusions below are the historical audit
+snapshot; the deployment gate remains closed for measured radiometric usability.
+
 Audit date: 12 October 2026. Reviewed stack head:
 `e29986877035588f50dff47ecbdfc39df86a02f4`.
 This is an implementation and development-evidence audit, not a scientific

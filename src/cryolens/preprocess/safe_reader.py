@@ -96,6 +96,7 @@ class CalibrationLUT:
         shape: tuple[int, int],
         offset: tuple[int, int] = (0, 0),
         extrapolate_lines: bool = False,
+        extrapolate_pixels: bool = False,
     ) -> NDArray[np.float32]:
         """Bilinearly expand the LUT onto a full raster of ``shape``.
 
@@ -128,7 +129,8 @@ class CalibrationLUT:
         # Interpolate along pixels for each annotated line.
         by_line = np.empty((unique_lines.size, n_samples), dtype=np.float64)
         for r in range(unique_lines.size):
-            by_line[r] = np.interp(target_pixels, unique_pixels.astype(np.float64), grid[r])
+            interpolate = _interp_extrapolate_1d if extrapolate_pixels else np.interp
+            by_line[r] = interpolate(target_pixels, unique_pixels.astype(np.float64), grid[r])
 
         # Then along lines for every output row, chunked to bound peak memory.
         src_lines = unique_lines.astype(np.float64)
@@ -254,6 +256,7 @@ def _noise_power_grid(
     shape: tuple[int, int],
     offset: tuple[int, int] = (0, 0),
     full_shape: tuple[int, int] | None = None,
+    valid_pixels: NDArray[np.bool_] | None = None,
 ) -> NDArray[np.float32]:
     """Multiply ESA range noise by the annotated azimuth factors (IPF >= 2.90).
 
@@ -302,21 +305,50 @@ def _noise_power_grid(
             # azimuth block, then extrapolates the bracketing vectors at the
             # block edges. Interpolating globally blends different blocks.
             in_block = (lut.lines >= r0) & (lut.lines < r1)
-            if not in_block.any():
-                raise ValueError("Azimuth block has no qualified range noise vectors.")
+            fallback = not in_block.any()
+            if fallback:
+                # MPC-0392 v2.2 section 6.3.2.2: a short block may have no knot.
+                # Choose the nearest range vector within this subswath's extent,
+                # using its measured samples, never an invented noise profile.
+                swath = required("swath")
+                swath_blocks = [v for v in vectors if v.findtext("swath") == swath]
+                first = min(int(required("firstAzimuthLine", v)) for v in swath_blocks)
+                last = max(int(required("lastAzimuthLine", v)) for v in swath_blocks)
+                candidates = np.unique(lut.lines[(lut.lines >= first) & (lut.lines <= last)])
+                ordered_candidates = sorted(
+                    candidates, key=lambda line: abs(float(line) - (r0 + r1 - 1) / 2)
+                )
+                for line in ordered_candidates:
+                    selected = (lut.lines == line) & (lut.pixels >= c0) & (lut.pixels < c1)
+                    if selected.sum() >= 2 and np.all(lut.values[selected] > 0):
+                        # Keep measured bracketing range knots. Trimming them at
+                        # a merge edge extrapolates its steep slope into negative
+                        # noise; SNAP interpolates the chosen complete vector.
+                        in_block = lut.lines == line
+                        break
+                if not in_block.any():
+                    raise ValueError("Azimuth block has no qualified range noise vectors.")
             block_lut = CalibrationLUT(
                 lut.lines[in_block], lut.pixels[in_block], lut.values[in_block]
             )
             power[rr0 - wr0 : rr1 - wr0, cc0 - wc0 : cc1 - wc0] = block_lut.interpolate(
-                (rr1 - rr0, cc1 - cc0), (rr0, cc0), extrapolate_lines=True
+                (rr1 - rr0, cc1 - cc0),
+                (rr0, cc0),
+                extrapolate_lines=True,
+                extrapolate_pixels=fallback,
             )
             factors[rr0 - wr0 : rr1 - wr0, cc0 - wc0 : cc1 - wc0] = _interp_extrapolate_1d(
                 np.arange(rr0, rr1), lines, values
             )[:, None]
-    if not np.isfinite(factors).all() or np.any(factors < 0):
-        raise ValueError("Azimuth noise annotation does not cover the full measurement grid.")
-    if np.any(power < 0) or not np.isfinite(power).all():
-        raise ValueError("Noise power must be finite and nonnegative across the measurement.")
+    required_pixels = np.ones(shape, dtype=bool) if valid_pixels is None else valid_pixels
+    if required_pixels.shape != shape:
+        raise ValueError("Noise validity mask differs from the measurement window")
+    if not np.isfinite(factors[required_pixels]).all() or np.any(factors[required_pixels] < 0):
+        raise ValueError("Azimuth noise annotation does not cover valid measurement pixels.")
+    if np.any(power[required_pixels] < 0) or not np.isfinite(power[required_pixels]).all():
+        raise ValueError(
+            "Noise power must be finite and nonnegative across valid measurement pixels."
+        )
     return np.asarray(power * factors, dtype=np.float32)
 
 
@@ -481,7 +513,7 @@ class SAFEProductReader:
         if remove_thermal_noise and not noise_removed:
             if noise_path is None:
                 raise ValueError("Thermal noise removal requested but noise annotation is missing.")
-            noise_power = _noise_power_grid(noise_path, shape, offset, full_shape).astype(
+            noise_power = _noise_power_grid(noise_path, shape, offset, full_shape, valid).astype(
                 np.float64
             )
             # The noise LUT is expressed in DN^2, so it is divided by the same

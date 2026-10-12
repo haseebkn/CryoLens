@@ -10,6 +10,7 @@ from rasterio.transform import from_bounds
 from rasterio.warp import calculate_default_transform, reproject
 
 from cryolens.config.settings import get_app_config
+from cryolens.preprocess.marine_geocoding import MarineGeocoder
 from cryolens.preprocess.s1denoise import S1SubswathDenoise
 
 logger = logging.getLogger(__name__)
@@ -60,6 +61,8 @@ class PurePythonSARProcessor:
         apply_denoise: bool = False,
         gcp_step: int = 64,
         destination_grid: tuple[Any, int, int] | None = None,
+        marine_geocoder: MarineGeocoder | None = None,
+        source_window: tuple[int, int, int, int] | None = None,
     ) -> dict[str, Any]:
         """Build the 4-band stack from already-calibrated sigma-nought.
 
@@ -150,6 +153,60 @@ class PurePythonSARProcessor:
 
         nodata_val = -9999.0
         reprojected_bands: dict[str, NDArray[np.floating]] = {}
+        if marine_geocoder is not None:
+            window = source_window or (0, 0, h, w)
+            if window[2:] != (h, w):
+                raise ValueError("Geocoding source window differs from supplied arrays")
+            reprojected_bands = marine_geocoder.resample(
+                raw_stack, valid, window, (dst_transform, dst_w, dst_h), self.target_crs, nodata_val
+            )
+        else:
+            reprojected_bands = self._warp_gcps(
+                raw_stack, valid, gcps, dst_transform, dst_w, dst_h, nodata_val
+            )
+        output_valid = np.ones((dst_h, dst_w), dtype=bool)
+        for values in reprojected_bands.values():
+            output_valid &= np.isfinite(values) & (values != nodata_val)
+        output_valid &= (reprojected_bands["hh_linear"] > 0) & (reprojected_bands["hv_linear"] > 0)
+        if not output_valid.any():
+            raise ValueError("Reprojection produced no valid observations.")
+        hh_db = np.full((dst_h, dst_w), nodata_val, dtype=np.float32)
+        hv_db = hh_db.copy()
+        hh_db[output_valid] = 10 * np.log10(reprojected_bands.pop("hh_linear")[output_valid])
+        hv_db[output_valid] = 10 * np.log10(reprojected_bands.pop("hv_linear")[output_valid])
+        ratio = np.full((dst_h, dst_w), nodata_val, dtype=np.float32)
+        ratio[output_valid] = hh_db[output_valid] - hv_db[output_valid]
+        reprojected_bands["incidence_angle"][~output_valid] = nodata_val
+        reprojected_bands.update(sigma0_hh_db=hh_db, sigma0_hv_db=hv_db, ratio_hh_hv=ratio)
+
+        return {
+            "bands": reprojected_bands,
+            "transform": dst_transform,
+            "crs": self.target_crs,
+            "shape": (dst_h, dst_w),
+            "nodata": nodata_val,
+            "geolocation_method": "marine_range_doppler" if marine_geocoder else "annotation_gcps",
+            "height_datum": "EGM96_mean_sea_surface" if marine_geocoder else "annotation",
+            "orbit_correction_applied": False,
+            "terrain_correction_applied": False,
+            "resampling_domain": "linear_power",
+            "resampling_kernel": "bilinear_point" if marine_geocoder else "gdal_bilinear",
+            "geocoding_provenance": marine_geocoder.provenance() if marine_geocoder else {},
+        }
+
+    def _warp_gcps(
+        self,
+        raw_stack: dict[str, Any],
+        valid: NDArray,
+        gcps: list[Any],
+        dst_transform: Any,
+        dst_w: int,
+        dst_h: int,
+        nodata_val: float,
+    ) -> dict[str, Any]:
+        """Retain the annotation-GCP helper for explicitly unqualified experiments."""
+        src_crs = "EPSG:4326"
+        reprojected_bands = {}
         for band_name, band_arr in raw_stack.items():
             dst_arr = np.full((dst_h, dst_w), nodata_val, dtype=np.float32)
             reproject(
@@ -178,32 +235,9 @@ class PurePythonSARProcessor:
             resampling=Resampling.nearest,
             dst_nodata=0,
         )
-        output_valid = support > 0
         for values in reprojected_bands.values():
-            output_valid &= np.isfinite(values) & (values != nodata_val)
-        output_valid &= (reprojected_bands["hh_linear"] > 0) & (reprojected_bands["hv_linear"] > 0)
-        if not output_valid.any():
-            raise ValueError("Reprojection produced no valid observations.")
-        hh_db = np.full((dst_h, dst_w), nodata_val, dtype=np.float32)
-        hv_db = hh_db.copy()
-        hh_db[output_valid] = 10 * np.log10(reprojected_bands.pop("hh_linear")[output_valid])
-        hv_db[output_valid] = 10 * np.log10(reprojected_bands.pop("hv_linear")[output_valid])
-        ratio = np.full((dst_h, dst_w), nodata_val, dtype=np.float32)
-        ratio[output_valid] = hh_db[output_valid] - hv_db[output_valid]
-        reprojected_bands["incidence_angle"][~output_valid] = nodata_val
-        reprojected_bands.update(sigma0_hh_db=hh_db, sigma0_hv_db=hv_db, ratio_hh_hv=ratio)
-
-        return {
-            "bands": reprojected_bands,
-            "transform": dst_transform,
-            "crs": self.target_crs,
-            "shape": (dst_h, dst_w),
-            "nodata": nodata_val,
-            "geolocation_method": "annotation_gcps",
-            "orbit_correction_applied": False,
-            "terrain_correction_applied": False,
-            "resampling_domain": "linear_power",
-        }
+            values[support == 0] = nodata_val
+        return reprojected_bands
 
     def process_scene_arrays(
         self,

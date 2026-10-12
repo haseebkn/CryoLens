@@ -12,10 +12,20 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--report-dir", type=Path, required=True)
     parser.add_argument("--tracking-uri", required=True)
+    parser.add_argument("--config", type=Path)
     args = parser.parse_args()
     report_path = args.report_dir / "report.json"
     report = json.loads(report_path.read_text(encoding="utf-8"))
-    configuration = json.loads(Path("configs/sentinel1-validation-v1.json").read_text())
+    version = "v2" if report.get("schema_version", 1) >= 2 else "v1"
+    config_path = args.config or Path(f"configs/sentinel1-validation-{version}.json")
+    configuration = json.loads(config_path.read_text())
+    experiment_name = "cryolens-processing-" + version
+    image_ids = {
+        json.loads(p.read_text())["image_id"]
+        for p in (args.report_dir / "reference-receipts").glob("*-receipt.json")
+    }
+    if len(image_ids) != 1:
+        raise ValueError("Processing tracking needs one consistent verified reference runtime")
     with tracked_experiment(
         manifest_path=Path(configuration["frozen_manifest"]),
         project_root=Path.cwd(),
@@ -26,18 +36,34 @@ def main() -> None:
             "purpose": "Post-hoc processing investigation; no detector performance evaluation",
             "configuration": configuration,
             "completed_report_sha256": file_digest(report_path),
-            "actual_inputs": [p["provenance"] for p in report["products"]],
+            "actual_inputs": [
+                p.get(
+                    "provenance",
+                    {
+                        "product": p["product"],
+                        "mode": p["mode"],
+                        "source_hashes_verified": p["source_hashes_verified"],
+                        "baseline_report_sha256": report["baseline_report_sha256"],
+                    },
+                )
+                if version == "v2"
+                else p["provenance"]
+                for p in report["products"]
+            ],
+            "activity": "Post-hoc logging of completed processing evidence; generation source is separately preserved in the executed-code artifact",
         },
         tracking_uri=args.tracking_uri,
-        experiment_name="cryolens-processing-v1",
+        experiment_name=experiment_name,
     ) as run:
-        run.client.set_tag(run.run_id, "mlflow.runName", "sentinel1-processing-validation-v1")
+        run.client.set_tag(
+            run.run_id, "mlflow.runName", "sentinel1-processing-validation-" + version
+        )
         run.client.set_tag(run.run_id, "activity", "processing_validation_development_inputs")
         run.client.set_tag(
             run.run_id, "deployment_gate_open", str(report["deployment_gate_open"]).lower()
         )
         run.client.log_param(run.run_id, "validation_products", len(report["products"]))
-        run.client.log_param(run.run_id, "reference_image_id", report["reference_image_id"])
+        run.client.log_param(run.run_id, "reference_image_id", next(iter(image_ids)))
         for index, product in enumerate(report["products"]):
             run.log_metrics(
                 {
@@ -60,7 +86,7 @@ def main() -> None:
         run.log_artifact(Path(configuration["graph"]), "reference_recipes")
         receipt = {
             "run_id": run.run_id,
-            "experiment": "cryolens-processing-v1",
+            "experiment": experiment_name,
             "report_sha256": file_digest(report_path),
             "purpose": "Completed processing investigation; no precision, recall or false-alarm measurement",
             "git_commit": run.client.get_run(run.run_id).data.tags["git_commit"],
