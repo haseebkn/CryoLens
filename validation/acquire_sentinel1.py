@@ -20,6 +20,7 @@ import httpx
 from cryolens.config.settings import Settings
 from cryolens.eval.cohort import acquisition_id, file_digest, load_manifest
 from cryolens.ingest.cdse import CDSEClient
+from cryolens.preprocess.provenance import safe_file_inventory
 from cryolens.preprocess.quality import ProcessingQualityError, QualityPolicy, assess_safe_product
 from cryolens.preprocess.safe_reader import SAFEProductReader, _open_path
 
@@ -123,9 +124,8 @@ def main() -> None:
             receipt = json.loads(receipt_path.read_text())
             if receipt["catalogue"]["Id"] != record["id"] or receipt["catalogue"]["Name"] != name:
                 raise ValueError("Cached download catalogue identity changed")
-            for member, digest in receipt["safe_files_sha256"].items():
-                if file_digest(safe / member) != digest:
-                    raise ValueError("Previously downloaded file changed")
+            if safe_file_inventory(safe) != receipt["safe_files_sha256"]:
+                raise ValueError("Previously downloaded SAFE source inventory changed")
         else:
             if safe.exists():
                 raise ValueError("Unreceipted SAFE already exists")
@@ -223,11 +223,7 @@ def main() -> None:
                 "plan_sha256": file_digest(args.plan),
                 "frozen_manifest_sha256": file_digest(Path(plan["frozen_manifest"])),
                 "purpose": "processing development only; excluded from frozen test groups",
-                "safe_files_sha256": {
-                    x.relative_to(safe).as_posix(): file_digest(x)
-                    for x in sorted(safe.rglob("*"))
-                    if x.is_file()
-                },
+                "safe_files_sha256": safe_file_inventory(safe),
             }
             receipt_path.write_text(json.dumps(receipt, indent=2, allow_nan=False))
             print("Downloaded and verified authentic SAFE:", name, "bytes", total, flush=True)

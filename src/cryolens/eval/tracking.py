@@ -37,9 +37,13 @@ def code_provenance(project_root: Path) -> dict[str, Any]:
         return subprocess.check_output(["git", "-C", str(project_root), *args], text=True).strip()
 
     files = {}
-    for folder in ("src", "scripts", "configs"):
+    for folder in ("src", "scripts", "configs", "validation"):
         for path in sorted((project_root / folder).rglob("*")):
-            if path.is_file() and path.suffix in {".py", ".json", ".yaml", ".geojson", ".xml"}:
+            if (
+                path.is_file()
+                and path.suffix in {".py", ".json", ".yaml", ".geojson", ".xml"}
+                and (folder != "validation" or path.suffix == ".py")
+            ):
                 files[path.relative_to(project_root).as_posix()] = file_digest(path)
     for name in ("pyproject.toml", "uv.lock"):
         path = project_root / name
@@ -55,6 +59,7 @@ def code_provenance(project_root: Path) -> dict[str, Any]:
                 "src",
                 "scripts",
                 "configs",
+                ":(glob)validation/**/*.py",
                 "pyproject.toml",
                 "uv.lock",
             )

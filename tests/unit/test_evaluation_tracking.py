@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -66,6 +68,14 @@ def test_real_tracking_logs_manifest_configuration_code_and_no_performance(
     provenance = json.loads(Path(downloaded).read_text())
     assert ".env" not in provenance["source_files_sha256"]
     assert provenance["preprocessing_sha256"]
+    snapshot = client.download_artifacts(run_id, "provenance/code_snapshot.zip")
+    with zipfile.ZipFile(snapshot) as archive:
+        assert set(archive.namelist()) == set(provenance["source_files_sha256"])
+        driver = "validation/track_report.py"
+        assert (
+            hashlib.sha256(archive.read(driver)).hexdigest()
+            == provenance["source_files_sha256"][driver]
+        )
 
 
 def test_failed_experiment_is_persisted_as_failed(scope: tuple[Path, str]) -> None:

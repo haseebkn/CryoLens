@@ -20,6 +20,7 @@ from shapely.geometry import shape
 
 from cryolens.eval.cohort import file_digest
 from cryolens.geo.aoi import load_aoi
+from cryolens.preprocess.provenance import safe_file_inventory
 from cryolens.preprocess.quality import QualityPolicy
 from cryolens.preprocess.safe_reader import _open_path
 
@@ -121,9 +122,8 @@ def main() -> None:
         ):
             raise ValueError("Archive differs from live catalogue receipt")
         safe = Path(_open_path(product / name))
-        for member, expected_sha in receipt["safe_files_sha256"].items():
-            if file_digest(safe / member) != expected_sha:
-                raise ValueError("Extracted source changed")
+        if safe_file_inventory(safe) != receipt["safe_files_sha256"]:
+            raise ValueError("Extracted SAFE source inventory changed")
         if name not in quality_by_name:
             raise ValueError("Full quality scan missing for " + name)
         p, q = quality_by_name[name]

@@ -9,6 +9,18 @@ from cryolens.eval.cohort import file_digest
 from cryolens.preprocess.safe_reader import SAFEProductReader, _open_path
 
 
+def safe_file_inventory(safe: Path) -> dict[str, str]:
+    """Inventory every original extracted SAFE file, including additional components."""
+    safe = Path(_open_path(safe))
+    if not safe.is_dir() or not (safe / "manifest.safe").is_file():
+        raise ValueError("Original SAFE file inventory incomplete")
+    return {
+        path.relative_to(safe).as_posix(): file_digest(path)
+        for path in sorted(safe.rglob("*"))
+        if path.is_file()
+    }
+
+
 def safe_source_inventory(reader: SAFEProductReader) -> dict[str, str]:
     safe = Path(_open_path(reader.safe_dir))
     paths = [
