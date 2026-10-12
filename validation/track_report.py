@@ -7,10 +7,11 @@ from typing import Any
 
 from cryolens.eval.cohort import file_digest
 from cryolens.eval.tracking import tracked_experiment
+from cryolens.preprocess.validation import execution_artifact_bytes
 
 
 def processing_recipe(
-    report: dict[str, Any], supplied: Path | None = None
+    report: dict[str, Any], supplied: Path | None = None, snapshot: Path | None = None
 ) -> tuple[Path, dict[str, Any], str]:
     """Select a recipe from bound execution evidence, independent of report schema."""
     graph_hash = report.get("graph_sha256")
@@ -22,10 +23,22 @@ def processing_recipe(
     )
     matches = []
     for path in candidates:
-        configuration = json.loads(path.read_text(encoding="utf-8"))
-        if configuration_hash and file_digest(path) != configuration_hash:
-            continue
-        if file_digest(Path(configuration["graph"])) != graph_hash:
+        try:
+            content = (
+                execution_artifact_bytes(
+                    path, configuration_hash, snapshot, report.get("execution_snapshot_sha256")
+                )
+                if configuration_hash
+                else path.read_bytes()
+            )
+            configuration = json.loads(content)
+            execution_artifact_bytes(
+                Path(configuration["graph"]),
+                graph_hash,
+                snapshot,
+                report.get("execution_snapshot_sha256") if snapshot else None,
+            )
+        except ValueError:
             continue
         recipe = configuration.get("recipe_id", "v" + str(configuration["schema_version"]))
         matches.append((path, configuration, recipe))
@@ -44,7 +57,10 @@ def main() -> None:
     args = parser.parse_args()
     report_path = args.report_dir / "report.json"
     report = json.loads(report_path.read_text(encoding="utf-8"))
-    config_path, configuration, version = processing_recipe(report, args.config)
+    snapshot = (
+        args.report_dir / "executed-code.zip" if report.get("execution_snapshot_sha256") else None
+    )
+    config_path, configuration, version = processing_recipe(report, args.config, snapshot)
     if (args.report_dir / "tracking_receipt.json").exists():
         raise FileExistsError("Preserve existing tracking evidence; use a new report directory")
     experiment_name = "cryolens-processing-" + version
@@ -130,13 +146,14 @@ def main() -> None:
         for path in sorted(Path("validation").iterdir()):
             if path.is_file():
                 run.log_artifact(path, "reference_recipes")
-        run.log_artifact(Path(configuration["graph"]), "reference_recipes")
+        if snapshot is None:
+            run.log_artifact(Path(configuration["graph"]), "reference_recipes")
         receipt = {
             "run_id": run.run_id,
             "experiment": experiment_name,
             "report_sha256": file_digest(report_path),
             "recipe_id": version,
-            "configuration_sha256": file_digest(config_path),
+            "configuration_sha256": report.get("configuration_sha256") or file_digest(config_path),
             "graph_sha256": report["graph_sha256"],
             "purpose": "Completed processing investigation; no precision, recall or false-alarm measurement",
             "git_commit": run.client.get_run(run.run_id).data.tags["git_commit"],

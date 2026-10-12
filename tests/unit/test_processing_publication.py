@@ -45,6 +45,87 @@ def test_git_preserves_archived_execution_graph_bytes(tmp_path: Path, autocrlf: 
     assert target.read_bytes() == executed
 
 
+@pytest.mark.parametrize("autocrlf", ["true", "false"])
+def test_short_block_execution_contracts_survive_git_checkout(
+    tmp_path: Path, autocrlf: str
+) -> None:
+    import hashlib
+    import subprocess
+    import zipfile
+
+    from cryolens.preprocess.validation import execution_artifact_bytes
+    from validation.track_report import processing_recipe
+
+    root = Path(__file__).resolve().parents[2]
+    folder = Path("docs/processing-validation/v2/short-block-v3")
+    report = json.loads((root / folder / "report.json").read_bytes())
+    tracking = json.loads((root / folder / "tracking_receipt.json").read_bytes())
+    snapshot = folder / "executed-code.zip"
+    config = Path("configs/sentinel1-short-block-validation.json")
+    graph = Path("configs/snap/validation-reference.xml")
+    contracts = {
+        folder / "report.json": tracking["report_sha256"],
+        snapshot: report["execution_snapshot_sha256"],
+        config: report["configuration_sha256"],
+        folder / "reference-receipts/short-block-receipt.json": report["products"][0]["provenance"][
+            "reference_receipt_sha256"
+        ],
+        Path("docs/processing-validation/v2/short-block-report.json"): report["products"][0][
+            "quality_reused_from_historical_report_sha256"
+        ],
+        Path("docs/processing-validation/v2/reference-inventory-audit.json"): report[
+            "previous_invalidation_sha256"
+        ],
+        Path("docs/processing-validation/v2/reference-receipts/short-block-receipt.json"): report[
+            "previous_reference_receipt_sha256"
+        ],
+        graph: json.loads((root / "docs/processing-validation/v1/report.json").read_bytes())[
+            "graph_sha256"
+        ],
+    }
+    (tmp_path / ".gitattributes").write_bytes((root / ".gitattributes").read_bytes())
+    for path, expected in contracts.items():
+        target = tmp_path / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((root / path).read_bytes())
+        assert hashlib.sha256(target.read_bytes()).hexdigest() == expected
+
+    def git(*args: str) -> bytes:
+        return subprocess.check_output(
+            ["git", "-C", str(tmp_path), "-c", f"core.autocrlf={autocrlf}", *args]
+        )
+
+    git("init", "--quiet")
+    git("add", ".gitattributes", *(path.as_posix() for path in contracts))
+    for path, expected in contracts.items():
+        assert hashlib.sha256(git("show", ":" + path.as_posix())).hexdigest() == expected
+        (tmp_path / path).unlink()
+        git("checkout-index", "--force", path.as_posix())
+        assert hashlib.sha256((tmp_path / path).read_bytes()).hexdigest() == expected
+    with zipfile.ZipFile(tmp_path / snapshot) as archive:
+        inventory = {
+            name if not name.startswith("C:/") else "validation/refresh_short_block.py": digest
+            for name, digest in report["execution_source_sha256"].items()
+        }
+        assert set(archive.namelist()) == set(inventory)
+        for name, expected in inventory.items():
+            assert hashlib.sha256(archive.read(name)).hexdigest() == expected
+        executed_graph = archive.read(graph.as_posix())
+    assert (
+        execution_artifact_bytes(
+            graph, report["graph_sha256"], tmp_path / snapshot, report["execution_snapshot_sha256"]
+        )
+        == executed_graph
+    )
+    _, configuration, recipe = processing_recipe(report, config, tmp_path / snapshot)
+    assert recipe == "short-block-v3"
+    assert configuration["window"] == report["products"][0]["window"]
+    with pytest.raises(ValueError, match="changed"):
+        execution_artifact_bytes(tmp_path / graph, report["graph_sha256"])
+    with pytest.raises(ValueError, match="snapshot"):
+        execution_artifact_bytes(graph, report["graph_sha256"], tmp_path / snapshot, "0" * 64)
+
+
 @pytest.mark.parametrize(
     "marine_case",
     [

@@ -197,3 +197,18 @@ and the built wheel decoded its packaged pinned geoid outside the repository.
 Analytic geometry, sampling/nodata and malformed-metadata tests exercise real
 functions. Short-block and padding regressions failed before their fixes. The
 27 real SNAP comparisons provide separate scientific processing evidence.
+
+The accepted short-block v3 report, receipt and retained historical dependencies
+have byte-preserving Git attributes. Its configuration is restored verbatim from
+the hash-bound execution ZIP. The shared original graph retains the LF bytes
+recorded by v1; short-block v3 consumed the distinct CRLF bytes archived in its
+execution ZIP. To verify that reference, pass the original relative graph member
+to `verify_reference_receipt` together with `execution_snapshot` and the report's
+`execution_snapshot_sha256`. Verification checks the ZIP and graph hashes before
+using the archived graph, and still checks the full input and output inventories.
+Tracking likewise consumes this hash-bound snapshot for archived recipes. A
+missing or changed archive rejects consumption rather than rewriting provenance.
+Git blob and checkout tests cover both autocrlf settings, the original v1 graph,
+the short-block configuration, report, receipts and retained dependencies, and
+all archived execution members. These packaging corrections preserve every
+recorded hash and scientific outcome; deployment remains blocked.

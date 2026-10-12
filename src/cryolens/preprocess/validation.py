@@ -8,6 +8,7 @@ import hashlib
 import json
 import subprocess
 import xml.etree.ElementTree as ET
+import zipfile
 from pathlib import Path
 from typing import Any
 
@@ -26,6 +27,30 @@ from cryolens.preprocess.python_chain import PurePythonSARProcessor
 from cryolens.preprocess.quality import ProcessingQualityError, assess_safe_product
 from cryolens.preprocess.safe_reader import SAFEProductReader, _open_path, _parse_product_annotation
 from cryolens.preprocess.stack import COGStackBuilder
+
+
+def execution_artifact_bytes(
+    path: Path,
+    expected_sha256: str,
+    snapshot: Path | None = None,
+    snapshot_sha256: str | None = None,
+) -> bytes:
+    """Consume exact execution bytes, rejecting unbound or changed archives."""
+    if snapshot is None:
+        if snapshot_sha256 is not None:
+            raise ValueError("Execution snapshot path missing")
+        content = path.read_bytes()
+    else:
+        if not snapshot_sha256 or file_digest(snapshot) != snapshot_sha256:
+            raise ValueError("Execution snapshot hash missing or changed")
+        with zipfile.ZipFile(snapshot) as archive:
+            try:
+                content = archive.read(path.as_posix())
+            except KeyError as error:
+                raise ValueError("Execution artifact missing from snapshot") from error
+    if hashlib.sha256(content).hexdigest() != expected_sha256:
+        raise ValueError("Execution artifact hash changed: " + str(path))
+    return content
 
 
 def require_development_product(safe: Path, manifest: Path) -> None:
@@ -366,10 +391,14 @@ def run_reference(
 
 
 def reference_geo_region(
-    scratch: Path, graph: Path, window: tuple[int, int, int, int]
+    scratch: Path,
+    graph: Path,
+    window: tuple[int, int, int, int],
+    graph_bytes: bytes | None = None,
 ) -> str | None:
     """Clip after range-Doppler processing, retaining original timing/range geometry."""
-    if ET.parse(graph).find("node[@id='GeoSubset']/parameters/geoRegion") is None:
+    root = ET.fromstring(graph_bytes) if graph_bytes is not None else ET.parse(graph).getroot()
+    if root.find("node[@id='GeoSubset']/parameters/geoRegion") is None:
         return None
     hh = SAFEProductReader(scratch).read_sigma0("HH", False, window=window)
     lat, lon = hh["latitude"], hh["longitude"]
@@ -413,7 +442,11 @@ def reference_input_files(scratch: Path) -> list[Path]:
 
 
 def reference_identity(
-    scratch: Path, graph: Path, window: tuple[int, int, int, int], image: str
+    scratch: Path,
+    graph: Path,
+    window: tuple[int, int, int, int],
+    image: str,
+    graph_bytes: bytes | None = None,
 ) -> dict[str, Any]:
     """Bind cached reference pixels to inputs, recipe, runtime and source window."""
     runtime = subprocess.check_output(
@@ -421,9 +454,13 @@ def reference_identity(
     ).strip()
     return {
         "window": list(window),
-        "geographic_subset": reference_geo_region(scratch, graph, window),
+        "geographic_subset": reference_geo_region(scratch, graph, window, graph_bytes),
         "image_id": runtime,
-        "graph_sha256": file_digest(graph),
+        "graph_sha256": (
+            hashlib.sha256(graph_bytes).hexdigest()
+            if graph_bytes is not None
+            else file_digest(graph)
+        ),
         "scratch_files_sha256": {
             path.relative_to(scratch).as_posix(): file_digest(Path(_open_path(path)))
             for path in reference_input_files(scratch)
@@ -470,13 +507,23 @@ def write_reference_receipt(
 
 
 def verify_reference_receipt(
-    scratch: Path, graph: Path, prefix: Path, window: tuple[int, int, int, int], image: str
+    scratch: Path,
+    graph: Path,
+    prefix: Path,
+    window: tuple[int, int, int, int],
+    image: str,
+    *,
+    execution_snapshot: Path | None = None,
+    execution_snapshot_sha256: str | None = None,
 ) -> None:
     path = Path(str(prefix) + "-receipt.json")
     if not path.is_file():
         raise ValueError("Reference cache lacks provenance; regenerate with --run-reference")
     receipt = json.loads(path.read_text(encoding="utf-8"))
-    identity = reference_identity(scratch, graph, window, image)
+    graph_bytes = execution_artifact_bytes(
+        graph, receipt["graph_sha256"], execution_snapshot, execution_snapshot_sha256
+    )
+    identity = reference_identity(scratch, graph, window, image, graph_bytes)
     if set(receipt.get("scratch_files_sha256", {})) != set(identity["scratch_files_sha256"]):
         raise ValueError("Reference input receipt incomplete or changed; regenerate reference")
     if any(receipt.get(key) != value for key, value in identity.items()):

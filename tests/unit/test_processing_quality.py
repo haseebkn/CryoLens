@@ -352,6 +352,65 @@ def reference_cache_fixture(
     return scratch, graph, prefix, window
 
 
+def test_reference_cache_consumes_verified_archived_graph(
+    reference_cache_fixture: tuple[Path, Path, Path, tuple[int, int, int, int]],
+    tmp_path: Path,
+) -> None:
+    import zipfile
+
+    from cryolens.eval.cohort import file_digest
+    from cryolens.preprocess import validation
+
+    scratch, graph, prefix, window = reference_cache_fixture
+    root = Path(__file__).resolve().parents[2]
+    evidence = root / "docs/processing-validation/v2/short-block-v3"
+    report = json.loads((evidence / "report.json").read_bytes())
+    snapshot = evidence / "executed-code.zip"
+    member = Path("configs/snap/validation-reference.xml")
+    with zipfile.ZipFile(snapshot) as archive:
+        graph.write_bytes(archive.read(member.as_posix()))
+    Path(str(prefix) + "-receipt.json").unlink()
+    validation.write_reference_receipt(scratch, graph, prefix, window, "runtime")
+    graph.write_bytes((root / member).read_bytes())
+    before = Path(str(prefix) + "-receipt.json").read_bytes()
+    with pytest.raises(ValueError, match="changed"):
+        validation.verify_reference_receipt(scratch, graph, prefix, window, "runtime")
+    validation.verify_reference_receipt(
+        scratch,
+        member,
+        prefix,
+        window,
+        "runtime",
+        execution_snapshot=snapshot,
+        execution_snapshot_sha256=report["execution_snapshot_sha256"],
+    )
+    assert Path(str(prefix) + "-receipt.json").read_bytes() == before
+    corrupted = tmp_path / "changed.zip"
+    corrupted.write_bytes(snapshot.read_bytes() + b"changed")
+    with pytest.raises(ValueError, match="snapshot"):
+        validation.verify_reference_receipt(
+            scratch,
+            member,
+            prefix,
+            window,
+            "runtime",
+            execution_snapshot=corrupted,
+            execution_snapshot_sha256=report["execution_snapshot_sha256"],
+        )
+    assert file_digest(snapshot) == report["execution_snapshot_sha256"]
+    Path(str(prefix) + "_geo.tif").write_bytes(b"changed")
+    with pytest.raises(ValueError, match="output.*changed"):
+        validation.verify_reference_receipt(
+            scratch,
+            member,
+            prefix,
+            window,
+            "runtime",
+            execution_snapshot=snapshot,
+            execution_snapshot_sha256=report["execution_snapshot_sha256"],
+        )
+
+
 def test_reference_cache_rejects_recipe_and_pixel_changes(
     reference_cache_fixture: tuple[Path, Path, Path, tuple[int, int, int, int]],
 ) -> None:
