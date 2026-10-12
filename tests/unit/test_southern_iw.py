@@ -370,6 +370,126 @@ def test_consumer_rejects_scientific_metrics_with_successful_flags(
         )
 
 
+@pytest.mark.parametrize(
+    "check_name",
+    [
+        "calibration_HH",
+        "calibration_HV",
+        "noise_HH",
+        "noise_HV",
+        "reprojection_HH",
+        "reprojection_HV",
+    ],
+)
+@pytest.mark.parametrize("bias", [-1.0, 1.0])
+def test_consumer_rejects_contradictory_residual_summaries(
+    southern_publication: Path, check_name: str, bias: float
+) -> None:
+    import json
+
+    from validation.finalise_southern_iw_report import processing_evidence
+
+    search = json.loads(
+        (southern_publication / "acquisition-search-verified/report.json").read_text()
+    )
+    source = next(row for row in search["products"] if "20251206" in row["product"])
+    path = southern_publication / "iw-december-qualified/report.json"
+    report = json.loads(path.read_text())
+    check = report["products"][0]["windows"][0]["checks"][check_name]
+    check["median_bias_db"] = bias
+    assert check["passed"] is True
+    path.write_text(json.dumps(report))
+    with pytest.raises(ValueError, match="Scientific pass flag"):
+        processing_evidence(
+            southern_publication, source, "iw-december-qualified", "acquisition-search-verified"
+        )
+
+
+@pytest.mark.parametrize("check_name", ["noise_HV", "reprojection_HV"])
+@pytest.mark.parametrize("sign", [-1, 1])
+@pytest.mark.parametrize("rounding", [False, True])
+def test_consumer_accepts_residual_summary_boundaries(
+    southern_publication: Path, check_name: str, sign: int, rounding: bool
+) -> None:
+    import json
+
+    from validation.finalise_southern_iw_report import processing_evidence
+
+    search = json.loads(
+        (southern_publication / "acquisition-search-verified/report.json").read_text()
+    )
+    source = next(row for row in search["products"] if "20251206" in row["product"])
+    path = southern_publication / "iw-december-qualified/report.json"
+    report = json.loads(path.read_text())
+    check = report["products"][0]["windows"][0]["checks"][check_name]
+    limit = 1.0 if check_name.startswith("reprojection_") else 0.02
+    check["p95_absolute_error_db"] = limit
+    check["median_bias_db"] = sign * (limit + (limit * 1e-8 if rounding else 0.0))
+    path.write_text(json.dumps(report))
+    result = processing_evidence(
+        southern_publication, source, "iw-december-qualified", "acquisition-search-verified"
+    )
+    assert result["passing_product_checks"] is True
+
+
+@pytest.mark.parametrize(
+    ("positive", "finite", "fraction"),
+    [(10000, 10000, 0.0001), (9999, 10000, 0.00005), (9999, 10000, -0.0001)],
+)
+def test_consumer_rejects_impossible_sign_mismatch_counts(
+    southern_publication: Path, positive: int, finite: int, fraction: float
+) -> None:
+    import json
+
+    from validation.finalise_southern_iw_report import processing_evidence
+
+    search = json.loads(
+        (southern_publication / "acquisition-search-verified/report.json").read_text()
+    )
+    source = next(row for row in search["products"] if "20251206" in row["product"])
+    path = southern_publication / "iw-december-qualified/report.json"
+    report = json.loads(path.read_text())
+    report["products"][0]["windows"][0]["checks"]["noise_HV"].update(
+        positive_matched_pixels=positive,
+        finite_matched_pixels=finite,
+        sign_mismatch_fraction=fraction,
+    )
+    path.write_text(json.dumps(report))
+    with pytest.raises(ValueError, match="Scientific pass flag"):
+        processing_evidence(
+            southern_publication, source, "iw-december-qualified", "acquisition-search-verified"
+        )
+
+
+@pytest.mark.parametrize("bias", [-0.019, 0.019])
+def test_consumer_accepts_produced_residuals_and_sign_limit(
+    southern_publication: Path, bias: float
+) -> None:
+    import json
+
+    from cryolens.preprocess.validation import compare_power
+    from validation.finalise_southern_iw_report import processing_evidence
+
+    search = json.loads(
+        (southern_publication / "acquisition-search-verified/report.json").read_text()
+    )
+    source = next(row for row in search["products"] if "20251206" in row["product"])
+    path = southern_publication / "iw-december-qualified/report.json"
+    report = json.loads(path.read_text())
+    actual = np.full(10000, 10 ** (bias / 10))
+    actual[0] = -1.0
+    check = compare_power(actual, np.ones(10000))
+    assert check["passed"] is True
+    assert check["sign_mismatch_fraction"] == 0.0001
+    assert abs(check["median_bias_db"]) == check["p95_absolute_error_db"]
+    report["products"][0]["windows"][0]["checks"]["noise_HV"] = check
+    path.write_text(json.dumps(report))
+    result = processing_evidence(
+        southern_publication, source, "iw-december-qualified", "acquisition-search-verified"
+    )
+    assert result["passing_product_checks"] is True
+
+
 def test_consumer_accepts_existing_scientific_limits_and_cog_warnings(
     southern_publication: Path,
 ) -> None:
@@ -389,6 +509,7 @@ def test_consumer_accepts_existing_scientific_limits_and_cog_warnings(
             check = checks[f"{stage}_{pol}"]
             check.update(
                 positive_matched_pixels=4096,
+                finite_matched_pixels=260000,
                 p95_absolute_error_db=0.02,
                 sign_mismatch_fraction=0.0001,
             )

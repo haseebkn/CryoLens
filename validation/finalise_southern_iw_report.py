@@ -126,6 +126,13 @@ def scientific_checks_passed(
             raise ValueError("Invalid scientific pixel count")
         return value
 
+    def residual_summary_valid(check: dict[str, Any], limit_db: float) -> bool:
+        bias = abs(metric(check, "median_bias_db"))
+        p95 = metric(check, "p95_absolute_error_db")
+        return 0 <= p95 <= limit_db and (
+            bias <= p95 or math.isclose(bias, p95, rel_tol=1e-7, abs_tol=1e-12)
+        )
+
     try:
         for name, check in checks.items():
             if type(check["passed"]) is not bool:
@@ -136,11 +143,18 @@ def scientific_checks_passed(
             if name.startswith(("calibration_", "noise_")):
                 positive = count(check, "positive_matched_pixels")
                 finite = count(check, "finite_matched_pixels")
-                metric(check, "median_bias_db")
+                sign_fraction = metric(check, "sign_mismatch_fraction")
                 valid = (
                     4096 <= positive <= finite <= window[2] * window[3]
-                    and 0 <= metric(check, "p95_absolute_error_db") <= 0.02
-                    and 0 <= metric(check, "sign_mismatch_fraction") <= 0.0001
+                    and residual_summary_valid(check, 0.02)
+                    and 0 <= sign_fraction <= 0.0001
+                    and round(sign_fraction * finite) <= finite - positive
+                    and math.isclose(
+                        sign_fraction,
+                        round(sign_fraction * finite) / finite,
+                        rel_tol=1e-12,
+                        abs_tol=1e-15,
+                    )
                 )
             elif name == "annotation_geolocation":
                 valid = 0 <= metric(check, "max_error_m") <= 20
@@ -166,10 +180,8 @@ def scientific_checks_passed(
                     >= 4096
                 )
             elif name.startswith("reprojection_"):
-                metric(check, "median_bias_db")
-                valid = (
-                    count(check, "matched_pixels") >= 4096
-                    and 0 <= metric(check, "p95_absolute_error_db") <= 1.0
+                valid = count(check, "matched_pixels") >= 4096 and residual_summary_valid(
+                    check, 1.0
                 )
             elif name == "diagnostic_scope":
                 valid = (
