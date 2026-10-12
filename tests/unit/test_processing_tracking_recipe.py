@@ -106,10 +106,102 @@ def test_conflicting_recipe_never_starts_tracking(
 
 
 def test_graph_bound_historical_recipe_ignores_report_serialization_version() -> None:
-    _, _, recipe = track_report.processing_recipe(
+    selected = track_report.processing_recipe(
         {
             "schema_version": 2,
             "graph_sha256": file_digest(Path("configs/snap/validation-reference.xml")),
         }
     )
-    assert recipe == "v1"
+    assert selected.recipe_id == "v1"
+
+
+def test_archived_tracking_logs_selected_bytes_and_separate_checkout_provenance(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import hashlib
+    import shutil
+    import zipfile
+
+    root = Path(__file__).resolve().parents[2]
+    historical = root / "docs/processing-validation/v2/short-block-v3"
+    output = tmp_path / "copied-execution"
+    output.mkdir()
+    for name in ("report.json", "executed-code.zip"):
+        shutil.copyfile(historical / name, output / name)
+    shutil.copytree(historical / "reference-receipts", output / "reference-receipts")
+    report = json.loads((output / "report.json").read_bytes())
+    config = Path("configs/sentinel1-short-block-validation.json")
+    graph = Path("configs/snap/validation-reference.xml")
+    with zipfile.ZipFile(output / "executed-code.zip") as archive:
+        executed = {
+            config.name: archive.read(config.as_posix()),
+            graph.name: archive.read(graph.as_posix()),
+        }
+    live_config = tmp_path / config
+    live_config.parent.mkdir(parents=True)
+    live_config.write_bytes(executed[config.name] + b"\n")
+    live_graph = tmp_path / graph
+    live_graph.parent.mkdir(parents=True)
+    live_graph.write_bytes(executed[graph.name].replace(b"\r\n", b"\n"))
+    live_hashes = {
+        "configuration_sha256": file_digest(live_config),
+        "graph_sha256": file_digest(live_graph),
+    }
+    assert live_hashes["configuration_sha256"] != report["configuration_sha256"]
+    assert live_hashes["graph_sha256"] != report["graph_sha256"]
+    starts = []
+    logged: dict[tuple[str, str], bytes] = {}
+    run = MagicMock()
+    run.run_id = "synthetic-archive-check"
+    run.client.get_run.return_value.data.tags = {"git_commit": "fixture", "git_dirty": "true"}
+
+    def log_artifact(path: Path, artifact_path: str) -> None:
+        logged[(artifact_path, path.name)] = path.read_bytes()
+
+    run.log_artifact.side_effect = log_artifact
+
+    @contextmanager
+    def tracking(**kwargs: Any) -> Any:
+        starts.append(kwargs)
+        yield run
+
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "validation").mkdir()
+    monkeypatch.setattr(track_report, "tracked_experiment", tracking)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "track",
+            "--report-dir",
+            str(output),
+            "--tracking-uri",
+            "test-only",
+            "--config",
+            str(config),
+        ],
+    )
+    original_report = (output / "report.json").read_bytes()
+    track_report.main()
+    provenance = starts[0]["configuration"]
+    assert provenance["recipe_configuration_sha256"] == report["configuration_sha256"]
+    assert provenance["recipe_graph_sha256"] == report["graph_sha256"]
+    assert provenance["logging_checkout_recipe_sha256"] == live_hashes
+    for name, content in executed.items():
+        assert logged[("reference_recipes", name)] == content
+    assert (
+        hashlib.sha256(logged[("reference_recipes", config.name)]).hexdigest()
+        == report["configuration_sha256"]
+    )
+    assert (
+        hashlib.sha256(logged[("reference_recipes", graph.name)]).hexdigest()
+        == report["graph_sha256"]
+    )
+    assert logged[("logging_state/recipe", config.name)] == live_config.read_bytes()
+    assert logged[("logging_state/recipe", graph.name)] == live_graph.read_bytes()
+    receipt = json.loads((output / "tracking_receipt.json").read_bytes())
+    assert receipt["configuration_sha256"] == report["configuration_sha256"]
+    assert receipt["graph_sha256"] == report["graph_sha256"]
+    assert receipt["logging_checkout_recipe_sha256"] == live_hashes
+    assert (output / "report.json").read_bytes() == original_report
+    assert not list(tmp_path.glob(".processing-recipe-*"))

@@ -16,10 +16,10 @@ docs/processing-validation/v3/metadata/**/*.xml linguist-generated=true
 
 # Scientific receipts and source snapshots are intentional byte contracts.
 docs/processing-validation/v3/** -text whitespace=cr-at-eol
-docs/processing-validation/v2/short-block-v3/** -text whitespace=cr-at-eol
-docs/processing-validation/v2/short-block-report.json -text whitespace=cr-at-eol
-docs/processing-validation/v2/reference-inventory-audit.json -text whitespace=cr-at-eol
-docs/processing-validation/v2/reference-receipts/short-block-receipt.json -text whitespace=cr-at-eol
+docs/processing-validation/v1/** -text whitespace=cr-at-eol
+docs/processing-validation/v2/** -text whitespace=cr-at-eol
+configs/sentinel1-validation-v1.json -text whitespace=cr-at-eol
+configs/sentinel1-validation-v2.json -text whitespace=cr-at-eol
 configs/sentinel1-short-block-validation.json -text whitespace=cr-at-eol
 configs/snap/validation-reference.xml -text whitespace=cr-at-eol
 configs/snap/validation-reference-v2.xml -text whitespace=cr-at-eol
@@ -27,3 +27,4 @@ configs/snap/validation-reference-v2.xml -text whitespace=cr-at-eol
 # Human-readable prose is not a hashed execution artifact.
 docs/processing-validation/v3/**/*.md text eol=lf
 docs/processing-validation/v2/**/*.md text eol=lf
+docs/processing-validation/v1/**/*.md text eol=lf

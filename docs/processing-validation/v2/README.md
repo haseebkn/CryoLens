@@ -212,3 +212,31 @@ Git blob and checkout tests cover both autocrlf settings, the original v1 graph,
 the short-block configuration, report, receipts and retained dependencies, and
 all archived execution members. These packaging corrections preserve every
 recorded hash and scientific outcome; deployment remains blocked.
+
+The preservation rules also cover the main v1/v2 reports and their complete
+27-receipt inventories. Their original working bytes match the existing report
+and receipt hashes and are retained verbatim in Git. The v1 configuration is
+restored from the committed LF blob that matches its recorded hash. The v2
+configuration has no recorded execution hash or archived configuration member;
+its existing committed bytes are preserved as a graph-matched post-hoc recipe,
+not relabelled as authenticated execution configuration. The v2 ZIP's full source,
+driver and graph inventory is checked against the recorded member hashes.
+
+Post-hoc tracking captures selected configuration and graph bytes once, derives
+both recipe hashes from those bytes, and logs those exact recipe artifacts.
+Live checkout recipe bytes and hashes are captured separately under logging-state
+provenance. Existing MLflow runs and tracking receipts are untouched. Behavioral
+tests log copied historical reports through a synthetic tracker, including an
+archived short-block recipe whose configuration and graph differ from the live
+checkout, and exercise both Git autocrlf settings for all 54 main receipts.
+
+The earlier baseline report `ed1bf3b49fa34fb76d423941a437b621680b9e833c4effb39213f5e2197a3ed9`
+referenced by v2 and the prior scan report
+`a00361f6e962e1bb030323630df0625df469c38b4754bdd547d6e861ee676c4c`
+referenced by v1 are not recoverable from this worktree's published artifacts or
+report history. Those references remain unchanged historical dependencies;
+their contents are not reconstructed, authenticated or consumed by these
+packaging checks. Any consumer requiring those earlier reports must supply
+their exact hash-matching original bytes; absent or changed bytes reject at the
+execution-artifact boundary. These post-hoc logging checks do not establish new
+scientific qualification or reopen deployment.

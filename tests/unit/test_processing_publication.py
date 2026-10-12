@@ -46,6 +46,107 @@ def test_git_preserves_archived_execution_graph_bytes(tmp_path: Path, autocrlf: 
 
 
 @pytest.mark.parametrize("autocrlf", ["true", "false"])
+@pytest.mark.parametrize("version", ["v1", "v2"])
+def test_historical_reports_and_full_receipt_inventory_survive_git_checkout(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, autocrlf: str, version: str
+) -> None:
+    import hashlib
+    import subprocess
+    import zipfile
+    from contextlib import contextmanager
+    from typing import Any
+    from unittest.mock import MagicMock
+
+    from validation import track_report
+
+    root = Path(__file__).resolve().parents[2]
+    folder = Path("docs/processing-validation") / version
+    report = json.loads((root / folder / "report.json").read_bytes())
+    tracking = json.loads((root / folder / "tracking_receipt.json").read_bytes())
+    config = Path(f"configs/sentinel1-validation-{version}.json")
+    graph = Path(json.loads((root / config).read_bytes())["graph"])
+    contracts = {
+        folder / "report.json": tracking["report_sha256"],
+        graph: report["graph_sha256"],
+    }
+    if version == "v1":
+        contracts[config] = report["configuration_sha256"]
+    required = {
+        window["reference_receipt_sha256"]
+        for product in report["products"]
+        for window in product["windows"]
+    }
+    assert len(required) == 27
+    for receipt in (root / folder / "reference-receipts").glob("*.json"):
+        digest = hashlib.sha256(receipt.read_bytes()).hexdigest()
+        if digest in required:
+            contracts[receipt.relative_to(root)] = digest
+    assert len(contracts) == 29 + (version == "v1")
+    (tmp_path / ".gitattributes").write_bytes((root / ".gitattributes").read_bytes())
+    for path, expected in contracts.items():
+        content = (root / path).read_bytes()
+        assert hashlib.sha256(content).hexdigest() == expected
+        assert (
+            hashlib.sha256(
+                subprocess.check_output(["git", "-C", str(root), "show", ":" + path.as_posix()])
+            ).hexdigest()
+            == expected
+        )
+        target = tmp_path / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(content)
+    (tmp_path / config).write_bytes((root / config).read_bytes())
+
+    def git(*args: str) -> bytes:
+        return subprocess.check_output(
+            ["git", "-C", str(tmp_path), "-c", f"core.autocrlf={autocrlf}", *args]
+        )
+
+    git("init", "--quiet")
+    git("add", ".gitattributes", config.as_posix(), *(p.as_posix() for p in contracts))
+    for path, expected in contracts.items():
+        assert hashlib.sha256(git("show", ":" + path.as_posix())).hexdigest() == expected
+        (tmp_path / path).unlink()
+        git("checkout-index", "--force", path.as_posix())
+        assert hashlib.sha256((tmp_path / path).read_bytes()).hexdigest() == expected
+    (tmp_path / config).unlink()
+    git("checkout-index", "--force", config.as_posix())
+    if version == "v2":
+        with zipfile.ZipFile(root / folder / "executed-code.zip") as archive:
+            inventory = {
+                "src/cryolens/preprocess/" + name: digest
+                for name, digest in report["source_sha256"].items()
+            }
+            inventory["validation/validate_marine_processing.py"] = report["driver_sha256"]
+            inventory[graph.as_posix()] = report["graph_sha256"]
+            assert set(archive.namelist()) == set(inventory)
+            for member, expected in inventory.items():
+                assert hashlib.sha256(archive.read(member)).hexdigest() == expected
+    starts = []
+    run = MagicMock()
+    run.run_id = "synthetic-history-check"
+    run.client.get_run.return_value.data.tags = {"git_commit": "fixture", "git_dirty": "true"}
+
+    @contextmanager
+    def tracking_run(**kwargs: Any) -> Any:
+        starts.append(kwargs)
+        yield run
+
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "validation").mkdir()
+    monkeypatch.setattr(track_report, "tracked_experiment", tracking_run)
+    monkeypatch.setattr(
+        sys, "argv", ["track", "--report-dir", str(folder), "--tracking-uri", "test-only"]
+    )
+    track_report.main()
+    assert len(starts) == 1
+    assert starts[0]["configuration"]["recipe_graph_sha256"] == report["graph_sha256"]
+    saved = json.loads((tmp_path / folder / "tracking_receipt.json").read_bytes())
+    assert saved["report_sha256"] == tracking["report_sha256"]
+    assert saved["recipe_id"] == version
+
+
+@pytest.mark.parametrize("autocrlf", ["true", "false"])
 def test_short_block_execution_contracts_survive_git_checkout(
     tmp_path: Path, autocrlf: str
 ) -> None:
@@ -83,6 +184,16 @@ def test_short_block_execution_contracts_survive_git_checkout(
             "graph_sha256"
         ],
     }
+    historical_root = Path("docs/processing-validation/v2")
+    audit = json.loads((root / historical_root / "reference-inventory-audit.json").read_bytes())
+    contracts.update(
+        {
+            historical_root / name: digest
+            for name, digest in audit["short_block_invalidation"][
+                "historical_artifacts_sha256"
+            ].items()
+        }
+    )
     (tmp_path / ".gitattributes").write_bytes((root / ".gitattributes").read_bytes())
     for path, expected in contracts.items():
         target = tmp_path / path
@@ -117,9 +228,9 @@ def test_short_block_execution_contracts_survive_git_checkout(
         )
         == executed_graph
     )
-    _, configuration, recipe = processing_recipe(report, config, tmp_path / snapshot)
-    assert recipe == "short-block-v3"
-    assert configuration["window"] == report["products"][0]["window"]
+    selected = processing_recipe(report, config, tmp_path / snapshot)
+    assert selected.recipe_id == "short-block-v3"
+    assert selected.configuration["window"] == report["products"][0]["window"]
     with pytest.raises(ValueError, match="changed"):
         execution_artifact_bytes(tmp_path / graph, report["graph_sha256"])
     with pytest.raises(ValueError, match="snapshot"):
