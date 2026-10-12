@@ -315,6 +315,127 @@ def test_evidence_consumer_rejects_rehashed_scratch_receipt(
         )
 
 
+@pytest.mark.parametrize(
+    ("check_name", "field", "value"),
+    [
+        *[
+            (name, "p95_absolute_error_db", 1.0)
+            for name in ("calibration_HH", "calibration_HV", "noise_HH", "noise_HV")
+        ],
+        ("noise_HV", "sign_mismatch_fraction", 0.0002),
+        ("noise_HV", "positive_matched_pixels", 4095),
+        ("noise_HV", "finite_matched_pixels", 1),
+        ("noise_HV", "positive_matched_pixels", 262145),
+        ("noise_HV", "positive_matched_pixels", 4096.5),
+        ("noise_HV", "median_bias_db", float("nan")),
+        ("noise_HV", "p95_absolute_error_db", -0.01),
+        ("annotation_geolocation", "max_error_m", 20.01),
+        ("annotation_geolocation", "max_error_m", float("inf")),
+        ("incidence", "max_error_deg", 0.051),
+        ("incidence", "max_error_deg", None),
+        ("registration_HH", "relative_displacement_m", 40.01),
+        ("registration_HV", "relative_displacement_m", float("nan")),
+        ("registration_HH", "shift_rows_px", float("inf")),
+        ("registration_HV", "shift_columns_px", float("nan")),
+        ("reprojection_HH", "matched_pixels", 4095),
+        ("reprojection_HV", "p95_absolute_error_db", 1.01),
+        ("reprojection_HH", "p95_absolute_error_db", float("nan")),
+        ("reprojection_HV", "median_bias_db", float("inf")),
+        ("diagnostic_scope", "thermal_noise_corrected", True),
+        ("diagnostic_scope", "fresh_detection_allowed", True),
+        ("cog_integrity", "errors", ["invalid COG layout"]),
+        ("cog_integrity", "warnings", "invalid warning inventory"),
+        ("cog_integrity", "sha256", "g" * 64),
+        ("noise_HV", "passed", 1),
+    ],
+)
+def test_consumer_rejects_scientific_metrics_with_successful_flags(
+    southern_publication: Path, check_name: str, field: str, value: Any
+) -> None:
+    import json
+
+    from validation.finalise_southern_iw_report import processing_evidence
+
+    search = json.loads(
+        (southern_publication / "acquisition-search-verified/report.json").read_text()
+    )
+    source = next(row for row in search["products"] if "20251206" in row["product"])
+    path = southern_publication / "iw-december-qualified/report.json"
+    report = json.loads(path.read_text())
+    report["products"][0]["windows"][0]["checks"][check_name][field] = value
+    path.write_text(json.dumps(report))
+    with pytest.raises(ValueError, match="[Ss]cientific"):
+        processing_evidence(
+            southern_publication, source, "iw-december-qualified", "acquisition-search-verified"
+        )
+
+
+def test_consumer_accepts_existing_scientific_limits_and_cog_warnings(
+    southern_publication: Path,
+) -> None:
+    import json
+
+    from validation.finalise_southern_iw_report import processing_evidence
+
+    search = json.loads(
+        (southern_publication / "acquisition-search-verified/report.json").read_text()
+    )
+    source = next(row for row in search["products"] if "20251206" in row["product"])
+    path = southern_publication / "iw-december-qualified/report.json"
+    report = json.loads(path.read_text())
+    checks = report["products"][0]["windows"][0]["checks"]
+    for pol in ("HH", "HV"):
+        for stage in ("calibration", "noise"):
+            check = checks[f"{stage}_{pol}"]
+            check.update(
+                positive_matched_pixels=4096,
+                p95_absolute_error_db=0.02,
+                sign_mismatch_fraction=0.0001,
+            )
+        checks[f"registration_{pol}"]["relative_displacement_m"] = 40.0
+        checks[f"registration_{pol}"]["shift_rows_px"] = 1.0
+        checks[f"reprojection_{pol}"].update(matched_pixels=4096, p95_absolute_error_db=1.0)
+    checks["annotation_geolocation"]["max_error_m"] = 20.0
+    checks["incidence"]["max_error_deg"] = 0.05
+    checks["cog_integrity"]["warnings"] = ["Nonfatal validation warning"]
+    path.write_text(json.dumps(report))
+    result = processing_evidence(
+        southern_publication, source, "iw-december-qualified", "acquisition-search-verified"
+    )
+    assert result["passing_product_checks"] is True
+
+
+@pytest.mark.parametrize("pixels", [16, 4096])
+def test_consumer_preserves_genuine_failed_scientific_observations(
+    southern_publication: Path, pixels: int
+) -> None:
+    import json
+
+    from cryolens.preprocess.validation import compare_power
+    from validation.finalise_southern_iw_report import processing_evidence
+
+    search = json.loads(
+        (southern_publication / "acquisition-search-verified/report.json").read_text()
+    )
+    source = next(row for row in search["products"] if "20251206" in row["product"])
+    path = southern_publication / "iw-december-qualified/report.json"
+    report = json.loads(path.read_text())
+    product = report["products"][0]
+    window = product["windows"][0]
+    window["checks"]["noise_HV"] = compare_power(np.full(pixels, 2.0), np.ones(pixels))
+    assert window["checks"]["noise_HV"]["passed"] is False
+    window["scientific_comparison_passed"] = False
+    product["scientific_comparison_passed"] = False
+    report["scientific_comparison_passed"] = False
+    report["deployment_gate_open"] = False
+    path.write_text(json.dumps(report))
+    result = processing_evidence(
+        southern_publication, source, "iw-december-qualified", "acquisition-search-verified"
+    )
+    assert result["scientific_comparison_passed"] is False
+    assert result["passing_product_checks"] is False
+
+
 def test_genuine_marine_failure_remains_rejected(southern_publication: Path) -> None:
     import json
 

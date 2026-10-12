@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +20,77 @@ from cryolens.preprocess.provenance import original_inventory
 from cryolens.preprocess.quality import QualityPolicy
 from validation.finalise_acquisition_report import export_coverage
 from validation.publish_validation_run import verify_execution_sources
+
+
+def scientific_checks_passed(checks: dict[str, Any], window: list[int]) -> bool:
+    def metric(check: dict[str, Any], key: str) -> float:
+        value = check[key]
+        if type(value) not in (int, float) or not math.isfinite(value):
+            raise ValueError("Nonfinite or invalid scientific metric")
+        return float(value)
+
+    def count(check: dict[str, Any], key: str) -> int:
+        value = check[key]
+        if type(value) is not int or value < 0:
+            raise ValueError("Invalid scientific pixel count")
+        return value
+
+    try:
+        for name, check in checks.items():
+            if type(check["passed"]) is not bool:
+                raise ValueError("Invalid scientific pass flag")
+            if not check["passed"]:
+                continue
+            valid = False
+            if name.startswith(("calibration_", "noise_")):
+                positive = count(check, "positive_matched_pixels")
+                finite = count(check, "finite_matched_pixels")
+                metric(check, "median_bias_db")
+                valid = (
+                    4096 <= positive <= finite <= window[2] * window[3]
+                    and 0 <= metric(check, "p95_absolute_error_db") <= 0.02
+                    and 0 <= metric(check, "sign_mismatch_fraction") <= 0.0001
+                )
+            elif name == "annotation_geolocation":
+                valid = 0 <= metric(check, "max_error_m") <= 20
+            elif name == "incidence":
+                valid = 0 <= metric(check, "max_error_deg") <= 0.05
+            elif name.startswith("registration_"):
+                metric(check, "shift_rows_px")
+                metric(check, "shift_columns_px")
+                valid = (
+                    0 <= metric(check, "relative_displacement_m") <= 40
+                    and count(
+                        checks[name.replace("registration_", "reprojection_")], "matched_pixels"
+                    )
+                    >= 4096
+                )
+            elif name.startswith("reprojection_"):
+                metric(check, "median_bias_db")
+                valid = (
+                    count(check, "matched_pixels") >= 4096
+                    and 0 <= metric(check, "p95_absolute_error_db") <= 1.0
+                )
+            elif name == "diagnostic_scope":
+                valid = (
+                    check["thermal_noise_corrected"] is False
+                    and check["fresh_detection_allowed"] is False
+                )
+            elif name == "cog_integrity":
+                digest = check["sha256"]
+                valid = (
+                    check["errors"] == []
+                    and isinstance(check["warnings"], list)
+                    and all(isinstance(warning, str) for warning in check["warnings"])
+                    and isinstance(digest, str)
+                    and len(digest) == 64
+                    and all(c in "0123456789abcdef" for c in digest)
+                )
+            if not valid:
+                raise ValueError("Scientific pass flag contradicts recorded measurements")
+    except (KeyError, TypeError, OverflowError) as exc:
+        raise ValueError("Incomplete or invalid scientific check") from exc
+    return all(check["passed"] for check in checks.values())
 
 
 def processing_evidence(
@@ -103,9 +175,9 @@ def processing_evidence(
     }
     for window in windows:
         checks = window.get("checks", {})
-        if set(checks) != expected_checks or window["scientific_comparison_passed"] != all(
-            c["passed"] for c in checks.values()
-        ):
+        if set(checks) != expected_checks or window[
+            "scientific_comparison_passed"
+        ] != scientific_checks_passed(checks, window["window"]):
             raise ValueError("Window summary contradicts individual scientific checks")
         reference = receipts[window["reference_receipt_sha256"]]
         scratch = reference.get("scratch_files_sha256", {})
