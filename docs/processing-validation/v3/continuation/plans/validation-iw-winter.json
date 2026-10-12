@@ -1,0 +1,52 @@
+{
+  "schema_version": 2,
+  "purpose": "Predeclared nine-window processing comparison on new northern IW development acquisition; all quality thresholds unchanged",
+  "frozen_manifest": "docs/evaluation/v1/manifest.json",
+  "graph": "configs/snap/validation-reference-v2.xml",
+  "window_size_px": 512,
+  "sampling_fractions": [
+    [
+      0.1,
+      0.1
+    ],
+    [
+      0.1,
+      0.5
+    ],
+    [
+      0.1,
+      0.9
+    ],
+    [
+      0.5,
+      0.1
+    ],
+    [
+      0.5,
+      0.5
+    ],
+    [
+      0.5,
+      0.9
+    ],
+    [
+      0.9,
+      0.1
+    ],
+    [
+      0.9,
+      0.5
+    ],
+    [
+      0.9,
+      0.9
+    ]
+  ],
+  "products": [
+    {
+      "name": "iw-winter",
+      "path": "\\\\?\\D:\\CryoLens-data\\sentinel1-step2-20261012\\raw\\S1A_IW_GRDH_1SDH_20260328T094823_20260328T094848_063826_0806C8_672E_COG\\S1A_IW_GRDH_1SDH_20260328T094823_20260328T094848_063826_0806C8_672E_COG.SAFE"
+    }
+  ],
+  "recipe_id": "new-acquisition-iw-20261012"
+}

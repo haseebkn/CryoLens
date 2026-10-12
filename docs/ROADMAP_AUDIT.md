@@ -5,6 +5,11 @@ the reference cropping, height/timing assumptions, resampling and short-block
 noise handling. The geometric conclusions below are the historical audit
 snapshot; the deployment gate remains closed for measured radiometric usability.
 
+A subsequent [v3 acquisition investigation](processing-validation/v3/README.md)
+verified ten new downloads and a passing northern Labrador EW example. All seven
+new IW products fail the unchanged quality limit. Step 2 remains incomplete;
+the table below retains the earlier audit snapshot rather than rewriting it.
+
 Audit date: 12 October 2026. Reviewed stack head:
 `e29986877035588f50dff47ecbdfc39df86a02f4`.
 This is an implementation and development-evidence audit, not a scientific

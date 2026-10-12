@@ -21,6 +21,8 @@ from pyproj import Transformer
 from scipy.interpolate import CubicHermiteSpline
 from scipy.ndimage import map_coordinates
 
+from cryolens.preprocess.safe_reader import _open_path
+
 EGM96_ARCHIVE_SHA256 = "b5db7a14c3062decb8daaaf60f257ff374084be79aeda9ce333dd5b9c815751c"
 
 
@@ -52,6 +54,7 @@ class MarineGeocoder:
     """Inverse zero-Doppler mapping for declared, bistatic-corrected marine GRD."""
 
     def __init__(self, annotation: Path, geoid_archive: Path | None = None) -> None:
+        annotation = Path(_open_path(annotation))
         self.annotation_sha256 = hashlib.sha256(annotation.read_bytes()).hexdigest()
         root = ET.parse(annotation).getroot()
 

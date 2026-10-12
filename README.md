@@ -125,7 +125,7 @@ An earlier version of this project asserted the opposite. IW over the Grand Bank
 is roughly 76 percent dual-pol HH+HV, so the polarimetric basis survives.
 
 The reader now supports annotated IW GRD HH/HV measurements and has been tested
-on a real southern acquisition. The [current processing report](docs/processing-validation/v2/README.md)
+on a real southern acquisition. The [current processing report](docs/processing-validation/v3/README.md)
 records corrected comparison results and the remaining noise-usability rejection.
 **Operational southern NL coverage remains unvalidated**;
 successful downloading and mode parsing do not establish detection coverage.
@@ -157,11 +157,13 @@ and supports concealed repeats, adjudication and exact coverage masks. The
 rate is available.** January test SAR was prepared for human reference review
 only; its chart labels and model evaluation remain sealed.
 
-The [real SAFE processing report](docs/processing-validation/v2/README.md)
-compares three EW/IW products against actual SNAP 14.0.0 at matched pixels.
-It corrects marine height/timing, resampling and reference-cropping errors,
-and records strict quality rejections rather than concealing negative residuals.
-**Fresh SAFE detection deployment remains blocked.**
+The [new SAFE acquisition report](docs/processing-validation/v3/README.md)
+records ten authentic CDSE downloads and retains all rejected outcomes.
+One northern Labrador EW product passes nine fixed SNAP comparisons, whole-image
+quality (2.69% non-positive HV) and NL marine quality (3.51%). None of the seven
+new IW products passes the unchanged 5% limit; the best result is 6.20%.
+The [prior processing corrections](docs/processing-validation/v2/README.md)
+remain documented. **Roadmap step 2 and broad fresh SAFE deployment remain blocked.**
 
 The [Sentinel-2 paired-review report](docs/optical-review/v1/README.md) records
 live searches of all 25 evaluated development acquisitions: 15 have optical
@@ -200,8 +202,8 @@ are absent. CI uses locked dependencies and a real PostGIS service.
 | Analyst review and geographic API | Implemented; local API-key protection |
 | Independent target references | Real packets and human review underway; repeat review and adjudication pending. AI assistance must be disclosed; see the [roadmap audit](docs/ROADMAP_AUDIT.md) |
 | Sentinel-2 paired review | Planetary Computer and CDSE providers; verified original SAFE alternative, native crops, cloud/shadow/valid-data screening and separate attributed evidence; pilot coverage is limited |
-| SAFE EW/IW calibration and geolocation | Marine range-Doppler, EGM96 height, residual timing and matched SNAP checks; see [v2 validation](docs/processing-validation/v2/README.md). Absolute geolocation accuracy is not established |
-| ESA standard thermal noise removal | Sampled agreement does not establish usable observations; see the [current quality rejections](docs/processing-validation/v2/README.md#remaining-gate) |
+| SAFE EW/IW calibration and geolocation | Marine range-Doppler, EGM96 height, residual timing and matched SNAP checks; see [current validation](docs/processing-validation/v3/README.md). Absolute geolocation accuracy is not established |
+| ESA standard thermal noise removal | Sampled agreement does not establish usable observations; see the [current EW pass and IW rejections](docs/processing-validation/v3/README.md) |
 | Fresh SAFE detection deployment | Blocked by separate processing-quality and scientific-release gates; no current producer grants a release |
 | Precise-orbit acquisition | Implemented; POEORB/RESORB fetched from public ESA/ASF mirrors, no credentials needed |
 | Precise-orbit **correction** in Python pipeline | Not applied; marine geocoding uses annotated orbit/range metadata and records that source |

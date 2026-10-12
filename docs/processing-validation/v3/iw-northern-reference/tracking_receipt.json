@@ -1,0 +1,11 @@
+{
+  "run_id": "6c244371e400474d8f116bf4bd4f003b",
+  "experiment": "cryolens-processing-iw-northern-reference-20261012",
+  "report_sha256": "4ef17e5f3bebec58fd56012c64794b63f1c7f6b6c32bb5da30049fe466195cf7",
+  "recipe_id": "iw-northern-reference-20261012",
+  "configuration_sha256": "d58799e0e6049a2b14ca70b685aba883545aa906be2cbc448497dea24728519a",
+  "graph_sha256": "266c615e0dfb96b1cb56aefe363f7ffdea4171c9589d4a691615619e4a63d0db",
+  "purpose": "Completed processing investigation; no precision, recall or false-alarm measurement",
+  "git_commit": "f99b5971d9516ed3058089346646b40844994375",
+  "git_dirty": "true"
+}

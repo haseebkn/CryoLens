@@ -101,3 +101,18 @@ def test_point_kernel_preserves_invalid_neighbors_and_does_not_area_average(
         )
     assert result["power"][0, 0] == 10.5
     assert result["power"][0, 1] == -9999
+
+
+@pytest.mark.skipif(__import__("sys").platform != "win32", reason="Windows extended path contract")
+def test_geocoder_accepts_long_annotation_path(annotation: Path, tmp_path: Path) -> None:
+    from cryolens.preprocess.safe_reader import _open_path
+
+    folder = tmp_path / ("a" * 90) / ("b" * 90)
+    extended = Path(_open_path(folder))
+    extended.mkdir(parents=True)
+    ordinary = folder / "annotation.xml"
+    Path(_open_path(ordinary)).write_bytes(annotation.read_bytes())
+    model = MarineGeocoder(ordinary)
+    row, col, valid = model.coordinates(np.array([0.0]), np.array([0.0]), (0, 0, 100, 10000))
+    assert valid.all()
+    assert np.isfinite(row).all() and np.isfinite(col).all()

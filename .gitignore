@@ -108,3 +108,10 @@ CryoLens Data/
 
 # Published benchmark artefacts are part of the deliverable and are tracked.
 !docs/benchmarks/
+
+# Exact execution snapshots for the additive Sentinel-1 suitability investigation.
+!docs/processing-validation/v3/initial-execution-snapshot/executed-code.zip
+!docs/processing-validation/v3/ew-northern-qualified/executed-code.zip
+!docs/processing-validation/v3/iw-northern-reference/executed-code.zip
+!docs/processing-validation/v3/iw-noise-edge/executed-code.zip
+!docs/processing-validation/v3/iw-april9/executed-code.zip

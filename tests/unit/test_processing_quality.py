@@ -464,3 +464,34 @@ def test_reference_identity_hashes_inputs_beyond_windows_path_limit(
     original = validation.reference_identity(scratch, graph, window, "runtime")
     copied = validation.reference_identity(long_scratch, graph, window, "runtime")
     assert copied == original
+
+
+def test_short_block_keeps_measured_zero_edge_knots(tmp_path: Path) -> None:
+    """A measured positive profile with zero border knots is not missing noise."""
+    from cryolens.preprocess.safe_reader import _noise_power_grid
+
+    path = tmp_path / "noise.xml"
+    ranges = "".join(
+        f"<noiseRangeVector><line>{line}</line><pixel>0 3 5</pixel>"
+        "<noiseRangeLut>4 4 0</noiseRangeLut></noiseRangeVector>"
+        for line in (0, 9)
+    )
+    azimuth = "".join(
+        f"<noiseAzimuthVector><swath>IW3</swath><firstAzimuthLine>{lo}</firstAzimuthLine>"
+        f"<lastAzimuthLine>{hi}</lastAzimuthLine><firstRangeSample>0</firstRangeSample>"
+        f"<lastRangeSample>5</lastRangeSample><line>{lo} {hi}</line>"
+        "<noiseAzimuthLut>1 1</noiseAzimuthLut></noiseAzimuthVector>"
+        for lo, hi in ((0, 2), (3, 5), (6, 9))
+    )
+    path.write_text(f"<noise>{ranges}{azimuth}</noise>")
+    full = _noise_power_grid(path, (10, 6), full_shape=(10, 6))
+    np.testing.assert_allclose(full, np.tile([4, 4, 4, 4, 2, 0], (10, 1)))
+    window = _noise_power_grid(path, (2, 3), offset=(4, 3), full_shape=(10, 6))
+    np.testing.assert_allclose(window, full[4:6, 3:6])
+    original = path.read_text()
+    path.write_text(original.replace("4 4 0", "4 4 -1"))
+    with pytest.raises(ValueError, match="qualified|nonnegative"):
+        _noise_power_grid(path, (10, 6), full_shape=(10, 6))
+    path.write_text(original.replace("4 4 0", "0 0 0"))
+    with pytest.raises(ValueError, match="qualified"):
+        _noise_power_grid(path, (10, 6), full_shape=(10, 6))

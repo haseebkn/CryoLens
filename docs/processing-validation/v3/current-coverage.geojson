@@ -1,0 +1,415 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -53.53429,
+              58.649258
+            ],
+            [
+              -52.882507,
+              60.132877
+            ],
+            [
+              -57.421913,
+              60.555359
+            ],
+            [
+              -57.880016,
+              59.064625
+            ],
+            [
+              -53.53429,
+              58.649258
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1A_IW_GRDH_1SDH_20260218T100312_20260218T100337_063272_07F1DB_7F26_COG.SAFE",
+        "mode": "IW",
+        "date": "2026-02-18T10:03:12.024619Z",
+        "quality_passed": false,
+        "nonpositive_HV_fraction": 0.5549485698735164,
+        "scientific_comparison_passed": false,
+        "passing_product_checks": false,
+        "comparison_report": null,
+        "map_label": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -54.253014,
+              56.893452
+            ],
+            [
+              -53.534328,
+              58.64917
+            ],
+            [
+              -57.878319,
+              59.0644
+            ],
+            [
+              -58.391384,
+              57.301834
+            ],
+            [
+              -54.253014,
+              56.893452
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1A_IW_GRDH_1SDH_20260218T100337_20260218T100406_063272_07F1DB_285F_COG.SAFE",
+        "mode": "IW",
+        "date": "2026-02-18T10:03:37.025468Z",
+        "quality_passed": false,
+        "nonpositive_HV_fraction": 0.5570980632263047,
+        "scientific_comparison_passed": false,
+        "passing_product_checks": false,
+        "comparison_report": null,
+        "map_label": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -51.758591,
+              52.269741
+            ],
+            [
+              -51.244251,
+              53.761204
+            ],
+            [
+              -55.178719,
+              54.172478
+            ],
+            [
+              -55.55941,
+              52.678059
+            ],
+            [
+              -51.758591,
+              52.269741
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1A_IW_GRDH_1SDH_20260304T094831_20260304T094856_063476_07F9A7_1908_COG.SAFE",
+        "mode": "IW",
+        "date": "2026-03-04T09:48:31.350668Z",
+        "quality_passed": false,
+        "nonpositive_HV_fraction": 0.1887150230579251,
+        "scientific_comparison_passed": false,
+        "passing_product_checks": false,
+        "comparison_report": null,
+        "map_label": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -56.978851,
+              54.762306
+            ],
+            [
+              -50.45686,
+              55.48045
+            ],
+            [
+              -51.520695,
+              59.318573
+            ],
+            [
+              -58.738132,
+              58.569862
+            ],
+            [
+              -56.978851,
+              54.762306
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1A_EW_GRDM_1SDH_20260314T211636_20260314T211740_063629_07FF73_69C8_COG.SAFE",
+        "mode": "EW",
+        "date": "2026-03-14T21:16:36.485757Z",
+        "quality_passed": false,
+        "nonpositive_HV_fraction": 0.05636626423041002,
+        "scientific_comparison_passed": false,
+        "passing_product_checks": false,
+        "comparison_report": null,
+        "map_label": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -60.230774,
+              57.38525
+            ],
+            [
+              -58.534054,
+              53.552528
+            ],
+            [
+              -52.181599,
+              54.265221
+            ],
+            [
+              -53.226871,
+              58.125511
+            ],
+            [
+              -60.230774,
+              57.38525
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1C_EW_GRDM_1SDH_20260325T212331_20260325T212436_006926_00E035_18A7_COG.SAFE",
+        "mode": "EW",
+        "date": "2026-03-25T21:23:31.370245Z",
+        "quality_passed": true,
+        "nonpositive_HV_fraction": 0.019035400545902324,
+        "scientific_comparison_passed": false,
+        "passing_product_checks": false,
+        "comparison_report": null,
+        "map_label": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -62.067883,
+              60.924526
+            ],
+            [
+              -60.230942,
+              57.385605
+            ],
+            [
+              -53.225628,
+              58.125973
+            ],
+            [
+              -54.29781,
+              61.702564
+            ],
+            [
+              -62.067883,
+              60.924526
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG.SAFE",
+        "mode": "EW",
+        "date": "2026-03-25T21:24:36.049639Z",
+        "quality_passed": true,
+        "nonpositive_HV_fraction": 0.026921776714300915,
+        "scientific_comparison_passed": true,
+        "passing_product_checks": true,
+        "comparison_report": "ew-northern-qualified/report.json",
+        "map_label": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -53.052132,
+              54.454224
+            ],
+            [
+              -52.498367,
+              55.943245
+            ],
+            [
+              -56.605995,
+              56.356663
+            ],
+            [
+              -57.009212,
+              54.863461
+            ],
+            [
+              -53.052132,
+              54.454224
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1C_IW_GRDH_1SDH_20260327T095510_20260327T095535_006948_00E0EF_0CF3_COG.SAFE",
+        "mode": "IW",
+        "date": "2026-03-27T09:55:10.196904Z",
+        "quality_passed": false,
+        "nonpositive_HV_fraction": 0.28864435414382883,
+        "scientific_comparison_passed": false,
+        "passing_product_checks": false,
+        "comparison_report": null,
+        "map_label": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -51.600964,
+              52.73547
+            ],
+            [
+              -51.0788,
+              54.226543
+            ],
+            [
+              -54.997101,
+              54.633686
+            ],
+            [
+              -55.384026,
+              53.139412
+            ],
+            [
+              -51.600964,
+              52.73547
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1A_IW_GRDH_1SDH_20260328T094823_20260328T094848_063826_0806C8_672E_COG.SAFE",
+        "mode": "IW",
+        "date": "2026-03-28T09:48:23.852957Z",
+        "quality_passed": false,
+        "nonpositive_HV_fraction": 0.06201338429678103,
+        "scientific_comparison_passed": true,
+        "passing_product_checks": false,
+        "comparison_report": "iw-northern-reference/report.json",
+        "map_label": 8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -51.964123,
+              44.832432
+            ],
+            [
+              -51.541504,
+              46.330421
+            ],
+            [
+              -54.852859,
+              46.727489
+            ],
+            [
+              -55.188004,
+              45.229366
+            ],
+            [
+              -51.964123,
+              44.832432
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1C_IW_GRDH_1SDH_20260329T094123_20260329T094148_006977_00E1FB_54AA_COG.SAFE",
+        "mode": "IW",
+        "date": "2026-03-29T09:41:23.787894Z",
+        "quality_passed": false,
+        "nonpositive_HV_fraction": 0.4000527385716205,
+        "scientific_comparison_passed": false,
+        "passing_product_checks": false,
+        "comparison_report": null,
+        "map_label": 9
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -51.601772,
+              52.735451
+            ],
+            [
+              -51.079628,
+              54.226524
+            ],
+            [
+              -54.997631,
+              54.633621
+            ],
+            [
+              -55.384541,
+              53.139347
+            ],
+            [
+              -51.601772,
+              52.735451
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1A_IW_GRDH_1SDH_20260409T094823_20260409T094848_064001_080D54_B5FE_COG.SAFE",
+        "mode": "IW",
+        "date": "2026-04-09T09:48:23.996445Z",
+        "quality_passed": false,
+        "nonpositive_HV_fraction": 0.2265518654318725,
+        "scientific_comparison_passed": false,
+        "passing_product_checks": false,
+        "comparison_report": null,
+        "map_label": 10
+      }
+    }
+  ]
+}

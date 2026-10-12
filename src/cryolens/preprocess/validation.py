@@ -78,12 +78,18 @@ def prepare_reference_input(safe: Path, output: Path) -> dict[str, Any]:
                 blockxsize=256,
                 blockysize=256,
                 BIGTIFF="YES",
+                copy_src_overviews=True,
             )
         original_hash, decoded_hash = hashlib.sha256(), hashlib.sha256()
         with (
             rasterio.open(_open_path(source)) as original,
             rasterio.open(_open_path(target)) as converted,
         ):
+            if original.overviews(1) != converted.overviews(1):
+                raise ValueError(
+                    "Reference scratch changed internal overviews; use a new scratch directory"
+                )
+            overview_scales = original.overviews(1)
             if original.shape != converted.shape or original.dtypes != converted.dtypes:
                 raise ValueError("Reference scratch measurement changed dimensions/type")
             for _, window in converted.block_windows(1):
@@ -97,6 +103,7 @@ def prepare_reference_input(safe: Path, output: Path) -> dict[str, Any]:
                 "source_sha256": file_digest(source),
                 "decoded_blocks_sha256": original_hash.hexdigest(),
                 "decoded_pixels_identical": True,
+                "source_internal_overview_scales": overview_scales,
             }
         )
     manifest = safe / "manifest.safe"
@@ -478,6 +485,9 @@ def validate_configuration(config: dict[str, Any]) -> None:
     products = config.get("products")
     fractions = config.get("sampling_fractions")
     size = config.get("window_size_px")
+    rows = config.get("scan_block_rows", 256)
+    if not isinstance(rows, int) or isinstance(rows, bool) or rows < 1:
+        raise ValueError("Quality scan block rows must be a positive integer")
     if not isinstance(products, list) or not products:
         raise ValueError("Validation needs a nonempty product list")
     if not isinstance(size, int) or isinstance(size, bool) or size < 64:
@@ -558,10 +568,11 @@ def main() -> int:
         },
         "scientific_comparison_passed": False,
         "deployment_gate_open": False,
+        "quality_scan_block_rows": config.get("scan_block_rows", 256),
         "products": [],
     }
     for item in config["products"]:
-        safe = Path(item["path"])
+        safe = Path(_open_path(Path(item["path"])))
         require_development_product(safe, Path(config["frozen_manifest"]))
         reader = SAFEProductReader(safe)
         receipt = prepare_reference_input(safe, args.scratch_dir / safe.name)
@@ -590,7 +601,9 @@ def main() -> int:
         elif not args.skip_full_scan:
             try:
                 product["quality"] = assess_safe_product(
-                    reader, args.output_dir / f"{item['name']}-full-quality.json"
+                    reader,
+                    args.output_dir / f"{item['name']}-full-quality.json",
+                    block_rows=config.get("scan_block_rows", 256),
                 )
             except ProcessingQualityError as exc:
                 product["quality"] = exc.report

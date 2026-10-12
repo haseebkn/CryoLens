@@ -320,7 +320,12 @@ def _noise_power_grid(
                 )
                 for line in ordered_candidates:
                     selected = (lut.lines == line) & (lut.pixels >= c0) & (lut.pixels < c1)
-                    if selected.sum() >= 2 and np.all(lut.values[selected] > 0):
+                    # Publisher noise profiles can end with measured zero knots
+                    # at padded range edges. Preserve those knots, while still
+                    # requiring a genuine nonnegative, positive-supported profile.
+                    if np.count_nonzero(lut.values[selected] > 0) >= 2 and np.all(
+                        lut.values[selected] >= 0
+                    ):
                         # Keep measured bracketing range knots. Trimming them at
                         # a merge edge extrapolates its steep slope into negative
                         # noise; SNAP interpolates the chosen complete vector.

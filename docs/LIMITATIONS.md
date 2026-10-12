@@ -104,6 +104,15 @@ Unsupported engines and missing inputs fail explicitly.
 
 ### Validation outcome, 2026-10-12
 
+The additive [v3 acquisition investigation](processing-validation/v3/README.md)
+records ten newly verified downloads. One northern Labrador EW acquisition now
+passes the fixed nine-window SNAP comparisons and unchanged whole-image and
+marine-domain quality checks. All seven new IW acquisitions fail the 5% limit;
+roadmap step 2 remains incomplete. This adaptive development search does not
+establish seasonal availability, whole-footprint geometry, absolute field accuracy,
+or a regional false-alarm budget. Its historical failures are retained.
+
+
 The [reproducible processing report](processing-validation/v2/README.md)
 supersedes the earlier scene-median comparison. Similar extents and medians
 did not confirm calibration or absolute geolocation accuracy.

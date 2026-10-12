@@ -1,0 +1,44 @@
+{
+  "inputs_and_code": {
+    "safe_files_sha256": {
+      "annotation/calibration/calibration-s1a-iw-grd-hh-20260218t100337-20260218t100406-063272-07f1db-001-cog.xml": "0f2df33927420c2eddf876032ab918180d3a28d1cc7d4e1da2eede30fd064849",
+      "annotation/calibration/calibration-s1a-iw-grd-hv-20260218t100337-20260218t100406-063272-07f1db-002-cog.xml": "c9ce9b5318883da574699b771e7d5ab91aa265cc505e7e29f76ed81c0261cc96",
+      "annotation/calibration/noise-s1a-iw-grd-hh-20260218t100337-20260218t100406-063272-07f1db-001-cog.xml": "0a6f3cfe16a82a4b617589d8389eb6329e557fdc9f4373d1ccb382494968e80c",
+      "annotation/calibration/noise-s1a-iw-grd-hv-20260218t100337-20260218t100406-063272-07f1db-002-cog.xml": "e42b31815f7855fde9f8c574093ab1e4ddafdff188c4f4602353967381e7ba33",
+      "annotation/rfi/rfi-s1a-iw-grd-hh-20260218t100337-20260218t100406-063272-07f1db-001-cog.xml": "9189a9420f6c032f057adb5fa060924fdefed659f458162c60211dc6129c781e",
+      "annotation/rfi/rfi-s1a-iw-grd-hv-20260218t100337-20260218t100406-063272-07f1db-002-cog.xml": "9cf6d9cc9b0f9ed251fd9094f15977b75d9a3649ed0ad9180a29c72fadaf61d3",
+      "annotation/s1a-iw-grd-hh-20260218t100337-20260218t100406-063272-07f1db-001-cog.xml": "9cfe722cb1b68bf551bd1720d5d386f228f4ed40519a9c9297d651d8ec9f279b",
+      "annotation/s1a-iw-grd-hv-20260218t100337-20260218t100406-063272-07f1db-002-cog.xml": "4a3dbdc4e7de82e16111dc0a9cecd7d13696bcadfb7ed1864a8e3dc734a5197e",
+      "manifest.safe": "0031671262f838e7bd53caa782be6c6b3e0e3b45aaca80f9e707cb48a7436e10",
+      "measurement/s1a-iw-grd-hh-20260218t100337-20260218t100406-063272-07f1db-001-cog.tiff": "9638f31f95fed6e933a3a30495319a081133a00ca91c2d342abfde36914fcf20",
+      "measurement/s1a-iw-grd-hv-20260218t100337-20260218t100406-063272-07f1db-002-cog.tiff": "d471469536b28db5f4ca5323b1f501084f94ba139d4d54931c08323b2e49d738",
+      "preview/icons/logo.png": "3c515b23f2f508704a5451c0d8d86057215edab26a3d16fb2e5abe0a88c043e5",
+      "preview/map-overlay.kml": "9d7845746d43539182d20189df33332ee0d05a62df9f57badbce6a34e9dd2a74",
+      "preview/product-preview.html": "2bb60f3acf689e2a76cd455f6cf6c9b4bb74a80dc90e14446322f659a59275e9",
+      "preview/quick-look.png": "0a6d9b8ae1d712193156c61763c79f698bcc98593888aa4fa94db5d5ff03723a",
+      "preview/thumbnail.png": "9e9d6409f8a7ac32fa98d4d789770531343b9915b87ef20aeadde881a6bbcc45",
+      "S1A_IW_GRDH_1SDH_20260218T100337_20260218T100406_063272_07F1DB_B788.SAFE-report-20260218T115621.pdf": "0e5722158af7165294fc383a9843d8a9027eb9ef8c17229f75c7df22c6ae6c33",
+      "support/s1-level-1-calibration.xsd": "6e81a81e501fbe90afc523ceb266177e5cfd5c798ec633c3f56bab70cdba1b63",
+      "support/s1-level-1-measurement.xsd": "c0c1dd52ca353cc5046b87e8c1be1e9abfb7a546dadd293d1f9d591831bc1524",
+      "support/s1-level-1-noise.xsd": "715d34d8c59dd575604838b310e6fda9c397c90fa6377a0daab4527d94ae8ae3",
+      "support/s1-level-1-product.xsd": "05b71da914fc100524fa7fec01928f869a5e160bf1ae04e4cec5db5a23da5d6f",
+      "support/s1-level-1-quicklook.xsd": "88f59322d2372e958b850c49ff40cb8fba8c6eccef569acbbfb87f322d432d2d",
+      "support/s1-level-1-rfi.xsd": "63eb491df437adcbdc5cd9b0b796cdebc2635be27893871f981123bd108ce723",
+      "support/s1-map-overlay.xsd": "c9e9c41b11bdedad81fbebc234030f513a4c6cc7998c2dffaac05a40000aeb8f",
+      "support/s1-object-types.xsd": "198d2e5b79ef1b8a4ff3111f566e2f0f4316f48170bfefc34f75989b52df30d5",
+      "support/s1-product-preview.xsd": "967f7ad405a3c911b4b59525ba6bac134e9fd3742efd0c4e32648f67f4689c0e"
+    },
+    "policy": {
+      "version": "safe-quality-v1",
+      "max_nonpositive_fraction": 0.05,
+      "min_valid_fraction": 0.1,
+      "incidence_min_deg": 15.0,
+      "incidence_max_deg": 50.0,
+      "max_polarization_geolocation_error_m": 20.0
+    },
+    "safe_reader_sha256": "f86f14179a1cddb89eddd1333d1c7ff8bf6ff6d65c8b0ab379319336454bace6",
+    "quality_code_sha256": "0630433f240d23ed51e127c8cfa0820a9a6f7c0474aad959ec05c34f21fec50d",
+    "scan_block_rows": 32
+  },
+  "report_sha256": "387bd588888a197fef99344804a01f7059a395a3b61452d743230103976bcc0a"
+}

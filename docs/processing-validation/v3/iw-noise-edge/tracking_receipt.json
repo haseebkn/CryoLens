@@ -1,0 +1,11 @@
+{
+  "run_id": "ddc951e001af474a8787b61a6b20510d",
+  "experiment": "cryolens-processing-iw-measured-zero-edge-20261012",
+  "report_sha256": "73444f5176d67d3fd95cccc898a50704363cf64c39174e04eed8b5e6b552613a",
+  "recipe_id": "iw-measured-zero-edge-20261012",
+  "configuration_sha256": "b0befb712e0975ebbe0e40bb6d31ce5e73cdefa4a64f12f4713e85b038856756",
+  "graph_sha256": "266c615e0dfb96b1cb56aefe363f7ffdea4171c9589d4a691615619e4a63d0db",
+  "purpose": "Completed processing investigation; no precision, recall or false-alarm measurement",
+  "git_commit": "f99b5971d9516ed3058089346646b40844994375",
+  "git_dirty": "true"
+}

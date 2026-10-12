@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "purpose": "Additive development processing suitability search. All initial failures remain reported. No held-out detector labels or performance accessed.",
+  "selection_rule": "Among metadata-screened distinct IW footprints with zero reference heights, choose the northernmost within the NL AOI. Selection is by geographic/height metadata before reading this product; initial northern IW failed the unchanged 5% limit.",
+  "aoi_path": "configs/aoi.geojson",
+  "frozen_manifest": "docs/evaluation/v1/manifest.json",
+  "quality_policy": "safe-quality-v1 (unchanged)",
+  "selected": [
+    {
+      "id": "8357dae6-8875-451e-bfe8-41f7deb65515",
+      "name": "S1C_IW_GRDH_1SDH_20260327T095510_20260327T095535_006948_00E0EF_0CF3_COG.SAFE",
+      "mode": "IW",
+      "date": "2026-03-27T09:55:10.196904Z",
+      "bytes": 943622843,
+      "aoi_fraction": 1.0,
+      "overlap_centroid": [
+        -54.787533411921835,
+        55.40868169532613
+      ],
+      "attributes": {
+        "origin": "CLOUDFERRO",
+        "datatakeID": 57583,
+        "timeliness": "Fast-24h",
+        "cycleNumber": 43,
+        "orbitNumber": 6948,
+        "sliceNumber": 11,
+        "productClass": "S",
+        "processorName": "Sentinel-1 COGifier",
+        "orbitDirection": "DESCENDING",
+        "processingDate": "2026-03-27T13:47:21.442016Z",
+        "operationalMode": "IW",
+        "processingLevel": "LEVEL1",
+        "swathIdentifier": "IW",
+        "processingCenter": "Copernicus Data Space Ecosystem-CloudFerro",
+        "processorVersion": "001.00",
+        "sliceProductFlag": true,
+        "platformShortName": "SENTINEL-1",
+        "productComposition": "Slice",
+        "instrumentShortName": "SAR",
+        "relativeOrbitNumber": 127,
+        "polarisationChannels": "HH&HV",
+        "platformSerialIdentifier": "C",
+        "instrumentConfigurationID": 5,
+        "startTimeFromAscendingNode": 2040334.0,
+        "completionTimeFromAscendingNode": 2065331.0,
+        "productType": "IW_GRDH_1S-COG",
+        "beginningDateTime": "2026-03-27T09:55:10.196904Z",
+        "endingDateTime": "2026-03-27T09:55:35.194186Z"
+      },
+      "catalogue": {
+        "@odata.mediaContentType": "application/octet-stream",
+        "Id": "8357dae6-8875-451e-bfe8-41f7deb65515",
+        "Name": "S1C_IW_GRDH_1SDH_20260327T095510_20260327T095535_006948_00E0EF_0CF3_COG.SAFE",
+        "ContentType": "application/octet-stream",
+        "ContentLength": 943622843,
+        "OriginDate": "2026-03-27T12:46:25.053166Z",
+        "PublicationDate": "2026-03-27T13:50:02.450482Z",
+        "ModificationDate": "2026-03-27T13:50:02.450482Z",
+        "Online": true,
+        "EvictionDate": "9999-12-31T23:59:59.999999Z",
+        "S3Path": "/eodata/Sentinel-1/SAR/IW_GRDH_1S-COG/2026/03/27/S1C_IW_GRDH_1SDH_20260327T095510_20260327T095535_006948_00E0EF_0CF3_COG.SAFE",
+        "Checksum": [
+          {
+            "Value": "bb61ac20afaf19992ad07f4dc8a84eb4",
+            "Algorithm": "MD5",
+            "ChecksumDate": "2026-03-27T13:50:00.198027Z"
+          },
+          {
+            "Value": "411ee0cb14db4378bfd5dedd5236b8bdd7c411f723914c8a7096b6d79e740215",
+            "Algorithm": "BLAKE3",
+            "ChecksumDate": "2026-03-27T13:50:01.585301Z"
+          }
+        ],
+        "ContentDate": {
+          "Start": "2026-03-27T09:55:10.196904Z",
+          "End": "2026-03-27T09:55:35.194186Z"
+        },
+        "Footprint": "geography'SRID=4326;POLYGON ((-53.052132 54.454224, -52.498367 55.943245, -56.605995 56.356663, -57.009212 54.863461, -53.052132 54.454224))'",
+        "GeoFootprint": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -53.052132,
+                54.454224
+              ],
+              [
+                -52.498367,
+                55.943245
+              ],
+              [
+                -56.605995,
+                56.356663
+              ],
+              [
+                -57.009212,
+                54.863461
+              ],
+              [
+                -53.052132,
+                54.454224
+              ]
+            ]
+          ]
+        },
+        "Attributes": [
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "origin",
+            "Value": "CLOUDFERRO",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.IntegerAttribute",
+            "Name": "datatakeID",
+            "Value": 57583,
+            "ValueType": "Integer"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "timeliness",
+            "Value": "Fast-24h",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.IntegerAttribute",
+            "Name": "cycleNumber",
+            "Value": 43,
+            "ValueType": "Integer"
+          },
+          {
+            "@odata.type": "#OData.CSC.IntegerAttribute",
+            "Name": "orbitNumber",
+            "Value": 6948,
+            "ValueType": "Integer"
+          },
+          {
+            "@odata.type": "#OData.CSC.IntegerAttribute",
+            "Name": "sliceNumber",
+            "Value": 11,
+            "ValueType": "Integer"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "productClass",
+            "Value": "S",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "processorName",
+            "Value": "Sentinel-1 COGifier",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "orbitDirection",
+            "Value": "DESCENDING",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+            "Name": "processingDate",
+            "Value": "2026-03-27T13:47:21.442016Z",
+            "ValueType": "DateTimeOffset"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "operationalMode",
+            "Value": "IW",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "processingLevel",
+            "Value": "LEVEL1",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "swathIdentifier",
+            "Value": "IW",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "processingCenter",
+            "Value": "Copernicus Data Space Ecosystem-CloudFerro",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "processorVersion",
+            "Value": "001.00",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.BooleanAttribute",
+            "Name": "sliceProductFlag",
+            "Value": true,
+            "ValueType": "Boolean"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "platformShortName",
+            "Value": "SENTINEL-1",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "productComposition",
+            "Value": "Slice",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "instrumentShortName",
+            "Value": "SAR",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.IntegerAttribute",
+            "Name": "relativeOrbitNumber",
+            "Value": 127,
+            "ValueType": "Integer"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "polarisationChannels",
+            "Value": "HH&HV",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "platformSerialIdentifier",
+            "Value": "C",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.IntegerAttribute",
+            "Name": "instrumentConfigurationID",
+            "Value": 5,
+            "ValueType": "Integer"
+          },
+          {
+            "@odata.type": "#OData.CSC.DoubleAttribute",
+            "Name": "startTimeFromAscendingNode",
+            "Value": 2040334.0,
+            "ValueType": "Double"
+          },
+          {
+            "@odata.type": "#OData.CSC.DoubleAttribute",
+            "Name": "completionTimeFromAscendingNode",
+            "Value": 2065331.0,
+            "ValueType": "Double"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "productType",
+            "Value": "IW_GRDH_1S-COG",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+            "Name": "beginningDateTime",
+            "Value": "2026-03-27T09:55:10.196904Z",
+            "ValueType": "DateTimeOffset"
+          },
+          {
+            "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+            "Name": "endingDateTime",
+            "Value": "2026-03-27T09:55:35.194186Z",
+            "ValueType": "DateTimeOffset"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata_screen_annotation_sha256": "637d3b6bccf233574902cb35c660eac8f32011817092d7df88d06cc6de42b66c"
+}
