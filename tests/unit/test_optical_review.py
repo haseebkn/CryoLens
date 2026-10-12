@@ -9,8 +9,11 @@ import numpy as np
 import pytest
 import rasterio
 from fastapi.testclient import TestClient
+from geoalchemy2.shape import from_shape
 from pyproj import Transformer
+from rasterio.control import GroundControlPoint
 from rasterio.transform import from_origin
+from shapely.geometry import Point
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -19,11 +22,13 @@ from cryolens.db.models import (
     DetectionModel,
     OpticalEvidenceModel,
     OpticalPairModel,
+    SceneModel,
     ValidationModel,
 )
 from cryolens.eval.cohort import digest, file_digest
 from cryolens.ingest.sentinel2 import BANDS, Sentinel2Client, utc
-from cryolens.review.pairs import assess_visibility
+from cryolens.ingest.sentinel2_cdse import CDSESentinel2Client
+from cryolens.review.pairs import RadarChip, assess_visibility, build_pair
 from cryolens.review.policy import PairingPolicy
 from tests.unit.test_api import KEY, first_id
 from tests.unit.test_api import api_database as api_database
@@ -171,6 +176,51 @@ def test_native_download_preserves_source_pixels_grid_and_masks(
         assert (
             file_digest(tmp_path / "native" / receipt[band]["filename"]) == receipt[band]["sha256"]
         )
+
+
+def test_unavailable_pairs_keep_provider_provenance_and_cached_evidence(tmp_path: Path) -> None:
+    detection = DetectionModel(
+        id="synthetic-test-only",
+        centroid_wgs84=from_shape(Point(-52.5, 47.5), srid=4326),
+        scene=SceneModel(
+            product_id="synthetic-test-only",
+            acquisition_time=datetime(2020, 5, 15, 10, tzinfo=UTC),
+        ),
+    )
+    radar = RadarChip(
+        hh=np.full((10, 10), -20, dtype=np.float32),
+        hv=np.full((10, 10), -25, dtype=np.float32),
+        gcps=[
+            GroundControlPoint(row=row, col=col, x=lon, y=lat)
+            for row, lat in ((0, 47.51), (10, 47.49))
+            for col, lon in ((0, -52.51), (10, -52.49))
+        ],
+        source={"source_product_id": "synthetic-test-only", "native_pixel_spacing_m": 40},
+    )
+    policy = PairingPolicy(minimum_review_radius_m=100)
+    reason = "No optical acquisition within search window"
+    pc = Sentinel2Client()
+    cdse = CDSESentinel2Client(cache=tmp_path / "cdse-cache")
+    pc_receipt = {"provider": pc.provider, "complete": True, "items": []}
+    cdse_receipt = {"provider": cdse.provider, "complete": True, "items": []}
+    first = build_pair(detection, radar, None, pc, tmp_path, policy, pc_receipt, reason)
+    first_directory = tmp_path / first["id"]
+    evidence = first_directory / "analyst-evidence.json"
+    evidence.write_text('{"assessment": "unavailable"}', encoding="utf-8")
+    preserved = {path.name: path.read_bytes() for path in first_directory.iterdir()}
+
+    second = build_pair(detection, radar, None, cdse, tmp_path, policy, cdse_receipt, reason)
+
+    assert first["id"] != second["id"]
+    for manifest, client, receipt in ((first, pc, pc_receipt), (second, cdse, cdse_receipt)):
+        assert manifest["optical_provider"] == client.provider
+        assert manifest["search"] == receipt
+        assert manifest["visibility"]["status"] == "unavailable"
+        assert manifest["visibility"]["reason"] == reason
+        stored = json.loads((tmp_path / manifest["id"] / "pair.json").read_text())
+        assert stored == manifest
+        assert build_pair(detection, radar, None, client, tmp_path, policy, receipt, reason) == manifest
+    assert {path.name: path.read_bytes() for path in first_directory.iterdir()} == preserved
 
 
 def pair_fixture(

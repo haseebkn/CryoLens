@@ -214,6 +214,7 @@ def build_pair(
             "detection": detection.id,
             "radar": radar.source,
             "optical": item,
+            "optical_provider": client.provider,
             "policy": policy.model_dump(),
             "generation_code_sha256": code_hashes,
             "aoi_sha256": aoi_hash,
