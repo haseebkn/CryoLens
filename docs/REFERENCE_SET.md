@@ -213,7 +213,10 @@ after the latest recorded review**. Issue a random **20%** repeat sample:
 uv run --frozen python -m cryolens.reference issue --workspace <workspace> --original-reviewer <your-id> --reviewer <your-id> --mode repeat
 ```
 
-The command refuses early repeats. Fresh opaque IDs, renamed assets and shuffled
+The command refuses early repeats and fractions below the frozen 20% minimum.
+Imported repeat responses must also postdate their actual packet issuance;
+candidate responses cannot predate completion of the independent survey.
+Fresh opaque IDs, renamed assets and shuffled
 order conceal earlier answers and candidate status; recognizing an image remains
 possible. Private mappings retain base IDs and repeat n/N. Serve the returned
 phase ID as `--queue`, using the assigned reviewer, then import its export.
@@ -250,6 +253,17 @@ adjudication, exact coverage masks and a sealed content manifest. This completes
 one declared reference pilot, not regional validation or iceberg truth.
 New corrections belong in a newly documented review/adjudication version;
 accepted history is never overwritten.
+
+AI reviews and user feedback on AI suggestions remain separate event types and
+never count as personally inspected human submissions. Progress reports and
+frozen snapshots include the recorded assistance history and its event hashes.
+If that history exists, the adjudicator must explicitly set
+`ai_assistance_disclosed: true` and describe its limits before freezing.
+Concealing old answers during a repeat does not remove earlier AI exposure.
+A completed AI-assisted pilot must not be presented as wholly blind independent
+reference evidence; an independent reviewer or additional unexposed reference
+areas are needed for stronger claims. A missing assistance event does not prove
+that a review was blind.
 
 ## Expansion and remaining evidence
 

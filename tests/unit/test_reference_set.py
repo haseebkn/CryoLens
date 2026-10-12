@@ -387,6 +387,14 @@ def test_blind_repeat_waits_one_week_hides_old_answers_and_reports_consistency(
         issue_review(
             workspace, "fixture-reviewer", "fixture-reviewer", now=start + timedelta(days=6)
         )
+    with pytest.raises(ValueError, match="frozen repeat fraction"):
+        issue_review(
+            workspace,
+            "fixture-reviewer",
+            "fixture-reviewer",
+            fraction=0.01,
+            now=start + timedelta(days=8),
+        )
     issued = issue_review(
         workspace, "fixture-reviewer", "fixture-reviewer", now=start + timedelta(days=8)
     )
@@ -404,6 +412,12 @@ def test_blind_repeat_waits_one_week_hides_old_answers_and_reports_consistency(
         for t in issued["tasks"]
     ]
     write_json(workspace / "repeat.json", rows)
+    early_rows = [
+        {**r, "reviewed_utc": (start + timedelta(days=7, hours=1)).isoformat()} for r in rows
+    ]
+    write_json(workspace / "early-repeat.json", early_rows)
+    with pytest.raises(ValueError, match="issued"):
+        ingest(workspace, workspace / "early-repeat.json", now=start + timedelta(days=9))
     ingest(workspace, workspace / "repeat.json", now=start + timedelta(days=9))
     report = summarize(workspace)
     assert report["consistency"][0]["paired_responses"] == 2
@@ -460,6 +474,14 @@ def test_freeze_refuses_missing_humans_then_seals_actual_fixture_records(workspa
     with patch("cryolens.reference.freeze.datetime") as clock:
         clock.now.return_value = now + timedelta(seconds=2)
         clock.fromisoformat.side_effect = datetime.fromisoformat
+        with pytest.raises(ValueError, match="Adjudication predates"):
+            freeze_reference(
+                workspace,
+                "fixture-reviewer",
+                {**adjudication, "adjudicated_utc": (now - timedelta(seconds=1)).isoformat()},
+                workspace / "premature-freeze",
+            )
+        assert not (workspace / "premature-freeze").exists()
         result = freeze_reference(
             workspace,
             "fixture-reviewer",
@@ -479,6 +501,42 @@ def test_workspace_artifact_mutation_is_rejected(workspace: Path) -> None:
     (workspace / "review/survey" / f"{task['task_id']}-HH.png").write_bytes(b"changed")
     with pytest.raises(ValueError, match="artifact changed"):
         read_workspace(workspace)
+
+
+def test_ai_assistance_is_reported_and_cannot_be_silently_frozen(workspace: Path) -> None:
+    from cryolens.reference.records import append_event
+
+    rows = [human(workspace, task) for task in tasks(workspace)]
+    import_rows(workspace, rows)
+    with ledger(workspace) as connection:
+        append_event(
+            connection, "ai_assisted_visual_review", "fixture-ai-review", {"reviewer_type": "AI"}
+        )
+        append_event(
+            connection,
+            "human_feedback_on_ai_review",
+            "fixture-feedback",
+            {"hypothesis": "possible_iceberg"},
+        )
+    report = summarize(workspace)
+    assert report["human_responses"] == len(rows)
+    assert report["review_exposure"]["ai_review_events"] == 1
+    assert report["review_exposure"]["human_feedback_on_ai_events"] == 1
+    assert len(report["review_exposure"]["event_sha256"]) == 2
+    assert report["reference_set_complete"] is False
+    with pytest.raises(ValueError, match="AI assistance"):
+        freeze_reference(
+            workspace,
+            "fixture-reviewer",
+            {
+                "reviewer_id": "fixture-adjudicator",
+                "adjudicated_utc": datetime.now(UTC).isoformat(),
+                "notes": "Synthetic unit fixture, no real labels",
+                "target_ownership_at_core_boundaries_reviewed": True,
+            },
+            workspace / "frozen",
+        )
+    assert not (workspace / "frozen").exists()
 
 
 def test_heldout_reference_release_is_distinct_from_model_execution_and_skips_chart_access(
@@ -584,7 +642,14 @@ def test_candidate_review_requires_prior_survey_and_preserves_sampling_weights(
 
     with pytest.raises(ValueError, match="independent survey dispositions"):
         import_rows(root, [answer(candidate_tasks[0], "target")])
-    import_rows(root, [human(root, t) for t in tasks(root) if t["mode"] == "survey"])
+    surveys = [human(root, t) for t in tasks(root) if t["mode"] == "survey"]
+    import_rows(root, surveys)
+    early = {
+        **answer(candidate_tasks[0], "target"),
+        "reviewed_utc": read_workspace(root)["created_at"],
+    }
+    with pytest.raises(ValueError, match="predates.*survey"):
+        import_rows(root, [early], "early-candidate.json")
     import_rows(
         root,
         [

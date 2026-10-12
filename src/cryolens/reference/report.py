@@ -12,7 +12,7 @@ from cryolens.eval.cohort import digest, file_digest
 from cryolens.reference.consistency import agreement
 from cryolens.reference.design import finite_population_interval
 from cryolens.reference.packet import read_workspace
-from cryolens.reference.records import events, ledger
+from cryolens.reference.records import events, ledger, review_exposure
 
 
 def summarize(root: Path) -> dict[str, Any]:
@@ -155,6 +155,7 @@ def summarize(root: Path) -> dict[str, Any]:
         "reference_only_test_access": workspace["reference_only_test_access"],
         "human_responses": sum(e["kind"] == "response" for e in history),
         "reviewer_count": len(reviewers),
+        "review_exposure": review_exposure(history),
         "reviewers": reviewer_reports,
         "consistency": agreement(history),
         "independent_reviewer_obtained": any(

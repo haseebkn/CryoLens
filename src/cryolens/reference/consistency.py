@@ -44,6 +44,8 @@ def issue_review(
     )
     if not np.isfinite(fraction) or not 0 < fraction <= 1:
         raise ValueError("Review fraction must be in (0, 1]")
+    if mode == "repeat" and fraction < workspace["policy"]["repeat_fraction"]:
+        raise ValueError("Cannot reduce the frozen repeat fraction")
     current = now or datetime.now(UTC)
     with ledger(root) as connection:
         connection.execute("BEGIN IMMEDIATE")

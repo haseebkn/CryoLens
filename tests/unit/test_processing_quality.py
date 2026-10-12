@@ -215,6 +215,48 @@ def test_frozen_holdout_cannot_become_processing_development() -> None:
         require_development_product(safe, Path("docs/evaluation/v1/manifest.json"))
 
 
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"products": []},
+        {"sampling_fractions": []},
+        {"sampling_fractions": [[float("nan"), 0.5]]},
+        {"sampling_fractions": [[0.5, 0.5], [0.5, 0.5]]},
+        {"sampling_fractions": [[1.1, 0.5]]},
+        {"window_size_px": 0},
+    ],
+)
+def test_validation_cli_rejects_empty_or_invalid_comparison_plans(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, change: dict[str, Any]
+) -> None:
+    from cryolens.preprocess import validation
+
+    config = {
+        "products": [{"name": "fixture", "path": "fixture.SAFE"}],
+        "sampling_fractions": [[0.5, 0.5]],
+        "window_size_px": 512,
+        **change,
+    }
+    path = tmp_path / "config.json"
+    path.write_text(json.dumps(config))
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "validation",
+            "--config",
+            str(path),
+            "--output-dir",
+            str(tmp_path / "output"),
+            "--scratch-dir",
+            str(tmp_path / "scratch"),
+        ],
+    )
+    with pytest.raises(ValueError, match="Validation"):
+        validation.main()
+    assert not (tmp_path / "output").exists()
+
+
 def test_reference_cache_rejects_recipe_and_pixel_changes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -232,11 +274,28 @@ def test_reference_cache_rejects_recipe_and_pixel_changes(
         Path(str(prefix) + f"_{stage}.dim").write_text("<dim/>")
         folder = Path(str(prefix) + f"_{stage}.data")
         folder.mkdir()
-        for number in range(3):
-            (folder / f"{number}.img").write_bytes(stage.encode())
+        bands = (
+            ("Sigma0_HH", "Sigma0_HV")
+            if stage == "raw"
+            else ("sigma0_hh", "sigma0_hv", "latitude_band", "longitude_band", "incidence")
+        )
+        for band in bands:
+            (folder / f"{band}.img").write_bytes(stage.encode())
+            (folder / f"{band}.hdr").write_text("ENVI\nsamples = 512\n")
     window = (0, 0, 512, 512)
     validation.write_reference_receipt(scratch, graph, prefix, window, "runtime")
     validation.verify_reference_receipt(scratch, graph, prefix, window, "runtime")
+    header = Path(str(prefix) + "_den.data/sigma0_hv.hdr")
+    header.write_text("ENVI\nsamples = 256\n")
+    with pytest.raises(ValueError, match="changed"):
+        validation.verify_reference_receipt(scratch, graph, prefix, window, "runtime")
+    header.write_text("ENVI\nsamples = 512\n")
+    receipt_path = Path(str(prefix) + "-receipt.json")
+    receipt = json.loads(receipt_path.read_text())
+    receipt_path.write_text(json.dumps({**receipt, "outputs_sha256": {}}))
+    with pytest.raises(ValueError, match="incomplete"):
+        validation.verify_reference_receipt(scratch, graph, prefix, window, "runtime")
+    receipt_path.write_text(json.dumps(receipt))
     graph.write_text("<different-graph/>")
     with pytest.raises(ValueError, match="changed"):
         validation.verify_reference_receipt(scratch, graph, prefix, window, "runtime")

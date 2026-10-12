@@ -309,10 +309,13 @@ def test_missing_or_misaligned_optical_cannot_be_corroboration(
         session.commit()
     response = api_test_client.post(url, headers={"X-Analyst-Key": KEY}, json=body)
     assert response.status_code == 422 and "valid observed pixels" in response.text
+    metadata = {**metadata, "full_movement_envelope_in_chip": False}
+    (folder / "pair.json").write_text(json.dumps(metadata))
     with api_database() as session:
         pair = session.get(OpticalPairModel, pair_id)
         assert pair is not None
-        pair.metadata_json = {**metadata, "full_movement_envelope_in_chip": False}
+        pair.metadata_json = metadata
+        pair.manifest_sha256 = file_digest(folder / "pair.json")
         session.commit()
     response = api_test_client.post(
         url,
@@ -345,3 +348,30 @@ def test_changed_pair_artifacts_are_not_served_or_reviewed(
         ).status_code
         == 409
     )
+
+
+def test_optical_evidence_rejects_database_metadata_drift(
+    api_test_client: TestClient,
+    api_database: sessionmaker[Session],
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    detection, pair_id, _ = pair_fixture(api_test_client, api_database, tmp_path, monkeypatch)
+    with api_database() as session:
+        pair = session.get(OpticalPairModel, pair_id)
+        assert pair is not None
+        pair.metadata_json = {**pair.metadata_json, "matching_radius_m": 100000}
+        session.commit()
+    response = api_test_client.post(
+        f"/api/v1/detections/{detection}/optical-pairs/{pair_id}/evidence",
+        headers={"X-Analyst-Key": KEY},
+        json={
+            "assessment": "corroborating",
+            "visibility": "clear",
+            "observed_lonlat": [-52.5, 47.5],
+            "notes": "Explicit synthetic test evidence",
+        },
+    )
+    assert response.status_code == 409
+    with api_database() as session:
+        assert session.scalar(select(func.count()).select_from(OpticalEvidenceModel)) == 0

@@ -2,9 +2,11 @@
 
 Prepared from verified real AI4Arctic files on 5 October 2026. This is a
 preparation receipt, **not a completed human reference set or an accuracy report**.
-The user will review the first whole-scene pilot personally. No responses have
-been accepted, no review-time estimate exists, no consistency sample has been
-reviewed, and no independent second reviewer has been obtained.
+At preparation on 5 October, no responses had been accepted, no review-time
+estimate existed, no consistency sample had been reviewed, and no independent
+second reviewer had been obtained. The zero counts below are that historical
+snapshot. Human review and separately recorded AI assistance have since begun;
+see the dated [roadmap audit](../../ROADMAP_AUDIT.md) for the verified status.
 
 | Item | Development scene | Held-out scene |
 |---|---:|---:|

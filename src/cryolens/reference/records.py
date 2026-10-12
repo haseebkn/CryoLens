@@ -154,6 +154,19 @@ def append_event(connection: sqlite3.Connection, kind: str, key: str, body: dict
     return True
 
 
+def review_exposure(history: list[dict[str, Any]]) -> dict[str, Any]:
+    """Surface assistance recorded outside the formal human-response stream."""
+    ai = [e for e in history if e["kind"] == "ai_assisted_visual_review"]
+    feedback = [e for e in history if e["kind"] == "human_feedback_on_ai_review"]
+    return {
+        "ai_review_events": len(ai),
+        "human_feedback_on_ai_events": len(feedback),
+        "ai_assistance_recorded": bool(ai or feedback),
+        "event_sha256": [e["sha256"] for e in history if e in ai or e in feedback],
+        "claim_boundary": "Recorded AI assistance and nonblind feedback are separate from human submissions. Prior-answer concealment does not erase this exposure or establish independent accuracy. Absence of recorded assistance is not proof of blinding.",
+    }
+
+
 def phase_tasks(
     root: Path, history: list[dict[str, Any]], phase: str
 ) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
@@ -206,6 +219,8 @@ def validate_response(
     ):
         raise ValueError("Review time is outside the prepared/current interval")
     if issue is not None:
+        if response.reviewed_utc < datetime.fromisoformat(issue["issued_at"]):
+            raise ValueError("Review predates the issued review packet")
         if response.reviewer_id != issue[
             "reviewer_id"
         ] or response.reviewed_utc < datetime.fromisoformat(issue["not_before_utc"]):
@@ -344,6 +359,19 @@ def ingest(root: Path, path: Path, now: datetime | None = None) -> dict[str, Any
                 raise ValueError(
                     "Import the independent survey dispositions before candidate review"
                 )
+            if response.phase == "initial" and task["mode"] == "candidate":
+                survey_times = [
+                    datetime.fromisoformat(e["body"]["response"]["reviewed_utc"])
+                    for e in history
+                    if e["kind"] == "response"
+                    and e["body"]["mode"] == "survey"
+                    and e["body"]["response"]["phase"] == "initial"
+                    and e["body"]["response"]["reviewer_id"] == response.reviewer_id
+                ]
+                if response.reviewed_utc < max(survey_times):
+                    raise ValueError(
+                        "Candidate review predates completion of the independent survey"
+                    )
             staged.append(validate_response(root, workspace, response, task, issue, current))
         inserted = sum(
             append_event(connection, "response", key, body)

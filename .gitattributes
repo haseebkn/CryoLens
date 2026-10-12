@@ -2,3 +2,5 @@
 docs/optical-review/v1/*.json linguist-generated=true
 docs/optical-review/cdse-v1/*.json linguist-generated=true
 docs/reference-set/v1/*.json linguist-generated=true
+docs/audits/pr6-9/*.json linguist-generated=true
+docs/audits/pr6-9/reference-receipts/*.json linguist-generated=true

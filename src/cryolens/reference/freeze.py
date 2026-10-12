@@ -11,7 +11,7 @@ import numpy as np
 
 from cryolens.eval.cohort import digest, file_digest
 from cryolens.reference.packet import read_workspace, write_json
-from cryolens.reference.records import append_event, events, ledger
+from cryolens.reference.records import append_event, events, ledger, review_exposure
 
 
 def freeze_reference(
@@ -45,6 +45,12 @@ def freeze_reference(
                     "Every survey/candidate task needs an explicit primary reviewer disposition"
                 )
             selected[task["task_id"]] = bodies[key]
+        exposure = review_exposure(history)
+        if (
+            exposure["ai_assistance_recorded"]
+            and adjudication.get("ai_assistance_disclosed") is not True
+        ):
+            raise ValueError("Recorded AI assistance must be explicitly disclosed in adjudication")
         consistency_issues = [
             e["body"]
             for e in history
@@ -56,12 +62,14 @@ def freeze_reference(
         if len(resolutions) != len(adjudication.get("case_resolutions", [])):
             raise ValueError("Duplicate adjudication case resolution")
         comparisons = []
+        considered_reviews = list(selected.values())
         for issue in consistency_issues:
             for task in issue["tasks"]:
                 key = f"response:{issue['phase']}:{issue['reviewer_id']}:{task['task_id']}"
                 if key not in bodies:
                     raise ValueError("Complete all issued consistency tasks before freezing")
                 first, second = bodies[task["first_response_key"]], bodies[key]
+                considered_reviews.extend((first, second))
 
                 def decisions(body: dict[str, Any]) -> dict[str, Any]:
                     return {
@@ -157,7 +165,7 @@ def freeze_reference(
         if not coverage.any():
             raise ValueError("No independently completed unambiguous survey coverage")
         if date < max(
-            datetime.fromisoformat(b["response"]["reviewed_utc"]) for b in selected.values()
+            datetime.fromisoformat(b["response"]["reviewed_utc"]) for b in considered_reviews
         ):
             raise ValueError("Adjudication predates an accepted review")
         independent = any(i["mode"] == "independent" for i in consistency_issues)
@@ -189,6 +197,7 @@ def freeze_reference(
             ],
             "review_consistency": comparisons,
             "independent_reviewer_obtained": independent,
+            "review_exposure": exposure,
             "surveyed_pixels": int(coverage.sum()),
             "detection_eligible_surveyed_pixels": int(np.count_nonzero(coverage & eligible)),
             "detection_eligibility_available": workspace["detection"] is not None,
@@ -196,7 +205,7 @@ def freeze_reference(
             * workspace["nominal_pixel_area_km2"],
             "area_method": "exact saved native masks times nominal pixel spacing squared; approximate acquisition exposure",
             "reference_set_complete": True,
-            "claim_boundary": "Adjudicated SAR observable-target references, not independent iceberg physical truth or operational accuracy",
+            "claim_boundary": "Adjudicated SAR observable-target references; consult recorded review exposure before asserting independent evaluation. No iceberg physical truth or operational accuracy is established.",
             "files_sha256": {p.name: file_digest(p) for p in sorted(output.iterdir())},
         }
         write_json(output / "reference.json", {"payload": payload, "sha256": digest(payload)})

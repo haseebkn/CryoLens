@@ -71,6 +71,12 @@ def _artifact(pair: OpticalPairModel, filename: str) -> Path:
             409, "Pair manifest is unavailable or changed; regenerate and review provenance"
         )
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if (
+        manifest != pair.metadata_json
+        or manifest.get("id") != pair.id
+        or manifest.get("detection_id") != pair.detection_id
+    ):
+        raise HTTPException(409, "Pair database metadata differs from its verified manifest")
     if filename not in manifest["files"]:
         raise HTTPException(404, "Artifact not recorded in this pair")
     path = folder / filename

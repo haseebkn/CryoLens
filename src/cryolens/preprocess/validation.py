@@ -362,16 +362,32 @@ def reference_identity(
     }
 
 
+def reference_outputs(prefix: Path) -> list[Path]:
+    """Include the headers and sidecars that control decoding, not just pixel bytes."""
+    outputs = [Path(str(prefix) + "_geo.tif")]
+    outputs.extend(sorted(prefix.parent.glob(prefix.name + "_geo.tif.*")))
+    for stage, bands in (
+        ("raw", ("Sigma0_HH", "Sigma0_HV")),
+        ("den", ("sigma0_hh", "sigma0_hv", "latitude_band", "longitude_band", "incidence")),
+    ):
+        outputs.append(Path(str(prefix) + f"_{stage}.dim"))
+        folder = Path(str(prefix) + f"_{stage}.data")
+        required = [folder / (band + suffix) for band in bands for suffix in (".img", ".hdr")]
+        if not all(path.is_file() for path in required):
+            raise ValueError("Independent reference outputs are incomplete (bands/headers)")
+        outputs.extend(sorted(path for path in folder.rglob("*") if path.is_file()))
+    if not all(path.is_file() for path in outputs):
+        raise ValueError("Independent reference outputs are incomplete")
+    if any(not path.resolve().is_relative_to(prefix.parent.resolve()) for path in outputs):
+        raise ValueError("Independent reference output path escapes its directory")
+    return outputs
+
+
 def write_reference_receipt(
     scratch: Path, graph: Path, prefix: Path, window: tuple[int, int, int, int], image: str
 ) -> None:
     receipt = reference_identity(scratch, graph, window, image)
-    outputs = [Path(str(prefix) + "_geo.tif")]
-    for stage in ("raw", "den"):
-        outputs.append(Path(str(prefix) + f"_{stage}.dim"))
-        outputs.extend(sorted(Path(str(prefix) + f"_{stage}.data").rglob("*.img")))
-    if len(outputs) < 9 or not all(path.is_file() for path in outputs):
-        raise ValueError("Independent reference outputs are incomplete")
+    outputs = reference_outputs(prefix)
     receipt["outputs_sha256"] = {
         path.relative_to(prefix.parent).as_posix(): file_digest(path) for path in outputs
     }
@@ -388,12 +404,50 @@ def verify_reference_receipt(
     identity = reference_identity(scratch, graph, window, image)
     if any(receipt.get(key) != value for key, value in identity.items()):
         raise ValueError("Reference cache input/graph/runtime/window changed; regenerate reference")
+    expected_names = {
+        path.relative_to(prefix.parent).as_posix() for path in reference_outputs(prefix)
+    }
+    if set(receipt.get("outputs_sha256", {})) != expected_names:
+        raise ValueError("Reference output receipt incomplete or changed; regenerate reference")
     for name, expected in receipt["outputs_sha256"].items():
         target = (prefix.parent / name).resolve()
         if not target.is_relative_to(prefix.parent.resolve()):
             raise ValueError("Reference receipt contains an invalid output path")
         if not target.is_file() or file_digest(target) != expected:
             raise ValueError("Reference output missing, ambiguous or changed: " + name)
+
+
+def validate_configuration(config: dict[str, Any]) -> None:
+    """An empty or duplicated comparison plan cannot establish scientific acceptance."""
+    products = config.get("products")
+    fractions = config.get("sampling_fractions")
+    size = config.get("window_size_px")
+    if not isinstance(products, list) or not products:
+        raise ValueError("Validation needs a nonempty product list")
+    if not isinstance(size, int) or isinstance(size, bool) or size < 64:
+        raise ValueError("Validation windows need at least 64 pixels on each side")
+    if not isinstance(fractions, list) or not fractions:
+        raise ValueError("Validation needs nonempty sampling fractions")
+    positions = np.asarray(fractions, dtype=float)
+    if (
+        positions.shape != (len(fractions), 2)
+        or not np.isfinite(positions).all()
+        or np.any((positions < 0) | (positions > 1))
+        or len(np.unique(positions, axis=0)) != len(positions)
+    ):
+        raise ValueError("Validation sampling fractions must be unique finite pairs in [0, 1]")
+    names, paths = [], []
+    for product in products:
+        name = product.get("name", "")
+        if not isinstance(name, str) or not name or Path(name).name != name or name in {".", ".."}:
+            raise ValueError("Validation product name must be a nonempty basename")
+        path = product.get("path")
+        if not isinstance(path, str) or not path:
+            raise ValueError("Validation product path is required")
+        names.append(name)
+        paths.append(str(Path(path).resolve()))
+    if len(set(names)) != len(names) or len(set(paths)) != len(paths):
+        raise ValueError("Validation products must have unique names and paths")
 
 
 def main() -> int:
@@ -421,6 +475,7 @@ def main() -> int:
         previous = json.loads(previous_path.read_text(encoding="utf-8"))
         previous_sha256 = file_digest(previous_path)
     config = json.loads(args.config.read_text(encoding="utf-8"))
+    validate_configuration(config)
     args.output_dir.mkdir(parents=True, exist_ok=True)
     image_info = subprocess.run(
         ["docker", "image", "inspect", args.reference_image, "--format", "{{.Id}}"],

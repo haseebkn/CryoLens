@@ -58,6 +58,15 @@ hashes and measurement hashes are recorded. **The adapted scratch view is not
 an authenticated original SAFE archive.** Reference-cache receipts bind the
 scratch inputs, graph, runtime, window and output hashes; stale caches fail.
 
+Audit correction (PRs #6–#9): the original v1 cache receipts covered image
+bytes but omitted ENVI headers, which also control raster decoding. Current
+validation requires the full output set, including headers and sidecars, and
+rejects incomplete historical receipts. Regenerate those references with
+`--run-reference`; do not silently bless old caches by adding fresh hashes.
+The [roadmap audit](../../ROADMAP_AUDIT.md) records new SNAP executions and the
+remaining scientific failures. Empty or malformed comparison plans now fail
+before processing begins.
+
 ## Findings and acceptance limits
 
 The report contains matched counts, signed residual agreement, per-window

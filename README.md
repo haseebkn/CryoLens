@@ -196,7 +196,7 @@ are absent. CI uses locked dependencies and a real PostGIS service.
 |---|---|
 | Statistical radar candidate screening | Implemented; thresholds require regional validation |
 | Analyst review and geographic API | Implemented; local API-key protection |
-| Independent target references | Real survey and stratified candidate packets prepared; human annotation, repeat review and adjudication pending |
+| Independent target references | Real packets and human review underway; repeat review and adjudication pending. AI assistance must be disclosed; see the [roadmap audit](docs/ROADMAP_AUDIT.md) |
 | Sentinel-2 paired review | Planetary Computer and CDSE providers; verified original SAFE alternative, native crops, cloud/shadow/valid-data screening and separate attributed evidence; pilot coverage is limited |
 | SAFE EW/IW calibration and geolocation | Calibration matches SNAP on sampled pixels; legacy EW/IW reprojection discrepancies remain. Absolute geolocation accuracy is not established |
 | ESA standard thermal noise removal | Matches SNAP on sampled pixels, but full-scene HV non-positive fractions are 45.7%, 26.1% and 54.3%; all three tested products are rejected |
