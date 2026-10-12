@@ -121,9 +121,9 @@ def main() -> None:
             "comparison_status": "not_qualified",
         }
         if not receipt_path.is_file():
-            row["status"] = "metadata_excluded_without_full_download"
+            row["status"] = "download_unverified"
             row["reason"] = (
-                "Nonzero reference height is outside currently qualified geometry convention"
+                "Download receipt missing; download completion and integrity are unverified"
             )
             rows.append(row)
             continue
@@ -268,7 +268,7 @@ def main() -> None:
             "radiometric_pass": "#2474a9",
             "radiometric_reject": "#b34538",
             "processing_reject": "#8d5a32",
-            "metadata_excluded_without_full_download": "#777777",
+            "download_unverified": "#777777",
         }[row["status"]]
         polygons = list(geometry.geoms) if geometry.geom_type == "MultiPolygon" else [geometry]
         for poly in polygons:
@@ -282,7 +282,7 @@ def main() -> None:
     ax.set(
         xlabel="Longitude",
         ylabel="Latitude",
-        title="New Sentinel-1 acquisition footprints in the NL study polygon\nBlue: radiometric pass only; red: reject; grey: metadata excluded",
+        title="New Sentinel-1 acquisition footprints in the NL study polygon\nBlue: radiometric pass only; red: reject; grey: download unverified",
     )
     ax.set_aspect(1.6)
     ax.grid(alpha=0.2)

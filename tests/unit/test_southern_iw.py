@@ -818,17 +818,20 @@ def test_genuine_marine_failure_remains_rejected(southern_publication: Path) -> 
 
 
 @pytest.mark.parametrize("second_name", ["explicit.json", "EXPLICIT.json"])
+@pytest.mark.parametrize("partial_download", [False, True])
 def test_explicit_plan_publication_exports_plans_without_legacy_context(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, second_name: str
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, second_name: str, partial_download: bool
 ) -> None:
     import json
     import sys
+    import xml.etree.ElementTree as ET
     from types import SimpleNamespace
 
     from shapely.geometry import shape
 
     from cryolens.eval.cohort import file_digest
     from validation import publish_acquisition_search
+    from validation.screen_southern_metadata import height_value
 
     monkeypatch.chdir(tmp_path)
     footprint = {
@@ -862,6 +865,15 @@ def test_explicit_plan_publication_exports_plans_without_legacy_context(
     )
     root = tmp_path / "sources"
     root.mkdir()
+    if partial_download:
+        annotation = root / "raw/planned/planned.SAFE/annotation/product.xml"
+        annotation.parent.mkdir(parents=True)
+        annotation.write_text(
+            "<product><terrainHeightList><terrainHeight><value>0.0</value>"
+            "</terrainHeight></terrainHeightList></product>"
+        )
+        heights = ET.parse(annotation).findall(".//terrainHeightList/terrainHeight")
+        assert [height_value(height) for height in heights] == [0.0]
     output = tmp_path / "published"
     monkeypatch.setattr(
         sys,
@@ -883,7 +895,18 @@ def test_explicit_plan_publication_exports_plans_without_legacy_context(
     assert (output / "downloads").is_dir()
     report = json.loads((output / "report.json").read_text())
     assert report["downloaded_products"] == 0
+    assert report["downloaded_archive_bytes"] == 0
     assert report["products"][0]["product"] == "planned.SAFE"
+    assert report["products"][0]["status"] == "download_unverified"
+    assert report["products"][0]["reason"] == (
+        "Download receipt missing; download completion and integrity are unverified"
+    )
+    assert report["products"][0]["comparison_status"] == "not_qualified"
+    assert report["deployment_gate_open"] is False
+    assert report["processing_validation_complete"] is False
+    coverage = json.loads((output / "coverage.geojson").read_text())
+    assert coverage["features"][0]["properties"]["status"] == "download_unverified"
+    assert (output / "coverage.png").stat().st_size > 1000
     exports = report["consumed_plans"]
     assert len({item["published_file"].casefold() for item in exports}) == 2
     for source, item in zip([plan, second_plan], exports, strict=True):
