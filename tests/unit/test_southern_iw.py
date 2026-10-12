@@ -187,14 +187,37 @@ def southern_publication(tmp_path: Path) -> Path:
     return root
 
 
+@pytest.mark.parametrize("autocrlf", ["false", "true"])
 def test_real_published_evidence_replays_without_regional_release(
-    southern_publication: Path, monkeypatch: pytest.MonkeyPatch
+    southern_publication: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, autocrlf: str
 ) -> None:
     import json
+    import shutil
+    import subprocess
     import sys
 
     from validation.finalise_southern_iw_report import main
 
+    # Exercise Git's checkout of the AOI byte contract on Linux and Windows.
+    project = Path(__file__).resolve().parents[2]
+    checkout = tmp_path / "checkout"
+    (checkout / "configs").mkdir(parents=True)
+    shutil.copyfile(project / ".gitattributes", checkout / ".gitattributes")
+    aoi = checkout / "configs/aoi.geojson"
+    aoi.write_bytes((project / "configs/aoi.geojson").read_bytes().replace(b"\r\n", b"\n"))
+    for arguments in (
+        ["init", "--quiet"],
+        ["-c", f"core.autocrlf={autocrlf}", "add", ".gitattributes", "configs/aoi.geojson"],
+    ):
+        subprocess.run(["git", *arguments], cwd=checkout, check=True, capture_output=True)
+    aoi.unlink()
+    subprocess.run(
+        ["git", "-c", f"core.autocrlf={autocrlf}", "checkout-index", "configs/aoi.geojson"],
+        cwd=checkout,
+        check=True,
+        capture_output=True,
+    )
+    monkeypatch.chdir(checkout)
     monkeypatch.setattr(sys, "argv", ["finalise", "--report-dir", str(southern_publication)])
     main()
     report = json.loads((southern_publication / "current-status.json").read_text())
