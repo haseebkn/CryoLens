@@ -129,6 +129,7 @@ module = [
     "rioxarray.*",
     "geoalchemy2.*",
     "skimage.*",
+    "s1denoise.*",
 ]
 ignore_missing_imports = true
 

@@ -94,7 +94,7 @@ This document records the foundational architectural decisions, scientific const
 ## ADR-007: Sentinel-1 EW Subswath Noise Removal — SNAP vs. s1denoise
 
 * **Date:** 2026-08-19
-* **Status:** Accepted (Recommendation: NERSC `s1denoise`)
+* **Status:** Historical recommendation superseded; see the [processing investigation](processing-validation/v2/README.md) for the unqualified NERSC outcome and current denoising limits.
 * **Context:** Sentinel-1 Extra Wide (EW) swath SAR imagery consists of 5 subswaths (EW1 to EW5). Thermal noise floor variations (NESZ scalloping between $-28\text{ dB}$ and $-24\text{ dB}$) in the cross-polarization channel (HV) exceed calm ocean backscatter ($<-32\text{ dB}$). Standard ESA SNAP `ThermalNoiseRemoval` operator removes standard metadata noise vectors but frequently leaves residual inter-subswath boundary steps and scalloping streaks, triggering false-alarm stripes along range seams in CFAR and object detection.
 * **Evaluation & Decision:**
   * **ESA SNAP Standard TNR:** Suitable for high-backscatter land surfaces, but insufficient for low-clutter maritime open ocean.

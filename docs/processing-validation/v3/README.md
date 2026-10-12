@@ -180,8 +180,38 @@ location; adjust it for a new download root and retain the new configuration has
 Build/use the documented pinned SNAP reference image from the v2 recipe first.
 For a newly executed standard run, `validation/publish_validation_run.py` verifies
 its inputs, outputs and execution-source snapshot before publication.
-`validation/finalise_acquisition_report.py` rebuilds this summary from the published
-standard runs and matching marine evidence, refusing to overwrite it.
+
+For a cached rerun, use a new output directory containing a copy of the verified
+`reference/` outputs and receipts under their original basenames, and omit
+`--run-reference`. To reuse a full scan, pass
+`--reuse-full-scan-from OLD/report.json`; the old `--reuse-full-scan` flag is
+rejected. Reuse requires unchanged input provenance, reader and quality-code
+hashes and full-measurement scope. The new report records the reused report's
+digest. Skipping the full scan cannot open the gate.
+
+`validation/publish_acquisition_search.py` checks every available quality binding's
+report digest and strict policy, regardless of directory. Acceptance requires the
+complete current SAFE inventory to match the recorded inventory, including added
+components; unbound historical scans remain historical evidence.
+
+`validation/finalise_acquisition_report.py --report-dir NEW_DIRECTORY` aggregates
+published runs and schema-2 marine evidence. Prepare the new directory with
+`report.json`, `continuation/report.json`, both representative run directories
+(`ew-northern-qualified` and `iw-northern-reference`), and the bound original
+receipts in `continuation/downloads/`. Aggregation verifies each joined receipt's
+recorded digest and exact consumed-original source inventory against processing
+provenance. Missing HV statistics remain failed outcomes with reasons and null
+measurements. Any existing status or coverage output is refused before writes.
+
+The nine original [download receipts](downloads/) and ten [continuation receipts](continuation/downloads/)
+are preserved byte-for-byte from ten authentic raw originals and verified against
+the recorded SHA256 values. The [source-bound publication](source-bound-approval/README.md)
+includes its two required receipts under `continuation/downloads/`. JSON-only Git
+ignore exceptions and `-text` attributes preserve these byte contracts. The
+committed-evidence aggregation regression in
+[the publication tests](../../../tests/unit/test_processing_publication.py) replays
+that publication into a fresh destination and checks one qualified EW, rejected IW
+and closed release gates; historical status outputs remain unchanged.
 
 To finish step 2, qualify representative usable IW observations and southern NL
 coverage, not just additional downloads. If standard subtraction remains unsuitable,
@@ -194,10 +224,11 @@ false-alarm rate. Those still require the independent reference reviews.
 
 ## Local code verification
 
-The final full suite passed **420 tests**; 14 archive-dependent detection tests
-were skipped in the isolated checkout. Mypy passed 125 source/test files and the
-five evidence drivers; Ruff and formatting passed 170 Python files. New regressions
-exercise real long-path annotation reads, lossless overview preservation, measured
+At approval completion, the full suite passed **420 tests**; 14 archive-dependent
+detection tests were skipped in the isolated checkout. Mypy passed 126 source/test
+files and five evidence drivers; Ruff and formatting passed 171 Python files.
+These counts describe that verification snapshot, not later pipeline rounds.
+New regressions exercise real long-path annotation reads, lossless overview preservation, measured
 zero edge knots, immutable source-bound cache reuse and publication failure modes.
 The long-path, overview and zero-knot regressions failed before their corrections.
 Actual SNAP comparisons are separate scientific evidence, not mocked test outputs.
@@ -217,13 +248,12 @@ All 409 portable tests pass locally (14 archive-dependent tests skipped), and
 mypy, Ruff and formatting pass. The review retry stopped on external model
 capacity before completing review, push or CI; no new PR has been published.
 
-Two protective remedies await the required human decision: preventing occupied
-SNAP prefixes from being overwritten, and adding original source inventories to
-new marine receipts before aggregation. Existing marine measurements are retained
-as historical results; their receipt lacks measurement/annotation input hashes,
-so final provenance qualification and safe reuse remain provisional. Implement
-new source-bound evidence additively; do not backfill historical execution claims.
-The current status remains closed overall and does not grant scientific release.
+At that review, two protective remedies awaited a human decision: preventing
+occupied SNAP prefixes from being overwritten, and binding new marine receipts
+to original source inventories. The earlier marine measurements and
+[delivery review](delivery-review.json) remain historical records; unbound marine
+receipts cannot qualify new aggregates. The approved additive evidence below
+supersedes that pending approval state without backfilling historical claims.
 
 ## Approved protections and current evidence
 
@@ -231,8 +261,8 @@ The user approved R1 and R2. Both protections are implemented. Occupied SNAP
 prefixes fail before Docker execution; an atomic reservation prevents concurrent
 reuse and retains failed attempts. Logs and receipts use exclusive writes, and
 idempotent receipt verification preserves the original bytes. Existing validation
-reports are refused; bound quality reuse now reads `--reuse-full-scan-from`
-into a new output directory instead of replacing its source report.
+reports are refused. The [reuse procedure](#reproduction-and-remaining-gate)
+reads bound quality into a new output directory and preserves its source report.
 
 Marine schema 2 records original manifest, measurement and annotation byte hashes
 before scanning and rechecks them afterward. Aggregation requires an exact match

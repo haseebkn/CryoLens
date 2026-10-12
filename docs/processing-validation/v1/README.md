@@ -143,23 +143,27 @@ runtimes from the repository root:
 ```text
 docker build -f validation/Dockerfile.snap14 -t cryolens-snap-reference:14.0.0 .
 docker build -f validation/Dockerfile.nersc -t cryolens-nersc-reference:8259f056 .
-python -m cryolens.preprocess.validation --output-dir data/processed/safe-validation-v1/final --scratch-dir data/interim/safe-validation-setup/snap-input --run-reference
+python -m cryolens.preprocess.validation --config configs/sentinel1-validation-v1.json --output-dir data/processed/safe-validation-v1/final-reproduction --scratch-dir data/interim/safe-validation-setup/snap-input --run-reference
 ```
 
 The validator returns a non-zero exit code when the deployment gate fails,
 while retaining JSON reports, reference receipts, logs and diagnostic COGs.
-Rerun without `--run-reference` only with verified cached reference outputs.
-Add `--reuse-full-scan` only to reuse a previous full measurement scan whose
-input provenance, reader and quality-code hashes still match. A skipped scan
-cannot open the gate. The retained report records the reused report's digest.
+Use new output and publication directories; existing reports and occupied
+reference prefixes are refused. Reusing verified reference outputs or full scans
+requires the [current reuse procedure](../v3/README.md#reproduction-and-remaining-gate).
+A skipped scan cannot open the gate. These commands use the current processor
+with the historical v1 graph; they do not recreate the original execution bytes
+or restore the invalidated v1 geometry qualification.
 To evaluate the advanced algorithm with the repository's actual external
-runner, mount the original SAFE parent as `/input:ro`, an empty result directory
-as `/output`, and `validation` as `/validation:ro`, then invoke:
+runner, mount the original SAFE parent as `/input:ro`, the local
+`data/processed/safe-validation-v1` result parent as `/output`, and `validation`
+as `/validation:ro`. The runner creates `nersc-reproduction` inside the mounted
+parent; that child must not already exist. Then invoke:
 
 ```text
-docker run --rm -v <SAFE-parent>:/input:ro -v <results>:/output -v <repository>/validation:/validation:ro cryolens-nersc-reference:8259f056 /validation/run_nersc.py /input/<S1B-product>.SAFE /output
-python validation/publish_report.py --report data/processed/safe-validation-v1/final/report.json --iw-receipt data/interim/safe-validation-setup/iw-receipt.json --nersc-report data/processed/safe-validation-v1/nersc-report.json --output-dir docs/processing-validation/v1
-python validation/track_report.py --report-dir docs/processing-validation/v1 --tracking-uri sqlite:///data/processed/mlflow.db
+docker run --rm -v <SAFE-parent>:/input:ro -v <results>:/output -v <repository>/validation:/validation:ro cryolens-nersc-reference:8259f056 /validation/run_nersc.py /input/<S1B-product>.SAFE /output/nersc-reproduction
+python validation/publish_report.py --report data/processed/safe-validation-v1/final-reproduction/report.json --iw-receipt data/interim/safe-validation-setup/iw-receipt.json --nersc-report data/processed/safe-validation-v1/nersc-reproduction/nersc-report.json --output-dir docs/processing-validation/v1-reproduction
+python validation/track_report.py --report-dir docs/processing-validation/v1-reproduction --tracking-uri sqlite:///data/processed/mlflow.db
 ```
 
 The MLflow run is a post-hoc record of this processing investigation, bound to

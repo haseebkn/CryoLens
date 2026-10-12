@@ -245,20 +245,5 @@ execution-artifact boundary. These post-hoc logging checks do not establish new
 scientific qualification or reopen deployment.
 
 Legacy diagnostic publication and NERSC execution require new destination
-directories. Acquisition publication checks every available quality binding's
-report digest and strict policy, including bindings in default directories;
-unbound historical reports retain their explicit historical status. Aggregation
-requires the published acquisition download receipt hash and its exact consumed
-original source inventory to match processing provenance. Processing failures
-with no HV statistics remain rejections with their reasons and null measurements.
-Partial existing aggregation outputs are refused before any writes.
-
-The broad `downloads/` ignore rule previously excluded published acquisition
-receipts. The nine v3 and ten continuation receipts are now restored byte-for-byte
-from ten authentic raw originals, verified against every recorded SHA256.
-The two receipts required for source-bound aggregation are also preserved under
-`v3/source-bound-approval/continuation/downloads`. Scoped JSON-only ignore
-exceptions and the existing `-text` byte contract protect these publications.
-Fresh aggregation verifies one qualified EW, rejected IW and closed release gates;
-existing scientific status snapshots and recorded hashes remain unchanged.
-No new numerical processing was performed.
+directories. The [current acquisition publication and aggregation contract](../v3/README.md#reproduction-and-remaining-gate)
+owns quality bindings, acquisition-to-processing joins and receipt availability.
