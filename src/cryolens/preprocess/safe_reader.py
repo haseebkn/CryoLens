@@ -72,6 +72,8 @@ def _open_path(path: Path | str) -> str:
     """Format path with Windows extended-length prefix if needed."""
     resolved = str(Path(path).resolve())
     if sys.platform == "win32" and not resolved.startswith(("\\\\?\\", "//?/")):
+        if resolved.startswith("\\\\"):
+            return "\\\\?\\UNC\\" + resolved[2:]
         return f"\\\\?\\{resolved}"
     return resolved
 

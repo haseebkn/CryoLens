@@ -12,6 +12,41 @@ from cryolens.preprocess.quality import QualityPolicy
 from validation.finalise_acquisition_report import main
 
 
+@pytest.mark.parametrize("autocrlf", ["true", "false"])
+def test_git_preserves_archived_execution_graph_bytes(
+    tmp_path: Path, autocrlf: str
+) -> None:
+    import hashlib
+    import subprocess
+    import zipfile
+
+    root = Path(__file__).resolve().parents[2]
+    evidence = root / "docs/processing-validation/v3/ew-northern-qualified"
+    report = json.loads((evidence / "report.json").read_text())
+    graph = "configs/snap/validation-reference-v2.xml"
+    with zipfile.ZipFile(evidence / "executed-code.zip") as archive:
+        executed = archive.read(graph)
+    assert hashlib.sha256(executed).hexdigest() == report["graph_sha256"]
+    assert (root / graph).read_bytes() == executed
+    (tmp_path / ".gitattributes").write_bytes((root / ".gitattributes").read_bytes())
+    target = tmp_path / graph
+    target.parent.mkdir(parents=True)
+    target.write_bytes(executed)
+
+    def git(*args: str) -> bytes:
+        return subprocess.check_output(
+            ["git", "-C", str(tmp_path), "-c", f"core.autocrlf={autocrlf}", *args]
+        )
+
+    git("init", "--quiet")
+    git("add", ".gitattributes", graph)
+    blob = git("show", ":" + graph)
+    assert hashlib.sha256(blob).hexdigest() == report["graph_sha256"]
+    target.unlink()
+    git("checkout-index", "--force", graph)
+    assert target.read_bytes() == executed
+
+
 @pytest.mark.parametrize("marine_passed", [True, False])
 def test_summary_requires_matching_marine_quality_and_keeps_gate_closed(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, marine_passed: bool

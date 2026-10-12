@@ -9,6 +9,7 @@ Specification, so a change that breaks real products breaks these tests too.
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -24,6 +25,36 @@ from cryolens.preprocess.safe_reader import (
 )
 
 N_LINES, N_SAMPLES = 40, 60
+
+
+@pytest.mark.parametrize(
+    ("resolved", "expected"),
+    [
+        (r"\\server\share\scene.SAFE", r"\\?\UNC\server\share\scene.SAFE"),
+        (r"\\?\UNC\server\share\scene.SAFE", r"\\?\UNC\server\share\scene.SAFE"),
+        (r"C:\data\scene.SAFE", r"\\?\C:\data\scene.SAFE"),
+        (r"\\?\C:\data\scene.SAFE", r"\\?\C:\data\scene.SAFE"),
+        ("//?/C:/data/scene.SAFE", "//?/C:/data/scene.SAFE"),
+    ],
+)
+def test_windows_open_path_formats_resolved_filesystem_paths(
+    monkeypatch: pytest.MonkeyPatch, resolved: str, expected: str
+) -> None:
+    from cryolens.preprocess import safe_reader
+
+    monkeypatch.setattr(safe_reader, "sys", SimpleNamespace(platform="win32"))
+    monkeypatch.setattr(Path, "resolve", lambda self: resolved)
+    assert safe_reader._open_path("scene.SAFE") == expected
+
+
+def test_non_windows_open_path_keeps_resolved_path(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from cryolens.preprocess import safe_reader
+
+    monkeypatch.setattr(safe_reader, "sys", SimpleNamespace(platform="linux"))
+    path = tmp_path / "scene.SAFE"
+    assert safe_reader._open_path(path) == str(path.resolve())
 SIGMA_CONSTANT = 100.0
 NOISE_CONSTANT = 4.0
 

@@ -16,3 +16,4 @@ docs/processing-validation/v3/metadata/**/*.xml linguist-generated=true
 
 # Scientific receipts and source snapshots are intentional byte contracts.
 docs/processing-validation/v3/** -text
+configs/snap/validation-reference-v2.xml -text
