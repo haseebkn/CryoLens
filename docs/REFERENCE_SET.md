@@ -107,7 +107,11 @@ Inspect both polarizations and search the whole valid core. Mark all supported
 observable targets and uncertainties, including isolated small returns. Use
 the context to decide ownership of objects near core boundaries and mark each
 object once. Shift-drag ambiguous regions to exclude them from scored coverage.
-Uncertain points additionally exclude a declared three-pixel neighbourhood.
+Uncertain points additionally exclude the neighbourhood declared by the
+[reference policy](../configs/reference/protocol-v1.json). Exclusions are assembled
+in scene coordinates and applied after completed cores are combined, so a
+neighbouring completed tile cannot restore uncertain pixels. Progress totals,
+frozen scored coverage and annotation membership use this same exclusion mask.
 `partial` and `unusable` dispositions exclude the entire core from scoring;
 they are never interpreted as target-free. Unreviewed cores remain unreviewed.
 

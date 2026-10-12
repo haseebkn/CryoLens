@@ -35,7 +35,6 @@ clipping, filling, dropping valid negative pixels or reducing noise amplitudes.
    noise when no qualified annotation is available. The historical SNAP comparison
    reported agreement better than 0.00001 dB with no residual-sign mismatch, but
    its incomplete consumed-input receipt invalidates that acceptance claim.
-   A fresh reference execution is required to reestablish it.
    The separate [short-block v3 report](short-block-v3/report.json) records that
    new execution with a complete consumed-input inventory and current source
    snapshot; it claims calibration and signed-noise agreement only.
@@ -155,7 +154,9 @@ full-product quality. **Its signed reference-comparison acceptance is invalidate
 [the historical receipt](reference-receipts/short-block-receipt.json) records only
 `manifest.safe`, omitting linked annotation and measurement files. The existing
 rasters, receipt and report remain preserved as historical artifacts. Replacement
-acceptance needs a fresh SNAP run and newly bound report and MLflow evidence.
+acceptance is recorded separately in the [fresh short-block v3 report](short-block-v3/report.json)
+and [tracking receipt](short-block-v3/tracking_receipt.json); the replacement
+execution and its limits are described below.
 The full-product quality rejection and closed deployment gate remain unchanged.
 
 The [live inventory audit](reference-inventory-audit.json) independently hashes

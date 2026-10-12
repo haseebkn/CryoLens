@@ -222,7 +222,9 @@ class OrbitManager:
             destination = self.cache_dir / str(best["filename"])
             if destination.is_file():
                 try:
-                    validate_orbit(ET.parse(destination).getroot(), code, acquisition_time, orbit_type)
+                    validate_orbit(
+                        ET.parse(destination).getroot(), code, acquisition_time, orbit_type
+                    )
                 except (ET.ParseError, ValueError, OSError) as exc:
                     logger.warning("Ignoring invalid cached orbit %s: %s", destination.name, exc)
                 else:

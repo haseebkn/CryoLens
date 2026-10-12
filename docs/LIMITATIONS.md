@@ -95,8 +95,9 @@ physical ice boundaries with artifacts. Masks can suppress real targets.
 ## 6. Raw SAFE processing
 
 The Python path reads actual measurements, calibration and noise LUTs and
-uses annotation geolocation. It does not apply precise orbit correction or
-constitute a validated terrain-corrected operational chain. It requires
+uses marine range-Doppler mapping from annotated orbit/range metadata. It does
+not apply precise orbit correction or constitute a validated terrain-corrected
+operational chain. It requires
 comparison with trusted processing on real SAFE products. Running SNAP and
 then ignoring its output is no longer presented as a successful SNAP pipeline.
 Unsupported engines and missing inputs fail explicitly.
@@ -107,32 +108,27 @@ The [reproducible processing report](processing-validation/v2/README.md)
 supersedes the earlier scene-median comparison. Similar extents and medians
 did not confirm calibration or absolute geolocation accuracy.
 
-Actual SNAP 14.0.0 comparisons use matched sensor pixels and systematic spatial
-windows on legacy EW, fresh EW and fresh IW products. Calibration and signed
-noise subtraction agree closely after two interpolation fixes. Full-footprint
-HV non-positive fractions nevertheless remain about 45.7%, 26.1% and 54.3%,
-respectively. All three fail the conservative project quality preset. Negative
+The report owns the corrected comparison results, full-product quality rejections
+and historical short-block invalidation with its separately executed replacement.
+Comparisons against SNAP do not establish surveyed absolute accuracy or
+whole-footprint gridding. The fresh SAFE deployment gate remains closed, and
+rejected products write machine-readable reasons before detection. Negative
 residuals are retained for diagnostics; no positive floor manufactures data.
-
-V2 corrects the marine height datum, range-dependent timing and resampling,
-and preserves full acquisition geometry in the reference before cropping output.
-The earlier cropped-reference geometric decisions are superseded. Comparisons
-against SNAP do not establish surveyed absolute accuracy. The fresh SAFE deployment gate remains
-closed, and rejected products write machine-readable reasons before detection.
 The 5% non-positive threshold is a research acceptance preset, not a published
 ESA or C-CORE requirement.
 
-The published NERSC algorithm was evaluated on the legacy Sentinel-1B scene.
-With negative-gap filling disabled, 59.6% of HV remained non-positive. It is not
+The report also records the unqualified NERSC experiment. It is not
 adopted or assumed to solve this problem. Sentinel-1C/D coefficient qualification
 and a defensible noise workflow remain open. Benchmark results in BENCHMARK.md
 use the separate AI4Arctic processing path and do not depend on fresh SAFE data.
 
 Precise and restituted orbit products (POEORB/RESORB) can be acquired without
 credentials from the public ESA STEP and ASF auxiliary-data mirrors, selected by
-the validity window encoded in the product filename, and validated as parseable
-XML carrying state vectors before they are cached. **Acquiring an orbit is not
-applying one.** Geolocation remains that recorded in the product annotation, no
+the validity window encoded in the product filename. Downloaded and cached EOFs
+must match the mission and orbit type and contain finite position/velocity vectors
+whose timestamps cover the acquisition. Download, archive-decoding and candidate
+validation failures continue to the next mirror. **Acquiring an orbit is not
+applying one.** Marine geocoding uses the annotated orbit, no precise-orbit
 correction is computed, and `orbit_correction_applied` stays `False` in
 provenance. Applying a precise orbit means recomputing geolocation, which cannot
 responsibly be implemented until the resulting geolocation can be checked

@@ -75,7 +75,9 @@ def main() -> None:
                 raise ValueError("Published and executed reference receipts differ: " + name)
             receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
             if receipt["scratch_files_sha256"] != inputs:
-                raise ValueError("Reference consumed-input inventory incomplete or changed: " + name)
+                raise ValueError(
+                    "Reference consumed-input inventory incomplete or changed: " + name
+                )
             if receipt["graph_sha256"] != graph_hash or receipt["image_id"] != runtime:
                 raise ValueError("Reference recipe or runtime changed: " + name)
             outputs = {

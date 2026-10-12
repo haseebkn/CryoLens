@@ -68,11 +68,11 @@ class PurePythonSARProcessor:
 
         This is the path taken for real SAFE products, where calibration and
         thermal noise removal have already been applied by
-        :class:`~cryolens.preprocess.safe_reader.SAFEProductReader`. Geocoding
-        uses ground control points sampled from the product geolocation grid
-        rather than a bounding-box affine, because a Sentinel-1 swath is not a
-        north-up rectangle and treating it as one displaces targets by
-        kilometres at the swath edges.
+        :class:`~cryolens.preprocess.safe_reader.SAFEProductReader`. Annotation
+        GCPs define the default output extent; operational callers supply the
+        marine mapper for source sampling. Omitting it retains the unqualified
+        GCP-warp experiment. See docs/processing-validation/v2/README.md for the
+        marine geometry contract and its validation limits.
 
         Args:
             gcp_step: Sampling stride, in pixels, for ground control points.

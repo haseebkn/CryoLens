@@ -125,8 +125,9 @@ An earlier version of this project asserted the opposite. IW over the Grand Bank
 is roughly 76 percent dual-pol HH+HV, so the polarimetric basis survives.
 
 The reader now supports annotated IW GRD HH/HV measurements and has been tested
-on a real southern acquisition. Its noise usability and resampled-radiometry
-checks failed. **Operational southern NL coverage remains unvalidated**;
+on a real southern acquisition. The [current processing report](docs/processing-validation/v2/README.md)
+records corrected comparison results and the remaining noise-usability rejection.
+**Operational southern NL coverage remains unvalidated**;
 successful downloading and mode parsing do not establish detection coverage.
 
 ## Geographic scope
@@ -200,10 +201,10 @@ are absent. CI uses locked dependencies and a real PostGIS service.
 | Independent target references | Real packets and human review underway; repeat review and adjudication pending. AI assistance must be disclosed; see the [roadmap audit](docs/ROADMAP_AUDIT.md) |
 | Sentinel-2 paired review | Planetary Computer and CDSE providers; verified original SAFE alternative, native crops, cloud/shadow/valid-data screening and separate attributed evidence; pilot coverage is limited |
 | SAFE EW/IW calibration and geolocation | Marine range-Doppler, EGM96 height, residual timing and matched SNAP checks; see [v2 validation](docs/processing-validation/v2/README.md). Absolute geolocation accuracy is not established |
-| ESA standard thermal noise removal | Matches SNAP on sampled pixels, but full-scene HV non-positive fractions are 45.7%, 26.1% and 54.3%; all three tested products are rejected |
+| ESA standard thermal noise removal | Sampled agreement does not establish usable observations; see the [current quality rejections](docs/processing-validation/v2/README.md#remaining-gate) |
 | Fresh SAFE detection deployment | Blocked by separate processing-quality and scientific-release gates; no current producer grants a release |
 | Precise-orbit acquisition | Implemented; POEORB/RESORB fetched from public ESA/ASF mirrors, no credentials needed |
-| Precise-orbit **correction** in Python pipeline | Not applied; geolocation is still the product annotation's, and provenance says so |
+| Precise-orbit **correction** in Python pipeline | Not applied; marine geocoding uses annotated orbit/range metadata and records that source |
 | Trained ship/iceberg classifier | Not implemented |
 | Live AIS deconfliction | Not connected; no match does not establish iceberg identity |
 | Drift prediction / grounding | Disabled; verified forcing and skill assessment missing |

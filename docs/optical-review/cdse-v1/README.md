@@ -133,8 +133,9 @@ There is no silent substitution of a different provider or processing version.
 Review outputs remain under `data/processed/optical-review/`, with separate
 `candidate-coverage-cdse.json` and `catalogue-coverage-cdse.json` reports.
 The comparison writes `data/processed/cdse-optical-verification/comparison.json`.
-Copy per-run coverage receipts before another run. Pair IDs bind provenance,
-policy, AOI and generating-code hashes; previously generated evidence survives.
+Copy per-run coverage receipts before another run. The shared
+[pair identity and reuse contract](../v1/README.md#reproduction) keeps provider
+evidence separate; previously generated evidence survives.
 
 Validation: **325 tests passed, one real-data test explicitly skipped**, lint,
 formatting, type checks, actual PostGIS checks and distribution build/wheel

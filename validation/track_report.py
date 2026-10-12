@@ -17,7 +17,9 @@ def processing_recipe(
     configuration_hash = report.get("configuration_sha256")
     if not graph_hash:
         raise ValueError("Processing report lacks bound graph provenance")
-    candidates = [supplied] if supplied else sorted(Path("configs").glob("sentinel1-validation-v*.json"))
+    candidates = (
+        [supplied] if supplied else sorted(Path("configs").glob("sentinel1-validation-v*.json"))
+    )
     matches = []
     for path in candidates:
         configuration = json.loads(path.read_text(encoding="utf-8"))
@@ -28,7 +30,9 @@ def processing_recipe(
         recipe = configuration.get("recipe_id", "v" + str(configuration["schema_version"]))
         matches.append((path, configuration, recipe))
     if len(matches) != 1:
-        raise ValueError("Processing report configuration/graph provenance conflicts or is ambiguous")
+        raise ValueError(
+            "Processing report configuration/graph provenance conflicts or is ambiguous"
+        )
     return matches[0]
 
 

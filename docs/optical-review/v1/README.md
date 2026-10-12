@@ -3,7 +3,7 @@
 Implemented 2026-10-05. This is an executable analyst workflow and a measured
 availability pilot. It does not provide iceberg ground truth, precision, recall,
 or a false-alarm estimate. Fresh Sentinel-1 SAFE deployment remains gated by
-the [processing validation](../../processing-validation/v1/README.md).
+the [processing validation](../../processing-validation/v2/README.md).
 
 ## Measured availability
 
@@ -173,8 +173,10 @@ integrity evidence, not a whole-product checksum or target confirmation.
 
 Artifacts and `candidate-coverage.json` are written under
 `data/processed/optical-review/`; copy per-run reports before another pilot run.
-Pair IDs bind candidate, radar provenance, selected optical item, policy,
-generating-code checksums and AOI. Existing artifacts are hash-verified before
+Pair IDs bind candidate, radar provenance, selected optical item, provider, policy,
+generating-code checksums and AOI. Unavailable pairs also bind the provider and
+unavailability reason, keeping provider-specific search evidence separate even
+when no item is found. Existing artifacts are hash-verified before
 reuse and serving. A rerun records its new search, while cached pair manifests
 keep the original generation/search receipt. Raw data remain outside Git.
 

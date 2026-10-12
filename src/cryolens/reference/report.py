@@ -117,9 +117,7 @@ def summarize(root: Path) -> dict[str, Any]:
                 }
             )
         labels = [a["target_detection"]["label"] for b in bodies for a in b["annotations"]]
-        coverage, _ = survey_masks(
-            root, workspace, tasks, {b["base_task_id"]: b for b in survey}
-        )
+        coverage, _ = survey_masks(root, workspace, tasks, {b["base_task_id"]: b for b in survey})
         scored_pixels = int(coverage.sum())
         reviewer_reports.append(
             {

@@ -50,9 +50,15 @@ def main() -> None:
     if actual["manifest.safe"] != provenance["original_manifest_sha256"]:
         raise ValueError("Original development manifest changed")
     for name, expected in provenance["annotation_sha256"].items():
-        if actual[name] != expected or file_digest(Path(_open_path(args.scratch / name))) != expected:
+        if (
+            actual[name] != expected
+            or file_digest(Path(_open_path(args.scratch / name))) != expected
+        ):
             raise ValueError("Original or scratch annotation changed: " + name)
-    if file_digest(Path(_open_path(args.scratch / "manifest.safe"))) != provenance["scratch_manifest_sha256"]:
+    if (
+        file_digest(Path(_open_path(args.scratch / "manifest.safe")))
+        != provenance["scratch_manifest_sha256"]
+    ):
         raise ValueError("Scratch manifest adaptation changed")
     for measurement in provenance["measurements"]:
         name = "measurement/" + measurement["measurement"]
@@ -68,7 +74,10 @@ def main() -> None:
             for _, window in scratch.block_windows(1):
                 source_hash.update(source.read(1, window=window).tobytes())
                 scratch_hash.update(scratch.read(1, window=window).tobytes())
-        if source_hash.hexdigest() != scratch_hash.hexdigest() or scratch_hash.hexdigest() != measurement["decoded_blocks_sha256"]:
+        if (
+            source_hash.hexdigest() != scratch_hash.hexdigest()
+            or scratch_hash.hexdigest() != measurement["decoded_blocks_sha256"]
+        ):
             raise ValueError("Scratch measurement does not preserve authentic decoded pixels")
     graph = Path(config["graph"])
     row, col, height, width = config["window"]
@@ -77,7 +86,9 @@ def main() -> None:
     before = reference_identity(args.scratch, graph, window, image)
     args.output.mkdir(parents=True)
     execution_files = sorted(Path("src/cryolens/preprocess").glob("*.py")) + [
-        Path(__file__), config_path, graph
+        Path(__file__),
+        config_path,
+        graph,
     ]
     execution_hashes = {p.as_posix(): file_digest(p) for p in execution_files}
     with zipfile.ZipFile(args.output / "executed-code.zip", "w", zipfile.ZIP_DEFLATED) as archive:
@@ -116,8 +127,12 @@ def main() -> None:
         "scientific_comparison_passed": all(check["passed"] for check in checks.values()),
         "deployment_gate_open": False,
         "previous_reference_status": "invalidated; preserved unchanged",
-        "previous_reference_receipt_sha256": file_digest(Path("docs/processing-validation/v2/reference-receipts/short-block-receipt.json")),
-        "previous_invalidation_sha256": file_digest(Path("docs/processing-validation/v2/reference-inventory-audit.json")),
+        "previous_reference_receipt_sha256": file_digest(
+            Path("docs/processing-validation/v2/reference-receipts/short-block-receipt.json")
+        ),
+        "previous_invalidation_sha256": file_digest(
+            Path("docs/processing-validation/v2/reference-inventory-audit.json")
+        ),
         "products": [
             {
                 "product": args.safe.name,
@@ -137,7 +152,9 @@ def main() -> None:
         ],
         "claim_boundary": "Fresh authentic short-block calibration and signed-noise comparison only. Historical whole-product radiometric rejection is reused with its original generation provenance; no fresh full scan, geometry acceptance, held-out evaluation, human review or deployment readiness is claimed.",
     }
-    (args.output / "report.json").write_text(json.dumps(report, indent=2, allow_nan=False), encoding="utf-8")
+    (args.output / "report.json").write_text(
+        json.dumps(report, indent=2, allow_nan=False), encoding="utf-8"
+    )
     args.publish.mkdir(parents=True)
     (args.publish / "reference-receipts").mkdir()
     for source, destination in (
