@@ -495,3 +495,44 @@ def test_short_block_keeps_measured_zero_edge_knots(tmp_path: Path) -> None:
     path.write_text(original.replace("4 4 0", "0 0 0"))
     with pytest.raises(ValueError, match="qualified"):
         _noise_power_grid(path, (10, 6), full_shape=(10, 6))
+
+
+@pytest.mark.parametrize(
+    "suffix", [".log", "-receipt.json", "_geo.tif", "_den.data", "-execution.lock"]
+)
+def test_reference_run_rejects_occupied_prefix_before_docker(
+    tmp_path: Path, mocker: Any, suffix: str
+) -> None:
+    from cryolens.preprocess.validation import run_reference
+
+    prefix = tmp_path / "reference"
+    existing = Path(str(prefix) + suffix)
+    if suffix.endswith(".data"):
+        existing.mkdir()
+        (existing / "band.img").write_bytes(b"historical output")
+    else:
+        existing.write_bytes(b"historical evidence")
+    docker = mocker.patch("cryolens.preprocess.validation.subprocess.run")
+    with pytest.raises(FileExistsError, match="occupied"):
+        run_reference(tmp_path / "safe", tmp_path / "graph.xml", prefix, (0, 0, 10, 10), "runtime")
+    docker.assert_not_called()
+    if existing.is_file():
+        assert existing.read_bytes() == b"historical evidence"
+    else:
+        assert (existing / "band.img").read_bytes() == b"historical output"
+
+
+def test_direct_receipt_write_is_idempotent_but_never_replaces_evidence(
+    reference_cache_fixture: tuple[Path, Path, Path, tuple[int, int, int, int]],
+) -> None:
+    from cryolens.preprocess.validation import write_reference_receipt
+
+    scratch, graph, prefix, window = reference_cache_fixture
+    path = Path(str(prefix) + "-receipt.json")
+    original = path.read_bytes()
+    write_reference_receipt(scratch, graph, prefix, window, "runtime")
+    assert path.read_bytes() == original
+    Path(str(prefix) + "_geo.tif").write_bytes(b"changed")
+    with pytest.raises(FileExistsError, match="already exists"):
+        write_reference_receipt(scratch, graph, prefix, window, "runtime")
+    assert path.read_bytes() == original

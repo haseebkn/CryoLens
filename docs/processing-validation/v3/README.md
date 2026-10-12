@@ -194,7 +194,7 @@ false-alarm rate. Those still require the independent reference reviews.
 
 ## Local code verification
 
-The final full suite passed **409 tests**; 14 archive-dependent detection tests
+The final full suite passed **419 tests**; 14 archive-dependent detection tests
 were skipped in the isolated checkout. Mypy passed 125 source/test files and the
 five evidence drivers; Ruff and formatting passed 170 Python files. New regressions
 exercise real long-path annotation reads, lossless overview preservation, measured
@@ -208,7 +208,7 @@ recorded report hashes, alongside configuration, source ZIP and reference-receip
 inventories. Original source snapshots and measured hashes are not rewritten to
 make a different checkout appear to have generated the historical results.
 
-## Delivery review status
+## Historical delivery review status (before approval)
 
 The independent review found four issues after the measured executions. Graph
 bytes and Windows UNC paths were corrected in the preserved pipeline commit
@@ -224,3 +224,35 @@ as historical results; their receipt lacks measurement/annotation input hashes,
 so final provenance qualification and safe reuse remain provisional. Implement
 new source-bound evidence additively; do not backfill historical execution claims.
 The current status remains closed overall and does not grant scientific release.
+
+## Approved protections and current evidence
+
+The user approved R1 and R2. Both protections are implemented. Occupied SNAP
+prefixes fail before Docker execution; an atomic reservation prevents concurrent
+reuse and retains failed attempts. Logs and receipts use exclusive writes, and
+idempotent receipt verification preserves the original bytes. Existing validation
+reports are refused; bound quality reuse now reads `--reuse-full-scan-from`
+into a new output directory instead of replacing its source report.
+
+Marine schema 2 records original manifest, measurement and annotation byte hashes
+before scanning and rechecks them afterward. Aggregation requires an exact match
+to the processing report's original source inventory. Legacy unbound marine
+receipts remain historical evidence and cannot qualify a new aggregate.
+
+The [additive source-bound status](source-bound-approval/current-status.json)
+was generated from newly executed full EW/IW scans and comparisons against the
+verified, unchanged SNAP references. The [new marine receipt](source-bound-approval/ew-northern-qualified/marine-quality.json)
+records eleven original processing inputs and the exact driver/reader/helper
+execution hashes. Full EW HV remains 2.692%, marine HV 3.510%, and IW HV 6.201%.
+Nine EW and nine IW scientific comparisons pass; IW and the enclosing release
+gates remain closed. No historical report, recorded hash or original snapshot
+was altered or silently backfilled. This rerun adds no new distinct SNAP execution.
+The [real occupied-prefix check](source-bound-approval/occupied-prefix-check.json)
+confirms the original log, receipt and reference TIFF remain byte-identical.
+
+The actual source-bound execution is captured in the new `executed-code.zip`
+archives. Its marine driver precedes a later import-order formatting change;
+the recorded driver hash matches the archived executed bytes. Post-hoc MLflow
+runs `12b2bb1d7b024cdbaf57e165a33e2b1c` and `9765facb1bd94323887670911b92cbcf`
+record the actual dirty checkout and new completed-report hashes. They do not
+rewrite the earlier runs or claim model training/detection performance.

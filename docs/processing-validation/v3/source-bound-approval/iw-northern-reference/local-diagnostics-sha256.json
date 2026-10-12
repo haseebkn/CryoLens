@@ -1,0 +1,11 @@
+{
+  "diagnostics/iw-northern-reference-r0.1-c0.1/iw-northern-reference-r0.1-c0.1_4band_EPSG3978.tif": "e4dc01cd0783ffb2d184e2da0e7e399109206f61b29babb4bf8718422bac691c",
+  "diagnostics/iw-northern-reference-r0.1-c0.5/iw-northern-reference-r0.1-c0.5_4band_EPSG3978.tif": "2e014c6032df71107b210deeea84ea1be44e7a37f1f506b7ea28748591fbab6c",
+  "diagnostics/iw-northern-reference-r0.1-c0.9/iw-northern-reference-r0.1-c0.9_4band_EPSG3978.tif": "ac8acd50762db851720e99af63a8ebd478ca88398c6fbaf5ff7d216bebb12958",
+  "diagnostics/iw-northern-reference-r0.5-c0.1/iw-northern-reference-r0.5-c0.1_4band_EPSG3978.tif": "76b888005bd0ca8bbe71fcb53b200514837fee34efc04bb3f65363042b9f2d8f",
+  "diagnostics/iw-northern-reference-r0.5-c0.5/iw-northern-reference-r0.5-c0.5_4band_EPSG3978.tif": "e571ca458a61b14413385d983ce7576a386a2b1688f93a9cede5bc36fbed97d1",
+  "diagnostics/iw-northern-reference-r0.5-c0.9/iw-northern-reference-r0.5-c0.9_4band_EPSG3978.tif": "9750d016d2aa90059c5ea4a3e538a731b209f3b7e35b8c6bcd5a60428f501366",
+  "diagnostics/iw-northern-reference-r0.9-c0.1/iw-northern-reference-r0.9-c0.1_4band_EPSG3978.tif": "2ed41473e2f51d95b786ba18d4147f3a4e74ad1b3487972444f2e4d345bce37a",
+  "diagnostics/iw-northern-reference-r0.9-c0.5/iw-northern-reference-r0.9-c0.5_4band_EPSG3978.tif": "fa32967c346b40d96e7071d320e63701924860e6c10bd6b09d6a491400169016",
+  "diagnostics/iw-northern-reference-r0.9-c0.9/iw-northern-reference-r0.9-c0.9_4band_EPSG3978.tif": "775cb36712913b8424bd88aef1620b4eb9ab602aa54a19bb5c27c8d4787e72d0"
+}

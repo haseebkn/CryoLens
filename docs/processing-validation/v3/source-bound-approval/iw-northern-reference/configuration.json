@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "purpose": "Retry the identical fixed nine windows with lossless source overviews retained; full 5 percent quality threshold unchanged.",
+  "frozen_manifest": "docs/evaluation/v1/manifest.json",
+  "graph": "configs/snap/validation-reference-v2.xml",
+  "window_size_px": 512,
+  "sampling_fractions": [
+    [
+      0.1,
+      0.1
+    ],
+    [
+      0.1,
+      0.5
+    ],
+    [
+      0.1,
+      0.9
+    ],
+    [
+      0.5,
+      0.1
+    ],
+    [
+      0.5,
+      0.5
+    ],
+    [
+      0.5,
+      0.9
+    ],
+    [
+      0.9,
+      0.1
+    ],
+    [
+      0.9,
+      0.5
+    ],
+    [
+      0.9,
+      0.9
+    ]
+  ],
+  "products": [
+    {
+      "name": "iw-northern-reference",
+      "path": "\\\\?\\D:\\CryoLens-data\\sentinel1-step2-20261012\\raw\\S1A_IW_GRDH_1SDH_20260328T094823_20260328T094848_063826_0806C8_672E_COG\\S1A_IW_GRDH_1SDH_20260328T094823_20260328T094848_063826_0806C8_672E_COG.SAFE"
+    }
+  ],
+  "recipe_id": "iw-northern-reference-20261012",
+  "scan_block_rows": 32
+}

@@ -45,15 +45,45 @@ def test_git_preserves_archived_execution_graph_bytes(tmp_path: Path, autocrlf: 
     assert target.read_bytes() == executed
 
 
-@pytest.mark.parametrize("marine_passed", [True, False])
+@pytest.mark.parametrize(
+    "marine_case",
+    [
+        "valid",
+        "rejected",
+        "unbound",
+        "measurement_changed",
+        "annotation_changed",
+        "manifest_changed",
+    ],
+)
 def test_summary_requires_matching_marine_quality_and_keeps_gate_closed(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, marine_passed: bool
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, marine_case: str
 ) -> None:
     policy = QualityPolicy().model_dump()
     footprint = {
         "type": "Polygon",
         "coordinates": [[[-56, 53], [-54, 53], [-54, 55], [-56, 55], [-56, 53]]],
     }
+    provenance = {
+        "original_manifest_sha256": "0" * 64,
+        "measurements": [
+            {"measurement": "hh.tiff", "source_sha256": "1" * 64},
+            {"measurement": "hv.tiff", "source_sha256": "2" * 64},
+        ],
+        "annotation_sha256": {"annotation/hh.xml": "3" * 64},
+    }
+    source_inventory = {
+        "manifest.safe": "0" * 64,
+        "measurement/hh.tiff": "1" * 64,
+        "measurement/hv.tiff": "2" * 64,
+        "annotation/hh.xml": "3" * 64,
+    }
+    if marine_case == "measurement_changed":
+        source_inventory["measurement/hh.tiff"] = "9" * 64
+    if marine_case == "annotation_changed":
+        source_inventory["annotation/hh.xml"] = "9" * 64
+    if marine_case == "manifest_changed":
+        source_inventory["manifest.safe"] = "9" * 64
     rows = []
     for mode, folder, quality_passed, fraction in [
         ("EW", "ew-northern-qualified", True, 0.03),
@@ -84,7 +114,13 @@ def test_summary_requires_matching_marine_quality_and_keeps_gate_closed(
                     "deployment_gate_open": quality_passed,
                     "validation_source_sha256": {"safe_reader.py": "executed-reader"},
                     "products": [
-                        {"product": name, "mode": mode, "windows": [{}] * 9, "quality": quality}
+                        {
+                            "product": name,
+                            "mode": mode,
+                            "windows": [{}] * 9,
+                            "quality": quality,
+                            "provenance": provenance,
+                        }
                     ],
                 }
             )
@@ -97,7 +133,10 @@ def test_summary_requires_matching_marine_quality_and_keeps_gate_closed(
     (tmp_path / "ew-northern-qualified/marine-quality.json").write_text(
         json.dumps(
             {
-                "passed": marine_passed,
+                "schema_version": 1 if marine_case == "unbound" else 2,
+                "source_files_sha256": source_inventory,
+                "source_inventory_verified_after_scan": True,
+                "passed": marine_case != "rejected",
                 "policy": policy,
                 "product": "EW.SAFE",
                 "reader_sha256": "executed-reader",
@@ -105,7 +144,7 @@ def test_summary_requires_matching_marine_quality_and_keeps_gate_closed(
         )
     )
     monkeypatch.setattr(sys, "argv", ["finalise_acquisition_report", "--report-dir", str(tmp_path)])
-    if not marine_passed:
+    if marine_case != "valid":
         with pytest.raises(ValueError, match="marine quality"):
             main()
         assert not (tmp_path / "current-status.json").exists()

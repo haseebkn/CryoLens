@@ -14,7 +14,10 @@ from shapely.ops import transform, unary_union
 
 from cryolens.eval.cohort import file_digest
 from cryolens.geo.aoi import points_in_aoi
+from cryolens.preprocess import provenance as provenance_module
+from cryolens.preprocess import safe_reader as reader_module
 from cryolens.preprocess.masks import LandMaskGenerator
+from cryolens.preprocess.provenance import safe_source_inventory
 from cryolens.preprocess.quality import QualityPolicy
 from cryolens.preprocess.safe_reader import SAFEProductReader, _parse_product_annotation
 from cryolens.preprocess.validation import require_development_product
@@ -30,12 +33,21 @@ def main() -> None:
         raise FileExistsError("Preserve existing report; choose a new output")
     require_development_product(args.safe, Path("docs/evaluation/v1/manifest.json"))
     policy = QualityPolicy()
+    reader = SAFEProductReader(args.safe)
+    source_inventory = safe_source_inventory(reader)
+    shoreline_hash = file_digest(args.shoreline)
+    aoi_hash = file_digest(Path("configs/aoi.geojson"))
+    code_paths = {
+        "driver": Path(__file__),
+        "reader": Path(reader_module.__file__),
+        "inventory_helper": Path(provenance_module.__file__),
+    }
+    code_hashes = {name: file_digest(path) for name, path in code_paths.items()}
     coast = LandMaskGenerator(cache_path=args.shoreline).load_geometries()
     forward = pyproj.Transformer.from_crs(4326, 3978, always_xy=True).transform
     inverse = pyproj.Transformer.from_crs(3978, 4326, always_xy=True).transform
     land = transform(inverse, transform(forward, unary_union(coast)).buffer(500))
     shapely.prepare(land)
-    reader = SAFEProductReader(args.safe)
     meta = _parse_product_annotation(reader._find_for_polarisation("HH")[1])
     height, width = meta["n_lines"], meta["n_samples"]
     counts: dict[str, dict[str, Any]] = {
@@ -88,23 +100,36 @@ def main() -> None:
             reasons.append(pol + ": insufficient valid marine observations")
         if row["invalid_incidence_pixels"]:
             reasons.append(pol + ": invalid incidence angles")
+    if safe_source_inventory(reader) != source_inventory:
+        raise ValueError("SAFE sources changed during marine scan; no evidence accepted")
+    if (
+        file_digest(args.shoreline) != shoreline_hash
+        or file_digest(Path("configs/aoi.geojson")) != aoi_hash
+    ):
+        raise ValueError("Marine mask inputs changed during scan")
+    if {name: file_digest(path) for name, path in code_paths.items()} != code_hashes:
+        raise ValueError("Marine processing code changed during scan")
     report = {
-        "schema_version": 1,
+        "schema_version": 2,
+        "source_files_sha256": source_inventory,
+        "source_inventory_verified_after_scan": True,
         "product": reader.safe_dir.name,
         "scope": "nl_aoi_marine_measurement_grid",
         "coastal_buffer_m": 500,
-        "shoreline_sha256": file_digest(args.shoreline),
-        "aoi_sha256": file_digest(Path("configs/aoi.geojson")),
+        "shoreline_sha256": shoreline_hash,
+        "aoi_sha256": aoi_hash,
         "policy": policy.model_dump(),
-        "driver_sha256": file_digest(Path(__file__)),
-        "reader_sha256": file_digest(Path("src/cryolens/preprocess/safe_reader.py")),
+        "driver_sha256": code_hashes["driver"],
+        "reader_sha256": code_hashes["reader"],
+        "inventory_helper_sha256": code_hashes["inventory_helper"],
         "channels": counts,
         "passed": not reasons,
         "reasons": reasons,
         "claim_boundary": "Full source-grid marine-domain quality only; no sea-ice exclusion, CFAR support, surveyed eligible area or detection performance. Buffered shoreline and pixel centres use annotation geolocation; absolute field accuracy remains unestablished.",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, indent=2, allow_nan=False))
+    with args.output.open("x", encoding="utf-8") as output:
+        json.dump(report, output, indent=2, allow_nan=False)
     print(json.dumps(report), flush=True)
 
 

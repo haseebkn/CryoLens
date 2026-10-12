@@ -320,6 +320,13 @@ def run_reference(
 ) -> None:
     """Invoke the actual external processor, retain output and fail on exit/errors."""
     prefix.parent.mkdir(parents=True, exist_ok=True)
+    if any(path.name.startswith(prefix.name) for path in prefix.parent.iterdir()):
+        raise FileExistsError(
+            "Reference prefix occupied; preserve evidence and choose a new prefix"
+        )
+    # Atomic reservation protects concurrent executions and remains on failure.
+    with Path(str(prefix) + "-execution.lock").open("x", encoding="utf-8") as reservation:
+        json.dump({"window": list(window), "image": image}, reservation)
     r, c, h, w = window
     command = [
         "docker",
@@ -351,7 +358,8 @@ def run_reference(
         command, capture_output=True, text=True, encoding="utf-8", errors="replace"
     )
     log = result.stdout + result.stderr
-    Path(str(prefix) + ".log").write_text(log, encoding="utf-8")
+    with Path(str(prefix) + ".log").open("x", encoding="utf-8") as stream:
+        stream.write(log)
     if result.returncode or "Error:" in log or "StackOverflowError" in log:
         raise RuntimeError("Independent SNAP run failed; see " + str(prefix) + ".log")
     write_reference_receipt(scratch, graph, prefix, window, image)
@@ -452,7 +460,13 @@ def write_reference_receipt(
     receipt["outputs_sha256"] = {
         path.relative_to(prefix.parent).as_posix(): file_digest(path) for path in outputs
     }
-    Path(str(prefix) + "-receipt.json").write_text(json.dumps(receipt, indent=2), encoding="utf-8")
+    path = Path(str(prefix) + "-receipt.json")
+    if path.exists():
+        if json.loads(path.read_text(encoding="utf-8")) == receipt:
+            return  # Idempotent verification never rewrites the original bytes.
+        raise FileExistsError("Reference receipt already exists; choose a new prefix")
+    with path.open("x", encoding="utf-8") as stream:
+        json.dump(receipt, stream, indent=2)
 
 
 def verify_reference_receipt(
@@ -533,11 +547,20 @@ def main() -> int:
         action="store_true",
         help="Diagnostic rerun only; cannot open deployment gate",
     )
+    parser.add_argument(
+        "--reuse-full-scan-from",
+        type=Path,
+        help="Read bound quality from a prior report into a NEW output directory",
+    )
     args = parser.parse_args()
+    if args.reuse_full_scan:
+        parser.error("Use --reuse-full-scan-from OLD/report.json and a new --output-dir")
+    if (args.output_dir / "report.json").exists():
+        raise FileExistsError("Preserve existing validation report; use a new output directory")
     previous = None
     previous_sha256 = None
-    if args.reuse_full_scan:
-        previous_path = args.output_dir / "report.json"
+    if args.reuse_full_scan_from:
+        previous_path = args.reuse_full_scan_from
         previous = json.loads(previous_path.read_text(encoding="utf-8"))
         previous_sha256 = file_digest(previous_path)
     config = json.loads(args.config.read_text(encoding="utf-8"))

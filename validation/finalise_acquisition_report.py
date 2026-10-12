@@ -15,6 +15,7 @@ from shapely.geometry import shape
 
 from cryolens.eval.cohort import file_digest
 from cryolens.geo.aoi import load_aoi
+from cryolens.preprocess.provenance import original_inventory
 from cryolens.preprocess.quality import QualityPolicy
 
 
@@ -67,7 +68,11 @@ def main() -> None:
         report for report, _path in evidence.values() if report["products"][0]["mode"] == "EW"
     )
     if (
-        not marine["passed"]
+        marine.get("schema_version") != 2
+        or marine.get("source_inventory_verified_after_scan") is not True
+        or marine.get("source_files_sha256")
+        != original_inventory(ew_report["products"][0].get("provenance", {}))
+        or not marine["passed"]
         or marine["policy"] != QualityPolicy().model_dump()
         or marine["product"] != ew_report["products"][0]["product"]
         or marine["reader_sha256"] != ew_report["validation_source_sha256"]["safe_reader.py"]
