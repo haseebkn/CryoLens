@@ -55,6 +55,8 @@ def test_non_windows_open_path_keeps_resolved_path(
     monkeypatch.setattr(safe_reader, "sys", SimpleNamespace(platform="linux"))
     path = tmp_path / "scene.SAFE"
     assert safe_reader._open_path(path) == str(path.resolve())
+
+
 SIGMA_CONSTANT = 100.0
 NOISE_CONSTANT = 4.0
 

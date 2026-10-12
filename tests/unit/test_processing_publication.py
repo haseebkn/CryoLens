@@ -13,9 +13,7 @@ from validation.finalise_acquisition_report import main
 
 
 @pytest.mark.parametrize("autocrlf", ["true", "false"])
-def test_git_preserves_archived_execution_graph_bytes(
-    tmp_path: Path, autocrlf: str
-) -> None:
+def test_git_preserves_archived_execution_graph_bytes(tmp_path: Path, autocrlf: str) -> None:
     import hashlib
     import subprocess
     import zipfile

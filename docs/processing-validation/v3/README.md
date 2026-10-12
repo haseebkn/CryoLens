@@ -194,7 +194,7 @@ false-alarm rate. Those still require the independent reference reviews.
 
 ## Local code verification
 
-The final full suite passed **401 tests**; 14 archive-dependent detection tests
+The final full suite passed **409 tests**; 14 archive-dependent detection tests
 were skipped in the isolated checkout. Mypy passed 125 source/test files and the
 five evidence drivers; Ruff and formatting passed 170 Python files. New regressions
 exercise real long-path annotation reads, lossless overview preservation, measured
@@ -207,3 +207,20 @@ contracts. The publication regression verifies actual committed Git blobs agains
 recorded report hashes, alongside configuration, source ZIP and reference-receipt
 inventories. Original source snapshots and measured hashes are not rewritten to
 make a different checkout appear to have generated the historical results.
+
+## Delivery review status
+
+The independent review found four issues after the measured executions. Graph
+bytes and Windows UNC paths were corrected in the preserved pipeline commit
+`8ebe1843`; actual Git checkout behavior and path formatting have regression tests.
+All 409 portable tests pass locally (14 archive-dependent tests skipped), and
+mypy, Ruff and formatting pass. The review retry stopped on external model
+capacity before completing review, push or CI; no new PR has been published.
+
+Two protective remedies await the required human decision: preventing occupied
+SNAP prefixes from being overwritten, and adding original source inventories to
+new marine receipts before aggregation. Existing marine measurements are retained
+as historical results; their receipt lacks measurement/annotation input hashes,
+so final provenance qualification and safe reuse remain provisional. Implement
+new source-bound evidence additively; do not backfill historical execution claims.
+The current status remains closed overall and does not grant scientific release.
