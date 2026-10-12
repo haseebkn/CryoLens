@@ -90,3 +90,27 @@ def test_summary_requires_matching_marine_quality_and_keeps_gate_closed(
     assert all(f["geometry"] == footprint for f in coverage["features"])
     with pytest.raises(FileExistsError, match="Preserve"):
         main()
+
+
+def test_published_processing_artifacts_preserve_their_recorded_byte_contract() -> None:
+    from cryolens.eval.cohort import file_digest
+    from validation.publish_validation_run import verify_execution_sources
+
+    root = Path(__file__).resolve().parents[2] / "docs/processing-validation/v3"
+    status = json.loads((root / "current-status.json").read_text())
+    assert file_digest(root / "report.json") == status["baseline_report_sha256"]
+    assert file_digest(root / "continuation/report.json") == status["continuation_report_sha256"]
+    for folder in ["ew-northern-qualified", "iw-northern-reference", "iw-noise-edge"]:
+        out = root / folder
+        report = json.loads((out / "report.json").read_text())
+        tracking = json.loads((out / "tracking_receipt.json").read_text())
+        assert file_digest(out / "report.json") == tracking["report_sha256"]
+        assert file_digest(out / "configuration.json") == report["configuration_sha256"]
+        verify_execution_sources(report, out)
+        receipts = {file_digest(p) for p in (out / "reference-receipts").glob("*.json")}
+        required = {
+            w["reference_receipt_sha256"]
+            for product in report["products"]
+            for w in product["windows"]
+        }
+        assert required <= receipts
