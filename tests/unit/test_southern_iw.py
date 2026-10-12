@@ -436,6 +436,241 @@ def test_consumer_preserves_genuine_failed_scientific_observations(
     assert result["passing_product_checks"] is False
 
 
+@pytest.mark.parametrize(
+    "tamper",
+    [
+        "reported_nonpositive",
+        "policy_nonpositive",
+        "coverage",
+        "incidence",
+        "fraction",
+        "nonfinite_fraction",
+        "nonfinite_coverage",
+        "negative_count",
+        "fractional_count",
+        "boolean_count",
+        "too_many_finite",
+        "too_many_nonpositive",
+        "too_many_incidence",
+        "missing_channel",
+        "summary",
+        "reasons",
+        "stripe_gap",
+        "stripe_overlap",
+        "stripe_width",
+        "stripe_height",
+        "stripe_missing_channel",
+        "stripe_fraction",
+        "stripe_coverage",
+        "stripe_finite",
+        "stripe_incidence",
+        "stripe_nonfinite",
+        "aggregate_finite",
+        "aggregate_incidence",
+        "empty_stripes",
+    ],
+)
+def test_consumer_rejects_matching_invalid_full_grid_quality(
+    southern_publication: Path, tamper: str
+) -> None:
+    import copy
+    import json
+
+    from validation.finalise_southern_iw_report import processing_evidence
+
+    search = json.loads(
+        (southern_publication / "acquisition-search-verified/report.json").read_text()
+    )
+    source = next(row for row in search["products"] if "20251206" in row["product"])
+    path = southern_publication / "iw-december-qualified/report.json"
+    report = json.loads(path.read_text())
+    quality = report["products"][0]["quality"]
+    channel = quality["channels"]["HV"]
+    stripe = quality["stripes"][0]
+    stripe_channel = stripe["channels"]["HV"]
+    if tamper == "reported_nonpositive":
+        channel["nonpositive_pixels"] = 104787441
+        channel["nonpositive_fraction"] = 104787441 / channel["finite_pixels"]
+    elif tamper in {"policy_nonpositive", "coverage", "incidence"}:
+        for item in quality["stripes"]:
+            values = item["channels"]["HV"]
+            if tamper == "policy_nonpositive":
+                nonpositive = values["finite_pixels"] // 4
+                values["nonpositive_fraction"] = nonpositive / values["finite_pixels"]
+            elif tamper == "coverage":
+                values.update(
+                    finite_pixels=1,
+                    nonpositive_fraction=0.0,
+                    valid_fraction=1 / (item["window"][2] * item["window"][3]),
+                )
+            else:
+                values["invalid_incidence_pixels"] = 1
+        channel["finite_pixels"] = sum(
+            s["channels"]["HV"]["finite_pixels"] for s in quality["stripes"]
+        )
+        channel["nonpositive_pixels"] = sum(
+            round(
+                s["channels"]["HV"]["nonpositive_fraction"] * s["channels"]["HV"]["finite_pixels"]
+            )
+            for s in quality["stripes"]
+        )
+        channel["invalid_incidence_pixels"] = sum(
+            s["channels"]["HV"]["invalid_incidence_pixels"] for s in quality["stripes"]
+        )
+        height = sum(s["window"][2] for s in quality["stripes"])
+        channel["nonpositive_fraction"] = channel["nonpositive_pixels"] / channel["finite_pixels"]
+        channel["valid_fraction"] = channel["finite_pixels"] / (height * stripe["window"][3])
+    elif tamper in {"fraction", "nonfinite_fraction"}:
+        channel["nonpositive_fraction"] = 0.0 if tamper == "fraction" else float("nan")
+    elif tamper == "nonfinite_coverage":
+        channel["valid_fraction"] = float("inf")
+    elif tamper in {"negative_count", "fractional_count", "boolean_count", "too_many_finite"}:
+        channel["finite_pixels"] = {
+            "negative_count": -1,
+            "fractional_count": 1.5,
+            "boolean_count": True,
+            "too_many_finite": 10**12,
+        }[tamper]
+    elif tamper in {"too_many_nonpositive", "too_many_incidence"}:
+        key = (
+            "nonpositive_pixels" if tamper == "too_many_nonpositive" else "invalid_incidence_pixels"
+        )
+        channel[key] = channel["finite_pixels"] + 1
+    elif tamper == "missing_channel":
+        del quality["channels"]["HH"]
+    elif tamper == "summary":
+        quality["passed"] = False
+    elif tamper == "reasons":
+        quality["reasons"] = ["recorded quality failure"]
+    elif tamper in {"stripe_gap", "stripe_overlap"}:
+        quality["stripes"][1]["window"][0] += 1 if tamper == "stripe_gap" else -1
+    elif tamper == "stripe_width":
+        quality["stripes"][1]["window"][3] -= 1
+    elif tamper == "stripe_height":
+        stripe["window"][2] = 0
+    elif tamper == "stripe_missing_channel":
+        del stripe["channels"]["HH"]
+    elif tamper == "stripe_fraction":
+        stripe_channel["nonpositive_fraction"] = 0.0
+    elif tamper == "stripe_coverage":
+        stripe_channel["valid_fraction"] = 1.0
+    elif tamper == "stripe_finite":
+        stripe_channel["finite_pixels"] += 1
+    elif tamper == "stripe_incidence":
+        stripe_channel["invalid_incidence_pixels"] = stripe_channel["finite_pixels"] + 1
+    elif tamper == "stripe_nonfinite":
+        stripe_channel["nonpositive_fraction"] = float("nan")
+    elif tamper == "aggregate_finite":
+        channel["finite_pixels"] -= 1
+    elif tamper == "aggregate_incidence":
+        channel["invalid_incidence_pixels"] = 1
+    else:
+        quality["stripes"] = []
+    source["quality"] = copy.deepcopy(quality)
+    path.write_text(json.dumps(report))
+    with pytest.raises(ValueError, match="[Ff]ull-grid quality"):
+        processing_evidence(
+            southern_publication, source, "iw-december-qualified", "acquisition-search-verified"
+        )
+
+
+def test_consumer_validates_quality_without_processing_comparisons(
+    southern_publication: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import json
+    import sys
+
+    from validation.finalise_southern_iw_report import main
+
+    path = southern_publication / "acquisition-search-verified/report.json"
+    search = json.loads(path.read_text())
+    source = next(row for row in search["products"] if "20260122" in row["product"])
+    source["quality"]["channels"]["HV"]["nonpositive_fraction"] = 0.0
+    source["quality"]["passed"] = True
+    source["quality"]["reasons"] = []
+    path.write_text(json.dumps(search))
+    monkeypatch.setattr(sys, "argv", ["finalise", "--report-dir", str(southern_publication)])
+    with pytest.raises(ValueError, match="full-grid quality"):
+        main()
+    assert not (southern_publication / "current-status.json").exists()
+
+
+@pytest.mark.parametrize(
+    ("rows", "columns", "displacement"),
+    [
+        (100.0, 0.0, 0.0),
+        (0.0, 100.0, 0.0),
+        (0.6, 0.8, 0.0),
+        (0.0, 0.0, 40.0),
+        (1.000000001, 0.0, 40.00000004),
+    ],
+)
+def test_consumer_rejects_registration_shift_displacement_contradictions(
+    southern_publication: Path, rows: float, columns: float, displacement: float
+) -> None:
+    import json
+
+    from validation.finalise_southern_iw_report import processing_evidence
+
+    search = json.loads(
+        (southern_publication / "acquisition-search-verified/report.json").read_text()
+    )
+    source = next(row for row in search["products"] if "20251206" in row["product"])
+    path = southern_publication / "iw-december-qualified/report.json"
+    report = json.loads(path.read_text())
+    report["products"][0]["windows"][0]["checks"]["registration_HH"].update(
+        shift_rows_px=rows, shift_columns_px=columns, relative_displacement_m=displacement
+    )
+    path.write_text(json.dumps(report))
+    with pytest.raises(ValueError, match="Scientific pass flag"):
+        processing_evidence(
+            southern_publication, source, "iw-december-qualified", "acquisition-search-verified"
+        )
+
+
+@pytest.mark.parametrize("shift", [(0.6, 0.8), (-1.0, 0.0), (0.6, 0.79999999999)])
+def test_consumer_accepts_consistent_registration_on_bound_grid(
+    southern_publication: Path, shift: tuple[float, float]
+) -> None:
+    import json
+
+    from validation.finalise_southern_iw_report import processing_evidence
+
+    search = json.loads(
+        (southern_publication / "acquisition-search-verified/report.json").read_text()
+    )
+    source = next(row for row in search["products"] if "20251206" in row["product"])
+    path = southern_publication / "iw-december-qualified/report.json"
+    report = json.loads(path.read_text())
+    report["products"][0]["windows"][0]["checks"]["registration_HH"].update(
+        shift_rows_px=shift[0], shift_columns_px=shift[1], relative_displacement_m=40.0
+    )
+    path.write_text(json.dumps(report))
+    result = processing_evidence(
+        southern_publication, source, "iw-december-qualified", "acquisition-search-verified"
+    )
+    assert result["passing_product_checks"] is True
+
+
+def test_consumer_rejects_graph_binding_mismatch(southern_publication: Path) -> None:
+    import json
+
+    from validation.finalise_southern_iw_report import processing_evidence
+
+    search = json.loads(
+        (southern_publication / "acquisition-search-verified/report.json").read_text()
+    )
+    source = next(row for row in search["products"] if "20251206" in row["product"])
+    path = southern_publication / "iw-december-qualified/report.json"
+    report = json.loads(path.read_text())
+    report["graph_sha256"] = "0" * 64
+    path.write_text(json.dumps(report))
+    with pytest.raises(ValueError, match="Processing graph"):
+        processing_evidence(
+            southern_publication, source, "iw-december-qualified", "acquisition-search-verified"
+        )
+
+
 def test_genuine_marine_failure_remains_rejected(southern_publication: Path) -> None:
     import json
 

@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
+import xml.etree.ElementTree as ET
+import zipfile
 from pathlib import Path
 from typing import Any
 
@@ -22,7 +25,95 @@ from validation.finalise_acquisition_report import export_coverage
 from validation.publish_validation_run import verify_execution_sources
 
 
-def scientific_checks_passed(checks: dict[str, Any], window: list[int]) -> bool:
+def full_grid_quality(quality: dict[str, Any], product: str, mode: str) -> tuple[int, int]:
+    policy = QualityPolicy()
+
+    def count(value: Any) -> int:
+        if type(value) is not int or value < 0:
+            raise ValueError("Invalid full-grid quality count")
+        return value
+
+    def fraction(value: Any, expected: float) -> None:
+        if (
+            type(value) not in (int, float)
+            or not math.isfinite(value)
+            or not 0 <= value <= 1
+            or not math.isclose(value, expected, rel_tol=1e-12, abs_tol=1e-15)
+        ):
+            raise ValueError("Inconsistent full-grid quality fraction")
+
+    try:
+        if (
+            quality["scope"] != "full_measurement_grid"
+            or quality["policy"] != policy.model_dump()
+            or quality["product"] != product
+            or quality["instrument_mode"] != mode
+            or set(quality["channels"]) != {"HH", "HV"}
+            or not quality["stripes"]
+        ):
+            raise ValueError("Incomplete or unbound full-grid quality")
+        totals = {pol: [0, 0, 0] for pol in ("HH", "HV")}
+        height = 0
+        width = count(quality["stripes"][0]["window"][3])
+        for stripe in quality["stripes"]:
+            start, column, rows, columns = [count(v) for v in stripe["window"]]
+            if start != height or column != 0 or columns != width or not rows or not width:
+                raise ValueError("Full-grid quality stripes must cover one contiguous grid")
+            if set(stripe["channels"]) != {"HH", "HV"}:
+                raise ValueError("Both full-grid quality stripe channels are required")
+            height += rows
+            population = rows * width
+            for pol, channel in stripe["channels"].items():
+                finite = count(channel["finite_pixels"])
+                invalid = count(channel["invalid_incidence_pixels"])
+                if not invalid <= finite <= population:
+                    raise ValueError("Invalid full-grid quality stripe counts")
+                fraction(channel["valid_fraction"], finite / population)
+                value = channel["nonpositive_fraction"]
+                if type(value) not in (int, float) or not math.isfinite(value):
+                    raise ValueError("Invalid full-grid quality stripe fraction")
+                nonpositive = round(value * finite) if finite else 0
+                fraction(value, nonpositive / finite if finite else 1.0)
+                for index, total in enumerate((finite, nonpositive, invalid)):
+                    totals[pol][index] += total
+        conditions = []
+        for pol, channel in quality["channels"].items():
+            finite, nonpositive, invalid = [
+                count(channel[key])
+                for key in ("finite_pixels", "nonpositive_pixels", "invalid_incidence_pixels")
+            ]
+            if (
+                not 0 <= nonpositive <= finite <= height * width
+                or invalid > finite
+                or [finite, nonpositive, invalid] != totals[pol]
+            ):
+                raise ValueError("Full-grid quality counts differ from stripe aggregates")
+            nonpositive_fraction = nonpositive / finite if finite else 1.0
+            coverage = finite / (height * width)
+            fraction(channel["nonpositive_fraction"], nonpositive_fraction)
+            fraction(channel["valid_fraction"], coverage)
+            conditions.append(
+                nonpositive_fraction <= policy.max_nonpositive_fraction
+                and coverage >= policy.min_valid_fraction
+                and invalid == 0
+            )
+        reasons = quality["reasons"]
+        if (
+            not isinstance(reasons, list)
+            or not all(isinstance(reason, str) and reason for reason in reasons)
+            or type(quality["passed"]) is not bool
+            or quality["passed"] != (not reasons)
+            or quality["passed"] != (all(conditions) and not reasons)
+        ):
+            raise ValueError("Full-grid quality summary contradicts strict policy")
+    except (KeyError, TypeError, OverflowError) as exc:
+        raise ValueError("Incomplete or invalid full-grid quality") from exc
+    return height, width
+
+
+def scientific_checks_passed(
+    checks: dict[str, Any], window: list[int], pixel_spacing_m: float
+) -> bool:
     def metric(check: dict[str, Any], key: str) -> float:
         value = check[key]
         if type(value) not in (int, float) or not math.isfinite(value):
@@ -56,10 +147,19 @@ def scientific_checks_passed(checks: dict[str, Any], window: list[int]) -> bool:
             elif name == "incidence":
                 valid = 0 <= metric(check, "max_error_deg") <= 0.05
             elif name.startswith("registration_"):
-                metric(check, "shift_rows_px")
-                metric(check, "shift_columns_px")
+                rows = metric(check, "shift_rows_px")
+                columns = metric(check, "shift_columns_px")
+                displacement = metric(check, "relative_displacement_m")
+                measured_displacement = math.hypot(rows, columns) * pixel_spacing_m
                 valid = (
-                    0 <= metric(check, "relative_displacement_m") <= 40
+                    0 <= displacement <= 40
+                    and measured_displacement <= 40
+                    and math.isclose(
+                        displacement,
+                        measured_displacement,
+                        rel_tol=1e-9,
+                        abs_tol=1e-8,
+                    )
                     and count(
                         checks[name.replace("registration_", "reprojection_")], "matched_pixels"
                     )
@@ -106,11 +206,8 @@ def processing_evidence(
     if product["product"] != source["product"] or product["mode"] != source["mode"]:
         raise ValueError("Processing source identity differs")
     quality = product["quality"]
-    if (
-        quality.get("scope") != "full_measurement_grid"
-        or quality.get("policy") != QualityPolicy().model_dump()
-    ):
-        raise ValueError("Processing quality scope or policy changed")
+    height, width = full_grid_quality(quality, source["product"], source["mode"])
+    full_grid_quality(source["quality"], source["product"], source["mode"])
     if (
         quality["channels"] != source["quality"]["channels"]
         or quality["passed"] != source["quality"]["passed"]
@@ -143,9 +240,16 @@ def processing_evidence(
     if config.get("window_size_px") != 512 or config.get("sampling_fractions") != fractions:
         raise ValueError("Fixed nine-window sampling protocol changed")
     verify_execution_sources(report, root / folder)
-    stripes = quality["stripes"]
-    height = max(s["window"][0] + s["window"][2] for s in stripes)
-    width = max(s["window"][1] + s["window"][3] for s in stripes)
+    with zipfile.ZipFile(root / folder / "executed-code.zip") as archive:
+        graph = archive.read(config["graph"])
+    if hashlib.sha256(graph).hexdigest() != report["graph_sha256"]:
+        raise ValueError("Processing graph differs from producing snapshot")
+    grid = ET.fromstring(graph).find("./node[@id='Geocode']/parameters/pixelSpacingInMeter")
+    if grid is None or grid.text is None:
+        raise ValueError("Reference graph lacks grid spacing")
+    pixel_spacing_m = float(grid.text)
+    if not math.isfinite(pixel_spacing_m) or pixel_spacing_m <= 0:
+        raise ValueError("Invalid reference grid spacing")
     expected_windows = [
         [round((height - 512) * r), round((width - 512) * c), 512, 512] for r, c in fractions
     ]
@@ -177,7 +281,7 @@ def processing_evidence(
         checks = window.get("checks", {})
         if set(checks) != expected_checks or window[
             "scientific_comparison_passed"
-        ] != scientific_checks_passed(checks, window["window"]):
+        ] != scientific_checks_passed(checks, window["window"], pixel_spacing_m):
             raise ValueError("Window summary contradicts individual scientific checks")
         reference = receipts[window["reference_receipt_sha256"]]
         scratch = reference.get("scratch_files_sha256", {})
@@ -287,11 +391,7 @@ def main() -> None:
             raise ValueError("Invalid or duplicate acquisition product")
         seen.add(name)
         quality = source["quality"]
-        if (
-            quality.get("policy") != QualityPolicy().model_dump()
-            or quality.get("scope") != "full_measurement_grid"
-        ):
-            raise ValueError("Unqualified full-grid acquisition quality")
+        full_grid_quality(quality, source["product"], source["mode"])
         evidence = {
             "scientific_comparison_passed": None,
             "marine_quality_passed": None,
