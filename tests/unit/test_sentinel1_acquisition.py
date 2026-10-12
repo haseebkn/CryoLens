@@ -193,6 +193,7 @@ def test_acquisition_publication_checks_complete_live_safe_inventory(
     mutation: str,
 ) -> None:
     from shapely.geometry import shape
+
     from validation import publish_acquisition_search
 
     mutate_safe(cached_acquisition["safe"], mutation)

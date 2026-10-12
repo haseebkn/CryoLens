@@ -90,8 +90,14 @@ def test_download_receipt_byte_contract_survives_git_checkout(
     def git(*args: str) -> bytes:
         return subprocess.check_output(
             [
-                "git", "-C", str(tmp_path), "-c", f"core.autocrlf={autocrlf}",
-                "-c", "core.longpaths=true", *args,
+                "git",
+                "-C",
+                str(tmp_path),
+                "-c",
+                f"core.autocrlf={autocrlf}",
+                "-c",
+                "core.longpaths=true",
+                *args,
             ]
         )
 
@@ -433,7 +439,9 @@ def test_summary_requires_matching_marine_quality_and_keeps_gate_closed(
     downloads = tmp_path / "continuation/downloads"
     downloads.mkdir()
     for row in rows:
-        receipt_path = downloads / (row["product"] + ".json")
+        product = row["product"]
+        assert isinstance(product, str)
+        receipt_path = downloads / (product + ".json")
         inventory = {
             "manifest.safe": "0" * 64,
             "measurement/hh.tiff": "1" * 64,
