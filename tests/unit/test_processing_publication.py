@@ -199,3 +199,27 @@ def test_published_processing_artifacts_preserve_their_recorded_byte_contract() 
             for w in product["windows"]
         }
         assert required <= receipts
+
+
+def test_new_marine_receipt_matches_original_processing_inputs() -> None:
+    from cryolens.eval.cohort import file_digest
+    from cryolens.preprocess.provenance import original_inventory
+    from validation.publish_validation_run import verify_execution_sources
+
+    root = (
+        Path(__file__).resolve().parents[2] / "docs/processing-validation/v3/source-bound-approval"
+    )
+    for folder in ["ew-northern-qualified", "iw-northern-reference"]:
+        out = root / folder
+        report = json.loads((out / "report.json").read_text())
+        tracking = json.loads((out / "tracking_receipt.json").read_text())
+        assert file_digest(out / "report.json") == tracking["report_sha256"]
+        verify_execution_sources(report, out)
+    ew = json.loads((root / "ew-northern-qualified/report.json").read_text())
+    marine = json.loads((root / "ew-northern-qualified/marine-quality.json").read_text())
+    assert marine["schema_version"] == 2
+    assert marine["source_inventory_verified_after_scan"] is True
+    assert marine["source_files_sha256"] == original_inventory(ew["products"][0]["provenance"])
+    assert marine["reader_sha256"] == ew["validation_source_sha256"]["safe_reader.py"]
+    assert marine["passed"] is True
+    assert json.loads((root / "current-status.json").read_text())["step2_complete"] is False

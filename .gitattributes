@@ -15,5 +15,8 @@ docs/processing-validation/v3/**/*.json linguist-generated=true
 docs/processing-validation/v3/metadata/**/*.xml linguist-generated=true
 
 # Scientific receipts and source snapshots are intentional byte contracts.
-docs/processing-validation/v3/** -text
-configs/snap/validation-reference-v2.xml -text
+docs/processing-validation/v3/** -text whitespace=cr-at-eol
+configs/snap/validation-reference-v2.xml -text whitespace=cr-at-eol
+
+# Human-readable prose is not a hashed execution artifact.
+docs/processing-validation/v3/**/*.md text eol=lf
