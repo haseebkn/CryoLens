@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "acquisition_folder": "acquisition-search-verified",
+  "investigations": {
+    "S1C_IW_GRDH_1SDH_20260116T094124_20260116T094149_005927_00BE31_B041_COG.SAFE": "iw-january-rejected",
+    "S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG.SAFE": "iw-december-qualified"
+  },
+  "purpose": "Two source-bound nine-window comparisons; other two January acquisitions retain full quality rejections without claiming reference comparisons."
+}

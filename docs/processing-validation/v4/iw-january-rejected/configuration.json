@@ -1,0 +1,52 @@
+{
+  "schema_version": 2,
+  "purpose": "Predeclared southern IW processing validation. Fixed original nine windows, unchanged strict policy; no detector performance or operational release.",
+  "frozen_manifest": "docs/evaluation/v1/manifest.json",
+  "graph": "configs/snap/validation-reference-v2.xml",
+  "window_size_px": 512,
+  "sampling_fractions": [
+    [
+      0.1,
+      0.1
+    ],
+    [
+      0.1,
+      0.5
+    ],
+    [
+      0.1,
+      0.9
+    ],
+    [
+      0.5,
+      0.1
+    ],
+    [
+      0.5,
+      0.5
+    ],
+    [
+      0.5,
+      0.9
+    ],
+    [
+      0.9,
+      0.1
+    ],
+    [
+      0.9,
+      0.5
+    ],
+    [
+      0.9,
+      0.9
+    ]
+  ],
+  "products": [
+    {
+      "name": "southern-iw-1",
+      "path": "C:\\CryoLens-data\\sentinel1-south-20261012\\raw\\S1C_IW_GRDH_1SDH_20260116T094124_20260116T094149_005927_00BE31_B041_COG\\S1C_IW_GRDH_1SDH_20260116T094124_20260116T094149_005927_00BE31_B041_COG.SAFE"
+    }
+  ],
+  "scan_block_rows": 32
+}

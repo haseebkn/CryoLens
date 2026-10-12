@@ -1,0 +1,3 @@
+# Initial acquisition publication
+
+This is the immutable initial authenticity/quality snapshot. Its two explicit input plans shared a basename, so only the latter was archived under `plans/`. The measured outcomes and four download receipts are retained unchanged. Use the additive `../acquisition-search-verified/` package and `../publication-continuation.json` for the complete plan inventory; do not treat the initial packaging as a full reproduction bundle.

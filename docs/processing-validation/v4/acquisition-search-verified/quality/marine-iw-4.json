@@ -1,0 +1,54 @@
+{
+  "schema_version": 2,
+  "source_files_sha256": {
+    "manifest.safe": "5dcf05aade7a0eaecc78ba1db2f662a15591a0df873f489d8fd500e2083bd249",
+    "measurement/s1c-iw-grd-hh-20251206t093305-20251206t093330-005329-00a97f-001-cog.tiff": "469efcd0d13b9e51e63939efaa89090f3ab0ff589390740c18c5fc771aaf303b",
+    "measurement/s1c-iw-grd-hv-20251206t093305-20251206t093330-005329-00a97f-002-cog.tiff": "6e808d6c4dd1d90c25885af5512eb9747be06619eae900ecc417494dc6f5533a",
+    "annotation/calibration/calibration-s1c-iw-grd-hh-20251206t093305-20251206t093330-005329-00a97f-001-cog.xml": "0812224a8e59ed83cdc8e1c1431c849c78ac360a2c9efa44359606bd83781fc9",
+    "annotation/calibration/calibration-s1c-iw-grd-hv-20251206t093305-20251206t093330-005329-00a97f-002-cog.xml": "edd44f267290c94bebc4c329c628e764a8e2b0588f62eab2639d0d569dfc6994",
+    "annotation/calibration/noise-s1c-iw-grd-hh-20251206t093305-20251206t093330-005329-00a97f-001-cog.xml": "c379e8ed5f9073be76af73c51076a9f25e5df88c6543a87aca45e9e83a02d2b7",
+    "annotation/calibration/noise-s1c-iw-grd-hv-20251206t093305-20251206t093330-005329-00a97f-002-cog.xml": "b86cb477aff76d58bc9c2323f14e42536cdc366137fb3af6812e5aa48c3a0788",
+    "annotation/rfi/rfi-s1c-iw-grd-hh-20251206t093305-20251206t093330-005329-00a97f-001-cog.xml": "f01ffde59c27811227b31264470a432d37a55029a56ad1bc71fd237e6b5d1204",
+    "annotation/rfi/rfi-s1c-iw-grd-hv-20251206t093305-20251206t093330-005329-00a97f-002-cog.xml": "bc9c20494ee3eae1a2b4a93e1cfa99a62eeba9c0bf7b8d12fec11f8e9a458da8",
+    "annotation/s1c-iw-grd-hh-20251206t093305-20251206t093330-005329-00a97f-001-cog.xml": "d080c592a49a3b59d06c30fe2e32dbfdfe503ffaf288faa40fe34728fcb1070d",
+    "annotation/s1c-iw-grd-hv-20251206t093305-20251206t093330-005329-00a97f-002-cog.xml": "97d19e828a5a2024eacbf941449bde1816c23c00bd826f9a0697770d4d054e21"
+  },
+  "source_inventory_verified_after_scan": true,
+  "product": "S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG.SAFE",
+  "scope": "nl_aoi_marine_measurement_grid",
+  "coastal_buffer_m": 500,
+  "shoreline_sha256": "c3d44eb262868d63ab8d3a16f926d2360636f7a7c52d5db233eb7e729d802e28",
+  "aoi_sha256": "716d94c53b241b5ff955f5e4e39145a44a6d5b8ab7e26b139c0eaed15405aa85",
+  "policy": {
+    "version": "safe-quality-v1",
+    "max_nonpositive_fraction": 0.05,
+    "min_valid_fraction": 0.1,
+    "incidence_min_deg": 15.0,
+    "incidence_max_deg": 50.0,
+    "max_polarization_geolocation_error_m": 20.0
+  },
+  "driver_sha256": "30b10a24ad6dcc3ae085471368a7acab17b6ba10b6660eddee8869c635bfb627",
+  "reader_sha256": "9c5d38340b7da8a90221adfc602f3cddc0c9dc6b65d7da21fc6a3e227d2f3dd4",
+  "inventory_helper_sha256": "6f029ec073d973c52f9ec7d00956cf5f4224ef0bcb8c12250eed31efcfd0f8a6",
+  "channels": {
+    "HH": {
+      "marine_pixel_centres": 436551302,
+      "finite_pixels": 419149763,
+      "nonpositive_pixels": 747,
+      "invalid_incidence_pixels": 0,
+      "nonpositive_fraction": 1.7821792255194476e-06,
+      "valid_fraction": 0.960138616194071
+    },
+    "HV": {
+      "marine_pixel_centres": 436551302,
+      "finite_pixels": 419149763,
+      "nonpositive_pixels": 9793611,
+      "invalid_incidence_pixels": 0,
+      "nonpositive_fraction": 0.02336542177646418,
+      "valid_fraction": 0.960138616194071
+    }
+  },
+  "passed": true,
+  "reasons": [],
+  "claim_boundary": "Full source-grid marine-domain quality only; no sea-ice exclusion, CFAR support, surveyed eligible area or detection performance. Buffered shoreline and pixel centres use annotation geolocation; absolute field accuracy remains unestablished."
+}

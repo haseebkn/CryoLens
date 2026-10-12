@@ -1,0 +1,7 @@
+# Verification of the southern IW continuation
+
+The local complete test run passed **484 tests**, with **14 PostGIS-dependent integration tests skipped** because that service was not configured locally. CI must execute those integration tests. Ruff checked all 188 Python files; all 151 maintained package, test and validation files passed typing checks after the annotation fix. A broader check exposed missing dictionary type annotations in the older marine runner; this continuation fixes those annotations without changing its computations or historical execution records.
+
+Eighteen new behavioral tests cover catalogue pagination, frozen-test exclusion, weather units and temporal binding, signed noise diagnostics, non-colliding publication plans, actual published evidence replay, preservation of occupied output locations, and rejection of altered inventories, receipts, marine masks, counts, channel coverage and scientific comparison summaries. The final focused run passed 44 tests, including the explicit-plan export and lossless ancillary archive contracts. Replay keeps the regional, step-2 and scientific-release gates closed even though one product qualifies. A genuine marine-quality failure stays rejected.
+
+The executing scientific code remains archived with each report. Formatting and typing cleanup after execution do not replace those snapshots. The final report-consumer snapshot below records the current reproducibility tool, not a second execution of SNAP or a replacement of earlier scientific receipts.

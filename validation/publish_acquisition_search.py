@@ -43,10 +43,36 @@ def publication_quality(path: Path, require_binding: bool = False) -> dict[str, 
     return quality
 
 
+def selected_records(plans: list[Path]) -> dict[str, dict[str, Any]]:
+    """Scope a publication to declared plans, rejecting conflicting identities."""
+    selected: dict[str, dict[str, Any]] = {}
+    for path in plans:
+        for row in json.loads(path.read_text())["selected"]:
+            prior = selected.get(row["name"])
+            if prior is not None and prior["id"] != row["id"]:
+                raise ValueError("Conflicting catalogue identities in acquisition plans")
+            selected.setdefault(row["name"], row)
+    return selected
+
+
+def plan_output_names(plans: list[Path]) -> list[str]:
+    names = [path.name for path in plans]
+    if len(names) == len(set(names)):
+        return names
+    return [f"{index:02d}-{path.name}" for index, path in enumerate(plans, 1)]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--plan",
+        type=Path,
+        action="append",
+        default=[],
+        help="Explicit acquisition plan(s); omit only for the historical default plan directory",
+    )
     parser.add_argument(
         "--quality-dir",
         type=Path,
@@ -57,11 +83,11 @@ def main() -> None:
     args = parser.parse_args()
     if args.output.exists():
         raise FileExistsError("Preserve existing evidence; choose a new output")
-    plans = sorted(Path("data/processed").glob("acquisition-plan*.json"))
-    selected: dict[str, dict[str, Any]] = {}
-    for p in plans:
-        for r in json.loads(p.read_text())["selected"]:
-            selected.setdefault(r["name"], r)
+    plans = args.plan or sorted(Path("data/processed").glob("acquisition-plan*.json"))
+    if not plans:
+        raise ValueError("No acquisition plans supplied")
+    selected = selected_records(plans)
+    plan_names = plan_output_names(plans)
     quality_paths = list((args.root / "quality").glob("*.json")) + list(
         args.root.glob("validation-*/*full-quality.json")
     )
@@ -160,13 +186,14 @@ def main() -> None:
     args.output.mkdir(parents=True)
     for folder in ["plans", "quality", "downloads", "comparisons", "metadata"]:
         (args.output / folder).mkdir()
-    for p in plans:
-        shutil.copyfile(p, args.output / "plans" / p.name)
+    for p, name in zip(plans, plan_names, strict=True):
+        shutil.copyfile(p, args.output / "plans" / name)
     for name, (p, _quality) in quality_by_name.items():
         shutil.copyfile(p, args.output / "quality" / (name + ".json"))
         if p.with_suffix(".binding.json").is_file():
             shutil.copyfile(
-                p.with_suffix(".binding.json"), args.output / "quality" / (name + ".binding.json")
+                p.with_suffix(".binding.json"),
+                args.output / "quality" / (name + ".binding.json"),
             )
     for p in (args.root / "raw").glob("*/download-receipt.json"):
         r = json.loads(p.read_text())
@@ -175,28 +202,29 @@ def main() -> None:
         shutil.copyfile(p, args.output / "quality" / p.name)
     for p in args.root.glob("validation-*/report.json"):
         shutil.copyfile(p, args.output / "comparisons" / (p.parent.name + ".json"))
-    for p in Path("data/processed").glob("validation-*.json"):
-        shutil.copyfile(p, args.output / "plans" / p.name)
-    for folder in [
-        "metadata-screen",
-        "metadata-screen-ew",
-        "february-iw-screen",
-        "march4-iw-screen",
-        "western-iw-screen",
-        "april9-iw-screen",
-    ]:
-        source = Path("data/processed") / folder
-        if source.exists():
-            shutil.copytree(source, args.output / "metadata" / folder)
-    for name in [
-        "catalogue-search.json",
-        "recent-ew-metadata-screen.json",
-        "recent-ew-annotation.xml",
-        "iw-grdm-search.json",
-    ]:
-        p = Path("data/processed") / name
-        if p.is_file():
-            shutil.copyfile(p, args.output / "metadata" / name)
+    if not args.plan:
+        for p in Path("data/processed").glob("validation-*.json"):
+            shutil.copyfile(p, args.output / "plans" / p.name)
+        for folder in [
+            "metadata-screen",
+            "metadata-screen-ew",
+            "february-iw-screen",
+            "march4-iw-screen",
+            "western-iw-screen",
+            "april9-iw-screen",
+        ]:
+            source = Path("data/processed") / folder
+            if source.exists():
+                shutil.copytree(source, args.output / "metadata" / folder)
+        for name in [
+            "catalogue-search.json",
+            "recent-ew-metadata-screen.json",
+            "recent-ew-annotation.xml",
+            "iw-grdm-search.json",
+        ]:
+            p = Path("data/processed") / name
+            if p.is_file():
+                shutil.copyfile(p, args.output / "metadata" / name)
     service = subprocess.run(
         ["docker", "info", "--format", "{{.ServerVersion}}"],
         capture_output=True,
@@ -207,6 +235,10 @@ def main() -> None:
         "schema_version": 1,
         "observed_at": datetime.now(UTC).isoformat(),
         "provider": "Copernicus Data Space Ecosystem",
+        "consumed_plans": [
+            {"published_file": "plans/" + name, "sha256": file_digest(path)}
+            for path, name in zip(plans, plan_names, strict=True)
+        ],
         "policy": QualityPolicy().model_dump(),
         "frozen_manifest_sha256": file_digest(Path("docs/evaluation/v1/manifest.json")),
         "aoi_sha256": file_digest(Path("configs/aoi.geojson")),

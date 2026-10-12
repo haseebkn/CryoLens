@@ -1,0 +1,19 @@
+{
+  "purpose": "Independent official auxiliary orbit availability; acquisition is not application or absolute field validation",
+  "products": [
+    {
+      "product": "S1C_IW_GRDH_1SDH_20260116T094124_20260116T094149_005927_00BE31_B041_COG.SAFE",
+      "orbit": "S1C_OPER_AUX_POEORB_OPOD_20260205T070824_V20260115T225942_20260117T005942.EOF",
+      "sha256": "f2952b746d50e177bb240769e5b27b09280f9d7c9bcff3f06cf801b183452012",
+      "official_orbit_available": true,
+      "orbit_correction_applied": false
+    },
+    {
+      "product": "S1A_IW_GRDH_1SDH_20260122T094143_20260122T094208_062878_07E32B_F0E0_COG.SAFE",
+      "orbit": "S1A_OPER_AUX_POEORB_OPOD_20260211T070436_V20260121T225942_20260123T005942.EOF",
+      "sha256": "40eec9ae2b22a2d301addb330c5c728c179e870310c565d438aedf5cc220a7d4",
+      "official_orbit_available": true,
+      "orbit_correction_applied": false
+    }
+  ]
+}

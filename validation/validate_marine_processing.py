@@ -10,6 +10,7 @@ import argparse
 import json
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -36,7 +37,7 @@ def main() -> None:
     baseline = Path("docs/audits/pr6-9/report.json")
     original = json.loads(baseline.read_text())
     provenance = json.loads(Path("docs/processing-validation/v1/report.json").read_text())
-    report = {
+    report: dict[str, Any] = {
         "schema_version": 2,
         "started_at": datetime.now(UTC).isoformat(),
         "baseline_report_sha256": file_digest(baseline),
@@ -74,7 +75,7 @@ def main() -> None:
             if reader.instrument_mode == "IW"
             else "fresh-ew"
         )
-        row = {
+        row: dict[str, Any] = {
             "product": safe.name,
             "mode": reader.instrument_mode,
             "source_hashes_verified": False,

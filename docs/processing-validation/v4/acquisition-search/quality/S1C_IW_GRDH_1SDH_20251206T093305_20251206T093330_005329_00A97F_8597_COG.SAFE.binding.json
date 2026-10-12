@@ -1,0 +1,44 @@
+{
+  "inputs_and_code": {
+    "safe_files_sha256": {
+      "annotation/calibration/calibration-s1c-iw-grd-hh-20251206t093305-20251206t093330-005329-00a97f-001-cog.xml": "0812224a8e59ed83cdc8e1c1431c849c78ac360a2c9efa44359606bd83781fc9",
+      "annotation/calibration/calibration-s1c-iw-grd-hv-20251206t093305-20251206t093330-005329-00a97f-002-cog.xml": "edd44f267290c94bebc4c329c628e764a8e2b0588f62eab2639d0d569dfc6994",
+      "annotation/calibration/noise-s1c-iw-grd-hh-20251206t093305-20251206t093330-005329-00a97f-001-cog.xml": "c379e8ed5f9073be76af73c51076a9f25e5df88c6543a87aca45e9e83a02d2b7",
+      "annotation/calibration/noise-s1c-iw-grd-hv-20251206t093305-20251206t093330-005329-00a97f-002-cog.xml": "b86cb477aff76d58bc9c2323f14e42536cdc366137fb3af6812e5aa48c3a0788",
+      "annotation/rfi/rfi-s1c-iw-grd-hh-20251206t093305-20251206t093330-005329-00a97f-001-cog.xml": "f01ffde59c27811227b31264470a432d37a55029a56ad1bc71fd237e6b5d1204",
+      "annotation/rfi/rfi-s1c-iw-grd-hv-20251206t093305-20251206t093330-005329-00a97f-002-cog.xml": "bc9c20494ee3eae1a2b4a93e1cfa99a62eeba9c0bf7b8d12fec11f8e9a458da8",
+      "annotation/s1c-iw-grd-hh-20251206t093305-20251206t093330-005329-00a97f-001-cog.xml": "d080c592a49a3b59d06c30fe2e32dbfdfe503ffaf288faa40fe34728fcb1070d",
+      "annotation/s1c-iw-grd-hv-20251206t093305-20251206t093330-005329-00a97f-002-cog.xml": "97d19e828a5a2024eacbf941449bde1816c23c00bd826f9a0697770d4d054e21",
+      "manifest.safe": "5dcf05aade7a0eaecc78ba1db2f662a15591a0df873f489d8fd500e2083bd249",
+      "measurement/s1c-iw-grd-hh-20251206t093305-20251206t093330-005329-00a97f-001-cog.tiff": "469efcd0d13b9e51e63939efaa89090f3ab0ff589390740c18c5fc771aaf303b",
+      "measurement/s1c-iw-grd-hv-20251206t093305-20251206t093330-005329-00a97f-002-cog.tiff": "6e808d6c4dd1d90c25885af5512eb9747be06619eae900ecc417494dc6f5533a",
+      "preview/icons/logo.png": "3c515b23f2f508704a5451c0d8d86057215edab26a3d16fb2e5abe0a88c043e5",
+      "preview/map-overlay.kml": "13b3100a423f454929ad21662569f839be91afd1d647ec1807719111dd7defb4",
+      "preview/product-preview.html": "0520990cb46b4f66c0295993a719a2a383313a2155d0035fc7667fef13c5fbd5",
+      "preview/quick-look.png": "5f5402433683afe6aa77ed4ccce35b9d73167a3b8c33f749cc53591feaa77b32",
+      "preview/thumbnail.png": "e422d578dd3ba3e4e06a207729aecc550bd3cee8912b5e7659aa9d20a8e07f37",
+      "S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_811C.SAFE-report-20251206T125034.pdf": "3aa3e557ae381ab65682751763bab41d03dd9e538b228e15a2275d8126bb9b9e",
+      "support/s1-level-1-calibration.xsd": "6e81a81e501fbe90afc523ceb266177e5cfd5c798ec633c3f56bab70cdba1b63",
+      "support/s1-level-1-measurement.xsd": "c0c1dd52ca353cc5046b87e8c1be1e9abfb7a546dadd293d1f9d591831bc1524",
+      "support/s1-level-1-noise.xsd": "715d34d8c59dd575604838b310e6fda9c397c90fa6377a0daab4527d94ae8ae3",
+      "support/s1-level-1-product.xsd": "05b71da914fc100524fa7fec01928f869a5e160bf1ae04e4cec5db5a23da5d6f",
+      "support/s1-level-1-quicklook.xsd": "88f59322d2372e958b850c49ff40cb8fba8c6eccef569acbbfb87f322d432d2d",
+      "support/s1-level-1-rfi.xsd": "63eb491df437adcbdc5cd9b0b796cdebc2635be27893871f981123bd108ce723",
+      "support/s1-map-overlay.xsd": "c9e9c41b11bdedad81fbebc234030f513a4c6cc7998c2dffaac05a40000aeb8f",
+      "support/s1-object-types.xsd": "198d2e5b79ef1b8a4ff3111f566e2f0f4316f48170bfefc34f75989b52df30d5",
+      "support/s1-product-preview.xsd": "967f7ad405a3c911b4b59525ba6bac134e9fd3742efd0c4e32648f67f4689c0e"
+    },
+    "policy": {
+      "version": "safe-quality-v1",
+      "max_nonpositive_fraction": 0.05,
+      "min_valid_fraction": 0.1,
+      "incidence_min_deg": 15.0,
+      "incidence_max_deg": 50.0,
+      "max_polarization_geolocation_error_m": 20.0
+    },
+    "safe_reader_sha256": "9c5d38340b7da8a90221adfc602f3cddc0c9dc6b65d7da21fc6a3e227d2f3dd4",
+    "quality_code_sha256": "0630433f240d23ed51e127c8cfa0820a9a6f7c0474aad959ec05c34f21fec50d",
+    "scan_block_rows": 32
+  },
+  "report_sha256": "02784dd037f80f42a42a9e90eed65f2646899b15d72805742557415656019e38"
+}

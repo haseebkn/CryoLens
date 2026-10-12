@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "purpose": "Nine fixed windows, strict quality policy, northern EW passed initial whole-image and NL marine scans; independently validate against SNAP.",
+  "frozen_manifest": "docs/evaluation/v1/manifest.json",
+  "graph": "configs/snap/validation-reference-v2.xml",
+  "window_size_px": 512,
+  "sampling_fractions": [
+    [
+      0.1,
+      0.1
+    ],
+    [
+      0.1,
+      0.5
+    ],
+    [
+      0.1,
+      0.9
+    ],
+    [
+      0.5,
+      0.1
+    ],
+    [
+      0.5,
+      0.5
+    ],
+    [
+      0.5,
+      0.9
+    ],
+    [
+      0.9,
+      0.1
+    ],
+    [
+      0.9,
+      0.5
+    ],
+    [
+      0.9,
+      0.9
+    ]
+  ],
+  "products": [
+    {
+      "name": "ew-northern-pass",
+      "path": "D:\\CryoLens-data\\sentinel1-step2-20261012\\raw\\S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG\\S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG.SAFE"
+    }
+  ],
+  "recipe_id": "ew-northern-pass-20261012",
+  "scan_block_rows": 32
+}

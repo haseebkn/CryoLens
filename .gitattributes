@@ -30,3 +30,8 @@ docs/processing-validation/v3/**/*.md text eol=lf
 docs/processing-validation/v2/**/*.md text eol=lf
 docs/processing-validation/v1/**/*.md text eol=lf
 docs/audits/pr6-9/**/*.md text eol=lf
+# Southern IW scientific records are intentional byte contracts.
+docs/processing-validation/v4/** -text whitespace=cr-at-eol
+docs/processing-validation/v4/**/*.json linguist-generated=true
+docs/processing-validation/v4/**/*.xml linguist-generated=true
+docs/processing-validation/v4/**/*.md text eol=lf

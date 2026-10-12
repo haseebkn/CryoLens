@@ -1,0 +1,6 @@
+{
+  "stage": "full-footprint metadata diagnostic",
+  "driver_sha256": "0a6cba92fff73500d5aa42e67789e012a1d12f89a5f9c9841a64317e0883d665",
+  "reason": "unprefixed long Windows annotation path failed before computation",
+  "scientific_acceptance": false
+}

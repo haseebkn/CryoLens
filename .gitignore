@@ -127,3 +127,21 @@ CryoLens Data/
 
 !docs/processing-validation/v3/source-bound-approval/ew-northern-qualified/executed-code.zip
 !docs/processing-validation/v3/source-bound-approval/iw-northern-reference/executed-code.zip
+# Exact execution snapshots and JSON-only download receipts for southern IW validation.
+!docs/processing-validation/v4/selection-execution/executed-code.zip
+!docs/processing-validation/v4/evidence-assembly-execution/executed-code.zip
+!docs/processing-validation/v4/iw-january-rejected/executed-code.zip
+!docs/processing-validation/v4/iw-december-qualified/executed-code.zip
+!docs/processing-validation/v4/acquisition-search/downloads/
+docs/processing-validation/v4/acquisition-search/downloads/*
+!docs/processing-validation/v4/acquisition-search/downloads/*.json
+!docs/processing-validation/v4/acquisition-search-verified/downloads/
+docs/processing-validation/v4/acquisition-search-verified/downloads/*
+!docs/processing-validation/v4/acquisition-search-verified/downloads/*.json
+
+# Large ancillary XML/catalogue/weather payloads remain byte-exact in the scoped archive.
+docs/processing-validation/v4/acquisition-search/metadata/
+docs/processing-validation/v4/acquisition-search-verified/metadata/
+docs/processing-validation/v4/selection/
+docs/processing-validation/v4/diagnostics/orbit-check/official-eof/
+!docs/processing-validation/v4/ancillary-evidence.zip

@@ -1,0 +1,44 @@
+{
+  "inputs_and_code": {
+    "safe_files_sha256": {
+      "annotation/calibration/calibration-s1a-iw-grd-hh-20260122t094143-20260122t094208-062878-07e32b-001-cog.xml": "5556dff7b5259fb7caf4d1ebb48413ac2a2f216abe11af9728984a456e7056a4",
+      "annotation/calibration/calibration-s1a-iw-grd-hv-20260122t094143-20260122t094208-062878-07e32b-002-cog.xml": "2d49643faa2f24e59c8a1759602c81b9f91c6e8b1df56fb7e5b8fd72d8c38fc4",
+      "annotation/calibration/noise-s1a-iw-grd-hh-20260122t094143-20260122t094208-062878-07e32b-001-cog.xml": "01716b7a37fedb1b3456b633be250f3b1d525be98b0d33c6cfded819be791fe3",
+      "annotation/calibration/noise-s1a-iw-grd-hv-20260122t094143-20260122t094208-062878-07e32b-002-cog.xml": "78b1f2a98fe550bccc9575fe52ab30f30d464b21a02829c1983de8bdb26660b9",
+      "annotation/rfi/rfi-s1a-iw-grd-hh-20260122t094143-20260122t094208-062878-07e32b-001-cog.xml": "86024c94a3245dff9d0fb4a6458541d0b37198e885c022d03e1a85eeeb4e8339",
+      "annotation/rfi/rfi-s1a-iw-grd-hv-20260122t094143-20260122t094208-062878-07e32b-002-cog.xml": "3b2f9a63357fdd93e8db66b743b85170bad9a53aa8c6e5207cd25fe85788f5dd",
+      "annotation/s1a-iw-grd-hh-20260122t094143-20260122t094208-062878-07e32b-001-cog.xml": "9c941d26712873b7939425ffeb6fe4129eea31e63b353ced055dce4180e63334",
+      "annotation/s1a-iw-grd-hv-20260122t094143-20260122t094208-062878-07e32b-002-cog.xml": "88b849c70d3b9b75eb122857244b6ca5e5fbc38bc3e6d5fee58f5746845f3547",
+      "manifest.safe": "ef440f0ce9d5494d2661cc2256ba0bbd0d231a3d25f8cd2881a5974909c92610",
+      "measurement/s1a-iw-grd-hh-20260122t094143-20260122t094208-062878-07e32b-001-cog.tiff": "184c9b2e7e8a985e511c670cec421f0dd7ffb7a9155487f8da6939d9e78cf4e5",
+      "measurement/s1a-iw-grd-hv-20260122t094143-20260122t094208-062878-07e32b-002-cog.tiff": "f4b326fddecff9d64ebb8fbd604ad47183847a4d188b60671f5fa08013d7966a",
+      "preview/icons/logo.png": "3c515b23f2f508704a5451c0d8d86057215edab26a3d16fb2e5abe0a88c043e5",
+      "preview/map-overlay.kml": "eff74711efe72b87e10a89400e354896034bfe5982b6c272f062eb71e5f484cc",
+      "preview/product-preview.html": "5d0ce79ac209f0718eeb3ef36ea53f6ba582109752a29f129c527606fdfa4959",
+      "preview/quick-look.png": "0dc97cb5031971c772d03383d78bb28787d812c0818bb92792e39786960e2fe9",
+      "preview/thumbnail.png": "372c66cff283f5a1c6fd65a9ef46d5edb55d11d6dafe487c67f6538d6946f4b9",
+      "S1A_IW_GRDH_1SDH_20260122T094143_20260122T094208_062878_07E32B_DA4A.SAFE-report-20260122T112923.pdf": "422ef00b4767a1bbd28666a72fe75aa971b8d1643d93b138778c8009c503fae2",
+      "support/s1-level-1-calibration.xsd": "6e81a81e501fbe90afc523ceb266177e5cfd5c798ec633c3f56bab70cdba1b63",
+      "support/s1-level-1-measurement.xsd": "c0c1dd52ca353cc5046b87e8c1be1e9abfb7a546dadd293d1f9d591831bc1524",
+      "support/s1-level-1-noise.xsd": "715d34d8c59dd575604838b310e6fda9c397c90fa6377a0daab4527d94ae8ae3",
+      "support/s1-level-1-product.xsd": "05b71da914fc100524fa7fec01928f869a5e160bf1ae04e4cec5db5a23da5d6f",
+      "support/s1-level-1-quicklook.xsd": "88f59322d2372e958b850c49ff40cb8fba8c6eccef569acbbfb87f322d432d2d",
+      "support/s1-level-1-rfi.xsd": "63eb491df437adcbdc5cd9b0b796cdebc2635be27893871f981123bd108ce723",
+      "support/s1-map-overlay.xsd": "c9e9c41b11bdedad81fbebc234030f513a4c6cc7998c2dffaac05a40000aeb8f",
+      "support/s1-object-types.xsd": "198d2e5b79ef1b8a4ff3111f566e2f0f4316f48170bfefc34f75989b52df30d5",
+      "support/s1-product-preview.xsd": "967f7ad405a3c911b4b59525ba6bac134e9fd3742efd0c4e32648f67f4689c0e"
+    },
+    "policy": {
+      "version": "safe-quality-v1",
+      "max_nonpositive_fraction": 0.05,
+      "min_valid_fraction": 0.1,
+      "incidence_min_deg": 15.0,
+      "incidence_max_deg": 50.0,
+      "max_polarization_geolocation_error_m": 20.0
+    },
+    "safe_reader_sha256": "9c5d38340b7da8a90221adfc602f3cddc0c9dc6b65d7da21fc6a3e227d2f3dd4",
+    "quality_code_sha256": "0630433f240d23ed51e127c8cfa0820a9a6f7c0474aad959ec05c34f21fec50d",
+    "scan_block_rows": 32
+  },
+  "report_sha256": "dceb175a4a7ab56e804e012df31a507d8a878cbdeb15e0e5716eb134ac7cd2c7"
+}

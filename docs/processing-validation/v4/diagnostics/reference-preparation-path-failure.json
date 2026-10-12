@@ -1,0 +1,9 @@
+{
+  "stage": "lossless source-view preparation before any Docker execution",
+  "driver_sha256": "171b1aff2dcd84f4ef20fc637c060f3e4e9fc63e99171b6fe9b63c132b08e447",
+  "reason": "caller supplied an unprefixed long Windows source path; failed while hashing copied HH source",
+  "reference_execution_started": false,
+  "output_directory": "C:/CryoLens-data/sentinel1-south-20261012/validation-iw-1",
+  "partial_scratch_directory": "C:/CL13-snap",
+  "scientific_acceptance": false
+}

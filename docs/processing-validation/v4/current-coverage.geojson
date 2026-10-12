@@ -1,0 +1,185 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -49.779423,
+              45.266544
+            ],
+            [
+              -49.352558,
+              46.764229
+            ],
+            [
+              -52.746326,
+              47.16737
+            ],
+            [
+              -53.082211,
+              45.669453
+            ],
+            [
+              -49.779423,
+              45.266544
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG.SAFE",
+        "mode": "IW",
+        "date": "2025-12-06T09:33:05.205000Z",
+        "quality_passed": true,
+        "quality_reasons": [],
+        "nonpositive_HV_fraction": 0.02336542177646418,
+        "scientific_comparison_passed": true,
+        "marine_quality_passed": true,
+        "passing_product_checks": true,
+        "comparison_report": "iw-december-qualified\\report.json",
+        "comparison_report_sha256": "20dd5e1bdeccb52f4826de09ee0dead263aebcf284ef821a7369d4b82f755370",
+        "map_label": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -51.963638,
+              44.832577
+            ],
+            [
+              -51.540939,
+              46.33065
+            ],
+            [
+              -54.852821,
+              46.727802
+            ],
+            [
+              -55.188023,
+              45.229591
+            ],
+            [
+              -51.963638,
+              44.832577
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1C_IW_GRDH_1SDH_20260116T094124_20260116T094149_005927_00BE31_B041_COG.SAFE",
+        "mode": "IW",
+        "date": "2026-01-16T09:41:24.446000Z",
+        "quality_passed": false,
+        "quality_reasons": [
+          "HV: non-positive power fraction 0.268844 exceeds 0.05"
+        ],
+        "nonpositive_HV_fraction": 0.26884394476554463,
+        "scientific_comparison_passed": true,
+        "marine_quality_passed": false,
+        "passing_product_checks": false,
+        "comparison_report": "iw-january-rejected\\report.json",
+        "comparison_report_sha256": "ddafc3cb10557af80789ea67af8154403fa9aa8bf99503e1581d2dfb49660f19",
+        "map_label": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -51.285053,
+              47.214256
+            ],
+            [
+              -50.838593,
+              48.710438
+            ],
+            [
+              -54.29771,
+              49.107983
+            ],
+            [
+              -54.645214,
+              47.610928
+            ],
+            [
+              -51.285053,
+              47.214256
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1A_IW_GRDH_1SDH_20260122T094143_20260122T094208_062878_07E32B_F0E0_COG.SAFE",
+        "mode": "IW",
+        "date": "2026-01-22T09:41:43.617905Z",
+        "quality_passed": false,
+        "quality_reasons": [
+          "HV: non-positive power fraction 0.112389 exceeds 0.05"
+        ],
+        "nonpositive_HV_fraction": 0.11238918198103408,
+        "scientific_comparison_passed": null,
+        "marine_quality_passed": null,
+        "passing_product_checks": false,
+        "comparison_report": null,
+        "map_label": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -47.389526,
+              46.433277
+            ],
+            [
+              -46.951153,
+              47.93
+            ],
+            [
+              -50.373867,
+              48.328903
+            ],
+            [
+              -50.716854,
+              46.831562
+            ],
+            [
+              -47.389526,
+              46.433277
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1A_IW_GRDH_1SDH_20260124T092528_20260124T092553_062907_07E428_2AC0_COG.SAFE",
+        "mode": "IW",
+        "date": "2026-01-24T09:25:28.944791Z",
+        "quality_passed": false,
+        "quality_reasons": [
+          "HV: non-positive power fraction 0.183400 exceeds 0.05"
+        ],
+        "nonpositive_HV_fraction": 0.18340027856906146,
+        "scientific_comparison_passed": null,
+        "marine_quality_passed": null,
+        "passing_product_checks": false,
+        "comparison_report": null,
+        "map_label": 4
+      }
+    }
+  ]
+}
