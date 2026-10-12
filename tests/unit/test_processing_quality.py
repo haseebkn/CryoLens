@@ -327,9 +327,9 @@ def reference_cache_fixture(
         (scratch / "measurement" / f"s1a-ew-grd-{pol}-fixture.tiff").write_bytes(b"measurement")
         (scratch / "annotation" / f"s1a-ew-grd-{pol}-fixture.xml").write_text("<product/>")
         for kind in ("calibration", "noise"):
-            (scratch / "annotation/calibration" / f"{kind}-s1a-ew-grd-{pol}-fixture.xml").write_text(
-                f"<{kind}/>"
-            )
+            (
+                scratch / "annotation/calibration" / f"{kind}-s1a-ew-grd-{pol}-fixture.xml"
+            ).write_text(f"<{kind}/>")
     graph = tmp_path / "graph.xml"
     graph.write_text("<graph/>")
     monkeypatch.setattr(validation.subprocess, "check_output", lambda *a, **kw: "sha256:runtime")

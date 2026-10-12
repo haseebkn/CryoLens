@@ -357,11 +357,19 @@ def test_uncertainty_crossing_core_boundary_remains_excluded_in_freeze_and_progr
     reviewed = read_workspace(workspace)["created_at"]
     import_rows(
         workspace,
-        [human(workspace, t, marks=marks_by_task[t["task_id"]], reviewed_utc=reviewed) for t in original_tasks],
+        [
+            human(workspace, t, marks=marks_by_task[t["task_id"]], reviewed_utc=reviewed)
+            for t in original_tasks
+        ],
     )
     now = datetime.now(UTC)
     issued = issue_review(
-        workspace, "fixture-reviewer", "independent-fixture", mode="independent", fraction=0.2, now=now
+        workspace,
+        "fixture-reviewer",
+        "independent-fixture",
+        mode="independent",
+        fraction=0.2,
+        now=now,
     )
     import_rows(
         workspace,
@@ -395,7 +403,9 @@ def test_uncertainty_crossing_core_boundary_remains_excluded_in_freeze_and_progr
     expected = 65 * 67 - 5 - (2 * radius + 1) ** 2
     assert result["surveyed_pixels"] == expected
     with np.load(workspace / "boundary-frozen/coverage.npz") as saved:
-        assert not saved["independently_surveyed"][20 - radius : 21 + radius, 31 - radius : 32 + radius].any()
+        assert not saved["independently_surveyed"][
+            20 - radius : 21 + radius, 31 - radius : 32 + radius
+        ].any()
         assert not saved["scored_detection_area"][20, 32]
     annotations = json.loads((workspace / "boundary-frozen/annotations.json").read_text())
     assert len(annotations) == 2

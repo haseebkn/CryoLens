@@ -219,7 +219,10 @@ def test_unavailable_pairs_keep_provider_provenance_and_cached_evidence(tmp_path
         assert manifest["visibility"]["reason"] == reason
         stored = json.loads((tmp_path / manifest["id"] / "pair.json").read_text())
         assert stored == manifest
-        assert build_pair(detection, radar, None, client, tmp_path, policy, receipt, reason) == manifest
+        assert (
+            build_pair(detection, radar, None, client, tmp_path, policy, receipt, reason)
+            == manifest
+        )
     assert {path.name: path.read_bytes() for path in first_directory.iterdir()} == preserved
 
 

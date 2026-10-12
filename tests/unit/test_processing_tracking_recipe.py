@@ -25,7 +25,9 @@ def report_fixture(tmp_path: Path) -> dict[str, Any]:
         "products": [
             {
                 "provenance": {"product": "synthetic-test-only"},
-                "quality": {"channels": {pol: {"nonpositive_fraction": 0.1} for pol in ("HH", "HV")}},
+                "quality": {
+                    "channels": {pol: {"nonpositive_fraction": 0.1} for pol in ("HH", "HV")}
+                },
             }
         ],
     }
@@ -52,18 +54,27 @@ def test_schema_one_v2_execution_tracks_bound_v2_recipe(
         yield run
 
     monkeypatch.setattr(track_report, "tracked_experiment", tracking)
-    monkeypatch.setattr(sys, "argv", ["track", "--report-dir", str(tmp_path), "--tracking-uri", "test-only"])
+    monkeypatch.setattr(
+        sys, "argv", ["track", "--report-dir", str(tmp_path), "--tracking-uri", "test-only"]
+    )
     track_report.main()
     assert len(starts) == 1
     assert starts[0]["experiment_name"] == "cryolens-processing-v2"
     assert starts[0]["configuration"]["recipe_id"] == "v2"
-    assert starts[0]["configuration"]["configuration"]["graph"] == "configs/snap/validation-reference-v2.xml"
+    assert (
+        starts[0]["configuration"]["configuration"]["graph"]
+        == "configs/snap/validation-reference-v2.xml"
+    )
     saved = json.loads((tmp_path / "tracking_receipt.json").read_text())
     assert saved["recipe_id"] == "v2"
-    assert saved["configuration_sha256"] == file_digest(Path("configs/sentinel1-validation-v2.json"))
+    assert saved["configuration_sha256"] == file_digest(
+        Path("configs/sentinel1-validation-v2.json")
+    )
 
 
-@pytest.mark.parametrize("conflict", ["unbound", "configuration", "graph", "explicit-v1", "runtime", "receipt-graph"])
+@pytest.mark.parametrize(
+    "conflict", ["unbound", "configuration", "graph", "explicit-v1", "runtime", "receipt-graph"]
+)
 def test_conflicting_recipe_never_starts_tracking(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, conflict: str
 ) -> None:
@@ -96,6 +107,9 @@ def test_conflicting_recipe_never_starts_tracking(
 
 def test_graph_bound_historical_recipe_ignores_report_serialization_version() -> None:
     _, _, recipe = track_report.processing_recipe(
-        {"schema_version": 2, "graph_sha256": file_digest(Path("configs/snap/validation-reference.xml"))}
+        {
+            "schema_version": 2,
+            "graph_sha256": file_digest(Path("configs/snap/validation-reference.xml")),
+        }
     )
     assert recipe == "v1"

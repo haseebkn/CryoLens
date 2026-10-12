@@ -242,7 +242,9 @@ class TestDownloadValidation:
     """A mirror returning junk must never populate the cache."""
 
     @pytest.mark.parametrize("cached", [False, True])
-    @pytest.mark.parametrize("defect", ["empty", "mission", "type", "nan", "missing", "time", "coverage"])
+    @pytest.mark.parametrize(
+        "defect", ["empty", "mission", "type", "nan", "missing", "time", "coverage"]
+    )
     def test_unusable_candidate_rejected_before_cache_or_return(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, defect: str, cached: bool
     ) -> None:
@@ -269,7 +271,9 @@ class TestDownloadValidation:
                 return _Response(text=COVERING)
             if url.startswith(ESA_STEP_AUXDATA):
                 return _Response(content=invalid)
-            assert not (tmp_path / COVERING).exists() or (tmp_path / COVERING).read_bytes() == invalid
+            assert (
+                not (tmp_path / COVERING).exists() or (tmp_path / COVERING).read_bytes() == invalid
+            )
             return _Response(content=_orbit_xml())
 
         seen = _install_transport(monkeypatch, handler)
@@ -277,7 +281,9 @@ class TestDownloadValidation:
         path = manager.download_orbit_file("S1B", ACQUISITION, OrbitType.POEORB)
         assert seen[-1] == ASF_AUX_POEORB + COVERING
         assert path.read_bytes() == _orbit_xml()
-        assert manager.get_orbit_file("S1B", ACQUISITION, OrbitType.POEORB)["orbit_file_path"] == str(path)
+        assert manager.get_orbit_file("S1B", ACQUISITION, OrbitType.POEORB)[
+            "orbit_file_path"
+        ] == str(path)
 
     @pytest.mark.parametrize("failure", ["http", "timeout", "zip", "empty-zip", "xml"])
     def test_selected_download_failure_falls_back_to_asf(
@@ -313,9 +319,10 @@ class TestDownloadValidation:
         assert seen[-1] == ASF_AUX_POEORB + COVERING
         assert path.read_bytes() == _orbit_xml()
         assert list(tmp_path.iterdir()) == [path]
-        assert manager.get_orbit_file("S1B", ACQUISITION, OrbitType.POEORB)[
-            "orbit_correction_applied"
-        ] is False
+        assert (
+            manager.get_orbit_file("S1B", ACQUISITION, OrbitType.POEORB)["orbit_correction_applied"]
+            is False
+        )
 
     @pytest.mark.parametrize("failure", ["http", "timeout", "zip"])
     def test_all_selected_downloads_failing_leave_cache_empty(
