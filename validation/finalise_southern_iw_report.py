@@ -108,6 +108,13 @@ def processing_evidence(
         ):
             raise ValueError("Window summary contradicts individual scientific checks")
         reference = receipts[window["reference_receipt_sha256"]]
+        scratch = reference.get("scratch_files_sha256", {})
+        annotations = {k: v for k, v in scratch.items() if k.startswith("annotation/")}
+        if (
+            scratch.get("manifest.safe") != product["provenance"]["scratch_manifest_sha256"]
+            or annotations != product["provenance"]["annotation_sha256"]
+        ):
+            raise ValueError("Reference scratch source inventory differs from processing")
         if (
             reference["window"] != window["window"]
             or reference["graph_sha256"] != report["graph_sha256"]

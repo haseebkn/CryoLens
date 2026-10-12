@@ -57,7 +57,7 @@ def selected_records(plans: list[Path]) -> dict[str, dict[str, Any]]:
 
 def plan_output_names(plans: list[Path]) -> list[str]:
     names = [path.name for path in plans]
-    if len(names) == len(set(names)):
+    if len(names) == len({name.casefold() for name in names}):
         return names
     return [f"{index:02d}-{path.name}" for index, path in enumerate(plans, 1)]
 

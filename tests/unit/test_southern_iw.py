@@ -149,22 +149,24 @@ def test_weather_context_is_temporally_bound_and_uses_sea_grid() -> None:
         wind_context(row, weather)
 
 
-def test_published_plan_names_do_not_collide(tmp_path: Path) -> None:
+@pytest.mark.parametrize("second_name", ["acquisition-plan.json", "ACQUISITION-PLAN.json"])
+def test_published_plan_names_do_not_collide(tmp_path: Path, second_name: str) -> None:
     import hashlib
     import shutil
 
     from validation.publish_acquisition_search import plan_output_names
 
-    sources = [tmp_path / "first/acquisition-plan.json", tmp_path / "second/acquisition-plan.json"]
+    sources = [tmp_path / "first/acquisition-plan.json", tmp_path / "second" / second_name]
     for number, source in enumerate(sources):
         source.parent.mkdir()
         source.write_bytes(str(number).encode())
     names = plan_output_names(sources)
-    assert len(set(names)) == 2
+    assert len({name.casefold() for name in names}) == 2
     output = tmp_path / "publication"
     output.mkdir()
     for source, name in zip(sources, names, strict=True):
         shutil.copyfile(source, output / name)
+    for source, name in zip(sources, names, strict=True):
         assert (
             hashlib.sha256((output / name).read_bytes()).digest()
             == hashlib.sha256(source.read_bytes()).digest()
@@ -175,10 +177,10 @@ def test_published_plan_names_do_not_collide(tmp_path: Path) -> None:
 def southern_publication(tmp_path: Path) -> Path:
     """Replay the owned v4 evidence contract without downloading image arrays."""
     import shutil
+    import tempfile
 
     source = Path(__file__).resolve().parents[2] / "docs/processing-validation/v4"
-    root = tmp_path / "publication"
-    root.mkdir()
+    root = Path(tempfile.mkdtemp(prefix="p", dir=tmp_path.parent))
     for folder in ("acquisition-search-verified", "iw-january-rejected", "iw-december-qualified"):
         shutil.copytree(source / folder, root / folder)
     shutil.copyfile(source / "processing-manifest.json", root / "processing-manifest.json")
@@ -267,6 +269,52 @@ def test_evidence_consumer_rejects_changed_bindings_and_summaries(
         )
 
 
+@pytest.mark.parametrize(
+    "tamper", ["manifest", "annotation", "missing_annotation", "extra_annotation", "inventory"]
+)
+def test_evidence_consumer_rejects_rehashed_scratch_receipt(
+    southern_publication: Path, tamper: str
+) -> None:
+    import json
+
+    from cryolens.eval.cohort import file_digest
+    from validation.finalise_southern_iw_report import processing_evidence
+
+    folder = southern_publication / "iw-december-qualified"
+    search = json.loads(
+        (southern_publication / "acquisition-search-verified/report.json").read_text()
+    )
+    source = next(row for row in search["products"] if "20251206" in row["product"])
+    report_path = folder / "report.json"
+    report = json.loads(report_path.read_text())
+    window = report["products"][0]["windows"][0]
+    receipt_path = next(
+        path
+        for path in (folder / "reference-receipts").glob("*-receipt.json")
+        if file_digest(path) == window["reference_receipt_sha256"]
+    )
+    receipt = json.loads(receipt_path.read_text())
+    scratch = receipt["scratch_files_sha256"]
+    annotation = next(name for name in scratch if name.startswith("annotation/"))
+    if tamper == "manifest":
+        scratch["manifest.safe"] = "0" * 64
+    elif tamper == "annotation":
+        scratch[annotation] = "0" * 64
+    elif tamper == "missing_annotation":
+        del scratch[annotation]
+    elif tamper == "extra_annotation":
+        scratch["annotation/extra.xml"] = "0" * 64
+    else:
+        del receipt["scratch_files_sha256"]
+    receipt_path.write_text(json.dumps(receipt))
+    window["reference_receipt_sha256"] = file_digest(receipt_path)
+    report_path.write_text(json.dumps(report))
+    with pytest.raises(ValueError, match="Reference scratch source inventory"):
+        processing_evidence(
+            southern_publication, source, "iw-december-qualified", "acquisition-search-verified"
+        )
+
+
 def test_genuine_marine_failure_remains_rejected(southern_publication: Path) -> None:
     import json
 
@@ -292,8 +340,9 @@ def test_genuine_marine_failure_remains_rejected(southern_publication: Path) -> 
     assert result["passing_product_checks"] is False
 
 
+@pytest.mark.parametrize("second_name", ["explicit.json", "EXPLICIT.json"])
 def test_explicit_plan_publication_exports_plans_without_legacy_context(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, second_name: str
 ) -> None:
     import json
     import sys
@@ -301,6 +350,7 @@ def test_explicit_plan_publication_exports_plans_without_legacy_context(
 
     from shapely.geometry import shape
 
+    from cryolens.eval.cohort import file_digest
     from validation import publish_acquisition_search
 
     monkeypatch.chdir(tmp_path)
@@ -318,6 +368,9 @@ def test_explicit_plan_publication_exports_plans_without_legacy_context(
     }
     plan = tmp_path / "explicit.json"
     plan.write_text(json.dumps({"selected": [selected]}))
+    second_plan = tmp_path / "followup" / second_name
+    second_plan.parent.mkdir()
+    second_plan.write_bytes(json.dumps({"selected": [selected]}, indent=2).encode() + b"\r\n")
     legacy = tmp_path / "data/processed/metadata-screen/old.xml"
     legacy.parent.mkdir(parents=True)
     legacy.write_text("previous unrelated selection")
@@ -334,16 +387,32 @@ def test_explicit_plan_publication_exports_plans_without_legacy_context(
     root.mkdir()
     output = tmp_path / "published"
     monkeypatch.setattr(
-        sys, "argv", ["publish", "--root", str(root), "--output", str(output), "--plan", str(plan)]
+        sys,
+        "argv",
+        [
+            "publish",
+            "--root",
+            str(root),
+            "--output",
+            str(output),
+            "--plan",
+            str(plan),
+            "--plan",
+            str(second_plan),
+        ],
     )
     publish_acquisition_search.main()
-    assert (output / "plans/explicit.json").read_bytes() == plan.read_bytes()
     assert not (output / "metadata/metadata-screen").exists()
     assert (output / "downloads").is_dir()
     report = json.loads((output / "report.json").read_text())
     assert report["downloaded_products"] == 0
     assert report["products"][0]["product"] == "planned.SAFE"
-    assert report["consumed_plans"][0]["published_file"] == "plans/explicit.json"
+    exports = report["consumed_plans"]
+    assert len({item["published_file"].casefold() for item in exports}) == 2
+    for source, item in zip([plan, second_plan], exports, strict=True):
+        exported = output / item["published_file"]
+        assert exported.read_bytes() == source.read_bytes()
+        assert file_digest(exported) == item["sha256"] == file_digest(source)
 
 
 def test_ancillary_archive_preserves_the_owned_byte_inventory() -> None:
