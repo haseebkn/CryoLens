@@ -213,14 +213,13 @@ committed-evidence aggregation regression in
 that publication into a fresh destination and checks one qualified EW, rejected IW
 and closed release gates; historical status outputs remain unchanged.
 
-To finish step 2, qualify representative usable IW observations and southern NL
-coverage, not just additional downloads. If standard subtraction remains unsuitable,
-a validated alternative needs matched signed-power, spatial and downstream
-checks; the previous unqualified NERSC experiment is not assumed to solve it.
-Whole-footprint geometry, independent absolute geolocation and seasonal availability
-remain unmeasured. Precise-orbit correction and scientific release are not granted.
-This investigation supplies no iceberg identity, precision, recall or empirical
-false-alarm rate. Those still require the independent reference reviews.
+For subsequent southern IW evidence and the remaining step-2 qualifications,
+see the [current processing report](../v4/README.md). If standard subtraction
+remains unsuitable, a validated alternative needs matched signed-power, spatial
+and downstream checks; the unqualified NERSC experiment is not assumed to solve it.
+This v3 investigation supplies no iceberg identity, precision, recall or empirical
+false-alarm rate;
+those still require independent reference reviews.
 
 ## Local code verification
 
