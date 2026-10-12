@@ -3,9 +3,33 @@
 import argparse
 import json
 from pathlib import Path
+from typing import Any
 
 from cryolens.eval.cohort import file_digest
 from cryolens.eval.tracking import tracked_experiment
+
+
+def processing_recipe(
+    report: dict[str, Any], supplied: Path | None = None
+) -> tuple[Path, dict[str, Any], str]:
+    """Select a recipe from bound execution evidence, independent of report schema."""
+    graph_hash = report.get("graph_sha256")
+    configuration_hash = report.get("configuration_sha256")
+    if not graph_hash:
+        raise ValueError("Processing report lacks bound graph provenance")
+    candidates = [supplied] if supplied else sorted(Path("configs").glob("sentinel1-validation-v*.json"))
+    matches = []
+    for path in candidates:
+        configuration = json.loads(path.read_text(encoding="utf-8"))
+        if configuration_hash and file_digest(path) != configuration_hash:
+            continue
+        if file_digest(Path(configuration["graph"])) != graph_hash:
+            continue
+        recipe = configuration.get("recipe_id", "v" + str(configuration["schema_version"]))
+        matches.append((path, configuration, recipe))
+    if len(matches) != 1:
+        raise ValueError("Processing report configuration/graph provenance conflicts or is ambiguous")
+    return matches[0]
 
 
 def main() -> None:
@@ -16,16 +40,35 @@ def main() -> None:
     args = parser.parse_args()
     report_path = args.report_dir / "report.json"
     report = json.loads(report_path.read_text(encoding="utf-8"))
-    version = "v2" if report.get("schema_version", 1) >= 2 else "v1"
-    config_path = args.config or Path(f"configs/sentinel1-validation-{version}.json")
-    configuration = json.loads(config_path.read_text())
+    config_path, configuration, version = processing_recipe(report, args.config)
+    if (args.report_dir / "tracking_receipt.json").exists():
+        raise FileExistsError("Preserve existing tracking evidence; use a new report directory")
     experiment_name = "cryolens-processing-" + version
-    image_ids = {
-        json.loads(p.read_text())["image_id"]
+    receipts = {
+        file_digest(p): json.loads(p.read_text())
         for p in (args.report_dir / "reference-receipts").glob("*-receipt.json")
     }
+    required = {
+        window["reference_receipt_sha256"]
+        for product in report["products"]
+        for window in product.get("windows", [])
+        if "reference_receipt_sha256" in window
+    }
+    required.update(
+        product["provenance"]["reference_receipt_sha256"]
+        for product in report["products"]
+        if "reference_receipt_sha256" in product.get("provenance", {})
+    )
+    if required and not required <= receipts.keys():
+        raise ValueError("Processing report references missing or changed receipts")
+    selected_receipts = [receipts[key] for key in required] if required else list(receipts.values())
+    if any(receipt.get("graph_sha256") != report["graph_sha256"] for receipt in selected_receipts):
+        raise ValueError("Processing report and reference graph provenance conflict")
+    image_ids = {receipt["image_id"] for receipt in selected_receipts}
     if len(image_ids) != 1:
         raise ValueError("Processing tracking needs one consistent verified reference runtime")
+    if report.get("reference_image_id", next(iter(image_ids))) != next(iter(image_ids)):
+        raise ValueError("Processing report and reference runtime provenance conflict")
     with tracked_experiment(
         manifest_path=Path(configuration["frozen_manifest"]),
         project_root=Path.cwd(),
@@ -35,19 +78,19 @@ def main() -> None:
         configuration={
             "purpose": "Post-hoc processing investigation; no detector performance evaluation",
             "configuration": configuration,
+            "recipe_id": version,
+            "recipe_configuration_sha256": file_digest(config_path),
+            "recipe_graph_sha256": file_digest(Path(configuration["graph"])),
             "completed_report_sha256": file_digest(report_path),
             "actual_inputs": [
-                p.get(
-                    "provenance",
-                    {
-                        "product": p["product"],
-                        "mode": p["mode"],
-                        "source_hashes_verified": p["source_hashes_verified"],
-                        "baseline_report_sha256": report["baseline_report_sha256"],
-                    },
-                )
-                if version == "v2"
-                else p["provenance"]
+                p["provenance"]
+                if "provenance" in p
+                else {
+                    "product": p["product"],
+                    "mode": p["mode"],
+                    "source_hashes_verified": p["source_hashes_verified"],
+                    "baseline_report_sha256": report["baseline_report_sha256"],
+                }
                 for p in report["products"]
             ],
             "activity": "Post-hoc logging of completed processing evidence; generation source is separately preserved in the executed-code artifact",
@@ -88,6 +131,9 @@ def main() -> None:
             "run_id": run.run_id,
             "experiment": experiment_name,
             "report_sha256": file_digest(report_path),
+            "recipe_id": version,
+            "configuration_sha256": file_digest(config_path),
+            "graph_sha256": report["graph_sha256"],
             "purpose": "Completed processing investigation; no precision, recall or false-alarm measurement",
             "git_commit": run.client.get_run(run.run_id).data.tags["git_commit"],
             "git_dirty": run.client.get_run(run.run_id).data.tags["git_dirty"],

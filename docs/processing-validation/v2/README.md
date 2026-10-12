@@ -36,6 +36,9 @@ clipping, filling, dropping valid negative pixels or reducing noise amplitudes.
    reported agreement better than 0.00001 dB with no residual-sign mismatch, but
    its incomplete consumed-input receipt invalidates that acceptance claim.
    A fresh reference execution is required to reestablish it.
+   The separate [short-block v3 report](short-block-v3/report.json) records that
+   new execution with a complete consumed-input inventory and current source
+   snapshot; it claims calibration and signed-noise agreement only.
 6. **Nodata borders:** noise coverage is required for every actual valid
    measurement. Unannotated padding is allowed only where the raster mask or
    zero-DN declaration already establishes nodata. A valid observed pixel without
@@ -169,6 +172,23 @@ and report hash. It does not claim that `4ee9a50` generated the earlier executio
 receipts, and logs no detector/model performance.
 Its short-block artifact is historical evidence subject to the invalidation above;
 the logged run itself is not rewritten or presented as replacement acceptance.
+
+The additive [short-block v3 receipt](short-block-v3/reference-receipts/short-block-receipt.json)
+belongs to one newly executed SNAP 14 reference on the authentic September 11
+development product, window `(224, 4894, 99, 2078)`. Its
+[execution snapshot](short-block-v3/executed-code.zip) records the actual source
+bytes, independently of any later commit. The
+[new tracking receipt](short-block-v3/tracking_receipt.json) logs this separate
+report post hoc, with the actual dirty/clean Git status and selected recipe.
+The previous short-block receipt and its invalidation remain historical records.
+The previous 7.63% HV full-product rejection is reused with its original report
+hash and observation time; this short-block run does not claim a new full scan
+or whole-footprint geometry validation. Deployment remains blocked.
+
+Processing tracking selects the recipe from bound configuration and graph hashes,
+including v2-validator reports serialized as schema 1. Conflicting or unbound
+recipe evidence rejects before MLflow run creation. Existing tracking receipts
+cannot be overwritten.
 
 Local verification: 344 portable tests passed (14 archive-dependent tests skipped
 in the isolated checkout), mypy passed 120 files, Ruff and formatting passed,

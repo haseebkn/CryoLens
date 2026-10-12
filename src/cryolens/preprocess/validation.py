@@ -321,7 +321,7 @@ def run_reference(
         "--memory",
         "6g",
         "-v",
-        f"{scratch.parent.resolve().as_posix()}:/input",
+        f"{scratch.parent.resolve().as_posix()}:/input:ro",
         "-v",
         f"{graph.parent.resolve().as_posix()}:/graphs:ro",
         "-v",

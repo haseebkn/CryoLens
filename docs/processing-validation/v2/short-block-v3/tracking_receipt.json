@@ -1,0 +1,11 @@
+{
+  "run_id": "13bd8c237b434f119e34041e733e41aa",
+  "experiment": "cryolens-processing-short-block-v3",
+  "report_sha256": "7dc973aadee7ee3c27d01d53109a00fc7f9c975cbb58a8b281d882482e8afef1",
+  "recipe_id": "short-block-v3",
+  "configuration_sha256": "6f3408482fd9666d2cd2250e6df1cdcd9bc1445d7fa7c8d21f0776ab295f176f",
+  "graph_sha256": "2ecc390dead7f02661e77eced257af80b6f090a1286eedc5504bb06e35bf64b0",
+  "purpose": "Completed processing investigation; no precision, recall or false-alarm measurement",
+  "git_commit": "02026fa08149b3faa1bde9b838330f8aa1d741a8",
+  "git_dirty": "true"
+}

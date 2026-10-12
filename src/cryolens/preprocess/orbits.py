@@ -2,6 +2,7 @@
 
 import io
 import logging
+import math
 import re
 import warnings
 import xml.etree.ElementTree as ET
@@ -66,6 +67,27 @@ def parse_eof_name(name: str) -> dict[str, Any] | None:
 def covers(entry: dict[str, Any], acquisition_time: datetime) -> bool:
     """Return True when an orbit product's validity window contains the acquisition."""
     return bool(entry["validity_start"] <= acquisition_time <= entry["validity_stop"])
+
+
+def validate_orbit(
+    root: ET.Element, platform: str, acquisition_time: datetime, orbit_type: OrbitType
+) -> None:
+    """Require the same usable state-vector contract for downloads and cached files."""
+    mission = root.findtext(".//Mission", "").upper().replace("SENTINEL-", "S")
+    if mission != platform or root.findtext(".//File_Type", "") != f"AUX_{orbit_type.value}":
+        raise ValueError("Orbit mission or type does not match the acquisition")
+    times = []
+    for vector in root.findall(".//OSV"):
+        utc = vector.findtext("UTC", "").removeprefix("UTC=")
+        dt = datetime.fromisoformat(utc.replace("Z", "+00:00"))
+        times.append(dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt)
+        if any(
+            not math.isfinite(float(vector.findtext(tag, "nan")))
+            for tag in ("X", "Y", "Z", "VX", "VY", "VZ")
+        ):
+            raise ValueError("Invalid orbit state vector")
+    if len(times) < 2 or not min(times) <= acquisition_time <= max(times):
+        raise ValueError("Orbit state vectors do not cover the acquisition")
 
 
 class OrbitManager:
@@ -199,8 +221,13 @@ class OrbitManager:
 
             destination = self.cache_dir / str(best["filename"])
             if destination.is_file():
-                logger.info("Orbit already cached: %s", destination.name)
-                return destination
+                try:
+                    validate_orbit(ET.parse(destination).getroot(), code, acquisition_time, orbit_type)
+                except (ET.ParseError, ValueError, OSError) as exc:
+                    logger.warning("Ignoring invalid cached orbit %s: %s", destination.name, exc)
+                else:
+                    logger.info("Orbit already cached: %s", destination.name)
+                    return destination
 
             file_url = urljoin(listing_url, str(best["href"]))
             logger.info("Downloading %s orbit from %s", orbit_type.value, file_url)
@@ -232,11 +259,9 @@ class OrbitManager:
             # masquerade as an orbit product.
             try:
                 root = ET.fromstring(content)
-            except ET.ParseError as exc:
-                logger.warning("Downloaded orbit is not valid XML (%s): %s", file_url, exc)
-                continue
-            if len(root.findall(".//OSV")) < 2:
-                logger.warning("Downloaded orbit has too few state vectors: %s", file_url)
+                validate_orbit(root, code, acquisition_time, orbit_type)
+            except (ET.ParseError, ValueError) as exc:
+                logger.warning("Downloaded orbit is invalid (%s): %s", file_url, exc)
                 continue
 
             destination.write_bytes(content)
@@ -264,39 +289,13 @@ class OrbitManager:
         if acquisition_time.tzinfo is None:
             acquisition_time = acquisition_time.replace(tzinfo=UTC)
         orbit_type = orbit_type or self.determine_orbit_type(acquisition_time)
-        codes = {
-            "S1A": "S1A",
-            "SENTINEL-1A": "S1A",
-            "S1B": "S1B",
-            "SENTINEL-1B": "S1B",
-            "S1C": "S1C",
-            "SENTINEL-1C": "S1C",
-        }
-        sat_code = codes.get(platform.upper())
-        if sat_code is None:
-            raise ValueError(f"Unknown Sentinel-1 platform: {platform}")
+        sat_code = self._platform_code(platform)
         for path in sorted(
             self.cache_dir.glob(f"{sat_code}_*{orbit_type.value}*.EOF"), reverse=True
         ):
             try:
                 root = ET.parse(path).getroot()
-                mission = root.findtext(".//Mission", "").upper().replace("SENTINEL-", "S")
-                file_type = root.findtext(".//File_Type", "")
-                if mission != sat_code or file_type != f"AUX_{orbit_type.value}":
-                    continue
-                vectors = root.findall(".//OSV")
-                times = []
-                for vector in vectors:
-                    utc = vector.findtext("UTC", "").removeprefix("UTC=")
-                    dt = datetime.fromisoformat(utc.replace("Z", "+00:00"))
-                    times.append(dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt)
-                    for tag in ("X", "Y", "Z", "VX", "VY", "VZ"):
-                        import math
-
-                        if not math.isfinite(float(vector.findtext(tag, "nan"))):
-                            raise ValueError("Invalid orbit state vector")
-                if len(times) < 2 or not min(times) <= acquisition_time <= max(times):
-                    continue
+                validate_orbit(root, sat_code, acquisition_time, orbit_type)
             except (ET.ParseError, ValueError, OSError):
                 logger.warning("Ignoring invalid or incomplete orbit file %s", path.name)
                 continue

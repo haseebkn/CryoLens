@@ -104,6 +104,7 @@ CryoLens Data/
 *.zip
 !configs/auxdata/egm96/ww15mgh_b.zip
 !docs/processing-validation/v2/executed-code.zip
+!docs/processing-validation/v2/short-block-v3/executed-code.zip
 
 # Published benchmark artefacts are part of the deliverable and are tracked.
 !docs/benchmarks/

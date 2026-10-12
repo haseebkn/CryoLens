@@ -10,6 +10,7 @@ from typing import Any
 import numpy as np
 
 from cryolens.eval.cohort import digest, file_digest
+from cryolens.reference.coverage import survey_masks
 from cryolens.reference.packet import read_workspace, write_json
 from cryolens.reference.records import append_event, events, ledger, review_exposure
 
@@ -110,8 +111,7 @@ def freeze_reference(
             raise ValueError(
                 "Sampled candidate nonresponse cannot be silently dropped from a frozen reference"
             )
-        coverage = np.zeros(workspace["source_shape"], dtype=bool)
-        eligible = np.zeros_like(coverage)
+        coverage, eligible = survey_masks(root, workspace, tasks, selected)
         annotations: list[dict[str, Any]] = []
         for task in tasks:
             body = selected[task["task_id"]]
@@ -125,43 +125,24 @@ def freeze_reference(
                     for a in body["annotations"]
                 )
                 continue
-            with np.load(root / task["grid"], allow_pickle=False) as grid:
-                scored = grid["survey_domain"] & grid["core"]
-                if body["response"]["status"] != "complete":
-                    scored[:] = False
-                for r0, c0, r1, c1 in body["response"]["excluded_regions"]:
-                    scored[r0:r1, c0:c1] = False
-                radius = workspace["policy"]["uncertain_buffer_pixels"]
-                for mark in body["response"]["marks"]:
-                    if mark["label"] == "uncertain":
-                        row, col = mark["row"], mark["col"]
-                        scored[
-                            max(0, row - radius) : row + radius + 1,
-                            max(0, col - radius) : col + radius + 1,
-                        ] = False
-                row, col = task["origin"]
-                h, w = scored.shape
-                coverage[row : row + h, col : col + w] |= scored
-                eligible[row : row + h, col : col + w] |= grid["detector_eligible"] & grid["core"]
-                for mark, annotation in zip(
-                    body["response"]["marks"], body["annotations"], strict=True
-                ):
-                    annotations.append(
-                        {
-                            **annotation,
-                            "point_id": digest(
-                                {"task": task["task_id"], "row": mark["row"], "col": mark["col"]}
-                            ),
-                            "reference_component": "independent_area_search",
-                            "inside_unambiguous_survey": bool(scored[mark["row"], mark["col"]]),
-                            "inside_detection_eligible_survey": None
-                            if workspace["detection"] is None
-                            else bool(
-                                scored[mark["row"], mark["col"]]
-                                and grid["detector_eligible"][mark["row"], mark["col"]]
-                            ),
-                        }
-                    )
+            row, col = task["origin"]
+            for mark, annotation in zip(
+                body["response"]["marks"], body["annotations"], strict=True
+            ):
+                r, c = row + mark["row"], col + mark["col"]
+                annotations.append(
+                    {
+                        **annotation,
+                        "point_id": digest(
+                            {"task": task["task_id"], "row": mark["row"], "col": mark["col"]}
+                        ),
+                        "reference_component": "independent_area_search",
+                        "inside_unambiguous_survey": bool(coverage[r, c]),
+                        "inside_detection_eligible_survey": None
+                        if workspace["detection"] is None
+                        else bool(coverage[r, c] and eligible[r, c]),
+                    }
+                )
         if not coverage.any():
             raise ValueError("No independently completed unambiguous survey coverage")
         if date < max(

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -10,6 +11,7 @@ import numpy as np
 
 from cryolens.eval.cohort import digest, file_digest
 from cryolens.reference.consistency import agreement
+from cryolens.reference.coverage import survey_masks
 from cryolens.reference.design import finite_population_interval
 from cryolens.reference.packet import read_workspace
 from cryolens.reference.records import events, ledger, review_exposure
@@ -47,6 +49,7 @@ def summarize(root: Path) -> dict[str, Any]:
         if e["kind"] == "response" and e["body"]["response"]["phase"] == "initial"
     ]
     reviewers = sorted({b["response"]["reviewer_id"] for b in initial})
+    tasks = json.loads((root / "private/tasks.json").read_text())
     reviewer_reports = []
     for reviewer in reviewers:
         bodies = [b for b in initial if b["response"]["reviewer_id"] == reviewer]
@@ -114,7 +117,10 @@ def summarize(root: Path) -> dict[str, Any]:
                 }
             )
         labels = [a["target_detection"]["label"] for b in bodies for a in b["annotations"]]
-        scored_pixels = sum(b["scored_survey_pixels"] for b in survey)
+        coverage, _ = survey_masks(
+            root, workspace, tasks, {b["base_task_id"]: b for b in survey}
+        )
+        scored_pixels = int(coverage.sum())
         reviewer_reports.append(
             {
                 "reviewer_id": reviewer,

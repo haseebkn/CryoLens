@@ -331,6 +331,80 @@ def test_human_import_is_idempotent_append_only_and_excludes_ambiguity(workspace
             connection.execute("DELETE FROM events")
 
 
+def test_uncertainty_crossing_core_boundary_remains_excluded_in_freeze_and_progress(
+    workspace: Path,
+) -> None:
+    original_tasks = tasks(workspace)
+    marks_by_task = {}
+    for task in original_tasks:
+        row, col = task["origin"]
+        marks = []
+        with np.load(workspace / task["grid"]) as grid:
+            for scene_col, label in ((31, "uncertain"), (32, "target")):
+                r, c = 20 - row, scene_col - col
+                if 0 <= r < grid["core"].shape[0] and 0 <= c < grid["core"].shape[1]:
+                    if grid["core"][r, c]:
+                        marks.append(
+                            {
+                                "row": r,
+                                "col": c,
+                                "label": label,
+                                "identity": "unknown",
+                                "rationale": "Synthetic boundary response for behavioral regression",
+                            }
+                        )
+        marks_by_task[task["task_id"]] = marks
+    reviewed = read_workspace(workspace)["created_at"]
+    import_rows(
+        workspace,
+        [human(workspace, t, marks=marks_by_task[t["task_id"]], reviewed_utc=reviewed) for t in original_tasks],
+    )
+    now = datetime.now(UTC)
+    issued = issue_review(
+        workspace, "fixture-reviewer", "independent-fixture", mode="independent", fraction=0.2, now=now
+    )
+    import_rows(
+        workspace,
+        [
+            human(
+                workspace,
+                t,
+                phase=issued["phase"],
+                reviewer_id="independent-fixture",
+                reviewed_utc=now.isoformat(),
+                marks=marks_by_task[t["base_task_id"]],
+            )
+            for t in issued["tasks"]
+        ],
+        "independent.json",
+    )
+    result = freeze_reference(
+        workspace,
+        "fixture-reviewer",
+        {
+            "reviewer_id": "fixture-adjudicator",
+            "adjudicated_utc": now.isoformat(),
+            "notes": "Synthetic boundary adjudication; no real pilot records",
+            "target_ownership_at_core_boundaries_reviewed": True,
+            "independent_reviewer_status": "obtained",
+            "case_resolutions": [],
+        },
+        workspace / "boundary-frozen",
+    )
+    radius = read_workspace(workspace)["policy"]["uncertain_buffer_pixels"]
+    expected = 65 * 67 - 5 - (2 * radius + 1) ** 2
+    assert result["surveyed_pixels"] == expected
+    with np.load(workspace / "boundary-frozen/coverage.npz") as saved:
+        assert not saved["independently_surveyed"][20 - radius : 21 + radius, 31 - radius : 32 + radius].any()
+        assert not saved["scored_detection_area"][20, 32]
+    annotations = json.loads((workspace / "boundary-frozen/annotations.json").read_text())
+    assert len(annotations) == 2
+    assert all(a["inside_unambiguous_survey"] is False for a in annotations)
+    preserved = (workspace / "boundary-frozen/reference.json").read_bytes()
+    assert summarize(workspace)["reviewers"][0]["surveyed_unambiguous_pixels"] == expected
+    assert (workspace / "boundary-frozen/reference.json").read_bytes() == preserved
+
+
 def test_invalid_human_labels_positions_and_polarization_attestations_are_rejected(
     workspace: Path,
 ) -> None:

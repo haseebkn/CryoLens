@@ -241,6 +241,44 @@ class TestDownloadSelection:
 class TestDownloadValidation:
     """A mirror returning junk must never populate the cache."""
 
+    @pytest.mark.parametrize("cached", [False, True])
+    @pytest.mark.parametrize("defect", ["empty", "mission", "type", "nan", "missing", "time", "coverage"])
+    def test_unusable_candidate_rejected_before_cache_or_return(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, defect: str, cached: bool
+    ) -> None:
+        invalid = _orbit_xml()
+        if defect == "empty":
+            invalid = b"<orbit><OSV/><OSV/></orbit>"
+        elif defect == "mission":
+            invalid = invalid.replace(b"Sentinel-1B", b"Sentinel-1A")
+        elif defect == "type":
+            invalid = invalid.replace(b"AUX_POEORB", b"AUX_RESORB")
+        elif defect == "nan":
+            invalid = invalid.replace(b"<X>1.0</X>", b"<X>NaN</X>")
+        elif defect == "missing":
+            invalid = invalid.replace(b"<VY>5.0</VY>", b"")
+        elif defect == "time":
+            invalid = invalid.replace(b"UTC=2018", b"invalid=2018")
+        else:
+            invalid = invalid.replace(b"2018-04-28", b"2018-04-29")
+        if cached:
+            (tmp_path / COVERING).write_bytes(invalid)
+
+        def handler(url: str) -> _Response:
+            if url.endswith("/"):
+                return _Response(text=COVERING)
+            if url.startswith(ESA_STEP_AUXDATA):
+                return _Response(content=invalid)
+            assert not (tmp_path / COVERING).exists() or (tmp_path / COVERING).read_bytes() == invalid
+            return _Response(content=_orbit_xml())
+
+        seen = _install_transport(monkeypatch, handler)
+        manager = OrbitManager(cache_dir=tmp_path)
+        path = manager.download_orbit_file("S1B", ACQUISITION, OrbitType.POEORB)
+        assert seen[-1] == ASF_AUX_POEORB + COVERING
+        assert path.read_bytes() == _orbit_xml()
+        assert manager.get_orbit_file("S1B", ACQUISITION, OrbitType.POEORB)["orbit_file_path"] == str(path)
+
     @pytest.mark.parametrize("failure", ["http", "timeout", "zip", "empty-zip", "xml"])
     def test_selected_download_failure_falls_back_to_asf(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure: str
