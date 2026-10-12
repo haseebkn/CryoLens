@@ -194,10 +194,16 @@ false-alarm rate. Those still require the independent reference reviews.
 
 ## Local code verification
 
-The final full suite passed **400 tests**; 14 archive-dependent detection tests
+The final full suite passed **401 tests**; 14 archive-dependent detection tests
 were skipped in the isolated checkout. Mypy passed 125 source/test files and the
 five evidence drivers; Ruff and formatting passed 170 Python files. New regressions
 exercise real long-path annotation reads, lossless overview preservation, measured
 zero edge knots, immutable source-bound cache reuse and publication failure modes.
 The long-path, overview and zero-knot regressions failed before their corrections.
 Actual SNAP comparisons are separate scientific evidence, not mocked test outputs.
+
+Git newline conversion is disabled for this version's intentional evidence byte
+contracts. The publication regression verifies actual committed Git blobs against
+recorded report hashes, alongside configuration, source ZIP and reference-receipt
+inventories. Original source snapshots and measured hashes are not rewritten to
+make a different checkout appear to have generated the historical results.

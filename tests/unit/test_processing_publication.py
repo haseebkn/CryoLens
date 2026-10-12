@@ -93,6 +93,9 @@ def test_summary_requires_matching_marine_quality_and_keeps_gate_closed(
 
 
 def test_published_processing_artifacts_preserve_their_recorded_byte_contract() -> None:
+    import hashlib
+    import subprocess
+
     from cryolens.eval.cohort import file_digest
     from validation.publish_validation_run import verify_execution_sources
 
@@ -105,6 +108,16 @@ def test_published_processing_artifacts_preserve_their_recorded_byte_contract() 
         report = json.loads((out / "report.json").read_text())
         tracking = json.loads((out / "tracking_receipt.json").read_text())
         assert file_digest(out / "report.json") == tracking["report_sha256"]
+        git_blob = subprocess.check_output(
+            [
+                "git",
+                "-C",
+                str(root.parents[2]),
+                "show",
+                "HEAD:docs/processing-validation/v3/" + folder + "/report.json",
+            ]
+        )
+        assert hashlib.sha256(git_blob).hexdigest() == tracking["report_sha256"]
         assert file_digest(out / "configuration.json") == report["configuration_sha256"]
         verify_execution_sources(report, out)
         receipts = {file_digest(p) for p in (out / "reference-receipts").glob("*.json")}
