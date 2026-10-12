@@ -241,6 +241,67 @@ class TestDownloadSelection:
 class TestDownloadValidation:
     """A mirror returning junk must never populate the cache."""
 
+    @pytest.mark.parametrize("failure", ["http", "timeout", "zip", "empty-zip", "xml"])
+    def test_selected_download_failure_falls_back_to_asf(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure: str
+    ) -> None:
+        import requests
+
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as archive:
+            archive.writestr("unrelated.txt", "no orbit")
+
+        def handler(url: str) -> _Response:
+            esa = url.startswith(ESA_STEP_AUXDATA)
+            zipped = failure in {"zip", "empty-zip"} and esa
+            if url.endswith("/"):
+                return _Response(text=COVERING + (".zip" if zipped else ""))
+            if esa:
+                assert not list(tmp_path.iterdir())
+                if failure == "http":
+                    raise requests.HTTPError("503 Service Unavailable")
+                if failure == "timeout":
+                    raise requests.Timeout("download timed out")
+                if failure == "zip":
+                    return _Response(content=b"invalid ZIP")
+                if failure == "empty-zip":
+                    return _Response(content=buffer.getvalue())
+                return _Response(content=b"invalid XML")
+            return _Response(content=_orbit_xml())
+
+        seen = _install_transport(monkeypatch, handler)
+        manager = OrbitManager(cache_dir=tmp_path)
+        path = manager.download_orbit_file("S1B", ACQUISITION, OrbitType.POEORB)
+        assert seen[-1] == ASF_AUX_POEORB + COVERING
+        assert path.read_bytes() == _orbit_xml()
+        assert list(tmp_path.iterdir()) == [path]
+        assert manager.get_orbit_file("S1B", ACQUISITION, OrbitType.POEORB)[
+            "orbit_correction_applied"
+        ] is False
+
+    @pytest.mark.parametrize("failure", ["http", "timeout", "zip"])
+    def test_all_selected_downloads_failing_leave_cache_empty(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure: str
+    ) -> None:
+        import requests
+
+        def handler(url: str) -> _Response:
+            if url.endswith("/"):
+                return _Response(text=COVERING + (".zip" if failure == "zip" else ""))
+            if failure == "http":
+                raise requests.HTTPError("503 Service Unavailable")
+            if failure == "timeout":
+                raise requests.Timeout("download timed out")
+            return _Response(content=b"invalid ZIP")
+
+        seen = _install_transport(monkeypatch, handler)
+        with pytest.raises(FileNotFoundError, match="any configured public mirror"):
+            OrbitManager(cache_dir=tmp_path).download_orbit_file(
+                "S1B", ACQUISITION, OrbitType.POEORB
+            )
+        assert any(url.startswith(ASF_AUX_POEORB) for url in seen)
+        assert not list(tmp_path.iterdir())
+
     def test_rejects_non_xml_payload(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         def handler(url: str) -> _Response:
             if url.endswith("/"):

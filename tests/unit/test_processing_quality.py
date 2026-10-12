@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -310,14 +312,24 @@ def test_validation_cli_rejects_empty_or_invalid_comparison_plans(
     assert not (tmp_path / "output").exists()
 
 
-def test_reference_cache_rejects_recipe_and_pixel_changes(
+@pytest.fixture
+def reference_cache_fixture(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+) -> tuple[Path, Path, Path, tuple[int, int, int, int]]:
     from cryolens.preprocess import validation
 
-    scratch = tmp_path / "input.SAFE"
+    scratch = tmp_path / "S1A_EW_GRDM_fixture.SAFE"
     scratch.mkdir()
     (scratch / "manifest.safe").write_text("<manifest/>")
+    (scratch / "annotation/calibration").mkdir(parents=True)
+    (scratch / "measurement").mkdir()
+    for pol in ("hh", "hv"):
+        (scratch / "measurement" / f"s1a-ew-grd-{pol}-fixture.tiff").write_bytes(b"measurement")
+        (scratch / "annotation" / f"s1a-ew-grd-{pol}-fixture.xml").write_text("<product/>")
+        for kind in ("calibration", "noise"):
+            (scratch / "annotation/calibration" / f"{kind}-s1a-ew-grd-{pol}-fixture.xml").write_text(
+                f"<{kind}/>"
+            )
     graph = tmp_path / "graph.xml"
     graph.write_text("<graph/>")
     monkeypatch.setattr(validation.subprocess, "check_output", lambda *a, **kw: "sha256:runtime")
@@ -337,6 +349,15 @@ def test_reference_cache_rejects_recipe_and_pixel_changes(
             (folder / f"{band}.hdr").write_text("ENVI\nsamples = 512\n")
     window = (0, 0, 512, 512)
     validation.write_reference_receipt(scratch, graph, prefix, window, "runtime")
+    return scratch, graph, prefix, window
+
+
+def test_reference_cache_rejects_recipe_and_pixel_changes(
+    reference_cache_fixture: tuple[Path, Path, Path, tuple[int, int, int, int]],
+) -> None:
+    from cryolens.preprocess import validation
+
+    scratch, graph, prefix, window = reference_cache_fixture
     validation.verify_reference_receipt(scratch, graph, prefix, window, "runtime")
     header = Path(str(prefix) + "_den.data/sigma0_hv.hdr")
     header.write_text("ENVI\nsamples = 256\n")
@@ -360,3 +381,86 @@ def test_reference_cache_rejects_recipe_and_pixel_changes(
     Path(str(prefix) + "_geo.tif").write_bytes(b"changed")
     with pytest.raises(ValueError, match="changed"):
         validation.verify_reference_receipt(scratch, graph, prefix, window, "runtime")
+
+
+@pytest.mark.parametrize(
+    "changed",
+    [
+        "annotation/s1a-ew-grd-hh-fixture.xml",
+        "annotation/calibration/calibration-s1a-ew-grd-hh-fixture.xml",
+        "annotation/calibration/noise-s1a-ew-grd-hv-fixture.xml",
+        "measurement/s1a-ew-grd-hv-fixture.tiff",
+        "incomplete-receipt",
+    ],
+)
+def test_reference_cache_binds_linked_directories_and_rejects_incomplete_receipts(
+    reference_cache_fixture: tuple[Path, Path, Path, tuple[int, int, int, int]],
+    changed: str,
+) -> None:
+    from cryolens.preprocess import validation
+
+    scratch, graph, prefix, window = reference_cache_fixture
+    for directory in ("annotation", "measurement"):
+        original = scratch / directory
+        target = scratch.parent / (directory + "-target")
+        original.rename(target)
+        try:
+            original.symlink_to(target, target_is_directory=True)
+        except OSError:
+            if sys.platform != "win32":
+                raise
+            subprocess.run(
+                ["cmd", "/c", "mklink", "/J", str(original), str(target)],
+                check=True,
+                capture_output=True,
+            )
+    validation.write_reference_receipt(scratch, graph, prefix, window, "runtime")
+    validation.verify_reference_receipt(scratch, graph, prefix, window, "runtime")
+    receipt_path = Path(str(prefix) + "-receipt.json")
+    receipt = json.loads(receipt_path.read_text())
+    if changed == "incomplete-receipt":
+        receipt["scratch_files_sha256"] = {
+            "manifest.safe": receipt["scratch_files_sha256"]["manifest.safe"]
+        }
+        receipt_path.write_text(json.dumps(receipt))
+    else:
+        (scratch / changed).write_bytes(b"changed target")
+    preserved = receipt_path.read_bytes()
+    with pytest.raises(ValueError, match="incomplete|changed"):
+        validation.verify_reference_receipt(scratch, graph, prefix, window, "runtime")
+    assert receipt_path.read_bytes() == preserved
+
+
+@pytest.mark.parametrize(
+    "missing",
+    [
+        "annotation/s1a-ew-grd-hh-fixture.xml",
+        "annotation/calibration/calibration-s1a-ew-grd-hh-fixture.xml",
+        "annotation/calibration/noise-s1a-ew-grd-hv-fixture.xml",
+        "measurement/s1a-ew-grd-hv-fixture.tiff",
+    ],
+)
+def test_reference_identity_rejects_missing_consumed_components(
+    reference_cache_fixture: tuple[Path, Path, Path, tuple[int, int, int, int]],
+    missing: str,
+) -> None:
+    from cryolens.preprocess import validation
+
+    scratch, graph, _, window = reference_cache_fixture
+    (scratch / missing).unlink()
+    with pytest.raises((ValueError, FileNotFoundError), match="[Ii]ncomplete"):
+        validation.reference_identity(scratch, graph, window, "runtime")
+
+
+def test_reference_identity_hashes_inputs_beyond_windows_path_limit(
+    reference_cache_fixture: tuple[Path, Path, Path, tuple[int, int, int, int]],
+) -> None:
+    from cryolens.preprocess import validation
+    from cryolens.preprocess.safe_reader import _open_path
+
+    scratch, graph, _, window = reference_cache_fixture
+    long_scratch = scratch.parent / ("S1A_EW_GRDM_" + "x" * 100 + ".SAFE")
+    shutil.copytree(scratch, _open_path(long_scratch))
+    original = validation.reference_identity(scratch, graph, window, "runtime")
+    copied = validation.reference_identity(long_scratch, graph, window, "runtime")
+    assert copied == original

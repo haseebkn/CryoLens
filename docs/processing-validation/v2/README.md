@@ -32,8 +32,10 @@ clipping, filling, dropping valid negative pixels or reducing noise amplitudes.
    EW3 azimuth block spanning lines 224–322 with no interior range-noise vector.
    The reader now selects the nearest qualified vector within the declared
    subswath extent, retaining its measured range knots. It does not synthesize
-   noise when no qualified annotation is available. A fresh SNAP run on this
-   block agrees to better than 0.00001 dB, with no residual-sign mismatch.
+   noise when no qualified annotation is available. The historical SNAP comparison
+   reported agreement better than 0.00001 dB with no residual-sign mismatch, but
+   its incomplete consumed-input receipt invalidates that acceptance claim.
+   A fresh reference execution is required to reestablish it.
 6. **Nodata borders:** noise coverage is required for every actual valid
    measurement. Unannotated padding is allowed only where the raster mask or
    zero-DN declaration already establishes nodata. A valid observed pixel without
@@ -131,9 +133,11 @@ python validation/validate_marine_processing.py --evidence-root E:\CryoLens --re
 ```
 
 The [v2 graph](../../../configs/snap/validation-reference-v2.xml) preserves the
-full range/timing geometry. All cache receipts include the geographic output
-subset, graph, runtime, scratch input bytes and complete output inventories.
-Changing the recipe invalidates old caches. Each output directory must be new.
+full range/timing geometry. Cache acceptance requires the geographic output
+subset, graph, runtime, complete consumed-input bytes and output inventories.
+Explicit directory inventories include linked annotation and measurement targets.
+Incomplete historical inventories reject; they cannot be repaired by attaching
+current input hashes to old output pixels. Each output directory must be new.
 
 The published [report](report.json) records fresh full scans and matched-window
 checks. Raw rasters, runtime logs and diagnostic COGs remain in local data.
@@ -144,8 +148,18 @@ that a future clean Git commit generated the measurements.
 
 The [additional-scene report](short-block-report.json) records the tested short
 noise block, original and adapted scratch provenance, signed comparisons and
-full-product quality. Its independently generated reference remains bound by
-[the short-block receipt](reference-receipts/short-block-receipt.json).
+full-product quality. **Its signed reference-comparison acceptance is invalidated:**
+[the historical receipt](reference-receipts/short-block-receipt.json) records only
+`manifest.safe`, omitting linked annotation and measurement files. The existing
+rasters, receipt and report remain preserved as historical artifacts. Replacement
+acceptance needs a fresh SNAP run and newly bound report and MLflow evidence.
+The full-product quality rejection and closed deployment gate remain unchanged.
+
+The [live inventory audit](reference-inventory-audit.json) independently hashes
+the consumed inputs and output inventories for all 27 v2 references, and records
+the explicit short-block invalidation with hashes of the affected historical
+artifacts. It is a post-hoc audit, not a new scientific execution. The audit driver
+is [audit_reference_inventories.py](../../../validation/audit_reference_inventories.py).
 
 The [MLflow receipt](tracking_receipt.json) records real completed run
 `9f59fb74ce6c42c1aed5c1fabefc9d56` in `cryolens-processing-v2`, logged from the
@@ -153,6 +167,8 @@ clean `4ee9a50` checkout. This is post-hoc evidence logging, with the frozen sco
 configuration, source snapshot, reference recipes, measured quality diagnostics
 and report hash. It does not claim that `4ee9a50` generated the earlier execution
 receipts, and logs no detector/model performance.
+Its short-block artifact is historical evidence subject to the invalidation above;
+the logged run itself is not rewritten or presented as replacement acceptance.
 
 Local verification: 344 portable tests passed (14 archive-dependent tests skipped
 in the isolated checkout), mypy passed 120 files, Ruff and formatting passed,

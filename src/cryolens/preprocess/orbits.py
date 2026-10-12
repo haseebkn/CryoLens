@@ -6,6 +6,7 @@ import re
 import warnings
 import xml.etree.ElementTree as ET
 import zipfile
+import zlib
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from pathlib import Path
@@ -203,17 +204,29 @@ class OrbitManager:
 
             file_url = urljoin(listing_url, str(best["href"]))
             logger.info("Downloading %s orbit from %s", orbit_type.value, file_url)
-            payload = requests.get(file_url, timeout=timeout)
-            payload.raise_for_status()
-            content = payload.content
+            try:
+                payload = requests.get(file_url, timeout=timeout)
+                payload.raise_for_status()
+                content = payload.content
 
-            if str(best["href"]).endswith(".zip"):
-                with zipfile.ZipFile(io.BytesIO(content)) as archive:
-                    members = [n for n in archive.namelist() if n.endswith(".EOF")]
-                    if not members:
-                        logger.warning("Archive at %s contains no EOF member", file_url)
-                        continue
-                    content = archive.read(members[0])
+                if str(best["href"]).endswith(".zip"):
+                    with zipfile.ZipFile(io.BytesIO(content)) as archive:
+                        members = [n for n in archive.namelist() if n.endswith(".EOF")]
+                        if not members:
+                            logger.warning("Archive at %s contains no EOF member", file_url)
+                            continue
+                        content = archive.read(members[0])
+            except (
+                requests.RequestException,
+                zipfile.BadZipFile,
+                zlib.error,
+                RuntimeError,
+                EOFError,
+                OSError,
+                NotImplementedError,
+            ) as exc:
+                logger.warning("Orbit download unavailable at %s: %s", file_url, exc)
+                continue
 
             # Validate before caching so a truncated or HTML error page can never
             # masquerade as an orbit product.

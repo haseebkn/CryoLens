@@ -363,6 +363,40 @@ def reference_geo_region(
     return f"POLYGON(({west} {south},{east} {south},{east} {north},{west} {north},{west} {south}))"
 
 
+def reference_input_files(scratch: Path) -> list[Path]:
+    """Inventory the manifest and every consumed GRD annotation and measurement."""
+    reader = SAFEProductReader(Path(_open_path(scratch)))
+    paths = {scratch / "manifest.safe"}
+    for polarisation in ("HH", "HV"):
+        measurement, annotation, noise, calibration = reader._find_for_polarisation(polarisation)
+        if noise is None:
+            raise ValueError("Independent reference input is incomplete (noise annotation)")
+        paths.update(
+            scratch / path.relative_to(reader.safe_dir)
+            for path in (measurement, annotation, noise, calibration)
+        )
+    for directory, pattern in (
+        ("annotation", "*.xml"),
+        ("annotation/calibration", "*.xml"),
+        ("measurement", "*.tiff"),
+    ):
+        paths.update(
+            scratch / directory / path.name
+            for path in Path(_open_path(scratch / directory)).glob(pattern)
+        )
+    for location in ET.parse(_open_path(scratch / "manifest.safe")).getroot().iter():
+        if location.tag.split("}")[-1] != "fileLocation":
+            continue
+        member = Path(location.get("href", ""))
+        if member.parts and member.parts[0] in {"annotation", "measurement"}:
+            if member.is_absolute() or ".." in member.parts:
+                raise ValueError("Independent reference input contains an invalid path")
+            paths.add(scratch / member)
+    if not all(Path(_open_path(path)).is_file() for path in paths):
+        raise ValueError("Independent reference input is incomplete (manifest components)")
+    return sorted(paths)
+
+
 def reference_identity(
     scratch: Path, graph: Path, window: tuple[int, int, int, int], image: str
 ) -> dict[str, Any]:
@@ -376,9 +410,8 @@ def reference_identity(
         "image_id": runtime,
         "graph_sha256": file_digest(graph),
         "scratch_files_sha256": {
-            path.relative_to(scratch).as_posix(): file_digest(path)
-            for path in sorted(scratch.rglob("*"))
-            if path.is_file() and path.suffix.lower() in {".safe", ".xml", ".tiff"}
+            path.relative_to(scratch).as_posix(): file_digest(Path(_open_path(path)))
+            for path in reference_input_files(scratch)
         },
     }
 
@@ -423,6 +456,8 @@ def verify_reference_receipt(
         raise ValueError("Reference cache lacks provenance; regenerate with --run-reference")
     receipt = json.loads(path.read_text(encoding="utf-8"))
     identity = reference_identity(scratch, graph, window, image)
+    if set(receipt.get("scratch_files_sha256", {})) != set(identity["scratch_files_sha256"]):
+        raise ValueError("Reference input receipt incomplete or changed; regenerate reference")
     if any(receipt.get(key) != value for key, value in identity.items()):
         raise ValueError("Reference cache input/graph/runtime/window changed; regenerate reference")
     expected_names = {

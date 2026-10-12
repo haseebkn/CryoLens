@@ -1,0 +1,260 @@
+{
+  "observed_at": "2026-10-12T08:57:24.551709+00:00",
+  "activity": "Post-hoc live reference inventory audit; no SNAP execution or new science",
+  "audit_source_sha256": "6eabfd2952118cb933fb66506819541221e5d35fbb0fc19fe614c6b9632d8431",
+  "validation_source_sha256": "4c5a146560ab282ac3792650e7ce5567f6d29dc129a4fa778d9104c6b9a73dfe",
+  "reference_image_id": "sha256:ac08abe1c070613c2336d9cfa06746ef9eb7d12b99373f28fe878f27a2a70fa7",
+  "deployment_gate_open": false,
+  "products": [
+    {
+      "product": "S1B_EW_GRDM_1SDH_20180428T093937_20180428T094037_010682_013815_03AF_COG.SAFE",
+      "live_inputs_sha256": {
+        "annotation/calibration/calibration-s1b-ew-grd-hh-20180428t093937-20180428t094037-010682-013815-001-cog.xml": "68e5e267007dad58ecde3165cb7edd910f4b8c9d72ac8617dc8768b7192c3221",
+        "annotation/calibration/calibration-s1b-ew-grd-hv-20180428t093937-20180428t094037-010682-013815-002-cog.xml": "61c8e9e789350cacb7fd11b31a06bddb739aaa9b6bf123edc6e7085da1bf795a",
+        "annotation/calibration/noise-s1b-ew-grd-hh-20180428t093937-20180428t094037-010682-013815-001-cog.xml": "360a7a74fb372b0813b122ddd6b4fcbf92ab17da285c8ab642e4003fb4e80113",
+        "annotation/calibration/noise-s1b-ew-grd-hv-20180428t093937-20180428t094037-010682-013815-002-cog.xml": "dbdb25ac8f1de025186547b621df4f15eaa6c2974fb85faacb6d400222c3ffd8",
+        "annotation/s1b-ew-grd-hh-20180428t093937-20180428t094037-010682-013815-001-cog.xml": "e66fe2b49663a923380211a988bb5c83e5dbff4ca48627c002a3d38bc6901fb8",
+        "annotation/s1b-ew-grd-hv-20180428t093937-20180428t094037-010682-013815-002-cog.xml": "61842fea9f0ffab4a4669abbae18b57d72807f765c0e0fbe4dd77a05a5eff628",
+        "manifest.safe": "b02e1e79a38e7b64c7000583cac89639332983d269e016d38df0bbfdbc2681be",
+        "measurement/s1b-ew-grd-hh-20180428t093937-20180428t094037-010682-013815-001-cog.tiff": "a49db5124d3303e948be9e0c98fd145868777c85849632373753db74eacbaf94",
+        "measurement/s1b-ew-grd-hv-20180428t093937-20180428t094037-010682-013815-002-cog.tiff": "0fb1cfa1c3a39bfcd74b5373c443e677fa0ce52920006663298cf9be71ef169e"
+      }
+    },
+    {
+      "product": "S1C_EW_GRDM_1SDH_20260916T212442_20260916T212542_009478_012DA6_90E4_COG.SAFE",
+      "live_inputs_sha256": {
+        "annotation/calibration/calibration-s1c-ew-grd-hh-20260916t212442-20260916t212542-009478-012da6-001-cog.xml": "83c8c3ef14d858e367b62a0a78eaa6f88d4b7d58d31d10a03900b4993ca29108",
+        "annotation/calibration/calibration-s1c-ew-grd-hv-20260916t212442-20260916t212542-009478-012da6-002-cog.xml": "e01195d842fe91ee2f72373cda38941475ac5e1c66a9fa1f3d441fb6726200a0",
+        "annotation/calibration/noise-s1c-ew-grd-hh-20260916t212442-20260916t212542-009478-012da6-001-cog.xml": "d2001a1ad3abcd6b13fc5eca36de4a1a27098eb14889e13b18ee8246c70ca25d",
+        "annotation/calibration/noise-s1c-ew-grd-hv-20260916t212442-20260916t212542-009478-012da6-002-cog.xml": "e004956eb7a0a8e1fbd520d287a026bfc2713f0f42e6af97408f5c94c50f3953",
+        "annotation/rfi/rfi-s1c-ew-grd-hh-20260916t212442-20260916t212542-009478-012da6-001-cog.xml": "b5b12d8ec699090a0fcf73ca8b218812b0236bff468bbfde09de6546901ed9f1",
+        "annotation/rfi/rfi-s1c-ew-grd-hv-20260916t212442-20260916t212542-009478-012da6-002-cog.xml": "93ab5559c1e1b3982d843fff77e8484452dbb0207b68426e334a0e76e112b1e2",
+        "annotation/s1c-ew-grd-hh-20260916t212442-20260916t212542-009478-012da6-001-cog.xml": "e0216fbe76e291425e220ff7c6df064c43e94d4333a95c0e8c2d73e6ae8cf47c",
+        "annotation/s1c-ew-grd-hv-20260916t212442-20260916t212542-009478-012da6-002-cog.xml": "facf1aa8157bcc62dbb7caa8d9472fa25da7d3d3ec821584c615c11cdb23747f",
+        "manifest.safe": "a97612c3c9ded94e29bd25906952b5895ca28474a94cc3c76fbd44e7cfbf33a1",
+        "measurement/s1c-ew-grd-hh-20260916t212442-20260916t212542-009478-012da6-001-cog.tiff": "6664ce6ba7ff9eafddc11402e024e4db0ec378346e6e66d1e428fe9ec73e87df",
+        "measurement/s1c-ew-grd-hv-20260916t212442-20260916t212542-009478-012da6-002-cog.tiff": "b3b0d2476964ff26c03aa2c0be36d23f262306644d2fa0c171d9051d6a25a5f1"
+      }
+    },
+    {
+      "product": "S1C_IW_GRDH_1SDH_20260927T093334_20260927T093359_009631_0132BC_E3E9_COG.SAFE",
+      "live_inputs_sha256": {
+        "annotation/calibration/calibration-s1c-iw-grd-hh-20260927t093334-20260927t093359-009631-0132bc-001-cog.xml": "499b8b4b7d27b98314343dfd700b1136dc4247ddbde54d73fd9e1864bd035371",
+        "annotation/calibration/calibration-s1c-iw-grd-hv-20260927t093334-20260927t093359-009631-0132bc-002-cog.xml": "c0cfa607b63341cc0caf999c8bc90b30d22362bbd43c03eca8b51b4eb3cd17d5",
+        "annotation/calibration/noise-s1c-iw-grd-hh-20260927t093334-20260927t093359-009631-0132bc-001-cog.xml": "60590b66a8edb932e5a483b6494226166f2f3a975cbee203d731eaa69b1de435",
+        "annotation/calibration/noise-s1c-iw-grd-hv-20260927t093334-20260927t093359-009631-0132bc-002-cog.xml": "1af8016d40655440fe13f53043e588ea17c684e6cd0c2a0226f108a722edde02",
+        "annotation/rfi/rfi-s1c-iw-grd-hh-20260927t093334-20260927t093359-009631-0132bc-001-cog.xml": "c5e2bbf06f4e08041f0ee057743cd66c2b26fe36b5e0ed9a2bb47f6288c197c9",
+        "annotation/rfi/rfi-s1c-iw-grd-hv-20260927t093334-20260927t093359-009631-0132bc-002-cog.xml": "ed32ba0a1df58e59b6e24ee012e3a0c992f19f72b80e2364aae0c670f19f7f5d",
+        "annotation/s1c-iw-grd-hh-20260927t093334-20260927t093359-009631-0132bc-001-cog.xml": "44443a01c07cba45c207f11687b1c3ef17c83868977cff7d9de4b355530beebe",
+        "annotation/s1c-iw-grd-hv-20260927t093334-20260927t093359-009631-0132bc-002-cog.xml": "17ba44ea613d4ba9313f14dd9e991d49c0d449af4ca85dec8ff32527717f95c1",
+        "manifest.safe": "55b0cf1fbc076929794b2a8a76657ad3d094dee20a7eadd3444071ea786b2584",
+        "measurement/s1c-iw-grd-hh-20260927t093334-20260927t093359-009631-0132bc-001-cog.tiff": "7630b47dc09743602ddb72a5970179d83e49c852fa0941e3bc894f377f82c7af",
+        "measurement/s1c-iw-grd-hv-20260927t093334-20260927t093359-009631-0132bc-002-cog.tiff": "41cafab814decdf7ce59ad8e2305ea98c0ce7a3756385af12896d04b2c557f4b"
+      }
+    }
+  ],
+  "references": [
+    {
+      "name": "old-ew-r0.1-c0.1",
+      "receipt_sha256": "e5182fb9d14ce4781b05d440c8c1ca36a1f396b3e60ea17979113ab7d0ef5c1f",
+      "consumed_input_files": 9,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "old-ew-r0.1-c0.5",
+      "receipt_sha256": "bb64bf6d6a7b7ee40f15e3ed07abaf7aebfc7f03263e34abf1d627bb16b12e4c",
+      "consumed_input_files": 9,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "old-ew-r0.1-c0.9",
+      "receipt_sha256": "cebfd2baf095265e63685036cac8863c898419799c63be9593d28dcfd7bd4d56",
+      "consumed_input_files": 9,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "old-ew-r0.5-c0.1",
+      "receipt_sha256": "daddf8b27f11c4c0c78e7049fe8f4934a0c919ec6f634c064cb61b061fafc49b",
+      "consumed_input_files": 9,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "old-ew-r0.5-c0.5",
+      "receipt_sha256": "62c860ba8d009c374414cdb6470137791ff66762a5edd29e0fb5aa7449ff3037",
+      "consumed_input_files": 9,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "old-ew-r0.5-c0.9",
+      "receipt_sha256": "fb8e014cf46809f2dd50155e6baec0a9a4cdb3a6a8fc2ae50ed3f977de30024e",
+      "consumed_input_files": 9,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "old-ew-r0.9-c0.1",
+      "receipt_sha256": "3bf376ec594d414a7904360fa0250198054abe80d5b7297b939e72702a66c920",
+      "consumed_input_files": 9,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "old-ew-r0.9-c0.5",
+      "receipt_sha256": "e3d4aa749541c59ee7e8438502b94d3a39dd78fa89d8a44279a4e9caa4d4164b",
+      "consumed_input_files": 9,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "old-ew-r0.9-c0.9",
+      "receipt_sha256": "3e8075efae1df932aa7d1099576a525e0c33c4b0fa9a71b6072a53ca090d64d7",
+      "consumed_input_files": 9,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "fresh-ew-r0.1-c0.1",
+      "receipt_sha256": "484bf1aecaabc2ca320bdaa1832a17199557bae2865fc3ffe7793b32486dd03a",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "fresh-ew-r0.1-c0.5",
+      "receipt_sha256": "6f702437f95ad39074e755b4885a069c61639a4f7ee5616150b5ca4e16e935e2",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "fresh-ew-r0.1-c0.9",
+      "receipt_sha256": "08320efbb08177f811de251fab31319053d13b89a7ee0fdb19e0c632856f8f79",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "fresh-ew-r0.5-c0.1",
+      "receipt_sha256": "fd4edfc1b576f0b9ec0a6e1241d86be8d5e6d00a9afeec075d8279b622a8d2c6",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "fresh-ew-r0.5-c0.5",
+      "receipt_sha256": "5ede08a36466c3a303426997c14963aa9bcd5129305a36d756d1364eab015ef0",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "fresh-ew-r0.5-c0.9",
+      "receipt_sha256": "714060c8def8bafd1819892c0b16e8cd9d7a8760cf83bdeb87099bb05fb7d452",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "fresh-ew-r0.9-c0.1",
+      "receipt_sha256": "6bbc36a1f40f8447282f56f5fc402133197d93909ccf93f91e65aa32c9f18412",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "fresh-ew-r0.9-c0.5",
+      "receipt_sha256": "92e01852d84d990a2b851ab478abbf633a00e08d127dbd1790b5efac339d3638",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "fresh-ew-r0.9-c0.9",
+      "receipt_sha256": "9cee3bc2e44f525c9da10548ca310f5e813f9f8b3174adcab500c3c960d165ae",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "iw-r0.1-c0.1",
+      "receipt_sha256": "4881a9afa5ac088fafbbf9f0646ff124955df3820c76b995c28bc0bfda5c100c",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "iw-r0.1-c0.5",
+      "receipt_sha256": "2f98f814fa492eae5a4d456952b7fafd09aa9893466ad880037c971616ec2744",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "iw-r0.1-c0.9",
+      "receipt_sha256": "84947e6480ecff50ab61f7e007923a3816c67c3c58f34cfb37c4d8e2435fc797",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "iw-r0.5-c0.1",
+      "receipt_sha256": "9c1a24eb9922df83ec59a48efbaff6c8d7b524cbd5df6aaad82321830d7fda91",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "iw-r0.5-c0.5",
+      "receipt_sha256": "e3e5e74dc304fe159ff5bd6d845bfe1fdb8d759f2053607f6786bf0909d27cd9",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "iw-r0.5-c0.9",
+      "receipt_sha256": "8fab38c7566e2db91ed212757d6108952dc3b685b125f70ee9ffeeeae58d2bab",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "iw-r0.9-c0.1",
+      "receipt_sha256": "69aeaff07e0bf87489aca017e7fa442d696b7a1abf038ddba58f06597abbbd32",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "iw-r0.9-c0.5",
+      "receipt_sha256": "5bdeaf0f379d6cf912ec3a8ae32b464064d7ecab9c6734900447acf2aecf7536",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    },
+    {
+      "name": "iw-r0.9-c0.9",
+      "receipt_sha256": "a2dd7e3213bf48236f0987a80974eff5815c4db24f485471a03e176dcdcc6405",
+      "consumed_input_files": 11,
+      "output_files": 41,
+      "inventory_complete_and_live_hashes_match": true
+    }
+  ],
+  "short_block_invalidation": {
+    "status": "invalidated",
+    "reason": "Reference input receipt incomplete or changed; regenerate reference",
+    "scientific_comparison_accepted": false,
+    "historical_artifacts_sha256": {
+      "reference-receipts/short-block-receipt.json": "51f481b44040092367c1c9615e0fba204fb6133f4dfb00afe4b058dd8cb74cfa",
+      "short-block-report.json": "442756cbf0730e945f051a31ef79d55c5566f0d6c11bf5bdd3c981598057083d",
+      "tracking_receipt.json": "d9573f93a36833bbbe80908be00ff41d9b7d562ffb5616704dfba2bcb72b7392"
+    },
+    "historical_mlflow_run_id": "9f59fb74ce6c42c1aed5c1fabefc9d56",
+    "claim_boundary": "The historical short-block signed comparison and its MLflow artifact cannot establish reference acceptance. Full-product radiometric rejection remains. No hashes were added to old caches; replacement acceptance requires a fresh SNAP execution and newly bound report/tracking evidence."
+  },
+  "completed_at": "2026-10-12T08:57:28.226514+00:00"
+}
