@@ -231,12 +231,32 @@ archived short-block recipe whose configuration and graph differ from the live
 checkout, and exercise both Git autocrlf settings for all 54 main receipts.
 
 The earlier baseline report `ed1bf3b49fa34fb76d423941a437b621680b9e833c4effb39213f5e2197a3ed9`
-referenced by v2 and the prior scan report
+referenced by v2 is available at `docs/audits/pr6-9/report.json`: its original
+working bytes and all 27 audit reference receipts match their recorded hashes.
+These byte contracts are now preserved in Git and checked under both autocrlf
+settings. The prior scan report
 `a00361f6e962e1bb030323630df0625df469c38b4754bdd547d6e861ee676c4c`
-referenced by v1 are not recoverable from this worktree's published artifacts or
-report history. Those references remain unchanged historical dependencies;
-their contents are not reconstructed, authenticated or consumed by these
+referenced by v1 is not recoverable from this worktree's published artifacts or
+report history. That reference remains an unchanged historical dependency;
+its contents are not reconstructed, authenticated or consumed by these
 packaging checks. Any consumer requiring those earlier reports must supply
 their exact hash-matching original bytes; absent or changed bytes reject at the
 execution-artifact boundary. These post-hoc logging checks do not establish new
 scientific qualification or reopen deployment.
+
+Legacy diagnostic publication and NERSC execution require new destination
+directories. Acquisition publication checks every available quality binding's
+report digest and strict policy, including bindings in default directories;
+unbound historical reports retain their explicit historical status. Aggregation
+requires the published acquisition download receipt hash and its exact consumed
+original source inventory to match processing provenance. Processing failures
+with no HV statistics remain rejections with their reasons and null measurements.
+Partial existing aggregation outputs are refused before any writes.
+
+Published acquisition download-receipt directories are absent from this
+worktree; the broad `downloads/` ignore rule previously excluded them. Scoped
+exceptions now permit processing-validation JSON download receipts to be
+committed in future publications. Existing scientific status snapshots remain
+unchanged. Fresh aggregation requiring a missing receipt rejects explicitly;
+restore only authentic originals matching the already recorded receipt hashes,
+never reconstructed substitutes. No new numerical processing was performed.

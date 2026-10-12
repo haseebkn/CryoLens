@@ -171,7 +171,20 @@ def test_cached_acquisition_checks_complete_live_safe_inventory(
 
 @pytest.mark.parametrize(
     "mutation",
-    ["unchanged", "measurement_added", "noise_added", "other_file_added", "removed", "changed"],
+    [
+        "unchanged",
+        "measurement_added",
+        "noise_added",
+        "other_file_added",
+        "removed",
+        "changed",
+        "quality_changed",
+        "binding_policy_changed",
+        "historical_unbound",
+        "explicit_quality_changed",
+        "explicit_binding_policy_changed",
+        "explicit_unbound",
+    ],
 )
 def test_acquisition_publication_checks_complete_live_safe_inventory(
     cached_acquisition: dict[str, Any],
@@ -183,6 +196,27 @@ def test_acquisition_publication_checks_complete_live_safe_inventory(
     from validation import publish_acquisition_search
 
     mutate_safe(cached_acquisition["safe"], mutation)
+    quality = cached_acquisition["quality"]
+    extra_args = []
+    if mutation.startswith("explicit"):
+        directory = tmp_path / "new-quality"
+        directory.mkdir()
+        quality.with_suffix(".binding.json").rename(
+            directory / quality.with_suffix(".binding.json").name
+        )
+        quality = quality.rename(directory / quality.name)
+        extra_args = ["--quality-dir", str(directory)]
+    if mutation.endswith("quality_changed"):
+        result = json.loads(quality.read_text())
+        result["passed"] = False
+        quality.write_text(json.dumps(result))
+    if mutation.endswith("binding_policy_changed"):
+        binding_path = quality.with_suffix(".binding.json")
+        binding = json.loads(binding_path.read_text())
+        binding["inputs_and_code"]["policy"]["max_nonpositive_fraction"] = 0.5
+        binding_path.write_text(json.dumps(binding))
+    if mutation.endswith("unbound"):
+        quality.with_suffix(".binding.json").unlink()
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(
         publish_acquisition_search.httpx,
@@ -206,17 +240,64 @@ def test_acquisition_publication_checks_complete_live_safe_inventory(
         path.write_text("{}")
     output = tmp_path / "published"
     monkeypatch.setattr(
-        sys, "argv", ["publish", "--root", str(cached_acquisition["root"]), "--output", str(output)]
+        sys,
+        "argv",
+        [
+            "publish",
+            "--root",
+            str(cached_acquisition["root"]),
+            "--output",
+            str(output),
+            *extra_args,
+        ],
     )
-    if mutation == "unchanged":
+    if mutation in {"unchanged", "historical_unbound"}:
         publish_acquisition_search.main()
         published = json.loads((output / "report.json").read_text())
         assert published["products"][0]["status"] == "radiometric_pass"
         assert published["deployment_gate_open"] is False
     else:
-        with pytest.raises(ValueError, match="source inventory changed"):
+        expected_error = (
+            "source-bound"
+            if mutation == "explicit_unbound"
+            else "binding"
+            if "policy" in mutation or "quality" in mutation
+            else "source inventory changed"
+        )
+        with pytest.raises(ValueError, match=expected_error):
             publish_acquisition_search.main()
         assert not output.exists()
+
+
+def test_acquisition_preserves_orphaned_quality_binding(
+    cached_acquisition: dict[str, Any], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from validation import acquire_sentinel1
+
+    quality = cached_acquisition["quality"]
+    quality.unlink()
+    binding = quality.with_suffix(".binding.json")
+    before = binding.read_bytes()
+    monkeypatch.setattr(acquire_sentinel1, "load_manifest", lambda path: {"scenes": []})
+    monkeypatch.setattr(acquire_sentinel1, "Settings", lambda **kwargs: SimpleNamespace(cdse=None))
+    monkeypatch.setattr(acquire_sentinel1, "CDSEClient", lambda **kwargs: None)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "acquire",
+            "--plan",
+            str(cached_acquisition["plan"]),
+            "--root",
+            str(cached_acquisition["root"]),
+            "--env-file",
+            "unused.env",
+        ],
+    )
+    with pytest.raises(FileExistsError, match="Preserve existing quality binding"):
+        acquire_sentinel1.main()
+    assert binding.read_bytes() == before
+    assert not quality.exists()
 
 
 def test_new_product_is_excluded_when_near_frozen_test() -> None:

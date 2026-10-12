@@ -8,6 +8,8 @@ from pathlib import Path
 import matplotlib
 import numpy as np
 
+from cryolens.eval.cohort import file_digest
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
@@ -19,11 +21,11 @@ def main() -> None:
     parser.add_argument("--nersc-report", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
+    if args.output_dir.exists():
+        raise FileExistsError("Preserve published evidence; choose a new output")
     report = json.loads(args.report.read_text(encoding="utf-8"))
     if len(report["products"]) != 3 or any(len(p["windows"]) != 9 for p in report["products"]):
         raise ValueError("Publish only the complete configured 27-window experiment")
-    args.output_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(args.report, args.output_dir / "report.json")
     quality_reports = sorted(args.report.parent.glob("*-full-quality.json"))
     if len(quality_reports) != 3:
         raise ValueError("Expected the three retained full measurement scan reports")
@@ -34,17 +36,29 @@ def main() -> None:
         )
         if measured != expected:
             raise ValueError("Full measurement scan differs from final comparison report")
+    sources = sorted((args.report.parent / "reference").glob("*-receipt.json"))
+    required = {
+        window["reference_receipt_sha256"]
+        for product in report["products"]
+        for window in product["windows"]
+    }
+    if len(required) != 27 or not required <= {file_digest(path) for path in sources}:
+        raise ValueError("Complete bound reference receipt inventory missing")
+    receipt = json.loads(args.iw_receipt.read_text(encoding="utf-8"))
+    nersc_bytes = args.nersc_report.read_bytes()
+    args.output_dir.mkdir(parents=True)
+    shutil.copyfile(args.report, args.output_dir / "report.json")
+    for path in quality_reports:
         shutil.copyfile(path, args.output_dir / path.name)
     receipts = args.output_dir / "reference-receipts"
-    receipts.mkdir(exist_ok=True)
-    for path in sorted((args.report.parent / "reference").glob("*-receipt.json")):
+    receipts.mkdir()
+    for path in sources:
         shutil.copyfile(path, receipts / path.name)
-    receipt = json.loads(args.iw_receipt.read_text(encoding="utf-8"))
     receipt.pop("archive", None)
     (args.output_dir / "iw-integrity.json").write_text(
         json.dumps(receipt, indent=2), encoding="utf-8"
     )
-    shutil.copyfile(args.nersc_report, args.output_dir / "nersc-signed-power.json")
+    (args.output_dir / "nersc-signed-power.json").write_bytes(nersc_bytes)
     figure, axes = plt.subplots(3, 2, figsize=(9, 10), constrained_layout=True)
     for row, product in enumerate(report["products"]):
         residual = np.array([w["nonpositive_fraction"]["HV"] * 100 for w in product["windows"]])

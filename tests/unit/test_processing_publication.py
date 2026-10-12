@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from cryolens.eval.cohort import file_digest
 from cryolens.preprocess.quality import QualityPolicy
 from validation.finalise_acquisition_report import main
 
@@ -246,6 +247,11 @@ def test_short_block_execution_contracts_survive_git_checkout(
         "measurement_changed",
         "annotation_changed",
         "manifest_changed",
+        "download_changed",
+        "download_inventory",
+        "download_annotation_added",
+        "download_missing",
+        "processing_reject",
     ],
 )
 def test_summary_requires_matching_marine_quality_and_keeps_gate_closed(
@@ -287,6 +293,9 @@ def test_summary_requires_matching_marine_quality_and_keeps_gate_closed(
             "policy": policy,
             "channels": {"HV": {"nonpositive_fraction": fraction}},
         }
+        if marine_case == "processing_reject" and mode == "IW":
+            quality["channels"] = {}
+            quality["reasons"] = ["Missing noise annotation"]
         rows.append(
             {
                 "product": name,
@@ -319,6 +328,29 @@ def test_summary_requires_matching_marine_quality_and_keeps_gate_closed(
         )
     (tmp_path / "report.json").write_text("{}")
     (tmp_path / "continuation").mkdir()
+    downloads = tmp_path / "continuation/downloads"
+    downloads.mkdir()
+    for row in rows:
+        receipt_path = downloads / (row["product"] + ".json")
+        inventory = {
+            "manifest.safe": "0" * 64,
+            "measurement/hh.tiff": "1" * 64,
+            "measurement/hv.tiff": "2" * 64,
+            "annotation/hh.xml": "3" * 64,
+            "preview/quick-look.png": "4" * 64,
+        }
+        if row["mode"] == "EW" and marine_case == "download_inventory":
+            inventory["measurement/hv.tiff"] = "9" * 64
+        if row["mode"] == "EW" and marine_case == "download_annotation_added":
+            inventory["annotation/extra.xml"] = "9" * 64
+        receipt_path.write_text(
+            json.dumps({"catalogue": {"Name": row["product"]}, "safe_files_sha256": inventory})
+        )
+        row["download_receipt_sha256"] = file_digest(receipt_path)
+        if row["mode"] == "EW" and marine_case == "download_changed":
+            receipt_path.write_bytes(receipt_path.read_bytes() + b" ")
+        if row["mode"] == "EW" and marine_case == "download_missing":
+            receipt_path.unlink()
     (tmp_path / "continuation/report.json").write_text(
         json.dumps({"policy": policy, "products": rows, "downloaded_archive_bytes": 2})
     )
@@ -336,8 +368,11 @@ def test_summary_requires_matching_marine_quality_and_keeps_gate_closed(
         )
     )
     monkeypatch.setattr(sys, "argv", ["finalise_acquisition_report", "--report-dir", str(tmp_path)])
-    if marine_case != "valid":
-        with pytest.raises(ValueError, match="marine quality"):
+    if marine_case not in {"valid", "processing_reject"}:
+        with pytest.raises(
+            ValueError,
+            match="Acquisition" if marine_case.startswith("download") else "marine quality",
+        ):
             main()
         assert not (tmp_path / "current-status.json").exists()
         return
@@ -348,12 +383,85 @@ def test_summary_requires_matching_marine_quality_and_keeps_gate_closed(
     assert summary["step2_complete"] is False
     assert summary["scientific_release_granted"] is False
     assert len(summary["products"]) == 2
+    if marine_case == "processing_reject":
+        rejected = next(p for p in summary["products"] if p["mode"] == "IW")
+        assert rejected["status"] == "processing_reject"
+        assert rejected["quality_passed"] is False
+        assert rejected["nonpositive_HV_fraction"] is None
+        assert rejected["quality_reasons"] == ["Missing noise annotation"]
     coverage = json.loads((tmp_path / "current-coverage.geojson").read_text())
     assert len(coverage["features"]) == 2
     assert {f["properties"]["mode"] for f in coverage["features"]} == {"EW", "IW"}
     assert all(f["geometry"] == footprint for f in coverage["features"])
     with pytest.raises(FileExistsError, match="Preserve"):
         main()
+
+
+@pytest.mark.parametrize("artifact", ["current-coverage.geojson", "current-coverage.png"])
+def test_aggregation_refuses_partial_existing_publication(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, artifact: str
+) -> None:
+    occupied = tmp_path / artifact
+    occupied.write_bytes(b"historical coverage")
+    monkeypatch.setattr(sys, "argv", ["finalise", "--report-dir", str(tmp_path)])
+    with pytest.raises(FileExistsError, match="Preserve"):
+        main()
+    assert occupied.read_bytes() == b"historical coverage"
+    assert not (tmp_path / "current-status.json").exists()
+
+
+@pytest.mark.parametrize("autocrlf", ["true", "false"])
+def test_original_audit_byte_contract_survives_git_checkout(tmp_path: Path, autocrlf: str) -> None:
+    import hashlib
+    import subprocess
+
+    root = Path(__file__).resolve().parents[2]
+    folder = Path("docs/audits/pr6-9")
+    report = json.loads((root / folder / "report.json").read_bytes())
+    baseline = json.loads((root / "docs/processing-validation/v2/report.json").read_bytes())
+    contracts = {folder / "report.json": baseline["baseline_report_sha256"]}
+    required = {w["reference_receipt_sha256"] for p in report["sentinel1"] for w in p["windows"]}
+    assert len(required) == 27
+    for path in (root / folder / "reference-receipts").glob("*.json"):
+        digest = file_digest(path)
+        assert digest in required
+        contracts[path.relative_to(root)] = digest
+    assert len(contracts) == 28
+    (tmp_path / ".gitattributes").write_bytes((root / ".gitattributes").read_bytes())
+    (tmp_path / ".gitignore").write_bytes((root / ".gitignore").read_bytes())
+
+    def git(*args: str) -> bytes:
+        return subprocess.check_output(
+            ["git", "-C", str(tmp_path), "-c", f"core.autocrlf={autocrlf}", *args]
+        )
+
+    git("init", "--quiet")
+    for path, expected in contracts.items():
+        assert (
+            hashlib.sha256(
+                subprocess.check_output(["git", "-C", str(root), "show", ":" + path.as_posix()])
+            ).hexdigest()
+            == expected
+        )
+        target = tmp_path / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((root / path).read_bytes())
+    git("add", ".gitattributes", *(p.as_posix() for p in contracts))
+    for path, expected in contracts.items():
+        assert hashlib.sha256(git("show", ":" + path.as_posix())).hexdigest() == expected
+        (tmp_path / path).unlink()
+        git("checkout-index", "--force", path.as_posix())
+        assert file_digest(tmp_path / path) == expected
+    published_receipt = (
+        tmp_path / "docs/processing-validation/v3/continuation/downloads/fixture.json"
+    )
+    published_receipt.parent.mkdir(parents=True)
+    published_receipt.write_text("{}")
+    git("add", published_receipt.relative_to(tmp_path).as_posix())
+    assert git("show", ":" + published_receipt.relative_to(tmp_path).as_posix()).strip() == b"{}"
+    assert git("check-ignore", "downloads/private.json").strip() == b"downloads/private.json"
+    raster = "docs/processing-validation/v3/continuation/downloads/raw.tiff"
+    assert git("check-ignore", raster).decode().strip() == raster
 
 
 def test_published_processing_artifacts_preserve_their_recorded_byte_contract() -> None:

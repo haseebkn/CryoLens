@@ -25,6 +25,24 @@ from cryolens.preprocess.quality import QualityPolicy
 from cryolens.preprocess.safe_reader import _open_path
 
 
+def publication_quality(path: Path, require_binding: bool = False) -> dict[str, Any]:
+    quality: dict[str, Any] = json.loads(path.read_text())
+    policy = QualityPolicy().model_dump()
+    if quality.get("scope") != "full_measurement_grid" or quality.get("policy") != policy:
+        raise ValueError("Unqualified quality-report scope or changed thresholds")
+    binding_path = path.with_suffix(".binding.json")
+    if binding_path.is_file():
+        binding = json.loads(binding_path.read_text())
+        if (
+            binding.get("report_sha256") != file_digest(path)
+            or binding.get("inputs_and_code", {}).get("policy") != policy
+        ):
+            raise ValueError("Quality binding report digest or policy changed")
+    elif require_binding:
+        raise ValueError("New scan lacks a strict source-bound execution")
+    return quality
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, required=True)
@@ -51,9 +69,7 @@ def main() -> None:
     for p in quality_paths:
         if p.name.endswith(".binding.json"):
             continue
-        q = json.loads(p.read_text())
-        if q.get("scope") != "full_measurement_grid" or q["policy"] != QualityPolicy().model_dump():
-            raise ValueError("Unqualified quality-report scope or changed thresholds")
+        q = publication_quality(p)
         name = q["product"]
         if name in quality_by_name and quality_by_name[name][1]["channels"] != q["channels"]:
             raise ValueError("Independent scans disagree")
@@ -62,16 +78,7 @@ def main() -> None:
         for path in directory.glob("*.json"):
             if path.name.endswith(".binding.json"):
                 continue
-            q = json.loads(path.read_text())
-            binding_path = path.with_suffix(".binding.json")
-            binding = json.loads(binding_path.read_text())
-            if (
-                q.get("scope") != "full_measurement_grid"
-                or q["policy"] != QualityPolicy().model_dump()
-                or binding["report_sha256"] != file_digest(path)
-                or binding["inputs_and_code"]["policy"] != QualityPolicy().model_dump()
-            ):
-                raise ValueError("New scan lacks a strict source-bound execution")
+            q = publication_quality(path, require_binding=True)
             quality_by_name[q["product"]] = (path, q)
     rows = []
     for name, r in selected.items():

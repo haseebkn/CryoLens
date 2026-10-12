@@ -8,6 +8,8 @@ build/
 develop-eggs/
 dist/
 downloads/
+!docs/processing-validation/**/downloads/
+!docs/processing-validation/**/downloads/*.json
 eggs/
 .eggs/
 lib/

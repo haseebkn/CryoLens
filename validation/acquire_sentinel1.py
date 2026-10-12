@@ -225,7 +225,8 @@ def main() -> None:
                 "purpose": "processing development only; excluded from frozen test groups",
                 "safe_files_sha256": safe_file_inventory(safe),
             }
-            receipt_path.write_text(json.dumps(receipt, indent=2, allow_nan=False))
+            with receipt_path.open("x", encoding="utf-8") as stream:
+                json.dump(receipt, stream, indent=2, allow_nan=False)
             print("Downloaded and verified authentic SAFE:", name, "bytes", total, flush=True)
         quality_inputs = {
             "safe_files_sha256": receipt["safe_files_sha256"],
@@ -235,21 +236,26 @@ def main() -> None:
             "scan_block_rows": 32,
         }
         if not quality.exists():
+            if quality.with_suffix(".binding.json").exists():
+                raise FileExistsError(
+                    "Preserve existing quality binding; choose a new --quality-dir"
+                )
             print("Full quality scan:", name, flush=True)
             try:
                 result = assess_safe_product(SAFEProductReader(safe), quality, block_rows=32)
             except ProcessingQualityError as e:
                 result = e.report
-            quality.with_suffix(".binding.json").write_text(
-                json.dumps(
-                    {
-                        "inputs_and_code": quality_inputs,
-                        "report_sha256": file_digest(quality),
-                    },
-                    indent=2,
-                    allow_nan=False,
+            with quality.with_suffix(".binding.json").open("x", encoding="utf-8") as stream:
+                stream.write(
+                    json.dumps(
+                        {
+                            "inputs_and_code": quality_inputs,
+                            "report_sha256": file_digest(quality),
+                        },
+                        indent=2,
+                        allow_nan=False,
+                    )
                 )
-            )
         else:
             result = load_quality_cache(quality, quality_inputs)
         print(

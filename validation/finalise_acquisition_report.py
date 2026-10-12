@@ -17,30 +17,32 @@ from cryolens.eval.cohort import file_digest
 from cryolens.geo.aoi import load_aoi
 from cryolens.preprocess.provenance import original_inventory
 from cryolens.preprocess.quality import QualityPolicy
+from cryolens.preprocess.safe_reader import _open_path
 
 
 def export_coverage(root: Path, rows: list[dict[str, Any]]) -> None:
     path = root / "current-coverage.geojson"
     if path.exists():
         raise FileExistsError("Preserve existing coverage evidence")
-    path.write_text(
-        json.dumps(
-            {
-                "type": "FeatureCollection",
-                "features": [
-                    {
-                        "type": "Feature",
-                        "geometry": row["footprint"],
-                        "properties": {
-                            key: value for key, value in row.items() if key != "footprint"
-                        },
-                    }
-                    for row in rows
-                ],
-            },
-            indent=2,
+    with path.open("x", encoding="utf-8") as stream:
+        stream.write(
+            json.dumps(
+                {
+                    "type": "FeatureCollection",
+                    "features": [
+                        {
+                            "type": "Feature",
+                            "geometry": row["footprint"],
+                            "properties": {
+                                key: value for key, value in row.items() if key != "footprint"
+                            },
+                        }
+                        for row in rows
+                    ],
+                },
+                indent=2,
+            )
         )
-    )
 
 
 def main() -> None:
@@ -48,7 +50,10 @@ def main() -> None:
     parser.add_argument("--report-dir", type=Path, required=True)
     args = parser.parse_args()
     root = args.report_dir
-    if (root / "current-status.json").exists():
+    if any(
+        (root / name).exists()
+        for name in ("current-status.json", "current-coverage.geojson", "current-coverage.png")
+    ):
         raise FileExistsError("Preserve the current-status snapshot; choose a new version")
     search = json.loads((root / "continuation/report.json").read_text())
     if search["policy"] != QualityPolicy().model_dump():
@@ -62,6 +67,8 @@ def main() -> None:
         product = report["products"][0]
         if product["quality"]["policy"] != QualityPolicy().model_dump():
             raise ValueError("Processing evidence changed the strict quality policy")
+        if product["product"] in evidence:
+            raise ValueError("Duplicate processing product evidence")
         evidence[product["product"]] = (report, path.relative_to(root).as_posix())
     marine = json.loads((root / "ew-northern-qualified/marine-quality.json").read_text())
     ew_report = next(
@@ -79,17 +86,61 @@ def main() -> None:
     ):
         raise ValueError("EW marine quality is absent, rejected or bound to different processing")
     rows = []
+    seen = set()
     for source in search["products"]:
         if "archive_bytes" not in source:
             continue
+        if Path(source["product"]).name != source["product"] or "\\" in source["product"]:
+            raise ValueError("Invalid acquisition product name")
         comparison, path = evidence.get(source["product"], ({}, ""))
+        if source["product"] in seen:
+            raise ValueError("Duplicate acquisition-search product")
+        seen.add(source["product"])
+        quality = source["quality"]
+        if quality.get("policy") != QualityPolicy().model_dump():
+            raise ValueError("Acquisition quality changed the strict policy")
+        if comparison:
+            receipt_path = Path(
+                _open_path(root / "continuation/downloads" / (source["product"] + ".json"))
+            )
+            if not receipt_path.is_file() or file_digest(receipt_path) != source.get(
+                "download_receipt_sha256"
+            ):
+                raise ValueError("Acquisition download receipt missing or changed")
+            receipt = json.loads(receipt_path.read_text())
+            product = comparison["products"][0]
+            inventory = {
+                name: value
+                for name, value in receipt.get("safe_files_sha256", {}).items()
+                if name == "manifest.safe"
+                or (name.startswith("annotation/") and name.endswith(".xml"))
+                or (Path(name).parent.as_posix() == "measurement" and name.endswith(".tiff"))
+            }
+            if (
+                receipt.get("catalogue", {}).get("Name") != source["product"]
+                or (
+                    "catalogue_id" in source
+                    and receipt.get("catalogue", {}).get("Id") != source["catalogue_id"]
+                )
+                or product["mode"] != source["mode"]
+                or inventory != original_inventory(product.get("provenance", {}))
+            ):
+                raise ValueError("Acquisition source inventory differs from processing")
+        fraction = quality.get("channels", {}).get("HV", {}).get("nonpositive_fraction")
+        quality_passed = quality["passed"] and fraction is not None
         row = {
             "product": source["product"],
             "mode": source["mode"],
             "date": source["acquired_utc"],
             "footprint": source["footprint"],
-            "quality_passed": source["quality"]["passed"],
-            "nonpositive_HV_fraction": source["quality"]["channels"]["HV"]["nonpositive_fraction"],
+            "quality_passed": quality_passed,
+            "quality_reasons": quality.get("reasons", []),
+            "status": "processing_reject"
+            if fraction is None
+            else "radiometric_pass"
+            if quality_passed
+            else "radiometric_reject",
+            "nonpositive_HV_fraction": fraction,
             "scientific_comparison_passed": comparison.get("scientific_comparison_passed", False),
             "passing_product_checks": comparison.get("deployment_gate_open", False),
             "comparison_report": path or None,
@@ -119,7 +170,8 @@ def main() -> None:
         ],
         "products": rows,
     }
-    (root / "current-status.json").write_text(json.dumps(status, indent=2, allow_nan=False))
+    with (root / "current-status.json").open("x", encoding="utf-8") as stream:
+        json.dump(status, stream, indent=2, allow_nan=False)
     export_coverage(root, rows)
     fig, ax = plt.subplots(figsize=(9, 11), constrained_layout=True)
     aoi = load_aoi()

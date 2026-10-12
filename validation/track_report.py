@@ -212,9 +212,8 @@ def main() -> None:
             "git_commit": run.client.get_run(run.run_id).data.tags["git_commit"],
             "git_dirty": run.client.get_run(run.run_id).data.tags["git_dirty"],
         }
-    (args.report_dir / "tracking_receipt.json").write_text(
-        json.dumps(receipt, indent=2), encoding="utf-8"
-    )
+    with (args.report_dir / "tracking_receipt.json").open("x", encoding="utf-8") as stream:
+        json.dump(receipt, stream, indent=2)
     print(json.dumps(receipt, indent=2))
 
 
