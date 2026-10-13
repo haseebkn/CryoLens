@@ -3,7 +3,7 @@
 Implemented 2026-10-05. This is an executable analyst workflow and a measured
 availability pilot. It does not provide iceberg ground truth, precision, recall,
 or a false-alarm estimate. Fresh Sentinel-1 SAFE deployment remains gated by
-the [processing validation](../../processing-validation/v4/README.md).
+the [processing validation release boundary](../../processing-validation/v5/README.md#release-boundary).
 
 ## Measured availability
 

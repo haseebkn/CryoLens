@@ -102,11 +102,11 @@ comparison with trusted processing on real SAFE products. Running SNAP and
 then ignoring its output is no longer presented as a successful SNAP pipeline.
 Unsupported engines and missing inputs fail explicitly.
 
-### Validation outcome, 2026-10-12
+### Validation outcome, 2026-10-13
 
 The [current processing report](processing-validation/v5/README.md) owns the
-representative EW/IW outcomes and remaining qualifications. Its adaptive
-development search does not establish seasonal availability, absolute field
+representative EW/IW outcomes and remaining qualifications. Representative
+development observations do not establish seasonal availability, absolute field
 accuracy or a regional false-alarm budget. Historical failures remain retained.
 
 
@@ -114,11 +114,13 @@ The [reproducible processing report](processing-validation/v2/README.md)
 supersedes the earlier scene-median comparison. Similar extents and medians
 did not confirm calibration or absolute geolocation accuracy.
 
-The report owns the corrected comparison results, full-product quality rejections
-and historical short-block invalidation with its separately executed replacement.
-Comparisons against SNAP do not establish surveyed absolute accuracy or
-whole-footprint gridding. The fresh SAFE deployment gate remains closed, and
-rejected products write machine-readable reasons before detection. Negative
+That historical report owns the earlier comparison results, full-product quality
+rejections and historical short-block invalidation with its separately executed
+replacement.
+Comparisons against SNAP do not establish surveyed absolute accuracy. Current
+complete-output qualification is owned by the report linked above. The fresh SAFE
+deployment gate remains closed, and rejected products write machine-readable
+reasons before detection. Negative
 residuals are retained for diagnostics; no positive floor manufactures data.
 The 5% non-positive threshold is a research acceptance preset, not a published
 ESA or C-CORE requirement.

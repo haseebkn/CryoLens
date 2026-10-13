@@ -1,6 +1,6 @@
 # Southern Newfoundland IW processing validation, v4
 
-**One real Grand Banks IW acquisition now passes the unchanged full-grid, marine-domain and nine-window SNAP checks.** The earlier [northern Labrador EW example](../v3/source-bound-approval/README.md) remains qualified. This demonstrates working EW and IW processing on representative real products; it does not grant province-wide, year-round or navigational readiness. The enclosing step-2 and scientific-release flags remain closed pending the broader qualifications below.
+**Historical southern acquisition investigation; see [v5](../v5/README.md) for current complete-output qualification.** One real Grand Banks IW acquisition passed the unchanged full-grid, marine-domain and nine-window SNAP checks. The earlier [northern Labrador EW example](../v3/source-bound-approval/README.md) was also qualified. The enclosing step-2 and scientific-release flags in this investigation stayed closed. These retained acquisition outcomes do not grant province-wide, year-round or navigational readiness.
 
 ## Evidence packaging
 

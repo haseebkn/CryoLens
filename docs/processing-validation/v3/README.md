@@ -1,6 +1,6 @@
 # Sentinel-1 acquisition suitability investigation, v3
 
-**Roadmap step 2 is still incomplete.** Ten authentic CDSE products (three EW,
+**Historical acquisition investigation; see [v5](../v5/README.md) for current processing qualification.** At this stage, roadmap step 2 was incomplete. Ten authentic CDSE products (three EW,
 seven IW; 7,676,577,999 compressed bytes) were downloaded and independently
 verified. One northern Labrador EW product passes the fixed nine-window SNAP
 comparisons plus the unchanged whole-image and NL marine quality checks.
@@ -214,7 +214,7 @@ that publication into a fresh destination and checks one qualified EW, rejected 
 and closed release gates; historical status outputs remain unchanged.
 
 For subsequent southern IW evidence and the remaining step-2 qualifications,
-see the [current processing report](../v4/README.md). If standard subtraction
+see the [southern acquisition report](../v4/README.md). Current complete-output qualification is owned by [v5](../v5/README.md). If standard subtraction
 remains unsuitable, a validated alternative needs matched signed-power, spatial
 and downstream checks; the unqualified NERSC experiment is not assumed to solve it.
 This v3 investigation supplies no iceberg identity, precision, recall or empirical

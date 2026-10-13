@@ -14,12 +14,12 @@ Precision, recall and a real-world false-positive rate have **not** been establi
 
 Across **25 Sentinel-1 acquisitions** (28 eligible, 3 fully masked by the
 conservative open-water filter), the screening path retained **311 unverified
-candidates** over **1,670,147 kmÂ²** of cumulative eligible coverage, or 0.186
-per 1,000 kmÂ². This is a reproducible screening result, not a validated regional
+candidates** over **1,670,147 km²** of cumulative eligible coverage, or 0.186
+per 1,000 km². This is a reproducible screening result, not a validated regional
 false-alarm budget.
 
 It supersedes an earlier three-acquisition smoke run, and is **worse**, not
-better: retained density rose from 0.108 to 0.186 per 1,000 kmÂ² and the
+better: retained density rose from 0.108 to 0.186 per 1,000 km² and the
 suppression factor fell from 38.9x to 19.4x once coverage grew five-fold. Small
 samples flattered the result.
 
@@ -97,6 +97,18 @@ uv run --frozen python -m cryolens.detect --help
 uv run --frozen python -m cryolens.preprocess --help
 ```
 
+For an existing HH/HV SAFE product, ordinary Python preprocessing writes a
+complete corrected research COG and separate source/output receipts into a new
+product directory under `--output-dir`:
+
+```text
+uv run --frozen python -m cryolens.preprocess --engine python --scene path/to/product.SAFE --output-dir data/processed/new-run
+```
+
+Use a fresh output location for each run; occupied product directories are
+refused. See the [processing contract and reference workflow](docs/processing-validation/v5/README.md)
+for memory controls, fixed output geometry and the separate detection release.
+
 Raw imagery, credentials, trained weights and generated databases are excluded
 from Git. GSHHG shorelines are public and are required by the raw COG detection
 path (`make fetch-shorelines` on systems with Make). See
@@ -134,7 +146,7 @@ successful downloading and mode parsing do not establish detection coverage.
 
 The hand-defined study polygon covers the Labrador coastal corridor, Northeast
 Newfoundland Shelf and Grand Banks. It is stored in `configs/aoi.geojson` and
-bounded by 60.5Â°Wâ€“44Â°W, 42.5Â°Nâ€“60.5Â°N. It is **not a provincial boundary or EEZ**.
+bounded by 60.5°W–44°W, 42.5°N–60.5°N. It is **not a provincial boundary or EEZ**.
 Land and coastal exclusion are separate from this marine research area.
 Intersecting scenes may be loaded, but pixels and candidate centres outside
 the study area are excluded. Coverage is reported as analyzed area; masked
@@ -159,13 +171,13 @@ only; its chart labels and model evaluation remain sealed.
 
 See the [current SAFE processing evidence](docs/processing-validation/v5/README.md)
 for authentic downloads, representative passing products, retained rejections
-and the closed step-2, regional deployment and scientific-release gates.
+and the separate regional deployment and scientific-release gates.
 The [prior processing corrections](docs/processing-validation/v2/README.md)
 remain documented.
 
 The [Sentinel-2 paired-review report](docs/optical-review/v1/README.md) records
 live searches of all 25 evaluated development acquisitions: 15 have optical
-footprint overlap within Â±12 hours. A selected two-scene pilot has downloaded
+footprint overlap within ±12 hours. A selected two-scene pilot has downloaded
 optical pixels for 1 of 34 candidates; none passes the conservative visibility
 screen. These are availability measurements, not iceberg labels or regional
 coverage estimates. Missing optical evidence never automatically rejects a

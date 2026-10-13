@@ -47,7 +47,7 @@ This document records the foundational architectural decisions, scientific const
   * UTM Zone 22N ($54^\circ\text{W}$ to $48^\circ\text{W}$)
   * UTM Zone 23N ($48^\circ\text{W}$ to $42^\circ\text{W}$, outer Flemish Cap)
 * **Decision:** Use **`EPSG:3978` (NAD83 / Canada Atlas Lambert)** as the unified project CRS.
-* **Rationale:** 
+* **Rationale:**
   * Lambert Conformal Conic (LCC) is a **conformal** projection (preserves local angles and shapes).
   * Preserving angular fidelity is critical for drift trajectory modeling, force-balance vector additions, and shape-ratio estimation of targets.
   * Avoids boundary discontinuities, tile seam distortion, and multi-CRS joins across the $54^\circ\text{W}$ and $48^\circ\text{W}$ meridians.

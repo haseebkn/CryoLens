@@ -19,19 +19,25 @@ The eighteen reference receipts and logs represent eighteen distinct new SNAP ex
 
 The maintained Python command visits the entire source measurement grid in bounded stripes, applies the measured calibration and thermal-noise annotations, and writes the whole footprint in bounded destination blocks. Signed non-positive observations are counted before their invalid logarithmic support is masked. There is no positive floor or noise rescaling. Bilinear sampling operates in linear power, with a one-pixel source halo and common HH/HV/incidence validity; the ratio is computed from the final HH/HV decibels.
 
-All four bands use EPSG:3978 at 40 m spacing. The extent covers all projected annotation knots with an explicit two-pixel margin. A hash-bound independent SNAP grid can set the grid phase, avoiding an additional interpolation during matched comparison. This changes neither measurements nor pixel spacing. It is recorded in the preprocessing configuration.
+All four bands use EPSG:3978 at 40 m spacing. The extent covers all projected annotation knots with an explicit two-pixel margin. `--grid-reference` optionally supplies an independently generated north-up EPSG:3978/40 m grid phase, avoiding an additional interpolation during matched comparison. This changes neither measurements nor pixel spacing; the reference file hash is recorded in the preprocessing configuration.
 
 The output is a complete source-footprint research derivative. Target analysis and serving remain restricted to the shared NL marine AOI; the full raster is not provincial surveyed coverage. Marine mean-sea-surface geometry does not establish terrain or independent absolute ground accuracy.
 
+The Python CLI and pipeline share this producer. `--block-size` controls destination
+processing tiles (default 256, allowed 16–512); `--scan-rows` controls source quality
+stripes (default 32, positive integer). A source window exceeding 4,000,000 pixels
+fails with a request for a smaller block. These controls do not change the fixed
+output CRS or spacing.
+
 ## Unchanged checks
 
-The source policy remains `safe-quality-v1`: at most 5% non-positive finite power, at least 10% finite observations, incidence 15Ã¢â‚¬â€œ50 degrees, and HH/HV annotation geolocation agreement within 20 m. These are project research thresholds.
+The source policy remains `safe-quality-v1`: at most 5% non-positive finite power, at least 10% finite observations, incidence 15–50 degrees, and HH/HV annotation geolocation agreement within 20 m. These are project research thresholds.
 
-The nine fixed 512Ãƒâ€”512 windows per product keep the existing matched-pixel limits: calibration and signed-noise p95 absolute error at most 0.02 dB, sign mismatch at most 0.0001, annotation differences at most 20 m, incidence differences at most 0.05 degrees, relative registration at most 40 m, and corrected reprojection p95 absolute error at most 1 dB with at least 4,096 matched pixels.
+The nine fixed 512×512 windows per product keep the existing matched-pixel limits: calibration and signed-noise p95 absolute error at most 0.02 dB, sign mismatch at most 0.0001, annotation differences at most 20 m, incidence differences at most 0.05 degrees, relative registration at most 40 m, and corrected reprojection p95 absolute error at most 1 dB with at least 4,096 matched pixels.
 
 `validation-corrected-output-v1.xml` geocodes the **noise-corrected** calibration branch with actual SNAP 14. It preserves unclipped signed noise in the sensor-coordinate comparison. This is separate from the older raw-power geometric diagnostics.
 
-Every full-resolution output pixel and every stored overview pixel is inspected for common nodata, finite values, incidence, ratio identity, CRS/grid and COG integrity. Separate source-scan, output-quality and processing receipts preserve their exact hashes. Occupied product output locations are refused. Source inputs are hashed before and after the complete execution; actual executing code and non-secret configuration are archived independently of later review fixes.
+Every full-resolution output pixel and every stored overview pixel is inspected for common nodata, finite values, incidence, ratio identity, CRS/grid and COG integrity. Each new product directory retains `source-quality.json`, `output-quality.json` and `processing-receipt.json` separately with their exact hashes. Occupied product output locations are refused. Failed executions retain `processing-failure.json`; retry in a fresh location rather than overwriting them. Source inputs are hashed before and after the complete execution; the source inventory, actual executing code and non-secret configuration are archived independently of later review fixes.
 
 ## Reproduce
 
