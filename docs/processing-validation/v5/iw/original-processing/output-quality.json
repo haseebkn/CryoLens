@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "scope": "complete_corrected_output",
+  "passed": true,
+  "reasons": [],
+  "cog_errors": [],
+  "cog_warnings": [],
+  "shape": [
+    7005,
+    7870
+  ],
+  "transform": [
+    40.0,
+    0.0,
+    2995341.9440173022,
+    0.0,
+    -40.0,
+    959941.9164864671,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "pixel_spacing_m": 40,
+  "total_pixels": 55129350,
+  "valid_pixels": 25255613,
+  "valid_fraction": 0.4581155591350161,
+  "invalid_incidence_pixels": 0,
+  "inconsistent_ratio_pixels": 0,
+  "mismatched_nodata_pixels": 0,
+  "nonfinite_values": 0,
+  "band_ranges": {
+    "sigma0_hh_db": [
+      -30.47783660888672,
+      7.356475830078125
+    ],
+    "sigma0_hv_db": [
+      -53.99543380737305,
+      -12.633437156677246
+    ],
+    "ratio_hh_hv": [
+      -7.992221832275391,
+      42.98004150390625
+    ],
+    "incidence_angle": [
+      30.573810577392578,
+      45.76024627685547
+    ]
+  },
+  "output_sha256": "9db494c9efc1c082f9e646f379b73f346a8edc43827191dcdf71e8f2f48c3269",
+  "policy": {
+    "version": "safe-quality-v1",
+    "max_nonpositive_fraction": 0.05,
+    "min_valid_fraction": 0.1,
+    "incidence_min_deg": 15.0,
+    "incidence_max_deg": 50.0,
+    "max_polarization_geolocation_error_m": 20.0
+  }
+}

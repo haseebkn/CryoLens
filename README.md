@@ -14,12 +14,12 @@ Precision, recall and a real-world false-positive rate have **not** been establi
 
 Across **25 Sentinel-1 acquisitions** (28 eligible, 3 fully masked by the
 conservative open-water filter), the screening path retained **311 unverified
-candidates** over **1,670,147 km²** of cumulative eligible coverage, or 0.186
-per 1,000 km². This is a reproducible screening result, not a validated regional
+candidates** over **1,670,147 kmÂ²** of cumulative eligible coverage, or 0.186
+per 1,000 kmÂ². This is a reproducible screening result, not a validated regional
 false-alarm budget.
 
 It supersedes an earlier three-acquisition smoke run, and is **worse**, not
-better: retained density rose from 0.108 to 0.186 per 1,000 km² and the
+better: retained density rose from 0.108 to 0.186 per 1,000 kmÂ² and the
 suppression factor fell from 38.9x to 19.4x once coverage grew five-fold. Small
 samples flattered the result.
 
@@ -125,7 +125,7 @@ An earlier version of this project asserted the opposite. IW over the Grand Bank
 is roughly 76 percent dual-pol HH+HV, so the polarimetric basis survives.
 
 The reader supports annotated IW GRD HH/HV measurements. The
-[current processing report](docs/processing-validation/v4/README.md) owns the
+[current processing report](docs/processing-validation/v5/README.md) owns the
 representative EW/IW outcomes and remaining qualification requirements.
 **Operational southern NL coverage remains unvalidated**;
 successful downloading and mode parsing do not establish detection coverage.
@@ -134,7 +134,7 @@ successful downloading and mode parsing do not establish detection coverage.
 
 The hand-defined study polygon covers the Labrador coastal corridor, Northeast
 Newfoundland Shelf and Grand Banks. It is stored in `configs/aoi.geojson` and
-bounded by 60.5°W–44°W, 42.5°N–60.5°N. It is **not a provincial boundary or EEZ**.
+bounded by 60.5Â°Wâ€“44Â°W, 42.5Â°Nâ€“60.5Â°N. It is **not a provincial boundary or EEZ**.
 Land and coastal exclusion are separate from this marine research area.
 Intersecting scenes may be loaded, but pixels and candidate centres outside
 the study area are excluded. Coverage is reported as analyzed area; masked
@@ -157,7 +157,7 @@ and supports concealed repeats, adjudication and exact coverage masks. The
 rate is available.** January test SAR was prepared for human reference review
 only; its chart labels and model evaluation remain sealed.
 
-See the [current SAFE processing evidence](docs/processing-validation/v4/README.md)
+See the [current SAFE processing evidence](docs/processing-validation/v5/README.md)
 for authentic downloads, representative passing products, retained rejections
 and the closed step-2, regional deployment and scientific-release gates.
 The [prior processing corrections](docs/processing-validation/v2/README.md)
@@ -165,7 +165,7 @@ remain documented.
 
 The [Sentinel-2 paired-review report](docs/optical-review/v1/README.md) records
 live searches of all 25 evaluated development acquisitions: 15 have optical
-footprint overlap within ±12 hours. A selected two-scene pilot has downloaded
+footprint overlap within Â±12 hours. A selected two-scene pilot has downloaded
 optical pixels for 1 of 34 candidates; none passes the conservative visibility
 screen. These are availability measurements, not iceberg labels or regional
 coverage estimates. Missing optical evidence never automatically rejects a
@@ -200,8 +200,8 @@ are absent. CI uses locked dependencies and a real PostGIS service.
 | Analyst review and geographic API | Implemented; local API-key protection |
 | Independent target references | Real packets and human review underway; repeat review and adjudication pending. AI assistance must be disclosed; see the [roadmap audit](docs/ROADMAP_AUDIT.md) |
 | Sentinel-2 paired review | Planetary Computer and CDSE providers; verified original SAFE alternative, native crops, cloud/shadow/valid-data screening and separate attributed evidence; pilot coverage is limited |
-| SAFE EW/IW calibration and geolocation | Marine range-Doppler, EGM96 height, residual timing and matched SNAP checks; see [current validation](docs/processing-validation/v4/README.md). Absolute geolocation accuracy is not established |
-| ESA standard thermal noise removal | Sampled agreement does not establish usable observations; see the [current processing outcomes](docs/processing-validation/v4/README.md) |
+| SAFE EW/IW calibration and geolocation | Marine range-Doppler, EGM96 height, residual timing and matched SNAP checks; see [current validation](docs/processing-validation/v5/README.md). Absolute geolocation accuracy is not established |
+| ESA standard thermal noise removal | Sampled agreement does not establish usable observations; see the [current processing outcomes](docs/processing-validation/v5/README.md) |
 | Fresh SAFE detection deployment | Blocked by separate processing-quality and scientific-release gates; no current producer grants a release |
 | Precise-orbit acquisition | Implemented; POEORB/RESORB fetched from public ESA/ASF mirrors, no credentials needed |
 | Precise-orbit **correction** in Python pipeline | Not applied; marine geocoding uses annotated orbit/range metadata and records that source |

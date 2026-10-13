@@ -104,7 +104,7 @@ Unsupported engines and missing inputs fail explicitly.
 
 ### Validation outcome, 2026-10-12
 
-The [current processing report](processing-validation/v4/README.md) owns the
+The [current processing report](processing-validation/v5/README.md) owns the
 representative EW/IW outcomes and remaining qualifications. Its adaptive
 development search does not establish seasonal availability, absolute field
 accuracy or a regional false-alarm budget. Historical failures remain retained.

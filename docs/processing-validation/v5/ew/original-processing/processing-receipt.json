@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "recipe_id": "complete-corrected-safe-v1",
+  "product": "S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG.SAFE",
+  "started_at": "2026-10-13T05:36:49.297729+00:00",
+  "completed_at": "2026-10-13T05:58:12.974446+00:00",
+  "source_files_sha256": {
+    "manifest.safe": "861aca2ce7638857f2bc447efe81147f9249f149e1dfc808ec62ee0c1acb502e",
+    "measurement/s1c-ew-grd-hh-20260325t212436-20260325t212536-006926-00e035-001-cog.tiff": "d982c25be16e137eff1245195607e53b28608bcd75cd034fe996f65d8b808776",
+    "measurement/s1c-ew-grd-hv-20260325t212436-20260325t212536-006926-00e035-002-cog.tiff": "38e104018cf97735234ab39345eb7b92f325f6f14d9f88c1724e1ec4caf98790",
+    "annotation/calibration/calibration-s1c-ew-grd-hh-20260325t212436-20260325t212536-006926-00e035-001-cog.xml": "7c717999177dd7b8954ccde82a86782450cbb35fc15e8ba5fc6e9d068fe1f443",
+    "annotation/calibration/calibration-s1c-ew-grd-hv-20260325t212436-20260325t212536-006926-00e035-002-cog.xml": "5c7182847c0ae398baca76d7d1fc04c1b0838737a708efa32a0f4279a6488635",
+    "annotation/calibration/noise-s1c-ew-grd-hh-20260325t212436-20260325t212536-006926-00e035-001-cog.xml": "1c6e4b03bf89c88aa4e2e26b99804dc8ae55bd481faba00e444716fe2e16fce2",
+    "annotation/calibration/noise-s1c-ew-grd-hv-20260325t212436-20260325t212536-006926-00e035-002-cog.xml": "facb8c2e8c7cf9b024512a4bf4e5facbe2c8f3a08bee4750c62995ae7675c8dd",
+    "annotation/rfi/rfi-s1c-ew-grd-hh-20260325t212436-20260325t212536-006926-00e035-001-cog.xml": "9bd5bb1ed02c263f3a74caea69321cf79cb0e36aba3af6e78bab56a6f2c2703e",
+    "annotation/rfi/rfi-s1c-ew-grd-hv-20260325t212436-20260325t212536-006926-00e035-002-cog.xml": "c4e9ace214a556b4ed5742aa5e240e4cfecced6fceca4a72466666e99dc7bcbe",
+    "annotation/s1c-ew-grd-hh-20260325t212436-20260325t212536-006926-00e035-001-cog.xml": "09de185dff7671dea33e6d27c51a57db589f51bf8d58a6dab2b51fd53fefa1ad",
+    "annotation/s1c-ew-grd-hv-20260325t212436-20260325t212536-006926-00e035-002-cog.xml": "2953f218ea97e848479c4817075ac11fc0f71610d054b992a9b0c9bee127ae80"
+  },
+  "source_inventory_sha256": "af4a059afa591dc5c07846165fe350f37992b383645b58ba91ae917404ece16e",
+  "source_quality_sha256": "25a72f846665a96bf087930c6db25ba8ada414edc1db34c1ec7527756ec41b06",
+  "configuration_sha256": "8587122d2a6a5e57ec1d0489bfb6c392dc73ee5071f7654968cf0503bb2126f2",
+  "output_quality_sha256": "02b614792dca111c680a9fe0f3bc88df251e3d0037be060e4304123173d2c3db",
+  "output": "S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG_4band_EPSG3978.tif",
+  "output_sha256": "ec587b122b1f1fd72cc4e22620f01a18aa6f8e64a25d7a4619e7c89d75ca0eb9",
+  "output_bytes": 1762540776,
+  "source_quality_passed": true,
+  "output_quality_passed": true,
+  "traversal": {
+    "destination_pixels": 204045884,
+    "geometry_supported": 101915995,
+    "valid_pixels": 92854683,
+    "invalid_source_support": 9061312
+  },
+  "maximum_source_window_pixels": 138754,
+  "python_version": "3.11.15",
+  "rasterio_version": "1.4.4",
+  "execution_source_sha256": "40c16ac8da1cbde2ffc09b7e69e1112332129be8dc39a7a569ea520d6f2c8fc0",
+  "execution_snapshot_sha256": "01d4766f44bb9ec94bdd930f4faaa5b86ab1e7b61b996640918ed4d7ce6f1db0",
+  "reference_comparison_completed": false,
+  "fresh_detection_allowed": false,
+  "claim_boundary": "Complete corrected product export and structural checks only; independent matched reference validation is required separately."
+}

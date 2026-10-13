@@ -1,0 +1,16 @@
+[
+  {
+    "ObservedAt": "2026-10-13T05:48:24.5548263Z",
+    "Mode": "EW",
+    "ProcessId": 40624,
+    "WorkingSetMB": 150.1,
+    "PeakWorkingSetMB": 172.6
+  },
+  {
+    "ObservedAt": "2026-10-13T05:48:24.5696300Z",
+    "Mode": "IW",
+    "ProcessId": 46940,
+    "WorkingSetMB": 241.1,
+    "PeakWorkingSetMB": 296.9
+  }
+]

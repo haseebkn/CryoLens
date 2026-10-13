@@ -76,11 +76,10 @@ endpoints:
     # across the 2020, 2024 and 2026 seasons). Those southern waters are covered
     # by IW GRDH instead, about 76 percent of it dual-pol HH+HV.
     #
-    # This default therefore restricts catalogue queries to the northern half of
-    # the study area. It is left as EW deliberately: the detection chain assumes
-    # EW geometry (five subswaths, 40 m spacing), so returning IW products here
-    # would hand the pipeline data it cannot correctly process. Covering the
-    # Grand Banks requires IW support, not a wider query.
+    # EW remains the conservative default catalogue query. Representative real
+    # HH/HV EW and southern IW complete corrected products are now validated;
+    # see docs/processing-validation/v5. This does not automatically release
+    # fresh target detection or establish broad seasonal/regional IW coverage.
     instrument_mode: "EW"
     polarizations: ["HH", "HV"]
     product_type: "GRD"

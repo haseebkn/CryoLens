@@ -145,3 +145,6 @@ docs/processing-validation/v4/acquisition-search-verified/metadata/
 docs/processing-validation/v4/selection/
 docs/processing-validation/v4/diagnostics/orbit-check/official-eof/
 !docs/processing-validation/v4/ancillary-evidence.zip
+
+# Complete corrected-output execution snapshots; raster outputs stay local.
+!docs/processing-validation/v5/**/executed-code.zip

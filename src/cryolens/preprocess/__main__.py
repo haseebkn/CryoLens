@@ -7,17 +7,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from cryolens.config.settings import get_app_config
-from cryolens.preprocess.marine_geocoding import MarineGeocoder
-from cryolens.preprocess.python_chain import PurePythonSARProcessor
-from cryolens.preprocess.quality import (
-    ProcessingQualityError,
-    assess_safe_product,
-    record_processing_failure,
-    require_channels,
-)
-from cryolens.preprocess.safe_reader import SAFEProductReader
 from cryolens.preprocess.snap_chain import SNAPChainRunner
-from cryolens.preprocess.stack import COGStackBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +17,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--scene", required=True, help="Path to an existing .SAFE product")
     parser.add_argument("--engine", choices=["python", "snap"], default=None)
     parser.add_argument("--output-dir", default="./data/processed")
+    parser.add_argument("--block-size", type=int, default=256)
+    parser.add_argument("--scan-rows", type=int, default=32)
+    parser.add_argument(
+        "--grid-reference",
+        type=Path,
+        help="Optional independently generated EPSG:3978/40 m reference grid phase",
+    )
     return parser.parse_args()
 
 
@@ -35,7 +32,6 @@ def main() -> int:
     logging.basicConfig(level=logging.INFO)
     config = get_app_config()
     safe = Path(args.scene)
-    quality_path = Path(args.output_dir) / safe.stem / "processing-quality.json"
     if not safe.is_dir():
         logger.error("Input SAFE product does not exist: %s", safe)
         return 1
@@ -43,35 +39,10 @@ def main() -> int:
         if (args.engine or config.project.preprocessing.engine) == "snap":
             SNAPChainRunner().run_preprocessing(safe, output_dir=args.output_dir)
             return 0
-        reader = SAFEProductReader(safe)
-        assess_safe_product(reader, Path(args.output_dir) / safe.stem / "processing-quality.json")
-        hh = reader.read_sigma0("HH")
-        hv = reader.read_sigma0("HV")
-        require_channels(hh, hv, Path(args.output_dir) / safe.stem / "processing-quality.json")
-        processor = PurePythonSARProcessor(
-            target_crs=config.project.spatial.target_crs,
-            pixel_spacing_m=config.project.spatial.pixel_spacing_m,
-        )
-        result = processor.process_calibrated_arrays(
-            hh["sigma0_linear"],
-            hv["sigma0_linear"],
-            hh["incidence_angle_deg"],
-            hh["latitude"],
-            hh["longitude"],
-            apply_denoise=False,
-            marine_geocoder=MarineGeocoder(reader._find_for_polarisation("HH")[1]),
-        )
-        output = COGStackBuilder(args.output_dir).build_and_export_cog(
-            scene_id=safe.stem,
-            bands=result["bands"],
-            transform=result["transform"],
-            crs=result["crs"],
-            nodata=result["nodata"],
-            provenance={
-                "source_kind": "sentinel1_safe",
-                "processing_quality": "passed",
-                **result["geocoding_provenance"],
-            },
+        from cryolens.preprocess.product import process_safe_product
+
+        output = process_safe_product(
+            safe, Path(args.output_dir), args.block_size, args.scan_rows, args.grid_reference
         )
         logger.info(
             "Wrote %s using marine range-Doppler geocoding with EGM96 sea-surface height.",
@@ -79,8 +50,6 @@ def main() -> int:
         )
         return 0
     except (ValueError, OSError, RuntimeError, ET.ParseError) as exc:
-        if not isinstance(exc, ProcessingQualityError):
-            record_processing_failure(quality_path, safe.name, "preprocessing", exc)
         logger.error("Preprocessing failed: %s", exc)
         return 1
 

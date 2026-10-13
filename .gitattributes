@@ -37,3 +37,10 @@ docs/processing-validation/v4/** -text whitespace=cr-at-eol
 docs/processing-validation/v4/**/*.json linguist-generated=true
 docs/processing-validation/v4/**/*.xml linguist-generated=true
 docs/processing-validation/v4/**/*.md text eol=lf
+
+# Complete corrected product evidence is a byte contract.
+configs/sentinel1-complete-output-v1.json -text
+configs/snap/validation-corrected-output-v1.xml -text
+docs/processing-validation/v5/** -text whitespace=cr-at-eol
+docs/processing-validation/v5/**/*.md text eol=lf
+docs/processing-validation/v5/**/*.json linguist-generated=true

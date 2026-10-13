@@ -200,7 +200,7 @@ def test_preprocessing_cli_records_failure_without_export(
     )
     assert main() == 1
     assert not list(output.rglob("*.tif"))
-    receipt = json.loads(next(output.rglob("processing-quality.json")).read_text())
+    receipt = json.loads(next(output.rglob("source-quality.json")).read_text())
     assert receipt["passed"] is False
     assert any("HV" in reason for reason in receipt["reasons"])
 

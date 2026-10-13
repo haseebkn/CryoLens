@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "Lossless BigTIFF COG packaging; no recalibration or changed measurements",
+  "original_processing_receipt_sha256": "23c7a451be8572959822de4ccddea572e449259d958b2fbd120e93bbe70fca9b",
+  "original_output_sha256": "9db494c9efc1c082f9e646f379b73f346a8edc43827191dcdf71e8f2f48c3269",
+  "output": "S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG_4band_EPSG3978.tif",
+  "output_sha256": "0db029df9511f788c81f56458b19ae56e198f6573df9f306f680f14f695ba166",
+  "output_bytes": 427163466,
+  "full_resolution_pixels_compared": 55129350,
+  "all_corrected_pixels_identical": true,
+  "output_quality_sha256": "a8bd08e200ca29d777af50ffc822b24401c8baa4fe70eb8a6f4239ba44fd23ec",
+  "execution_source_sha256": "d01790641382eff10dae53a395f6141fadf241d1c84152ed9bb0cbfb72041af7",
+  "execution_snapshot_sha256": "004bea03424eadbecd92d0c12e45958a77eef6853880648a2e616f4fb5ff1f93",
+  "fresh_detection_allowed": false
+}

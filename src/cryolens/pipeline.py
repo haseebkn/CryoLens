@@ -28,14 +28,9 @@ from cryolens.geo.aoi import contains_point, raster_aoi_mask, scene_intersects_a
 from cryolens.geo.vectorize import TargetVectorizer
 from cryolens.ingest.cdse import CDSEClient, SARSceneMetadata
 from cryolens.preprocess.masks import LandMaskGenerator
-from cryolens.preprocess.python_chain import PurePythonSARProcessor
 from cryolens.preprocess.quality import (
-    assess_safe_product,
-    require_channels,
     require_detection_ready_cog,
 )
-from cryolens.preprocess.safe_reader import SAFEProductReader
-from cryolens.preprocess.stack import COGStackBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -139,47 +134,9 @@ class PipelineRunner:
         if engine != "python":
             raise ValueError(f"Unsupported preprocessing engine: {engine}")
 
-        reader = SAFEProductReader(safe_dir)
-        assess_safe_product(reader, self.output_dir / scene.scene_id / "processing-quality.json")
-        available = reader.available_polarisations()
-        if "HH" not in available or "HV" not in available:
-            raise ValueError(
-                f"{safe_dir.name} carries polarisations {available}; CryoLens requires "
-                "dual-pol HH+HV (ADR-002). Filter the catalogue query on polarisation."
-            )
+        from cryolens.preprocess.product import process_safe_product
 
-        hh = reader.read_sigma0("HH", remove_thermal_noise=True)
-        hv = reader.read_sigma0("HV", remove_thermal_noise=True)
-        require_channels(hh, hv, self.output_dir / scene.scene_id / "processing-quality.json")
-
-        processor = PurePythonSARProcessor(
-            target_crs=self.config.project.spatial.target_crs,
-            pixel_spacing_m=self.config.project.spatial.pixel_spacing_m,
-        )
-        from cryolens.preprocess.marine_geocoding import MarineGeocoder
-
-        result = processor.process_calibrated_arrays(
-            sigma0_hh_linear=hh["sigma0_linear"],
-            sigma0_hv_linear=hv["sigma0_linear"],
-            incidence_angle_deg=hh["incidence_angle_deg"],
-            latitude=hh["latitude"],
-            longitude=hh["longitude"],
-            apply_denoise=False,
-            marine_geocoder=MarineGeocoder(reader._find_for_polarisation("HH")[1]),
-        )
-
-        stack_builder = COGStackBuilder(output_dir=self.output_dir / scene.scene_id)
-        cog_path = stack_builder.build_and_export_cog(
-            scene_id=scene.scene_id,
-            bands=result["bands"],
-            transform=result["transform"],
-            crs=result["crs"],
-            provenance={
-                "source_kind": "sentinel1_safe",
-                "processing_quality": "passed",
-                **result["geocoding_provenance"],
-            },
-        )
+        cog_path = process_safe_product(safe_dir, self.output_dir)
         logger.info("Wrote calibrated 4-band COG: %s", cog_path)
         return cog_path
 
@@ -298,7 +255,7 @@ class PipelineRunner:
                 "ais_status": "not_checked",
                 "sea_ice_status": "unknown",
                 "screening_mode": "research_unknown_ice_explicit_opt_in",
-                "geolocation_status": "annotation_gcps_unvalidated",
+                "geolocation_status": "marine_range_doppler_research",
                 "orbit_correction_applied": False,
                 "preprocessing_engine": "python",
             }

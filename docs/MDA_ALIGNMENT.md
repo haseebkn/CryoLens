@@ -35,7 +35,7 @@ not evidence that a radar target is an iceberg or an illicit vessel.
 | Concern | Implemented response | Remaining evidence or integration |
 |---|---|---|
 | Geographic scope | Shared NL study polygon; pixel and API containment | Official customer AOI if required; this is a study boundary |
-| Radiometric integrity | Matched EW/IW calibration/noise checks against actual SNAP; marine geometry corrections; measured rejection receipts; no fabricated signal | Broader seasonal/regional availability and independent absolute field geolocation; see the [current processing qualifications](processing-validation/v4/README.md) |
+| Radiometric integrity | Matched EW/IW calibration/noise checks against actual SNAP; marine geometry corrections; measured rejection receipts; no fabricated signal | Broader seasonal/regional availability and independent absolute field geolocation; see the [current processing qualifications](processing-validation/v5/README.md) |
 | Target identity | CFAR candidates unclassified; score semantics explicit | Independent ship/iceberg labels, calibrated classifier, AIS and structure deconfliction |
 | False alarms | Masks, contextual gating, component filtering, per-stage removal ledger | Representative confirmed positives/negatives and missed-target survey |
 | Observation context | Source scene/time, processing settings, unknown context exposed | Source latency and coverage service-level requirements |

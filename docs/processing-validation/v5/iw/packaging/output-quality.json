@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "overview_quality": {
+    "levels": [
+      {
+        "scale": 2,
+        "shape": [
+          3502,
+          3935
+        ],
+        "pixels": 13780370,
+        "valid_pixels": 6312585,
+        "mismatched_nodata_pixels": 0,
+        "nonfinite_values": 0,
+        "inconsistent_ratio_pixels": 0,
+        "invalid_incidence_pixels": 0
+      },
+      {
+        "scale": 4,
+        "shape": [
+          1751,
+          1967
+        ],
+        "pixels": 3444217,
+        "valid_pixels": 1577141,
+        "mismatched_nodata_pixels": 0,
+        "nonfinite_values": 0,
+        "inconsistent_ratio_pixels": 0,
+        "invalid_incidence_pixels": 0
+      },
+      {
+        "scale": 8,
+        "shape": [
+          875,
+          983
+        ],
+        "pixels": 860125,
+        "valid_pixels": 394210,
+        "mismatched_nodata_pixels": 0,
+        "nonfinite_values": 0,
+        "inconsistent_ratio_pixels": 0,
+        "invalid_incidence_pixels": 0
+      },
+      {
+        "scale": 16,
+        "shape": [
+          437,
+          491
+        ],
+        "pixels": 214567,
+        "valid_pixels": 98106,
+        "mismatched_nodata_pixels": 0,
+        "nonfinite_values": 0,
+        "inconsistent_ratio_pixels": 0,
+        "invalid_incidence_pixels": 0
+      }
+    ],
+    "passed": true
+  },
+  "scope": "complete_corrected_output",
+  "passed": true,
+  "reasons": [],
+  "cog_errors": [],
+  "cog_warnings": [],
+  "shape": [
+    7005,
+    7870
+  ],
+  "transform": [
+    40.0,
+    0.0,
+    2995341.9440173022,
+    0.0,
+    -40.0,
+    959941.9164864671,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "pixel_spacing_m": 40,
+  "total_pixels": 55129350,
+  "valid_pixels": 25255613,
+  "valid_fraction": 0.4581155591350161,
+  "invalid_incidence_pixels": 0,
+  "inconsistent_ratio_pixels": 0,
+  "mismatched_nodata_pixels": 0,
+  "nonfinite_values": 0,
+  "band_ranges": {
+    "sigma0_hh_db": [
+      -30.47783660888672,
+      7.356475830078125
+    ],
+    "sigma0_hv_db": [
+      -53.99543380737305,
+      -12.633437156677246
+    ],
+    "ratio_hh_hv": [
+      -7.992221832275391,
+      42.98004150390625
+    ],
+    "incidence_angle": [
+      30.573810577392578,
+      45.76024627685547
+    ]
+  },
+  "output_sha256": "0db029df9511f788c81f56458b19ae56e198f6573df9f306f680f14f695ba166",
+  "policy": {
+    "version": "safe-quality-v1",
+    "max_nonpositive_fraction": 0.05,
+    "min_valid_fraction": 0.1,
+    "incidence_min_deg": 15.0,
+    "incidence_max_deg": 50.0,
+    "max_polarization_geolocation_error_m": 20.0
+  }
+}

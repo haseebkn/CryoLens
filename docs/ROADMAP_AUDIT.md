@@ -1,11 +1,11 @@
-# Roadmap audit: PRs #6–#9
+# Roadmap audit: PRs #6Ã¢â‚¬â€œ#9
 
 Later processing investigation: [v2](processing-validation/v2/README.md) corrects
 the reference cropping, height/timing assumptions, resampling and short-block
 noise handling. The geometric conclusions below are the historical audit
-snapshot; the deployment gate remains closed for measured radiometric usability.
+snapshot; the earlier radiometric rejections remain preserved. The current [v5 output validation](processing-validation/v5/README.md) closes representative complete EW/IW preprocessing; fresh target deployment still requires its separate release conditions.
 
-See the [current processing report](processing-validation/v4/README.md) for
+See the [current processing report](processing-validation/v5/README.md) for
 subsequent acquisition outcomes and remaining step-2 qualifications. The table
 below retains the earlier audit snapshot rather than rewriting it.
 
@@ -21,7 +21,7 @@ The existing review workspaces and human submissions were inspected read-only.
 |---|---|---|
 | 1. Scope and evaluation freeze | Versioned NL study polygon, acquisition partitions, task definitions, annotation/matching rules and actual MLflow provenance runs. The two newer PR #5 documentation/tracking commits are carried into this audit branch. | Preserve the frozen partitions. Footprint coverage is not eligible surveyed coverage. Disclose later reference-only and AI-assisted exposure. |
 | 2. Fresh Sentinel-1 processing (#6) | Authentic EW and HH/HV IW inputs; calibration/noise/geolocation comparison machinery; documented SNAP execution; quality rejection gates; NERSC experiment. | **Not complete: deployment gate closed.** None of the three products passes combined usability and comparison requirements. Resolve the failures, then demonstrate representative passing products. IW ingestion support is not validated operational southern-NL coverage. |
-| 3. Sentinel-2 paired review (#7–#8) | Planetary Computer and CDSE ingestion, native optical/quality layers, acquisition provenance, paired chips, visibility assessment and analyst evidence API/UI. Real CDSE archives and prepared artifacts are checked below. | Demonstrate useful optical evidence at a meaningful sampling scale. Current download availability is not reliable identity corroboration. Missing/clouded imagery must never make a SAR target false. |
+| 3. Sentinel-2 paired review (#7Ã¢â‚¬â€œ#8) | Planetary Computer and CDSE ingestion, native optical/quality layers, acquisition provenance, paired chips, visibility assessment and analyst evidence API/UI. Real CDSE archives and prepared artifacts are checked below. | Demonstrate useful optical evidence at a meaningful sampling scale. Current download availability is not reliable identity corroboration. Missing/clouded imagery must never make a SAR target false. |
 | 4. Reference set (#9) | Whole-area survey preparation, retained/rejected queues, stratified sampling probabilities, human submission ledger, concealed-answer consistency packets, adjudication and freeze tooling. | **Not complete:** finish real human dispositions, consistency review and adjudication; then freeze exact scored masks and evidence. AI observations and nonblind human feedback are recorded separately. |
 | 5. U-Net versus CROMA | No implemented experiment or result found in this stack; PyTorch is absent from the checked project environment. | Train/evaluate development baselines with leakage controls, then conduct the locked evaluation. |
 | 6. Full-pipeline measurement | Candidate generation/suppression accounting and metric helpers exist. | No valid end-to-end precision, recall, per-stage recall or empirical false-alarm report exists. Requires completed reference work and explicit uncertainty/sampling treatment. |
@@ -43,7 +43,7 @@ navigation product or an iceberg-identification service.
 2. **Empty scientific comparison (#6):** an empty sampling plan could reach an
    all-passed reduction without any actual comparisons. The CLI now rejects empty,
    duplicate or malformed products/windows before launching the reference.
-3. **Optical evidence provenance (#7–#8):** evidence eligibility read database
+3. **Optical evidence provenance (#7Ã¢â‚¬â€œ#8):** evidence eligibility read database
    metadata while artifact integrity checked a separate manifest. Those could
    disagree. Artifact/evidence requests now reject metadata that differs from the
    hash-verified manifest, including pair/detection identity.
@@ -140,6 +140,6 @@ freeze the reference. A repeat measures consistency, not correctness. An
 independent reviewer and suitable optical evidence remain useful additional
 evidence. Do not compute claimed operational accuracy from AI-assisted guesses.
 
-PRs #6–#9 are stacked, not four independent changes. This audit is additive and
+PRs #6Ã¢â‚¬â€œ#9 are stacked, not four independent changes. This audit is additive and
 does not merge them or authorize fresh-SAFE deployment. The scientific failures
 remain visible rather than weakening thresholds to turn the status green.
