@@ -43,7 +43,8 @@ physical ground truth.
 
 Sentinel-2 paired review now supplies real RGB/NIR/SCL crops and independent
 optical evidence records ([availability report](optical-review/v1/README.md)).
-The two-scene pilot has no candidate passing the visibility screen. Tile
+Current qualified EW/IW review coverage and its separate analyst interface are
+documented in the [fresh review report](optical-review/fresh-v1/README.md). Tile
 footprints can contain extensive nodata; a catalogue match is not clear imagery.
 The 20 m SCL layer can confuse ice and clouds and cannot resolve every small
 object visible in 10 m bands. Time-separated moving targets are not expected
@@ -52,13 +53,11 @@ assumptions, not measured accuracy or a validated vessel/iceberg drift bound.
 Chips are capped at 6 km radius and explicitly flag larger assumed envelopes.
 An absent counterpart never automatically changes the radar verdict.
 
-The [CDSE alternative-provider verification](optical-review/cdse-v1/README.md)
-verifies original SAFE bytes, but the available acquisition is reprocessed
-from baseline 02.12 to 05.00. Matching acquisition, orbit and tile does not
-establish product or pixel equivalence. BOA offsets are read from each original
-product's XML, and radiometric/SCL differences remain after offset correction.
-The CDSE one-candidate pilot also fails the useful-visibility screen. Alternative
-access does not supply missing target truth or validate fresh SAR processing.
+The [historical CDSE report](optical-review/cdse-v1/README.md) owns the
+reprocessed-product comparisons; the fresh report above owns its later
+exact-product verification. Matching acquisition, orbit and tile alone does not
+establish product or pixel equivalence. Verified alternative-provider access
+does not supply missing target truth or validate fresh SAR processing.
 
 ## 3. Data units and labels
 

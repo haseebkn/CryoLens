@@ -75,6 +75,11 @@ and [S2 L2A encoding documentation](https://documentation.dataspace.copernicus.e
 
 ## Paired review and measured pilot
 
+These historical pixel fractions retain the original clipped-buffer screening.
+See the shared [current screening contract](../v1/README.md#processing-and-matching-contract)
+and the separate [fresh EW/IW strict-screening receipt](../fresh-v1/README.md#additive-strict-screening-execution).
+Neither replaces this pilot's original receipts.
+
 The bounded pilot selects one previously reviewed development candidate at
 52.058636°N, 53.644867°W. Both matching CDSE tiles downloaded with no asset
 failures or selection truncation. **1/1 has downloaded optical context; 0/1

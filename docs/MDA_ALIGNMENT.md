@@ -40,7 +40,7 @@ not evidence that a radar target is an iceberg or an illicit vessel.
 | False alarms | Masks, contextual gating, component filtering, per-stage removal ledger | Representative confirmed positives/negatives and missed-target survey |
 | Observation context | Source scene/time, processing settings, unknown context exposed | Source latency and coverage service-level requirements |
 | Human quality control | Protected, attributed analyst review history | Operational multi-user authentication and independent adjudication |
-| Optical corroboration | Real Sentinel-2 RGB/NIR/SCL native crops, time/movement-aware paired chips and separate append-only evidence | Broader measured candidate visibility; independent review and matched target identity. Current pilot provides no usable optical confirmation |
+| Optical corroboration | Real Sentinel-2 RGB/NIR/SCL native crops, time/movement-aware paired chips and separate append-only evidence; see the [current fresh review report](optical-review/fresh-v1/README.md) | Broader measured candidate visibility; independent review and matched target identity. Human corroboration remains separate from screened visibility |
 | Interchange | WGS84 GeoJSON; source metadata preserved | Customer schema conformance tests; no MANICE/STAC compliance claim |
 | Forecast integrity | Disabled without verified forcing/model validation | Real forcing, bathymetry, physical parameters and trajectory error assessment |
 | Reproducibility | Locked dependencies, executable checks, versioned evidence | Independent reruns on broader seasons and Grand Banks coverage |

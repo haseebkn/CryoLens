@@ -175,20 +175,16 @@ and the separate regional deployment and scientific-release gates.
 The [prior processing corrections](docs/processing-validation/v2/README.md)
 remain documented.
 
-The [Sentinel-2 paired-review report](docs/optical-review/v1/README.md) records
-live searches of all 25 evaluated development acquisitions: 15 have optical
-footprint overlap within ±12 hours. A selected two-scene pilot has downloaded
-optical pixels for 1 of 34 candidates; none passes the conservative visibility
-screen. These are availability measurements, not iceberg labels or regional
-coverage estimates. Missing optical evidence never automatically rejects a
-radar candidate.
+The [qualified EW/IW optical-review report](docs/optical-review/fresh-v1/README.md)
+owns the current measured coverage, strict screening receipts and commands for
+the separate fresh analyst interface. Its predeclared spatial locations are
+review context; fresh target detection remains blocked. Human optical review
+and reference completion remain separate from software workflow completion.
+Missing optical evidence never automatically rejects a radar candidate.
 
-The [CDSE alternative-provider report](docs/optical-review/cdse-v1/README.md)
-adds authenticated original Sentinel-2 SAFE downloads and whole-product
-verification alongside the default Planetary Computer window reads. Two real
-products pass catalogue MD5, ZIP CRC and all 86 manifest file checks each.
-The matched acquisition is a newer processing baseline; it is explicitly
-reported as reprocessed, with baseline-aware native-pixel comparisons.
+The earlier [AI4Arctic paired-review pilot](docs/optical-review/v1/README.md)
+and [CDSE alternative-provider report](docs/optical-review/cdse-v1/README.md)
+retain their historical measurements and candidate-dashboard workflow.
 
 ```text
 uv run --frozen pytest

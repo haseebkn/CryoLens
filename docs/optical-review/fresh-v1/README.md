@@ -68,7 +68,7 @@ Step 3 now has receipt-bound fresh EW/IW pairing, actual optical downloads, expl
 
 The complete unit suite passed 609 tests before the final direct-verification and cloud-buffer additions. The subsequent 22-test focused run and final nine fresh-workflow regressions passed. Typing covered 158 maintained source/test/validation files; lint and format checks passed. The native delivery pipeline performs final-head review, checks and CI separately. Fixtures are synthetic and isolated; they do not add human evidence to the real review workspace.
 
-The browser workflow was exercised against the actual live report, including selecting the screened IW pair and displaying its native downloads and incomplete-envelope warning. No personal-inspection form was submitted during implementation. Both candidate and fresh evidence writes now share the fail-closed 60 m cloud/shadow validation. Cloud or ambiguous selected classes, nearby clouds and incomplete image/valid-data buffer support are rejected. Visibility screening applies the same support rule; absence writes re-screen verified pixels rather than trusting historical useful-visibility flags. Stored imagery and original receipts remain unchanged.
+The browser workflow was exercised against the actual live report, including selecting the screened IW pair and displaying its native downloads and incomplete-envelope warning. No personal-inspection form was submitted during implementation. Both candidate and fresh evidence writes use the shared [screening and evidence contract](../v1/README.md#processing-and-matching-contract), implemented in `cryolens.review.evidence` and `cryolens.review.pairs`. Stored imagery and original receipts remain unchanged.
 
 
 ## Additive strict-screening execution

@@ -7,7 +7,12 @@ availability pilot. It does not provide iceberg ground truth, precision, recall,
 or a false-alarm estimate. Fresh Sentinel-1 SAFE deployment remains gated by
 the [processing validation release boundary](../../processing-validation/v5/README.md#release-boundary).
 
-## Measured availability
+## Historical measured availability
+
+The pixel fractions below retain the original pilot's clipped-buffer screening.
+Current screening also rejects incomplete buffer support, as described in the
+contract below. The fresh EW/IW continuation has its own additive strict receipt;
+it does not re-screen or replace these historical candidate-pilot receipts.
 
 Live public Planetary Computer STAC searches cover all **25 evaluated development
 SAR acquisitions**, intersecting the shared NL study polygon and a **±12-hour**
@@ -98,8 +103,11 @@ Changing assumptions creates new pair IDs and retains prior evidence.
 Visibility is assessed over the inspected displacement disk intersected with
 the NL polygon, including missing pixels in the denominator. SCL 0/1 and missing
 RGB/SCL data are invalid. SCL 3/8/9/10 are cloud/shadow/cirrus with a 60 m circular
-buffer; 2/7 are ambiguous. Classes 4/5/6/11 are potentially visible, with snow/ice
-reported separately. `screened_useful` needs ≥80% screened visible coverage.
+buffer; 2/7 are ambiguous. Classes 4/5/6/11 are potentially visible only where
+the entire buffer has valid RGB/SCL support, including at chip edges and
+valid-data gaps. Incomplete support is reported separately and excluded from
+visible pixels. Snow/ice is reported separately. `screened_useful` needs ≥80%
+screened visible coverage.
 It is only screening **within the displayed region**, requires analyst inspection,
 and cannot prove clear sky, full displacement coverage or object resolvability.
 SCL categories and band resolutions follow the official
@@ -123,7 +131,9 @@ No new satellite credentials are required for this public optical provider.
 Record optical assessment and inspected visibility independently: corroborating,
 ambiguous, unavailable, or no visible counterpart. Corroboration requires an
 inspected clear view and an optical object position within the recorded
-displacement envelope and chip, with verified valid optical pixels. Supply its
+displacement envelope and chip. Both analyst interfaces verify optical pixels
+against the same screening contract above: cloud/ambiguous selected classes,
+nearby clouds and incomplete buffer support are rejected. Supply its
 WGS84 coordinates from georeferenced imagery and explain source, position,
 cloud/ice confusion, movement and resolution uncertainty in the evidence notes.
 Missing imagery cannot be submitted as corroboration or no-visible-counterpart
@@ -131,8 +141,9 @@ evidence. A no-visible-counterpart observation **never automatically rejects or
 reclassifies the radar candidate**. Evidence is authenticated and appended in a
 separate history. There is no update/delete evidence endpoint.
 
-The no-visible-counterpart category additionally requires screened useful
-visibility and the entire assumed displacement envelope inside the chip; a
+The no-visible-counterpart category additionally re-screens the verified aligned
+pixels for useful visibility instead of trusting historical visibility flags,
+and requires the entire assumed displacement envelope inside the chip; a
 partial or obscured view must be recorded as ambiguity or unavailability.
 Passing these checks still does not establish that a radar candidate is false.
 
