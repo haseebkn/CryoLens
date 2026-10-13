@@ -17,6 +17,8 @@ from cryolens.config.settings import get_settings
 from cryolens.db.models import DetectionModel, OpticalEvidenceModel, OpticalPairModel
 from cryolens.db.session import get_db_session
 from cryolens.eval.cohort import file_digest
+from cryolens.review.evidence import screened_visibility, valid_point
+from cryolens.review.policy import PairingPolicy
 
 router = APIRouter(prefix="/detections", tags=["Optical evidence"])
 
@@ -165,7 +167,9 @@ def record_evidence(
         )
     if body.assessment == "no_visible_counterpart" and (
         not metadata.get("full_movement_envelope_in_chip")
-        or not metadata.get("visibility", {}).get("useful_for_review")
+        or not screened_visibility(_artifact(pair, "optical-aligned.tif"), metadata)[
+            "useful_for_review"
+        ]
     ):
         raise HTTPException(
             422,
@@ -181,30 +185,15 @@ def record_evidence(
             raise HTTPException(
                 422, "Optical position exceeds the recorded movement/geolocation envelope"
             )
-        from pyproj import Transformer
-
-        x, y = Transformer.from_crs(4326, 3978, always_xy=True).transform(lon, lat)
-        transform = metadata["alignment"]["transform"]
-        row = (y - transform[5]) / transform[4]
-        col = (x - transform[2]) / transform[0]
-        height, width = metadata["alignment"]["shape"]
-        if not (0 <= row < height and 0 <= col < width):
-            raise HTTPException(422, "Optical position is outside the inspected chip")
-        import numpy as np
-        import rasterio
-        from rasterio.windows import Window
-
-        with rasterio.open(_artifact(pair, "optical-aligned.tif")) as raster:
-            window = Window(int(col), int(row), 1, 1)
-            values = raster.read(window=window)[:, 0, 0]
-            valid = bool(raster.dataset_mask(window=window)[0, 0])
-        if (
-            not valid
-            or not np.isfinite(values).all()
-            or np.any(values[:3] <= 0)
-            or values[-1] in (0, 1)
-        ):
-            raise HTTPException(422, "Optical position has no valid observed pixels")
+        try:
+            valid_point(
+                _artifact(pair, "optical-aligned.tif"),
+                (lon, lat),
+                [1, 2, 3, 4, 5],
+                PairingPolicy.model_validate(metadata.get("policy", {})).cloud_buffer_m,
+            )
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
     evidence = OpticalEvidenceModel(
         pair_id=pair.id,
         assessment=body.assessment,

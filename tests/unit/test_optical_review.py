@@ -241,20 +241,20 @@ def pair_fixture(
     folder.mkdir(parents=True)
     (folder / "paired.png").write_bytes(b"unit-test-image-fixture")
     x, y = Transformer.from_crs(4326, 3978, always_xy=True).transform(-52.5, 47.5)
-    transform = from_origin(x - 100, y + 100, 10, 10)
+    transform = from_origin(x - 200, y + 200, 10, 10)
     with rasterio.open(
         folder / "optical-aligned.tif",
         "w",
         driver="GTiff",
-        width=20,
-        height=20,
+        width=40,
+        height=40,
         count=5,
         dtype="float32",
         crs="EPSG:3978",
         transform=transform,
         nodata=0,
     ) as dst:
-        dst.write(np.full((5, 20, 20), 6, dtype=np.float32))
+        dst.write(np.full((5, 40, 40), 6, dtype=np.float32))
     metadata = {
         "id": pair_id,
         "detection_id": detection,
@@ -263,7 +263,7 @@ def pair_fixture(
         "matching_radius_m": 80,
         "full_movement_envelope_in_chip": True,
         "visibility": {"useful_for_review": True},
-        "alignment": {"transform": list(transform), "shape": [20, 20]},
+        "alignment": {"transform": list(transform), "shape": [40, 40]},
         "files": {p.name: file_digest(p) for p in folder.iterdir()},
     }
     (folder / "pair.json").write_text(json.dumps(metadata))
@@ -350,7 +350,7 @@ def test_missing_or_misaligned_optical_cannot_be_corroboration(
     assert api_test_client.post(url, headers={"X-Analyst-Key": KEY}, json=body).status_code == 201
     # Positive DN values alone cannot override a missing source-data mask.
     with rasterio.open(folder / "optical-aligned.tif", "r+") as raster:
-        raster.write_mask(np.zeros((20, 20), dtype=np.uint8))
+        raster.write_mask(np.zeros((40, 40), dtype=np.uint8))
     metadata = json.loads((folder / "pair.json").read_text())
     metadata["files"] = {p.name: file_digest(p) for p in folder.iterdir() if p.name != "pair.json"}
     (folder / "pair.json").write_text(json.dumps(metadata))
@@ -361,7 +361,7 @@ def test_missing_or_misaligned_optical_cannot_be_corroboration(
         pair.metadata_json = metadata
         session.commit()
     response = api_test_client.post(url, headers={"X-Analyst-Key": KEY}, json=body)
-    assert response.status_code == 422 and "valid observed pixels" in response.text
+    assert response.status_code == 422 and "valid image pixels" in response.text
     metadata = {**metadata, "full_movement_envelope_in_chip": False}
     (folder / "pair.json").write_text(json.dumps(metadata))
     with api_database() as session:
@@ -428,3 +428,76 @@ def test_optical_evidence_rejects_database_metadata_drift(
     assert response.status_code == 409
     with api_database() as session:
         assert session.scalar(select(func.count()).select_from(OpticalEvidenceModel)) == 0
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        "clear",
+        "cloud",
+        "ambiguous",
+        "near_cloud",
+        "edge",
+        "quality_gap",
+        "quality_nan",
+        "unknown_class",
+        "mask_gap",
+        "stale_absence",
+    ],
+)
+def test_candidate_endpoint_requires_complete_clear_buffer(
+    api_test_client: TestClient,
+    api_database: sessionmaker[Session],
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    case: str,
+) -> None:
+    from tests.unit.test_fresh_optical import alter_optical_quality
+
+    detection, pair_id, folder = pair_fixture(api_test_client, api_database, tmp_path, monkeypatch)
+    position = alter_optical_quality(folder / "optical-aligned.tif", case)
+    manifest_path = folder / "pair.json"
+    metadata = json.loads(manifest_path.read_text())
+    metadata["matching_radius_m"] = 80 if case == "stale_absence" else 300
+    metadata["files"] = {name: file_digest(folder / name) for name in metadata["files"]}
+    manifest_path.write_text(json.dumps(metadata))
+    with api_database() as session:
+        pair = session.get(OpticalPairModel, pair_id)
+        assert pair is not None
+        pair.metadata_json = metadata
+        pair.manifest_sha256 = file_digest(manifest_path)
+        session.commit()
+    response = api_test_client.post(
+        f"/api/v1/detections/{detection}/optical-pairs/{pair_id}/evidence",
+        headers={"X-Analyst-Key": KEY},
+        json={
+            "assessment": "no_visible_counterpart" if case == "stale_absence" else "corroborating",
+            "visibility": "clear",
+            "observed_lonlat": position,
+            "notes": "Synthetic buffer regression evidence only.",
+        },
+    )
+    assert response.status_code == (201 if case == "clear" else 422), response.text
+    if case != "clear":
+        assert ("limited visibility" if case == "stale_absence" else "buffer") in response.text
+    with api_database() as session:
+        assert session.scalar(select(func.count()).select_from(OpticalEvidenceModel)) == (
+            1 if case == "clear" else 0
+        )
+
+
+@pytest.mark.parametrize("case", ["edge", "quality_gap", "mask_gap"])
+def test_visibility_rejects_incomplete_buffer_support(case: str) -> None:
+    scl = np.full((25, 25), 6.0)
+    valid = np.ones((25, 25), dtype=bool)
+    domain = np.zeros((25, 25), dtype=bool)
+    row, col = 12, 1 if case == "edge" else 12
+    domain[row, col] = True
+    if case == "quality_gap":
+        scl[row, col + 3] = 0
+    if case == "mask_gap":
+        valid[row, col + 3] = False
+    result = assess_visibility(scl, valid, domain, PairingPolicy())
+    assert result["visible_fraction"] == 0
+    assert result["useful_for_review"] is False
+    assert result["incomplete_buffer_support_fraction"] == 1

@@ -4,6 +4,8 @@ Executed 13 October 2026 using the already qualified complete EW and IW outputs 
 
 ## Measured coverage
 
+The table uses the additive [strict-screening v1 receipt](strict-screening-v1/receipt.json). The original [coverage receipt](coverage.json) is preserved as historical r1 output; its pixel visibility fractions used clipped buffer support and are superseded for current screening. Strict re-screening leaves the location-level counts unchanged.
+
 The plan was frozen before either optical catalogue was queried. A regular 5 by 5 grid over each corrected raster yielded 8 eligible northern Labrador EW locations and 10 Grand Banks IW locations after NL-polygon, finite-radar and 500 m GSHHG coastal-buffer checks. These are spatial review locations, not detections, selected targets, a probability sample of NL waters or an area-weighted regional coverage estimate.
 
 | Quantity | EW | IW | Combined |
@@ -17,7 +19,7 @@ Both Planetary Computer and CDSE queries completed: zero optical products overla
 
 Eight actual optical tile/location pairs were downloaded for five IW locations. Along with 13 unavailable-evidence contexts, this yields 21 paired manifests. Multiple tiles at a location are not independent observations or targets. Native B02/B03/B04/B08 and SCL data preserve their respective 10 m and 20 m grids and are available through the analyst interface.
 
-The best-screened location is 46.932078 N, 52.495381 W. Its tile 22TCT has 99.896% screened visibility inside the displayed disk. Sentinel-2C observed it at 2025-12-06 14:38:31.025 UTC, **5.0906 hours after SAR**. The existing 0.5 m/s movement preset plus geolocation allowances gives **9.283 km**, exceeding the fixed **6 km** chip radius. This is useful inspection context within the chip, not full displacement coverage. **It cannot support a no-visible-counterpart claim under the existing checks.** The motion preset is not a vessel speed bound or a measured drift forecast.
+The best-screened location is 46.932078 N, 52.495381 W. Its tile 22TCT originally had 99.896% screened visibility inside the displayed disk; the strict re-screened visibility is **99.071%**. Both fractions describe this displayed disk only. Sentinel-2C observed it at 2025-12-06 14:38:31.025 UTC, **5.0906 hours after SAR**. The existing 0.5 m/s movement preset plus geolocation allowances gives **9.283 km**, exceeding the fixed **6 km** chip radius. This is useful inspection context within the chip, not full displacement coverage. **It cannot support a no-visible-counterpart claim under the existing checks.** The motion preset is not a vessel speed bound or a measured drift forecast.
 
 ![Actual qualified IW and downloaded Sentinel-2 pixels](example-pair.png)
 
@@ -66,4 +68,17 @@ Step 3 now has receipt-bound fresh EW/IW pairing, actual optical downloads, expl
 
 The complete unit suite passed 609 tests before the final direct-verification and cloud-buffer additions. The subsequent 22-test focused run and final nine fresh-workflow regressions passed. Typing covered 158 maintained source/test/validation files; lint and format checks passed. The native delivery pipeline performs final-head review, checks and CI separately. Fixtures are synthetic and isolated; they do not add human evidence to the real review workspace.
 
-The browser workflow was exercised against the actual live report, including selecting the screened IW pair and displaying its native downloads and incomplete-envelope warning. No personal-inspection form was submitted during implementation. Follow-up reviewer validation also enforces the original 60 m cloud/shadow buffer around an observed optical point. That stricter write guard does not alter stored pixels or the earlier coverage measurements.
+The browser workflow was exercised against the actual live report, including selecting the screened IW pair and displaying its native downloads and incomplete-envelope warning. No personal-inspection form was submitted during implementation. Both candidate and fresh evidence writes now share the fail-closed 60 m cloud/shadow validation. Cloud or ambiguous selected classes, nearby clouds and incomplete image/valid-data buffer support are rejected. Visibility screening applies the same support rule; absence writes re-screen verified pixels rather than trusting historical useful-visibility flags. Stored imagery and original receipts remain unchanged.
+
+
+## Additive strict-screening execution
+
+[strict-screening v1](strict-screening-v1/receipt.json) re-evaluates the existing aligned RGB/SCL pixels from the original local `E:/CryoLens/data/processed/step3-fresh-optical-20261013-r1/planetary-computer` pairs. It verifies all 21 manifests and recorded assets before and after screening, preserving their bytes, the original report, source snapshots, native/corrected pixels and pilot ledgers. No new satellite search, download or human annotation was performed. The 6 km display limit and original research assumptions remain fixed. Incomplete quality support at image edges and valid-data gaps now fails closed instead of assuming an unseen neighborhood is clear.
+
+The new receipt includes each original manifest hash, the source report hash, historical and strict pixel fractions, and the SHA256 of its separate [executed source snapshot](strict-screening-v1/executed-code.zip). This snapshot identifies the actual re-screening code; it does not replace the original r1 producer snapshots or claim that r1 used the corrected checks. The later source typing/import-order cleanup does not change the executed screening algorithm. The stricter result retains 5/18 optical-context locations, 1/18 useful displayed-disk locations and 0/18 full-movement locations. These remain scene/grid measurements, not regional availability or target accuracy estimates.
+
+Reproduce from the source snapshot or this checkout using a new, previously nonexistent output directory:
+
+```powershell
+python -m cryolens.review.strict_screening --root E:/CryoLens/data/processed/step3-fresh-optical-20261013-r1/planetary-computer --output docs/optical-review/fresh-v1/new-strict-screening
+```

@@ -19,7 +19,7 @@ from rasterio.control import GroundControlPoint
 from rasterio.enums import Resampling
 from rasterio.transform import from_origin
 from rasterio.warp import reproject
-from scipy.ndimage import binary_dilation
+from scipy.ndimage import binary_dilation, binary_erosion
 
 from cryolens.data.ai4arctic import AI4ArcticScene, load_scene
 from cryolens.db.models import DetectionModel
@@ -122,14 +122,17 @@ def assess_visibility(
     denominator = int(domain.sum())
     if not denominator:
         raise ValueError("Visibility needs a nonempty inspected region")
-    invalid = ~rgb_valid | np.isin(scl, [0, 1])
+    invalid = ~rgb_valid | ~np.isfinite(scl) | ~np.isin(scl, range(2, 12))
     clouds = np.isin(scl, [3, 8, 9, 10])
     buffer_px = math.ceil(policy.cloud_buffer_m / policy.review_grid_spacing_m)
+    support = ~invalid
     if buffer_px:
         yy, xx = np.ogrid[-buffer_px : buffer_px + 1, -buffer_px : buffer_px + 1]
-        clouds = binary_dilation(clouds, structure=(xx * xx + yy * yy <= buffer_px * buffer_px))
+        disk = xx * xx + yy * yy <= buffer_px * buffer_px
+        clouds = binary_dilation(clouds, structure=disk)
+        support = binary_erosion(support, structure=disk, border_value=0)
     ambiguous = np.isin(scl, [2, 7])
-    visible = ~invalid & ~clouds & ~ambiguous & np.isin(scl, [4, 5, 6, 11])
+    visible = support & ~clouds & np.isin(scl, [4, 5, 6, 11])
     fraction = float(np.count_nonzero(visible & domain) / denominator)
     valid_fraction = float(np.count_nonzero(~invalid & domain) / denominator)
     return {
@@ -142,6 +145,9 @@ def assess_visibility(
         "visible_fraction": fraction,
         "valid_fraction": valid_fraction,
         "cloud_or_shadow_buffered_fraction": float(np.count_nonzero(clouds & domain) / denominator),
+        "incomplete_buffer_support_fraction": float(
+            np.count_nonzero(~support & domain) / denominator
+        ),
         "ambiguous_scl_fraction": float(np.count_nonzero(ambiguous & domain) / denominator),
         "snow_ice_fraction": float(np.count_nonzero((scl == 11) & domain) / denominator),
         "inspected_pixels": denominator,
@@ -212,6 +218,7 @@ def build_pair(
     )
     code_hashes = {
         "pairs.py": file_digest(Path(__file__)),
+        "evidence.py": file_digest(Path(__file__).with_name("evidence.py")),
         "policy.py": file_digest(Path(__file__).with_name("policy.py")),
         "sentinel2.py": file_digest(Path(__file__).parents[1] / "ingest/sentinel2.py"),
         "sentinel2_cdse.py": file_digest(Path(__file__).parents[1] / "ingest/sentinel2_cdse.py"),
@@ -290,7 +297,7 @@ def build_pair(
             arrays[band], masks[band] = _warp(
                 output / f"{band}-native.tif", transform, size, band == "SCL"
             )
-        common_valid = masks["B04"] & masks["B03"] & masks["B02"] & masks["SCL"]
+        common_valid = masks["B04"] & masks["B03"] & masks["B02"] & masks["B08"] & masks["SCL"]
         columns, rows = np.meshgrid(np.arange(size) + 0.5, np.arange(size) + 0.5)
         domain = (
             (columns - size / 2) ** 2 + (rows - size / 2) ** 2

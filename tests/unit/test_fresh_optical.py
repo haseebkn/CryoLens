@@ -323,3 +323,105 @@ def test_observed_optical_position_respects_cloud_buffer(pair_root: Path) -> Non
         raster.write(np.array([[9]], dtype="float32"), 5, window=Window(col + 3, row, 1, 1))
     with pytest.raises(ValueError, match="cloud/shadow buffer"):
         valid_point(path, (-53, 50), [1, 2, 3, 4, 5], 60)
+
+
+def alter_optical_quality(path: Path, case: str) -> tuple[float, float]:
+    from rasterio.windows import Window
+
+    with rasterio.open(path, "r+") as src:
+        row, col = src.height // 2, src.width // 2
+        if case == "stale_absence":
+            src.write(np.full((src.height, src.width), 9, dtype="float32"), 5)
+        elif case == "edge":
+            col = 1
+        elif case == "cloud":
+            src.write(np.array([[9]], dtype="float32"), 5, window=Window(col, row, 1, 1))
+        elif case == "ambiguous":
+            src.write(np.array([[7]], dtype="float32"), 5, window=Window(col, row, 1, 1))
+        elif case in {"near_cloud", "quality_gap", "quality_nan", "unknown_class"}:
+            value = {"near_cloud": 9, "quality_gap": 0, "quality_nan": np.nan, "unknown_class": 12}[
+                case
+            ]
+            src.write(np.array([[value]], dtype="float32"), 5, window=Window(col + 3, row, 1, 1))
+        elif case == "mask_gap":
+            mask = np.full((src.height, src.width), 255, dtype="uint8")
+            mask[row, col + 3] = 0
+            src.write_mask(mask)
+        x, y = src.xy(row, col)
+        lon, lat = Transformer.from_crs(src.crs, 4326, always_xy=True).transform(x, y)
+        return lon, lat
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        "clear",
+        "cloud",
+        "ambiguous",
+        "near_cloud",
+        "edge",
+        "quality_gap",
+        "quality_nan",
+        "unknown_class",
+        "mask_gap",
+        "stale_absence",
+    ],
+)
+def test_fresh_endpoint_requires_complete_clear_buffer(pair_root: Path, case: str) -> None:
+    report_path = pair_root / "report.json"
+    report = json.loads(report_path.read_text())
+    reference = report["locations"][0]["pairs"][0]
+    folder = pair_root / "pairs" / reference["id"]
+    position = alter_optical_quality(folder / "optical-aligned.tif", case)
+    manifest_path = folder / "pair.json"
+    pair = json.loads(manifest_path.read_text())
+    pair["files"] = {name: file_digest(folder / name) for name in pair["files"]}
+    manifest_path.write_text(json.dumps(pair))
+    reference["manifest_sha256"] = file_digest(manifest_path)
+    report_path.write_text(json.dumps(report))
+    app = create_app(pair_root)
+    app.dependency_overrides[require_analyst] = lambda: "fixture"
+    client = TestClient(app)
+    response = client.post(
+        f"/api/pairs/{reference['id']}/evidence",
+        json={
+            "assessment": "no_visible_counterpart" if case == "stale_absence" else "corroborating",
+            "visibility": "clear",
+            "sar_observed_lonlat": [-53, 50],
+            "observed_lonlat": position,
+            "personally_inspected": True,
+            "viewed_channels": ["HH", "HV"],
+            "notes": "Synthetic buffer regression evidence only.",
+        },
+    )
+    assert response.status_code == (201 if case == "clear" else 422), response.text
+    if case != "clear":
+        assert ("screened coverage" if case == "stale_absence" else "buffer") in response.text
+    history = client.get(f"/api/pairs/{reference['id']}").json()["evidence_history"]
+    assert len(history) == (1 if case == "clear" else 0)
+
+
+def test_strict_rescreen_is_additive_and_reserves_output(pair_root: Path, tmp_path: Path) -> None:
+    from cryolens.review.strict_screening import rescreen
+
+    report = pair_root / "report.json"
+    data = json.loads(report.read_text())
+    data["denominator"] = "synthetic predeclared review locations"
+    data["locations"][0]["id"] = "synthetic"
+    data["locations"][0]["mode"] = "IW"
+    reference = data["locations"][0]["pairs"][0]
+    folder = pair_root / "pairs" / reference["id"]
+    manifest = json.loads((folder / "pair.json").read_text())
+    reference.update(optical_item_id=manifest["optical_item_id"])
+    report.write_text(json.dumps(data))
+    before = {p: file_digest(p) for p in pair_root.rglob("*") if p.is_file()}
+    output = tmp_path / "strict-screening"
+    result = rescreen(pair_root, output)
+    assert result["counts"]["IW"]["strict_useful"] == 1
+    assert result["locations"][0]["pairs"][0]["manifest_sha256"] == file_digest(
+        folder / "pair.json"
+    )
+    assert result["executed_code_sha256"] == file_digest(output / "executed-code.zip")
+    assert before == {p: file_digest(p) for p in before}
+    with pytest.raises(FileExistsError):
+        rescreen(pair_root, output)

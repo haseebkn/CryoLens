@@ -8,19 +8,17 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal
 
-import numpy as np
 import rasterio
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import Field, model_validator
 from pyproj import Geod, Transformer
-from rasterio.windows import Window
 
 from cryolens.api.routes.optical import OpticalEvidenceRequest
 from cryolens.api.security import require_analyst
 from cryolens.eval.cohort import file_digest
-from cryolens.geo.aoi import contains_point
 from cryolens.reference.records import append_event, events, ledger
+from cryolens.review.evidence import screened_visibility, valid_point
 from cryolens.review.pairs import verify_pair_files
 
 
@@ -42,37 +40,6 @@ class FreshEvidence(OpticalEvidenceRequest):
                 "A sampled location is not a target: identify an inspected SAR position in both channels first"
             )
         return self
-
-
-def valid_point(
-    path: Path, position: tuple[float, float], bands: list[int], cloud_buffer_m: float = 0
-) -> None:
-    if not contains_point(*position):
-        raise ValueError("Observation must lie in the NL study polygon")
-    with rasterio.open(path) as src:
-        x, y = Transformer.from_crs(4326, src.crs, always_xy=True).transform(*position)
-        row, col = src.index(x, y)
-        if not (0 <= row < src.height and 0 <= col < src.width):
-            raise ValueError("Observation lies outside inspected imagery")
-        data = src.read(bands, window=Window(col, row, 1, 1), masked=True)
-        if np.ma.getmaskarray(data).any() or not np.isfinite(data.data).all():
-            raise ValueError("Observation has no valid image pixels")
-        if len(bands) == 5 and (
-            np.any(data.data[:3] <= 0) or data.data[-1, 0, 0] not in (4, 5, 6, 11)
-        ):
-            raise ValueError("Optical position is invalid, obscured or SCL-ambiguous")
-        if len(bands) == 5 and cloud_buffer_m:
-            radius = int(np.ceil(cloud_buffer_m / abs(src.transform.a)))
-            left, top = max(0, col - radius), max(0, row - radius)
-            width, height = (
-                min(src.width, col + radius + 1) - left,
-                min(src.height, row + radius + 1) - top,
-            )
-            scl = src.read(5, window=Window(left, top, width, height))
-            yy, xx = np.ogrid[top : top + height, left : left + width]
-            disk = (xx - col) ** 2 + (yy - row) ** 2 <= radius**2
-            if np.any(np.isin(scl, [3, 8, 9, 10]) & disk):
-                raise ValueError("Optical position is inside the frozen cloud/shadow buffer")
 
 
 def validate_evidence(folder: Path, pair: dict[str, Any], body: FreshEvidence) -> None:
@@ -111,7 +78,11 @@ def validate_evidence(folder: Path, pair: dict[str, Any], body: FreshEvidence) -
             body.sar_observed_lonlat[0],
             body.sar_observed_lonlat[1],
         )[2]
-        if distance > 1 or not full or not pair["visibility"]["useful_for_review"]:
+        if (
+            distance > 1
+            or not full
+            or not screened_visibility(folder / "optical-aligned.tif", pair)["useful_for_review"]
+        ):
             raise ValueError(
                 "Absence needs full screened coverage about the SAR point; create a centred pair or record ambiguity"
             )
