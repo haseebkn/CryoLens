@@ -74,8 +74,12 @@ def main() -> None:
             session.add(evidence)
             session.flush()
             session.expire_all()
-            assert session.get(OpticalPairModel, pair.id).metadata_json["optical_item_id"] is None
-            assert session.get(OpticalEvidenceModel, evidence.id).assessment == "unavailable"
+            stored_pair = session.get(OpticalPairModel, pair.id)
+            assert stored_pair is not None
+            assert stored_pair.metadata_json["optical_item_id"] is None
+            stored_evidence = session.get(OpticalEvidenceModel, evidence.id)
+            assert stored_evidence is not None
+            assert stored_evidence.assessment == "unavailable"
             assert inside.predicted_class == "unclassified"
 
             def override_session() -> Generator[Session, None, None]:
