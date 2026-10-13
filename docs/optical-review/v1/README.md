@@ -1,5 +1,7 @@
 # Sentinel-2 ingestion and paired review, v1
 
+Later continuation: [qualified fresh EW/IW paired review](../fresh-v1/README.md). The measurements and AI4Arctic-specific workflow below are preserved as the original pilot.
+
 Implemented 2026-10-05. This is an executable analyst workflow and a measured
 availability pilot. It does not provide iceberg ground truth, precision, recall,
 or a false-alarm estimate. Fresh Sentinel-1 SAFE deployment remains gated by

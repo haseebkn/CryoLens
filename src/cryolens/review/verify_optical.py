@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -19,6 +20,7 @@ from cryolens.eval.cohort import file_digest
 from cryolens.ingest.sentinel2 import BANDS
 from cryolens.ingest.sentinel2_cdse import CDSESentinel2Client
 from cryolens.ingest.sentinel2_safe import read_product_metadata, same_acquisition
+from cryolens.preprocess.product import execution_context, write_record
 from cryolens.review.pairs import verify_pair_files
 
 
@@ -109,16 +111,34 @@ def compare_native_band(
 
 
 def verify_reference(
-    pair_path: Path, output: Path, client: CDSESentinel2Client | None = None
+    pair_path: Path,
+    output: Path,
+    client: CDSESentinel2Client | None = None,
+    artifacts: Path | None = None,
 ) -> dict[str, Any]:
     pair = json.loads(pair_path.read_text(encoding="utf-8"))
     if pair.get("optical_provider", "planetary-computer") != "planetary-computer" or not pair.get(
         "optical_item_id"
     ):
         raise ValueError("Comparison requires a real hosted optical pair")
-    root = (get_settings().data_dir / "processed/optical-review" / pair["id"]).resolve()
-    if not root.is_relative_to((get_settings().data_dir / "processed/optical-review").resolve()):
-        raise ValueError("Invalid reference artifact path")
+    if Path(pair["id"]).name != pair["id"] or pair["id"] in {".", ".."}:
+        raise ValueError("Invalid reference pair identifier")
+    root = (
+        artifacts.resolve()
+        if artifacts is not None
+        else (get_settings().data_dir / "processed/optical-review" / pair["id"]).resolve()
+    )
+    if artifacts is not None and (
+        root.name != pair["id"] or file_digest(root / "pair.json") != file_digest(pair_path)
+    ):
+        raise ValueError("Explicit native artifact directory differs from the supplied pair")
+    # Reserve before network or authentication; no old scientific record is replaced.
+    output.mkdir(parents=True, exist_ok=False)
+    execution, payloads = execution_context()
+    write_record(output / "execution.json", execution)
+    with zipfile.ZipFile(output / "executed-code.zip", "x", zipfile.ZIP_DEFLATED) as archive:
+        for name, content in payloads.items():
+            archive.writestr(name, content)
     verify_pair_files(root, pair)
     reference = next(
         item for item in pair["search"]["items"] if item["id"] == pair["optical_item_id"]
@@ -129,7 +149,6 @@ def verify_reference(
     name = reference["properties"]["s2:product_uri"]
     if not same_acquisition(name, item["cdse_product"]["Name"]):
         raise ValueError("Comparison acquisitions/platform/orbit/tile differ")
-    output.mkdir(parents=True, exist_ok=True)
     # Hosted metadata is a separate provenance source, not claimed as CDSE-verified.
     band_href = reference["assets"]["B04"]["href"]
     parsed = urlsplit(band_href)
@@ -168,8 +187,13 @@ def verify_reference(
         )
         for b in BANDS
     ]
+    current, _ = execution_context()
+    if current["source_files_sha256"] != execution["source_files_sha256"]:
+        raise ValueError("Comparison code changed during execution")
     report = {
         "schema_version": 1,
+        "execution_sha256": file_digest(output / "execution.json"),
+        "snapshot_sha256": file_digest(output / "executed-code.zip"),
         "checked_at": datetime.now(UTC).isoformat(),
         "reference_pair_id": pair["id"],
         "reference_manifest_sha256": file_digest(pair_path),
@@ -201,9 +225,14 @@ def main() -> int:
     parser.add_argument(
         "--output", type=Path, default=Path("data/processed/cdse-optical-verification")
     )
+    parser.add_argument(
+        "--artifacts",
+        type=Path,
+        help="Explicit hash-bound native pair directory for standalone SAFE review",
+    )
     args = parser.parse_args()
     try:
-        report = verify_reference(args.pair, args.output)
+        report = verify_reference(args.pair, args.output, artifacts=args.artifacts)
     except Exception as error:
         print(
             f"Direct optical verification failed ({type(error).__name__}); no equivalence result. Check provider access and local source artifacts. Credential-bearing request details are not printed."

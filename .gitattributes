@@ -44,3 +44,12 @@ configs/snap/validation-corrected-output-v1.xml -text
 docs/processing-validation/v5/** -text whitespace=cr-at-eol
 docs/processing-validation/v5/**/*.md text eol=lf
 docs/processing-validation/v5/**/*.json linguist-generated=true
+
+# Fresh optical scientific receipts are preserved byte for byte.
+configs/optical-review-fresh-v1.json -text whitespace=cr-at-eol
+docs/optical-review/fresh-v1/** -text whitespace=cr-at-eol
+docs/optical-review/fresh-v1/**/*.md text eol=lf
+docs/optical-review/fresh-v1/**/*.json linguist-generated=true
+
+# Publisher XML bytes are an exact source artifact, including whitespace.
+docs/optical-review/fresh-v1/cdse-direct-verification/hosted-product.xml whitespace=-blank-at-eol,cr-at-eol

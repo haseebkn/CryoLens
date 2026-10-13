@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 import matplotlib
 import numpy as np
@@ -38,6 +38,16 @@ class RadarChip:
     hv: np.ndarray
     gcps: list[GroundControlPoint]
     source: dict[str, Any]
+    transform: Any = None
+    crs: str | None = None
+
+
+class ReviewSubject(Protocol):
+    id: str
+    centroid_wgs84: Any
+    scene: Any
+    length_m: float | None
+    width_m: float | None
 
 
 @lru_cache(maxsize=1)
@@ -173,7 +183,7 @@ def _warp(
 
 
 def build_pair(
-    detection: DetectionModel,
+    detection: DetectionModel | ReviewSubject,
     radar: RadarChip,
     item: dict[str, Any] | None,
     client: Sentinel2Provider,
@@ -206,6 +216,7 @@ def build_pair(
         "sentinel2.py": file_digest(Path(__file__).parents[1] / "ingest/sentinel2.py"),
         "sentinel2_cdse.py": file_digest(Path(__file__).parents[1] / "ingest/sentinel2_cdse.py"),
         "sentinel2_safe.py": file_digest(Path(__file__).parents[1] / "ingest/sentinel2_safe.py"),
+        "fresh.py": file_digest(Path(__file__).with_name("fresh.py")),
         "ai4arctic.py": file_digest(Path(__file__).parents[1] / "data/ai4arctic.py"),
     }
     aoi_hash = digest(load_aoi().__geo_interface__)
@@ -238,7 +249,11 @@ def build_pair(
         nodata=np.nan,
         compress="deflate",
     ) as dst:
-        dst.gcps = radar.gcps, rasterio.crs.CRS.from_epsg(4326)
+        if radar.transform is not None:
+            dst.transform = radar.transform
+            dst.crs = radar.crs
+        else:
+            dst.gcps = radar.gcps, rasterio.crs.CRS.from_epsg(4326)
         dst.write(radar.hh.astype(np.float32), 1)
         dst.write(radar.hv.astype(np.float32), 2)
         dst.set_band_description(1, "sigma0_hh_db")
@@ -247,8 +262,12 @@ def build_pair(
     reproject(
         radar.hv,
         radar_aligned,
-        gcps=radar.gcps,
-        src_crs="EPSG:4326",
+        **(
+            {"src_transform": radar.transform}
+            if radar.transform is not None
+            else {"gcps": radar.gcps}
+        ),
+        src_crs=radar.crs or "EPSG:4326",
         src_nodata=np.nan,
         dst_transform=transform,
         dst_crs="EPSG:3978",
@@ -338,8 +357,12 @@ def build_pair(
         axis.set_ylabel("Projected distance north (km)")
     separation = f"Δt={seconds / 3600:+.2f} h" if seconds is not None else "Optical unavailable"
     envelope_note = "; envelope extends beyond chip" if match_radius > radius else ""
+    subject_note = (
+        "Review location, not a detected target. " if radar.source.get("review_only") else ""
+    )
     figure.suptitle(
-        f"{separation} · {visibility['status']} · radar {radar.source['native_pixel_spacing_m']:.0f} m samples / optical 10 m / SCL 20 m\nAssumed movement+geolocation radius {match_radius / 1000:.2f} km{envelope_note}. Missing counterpart never implies false radar detection",
+        subject_note
+        + f"{separation} · {visibility['status']} · radar {radar.source['native_pixel_spacing_m']:.0f} m samples / optical 10 m / SCL 20 m\nAssumed movement+geolocation radius {match_radius / 1000:.2f} km{envelope_note}. Missing counterpart never implies false radar detection",
         fontsize=10,
     )
     figure.savefig(output / "paired.png", dpi=160)
@@ -349,7 +372,11 @@ def build_pair(
         "generation_code_sha256": code_hashes,
         "aoi_sha256": aoi_hash,
         "id": pair_id,
-        "detection_id": detection.id,
+        "detection_id": None if radar.source.get("review_only") else detection.id,
+        "review_location_id": detection.id if radar.source.get("review_only") else None,
+        "subject_kind": "review_location"
+        if radar.source.get("review_only")
+        else "detector_candidate",
         "sar_product_id": detection.scene.product_id,
         "sar_acquired_utc": sar_time.isoformat(),
         "optical_item_id": item["id"] if item else None,

@@ -1,0 +1,156 @@
+{
+  "verified_at": "2026-10-13T09:12:36.545947+00:00",
+  "pairs_verified": 21,
+  "checks": [
+    {
+      "pair_id": "edfd05410e0099fbc5670b5706cf557bc6a024f8dd4f31fe0d63bfa7a4455048",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "11e832e0211b2cdb69329fe77cda8aebde049c54aa13d7bae3642c300dfbf301",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "c9085ac544ca2258ca98cb2dcf6563f5e4a545f4ed365579d3d514d12c24fe8a",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "5d8a43de4f950ce99a7e033d41bfaae1129a3b8a947cdcadab0c8f64aa44fac1",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "5385b774d8e2c92e4935e88836128beeb0e27bd35efa19052988f449982ae219",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "1c85aa6976ac5006ff96cadce393d8cb512063dd3a82f4031f4bb9911a303fef",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "f234ea58ee5926892803a5a5b32d9aeecba0b0f15475a350b9d37d358e5fcd81",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "60d68109465e4202af1f34e757fbc6c66542f15a44b3231c218ecb41b62cb658",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "f3abc6487acb1f6f61db1f12ea48f7e1a15408f9e6a559fac16d370c4bbecf9b",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "c398aa7e84148372d42655cfc9152640fc89b42abfc94c25264eed7b5ee2837d",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "6f2bfb37d3b924837bbf36a3f875ae10df2ed6f87d8e169f3ce0691b9d825cd5",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "a936a2d49c14a9164334f15a1549fdd4152277c24615451463f1e12b512fd566",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "783a6bf9d3edae9f380d9757d6dbf256d0be5529ad16e8e6dad84b1fbd717dd5",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "31ba0e01957c1a1c694260512a3b01f7e2f1ab2ea56aa716e8d84dd8be47fd42",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "d9e0af7367497061619e2c0f94c5209c451be69cc9cb5e0c978dc60b7f2329dd",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "b0c8377fc11ddfd802f9f2a7e9121239fd091bce964c3d5a09402354da0096e0",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "8ef680e92a719c71f6fb3c474b0f68d7e3667c5c71f2972394c002b021ebebca",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "c1d44e2e7154de7c61df3b6d68a2a0fb79ab470999c02289d9b6a5515c27fd9c",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "1a80e7f4db843851708c1815237f9e868eaac66f59c9a3802306a302b2ff7005",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "ec194065d4d4383595cc1163d2121191828fe2f35473dcfcbd6a16c1910de6be",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    },
+    {
+      "pair_id": "9c4286f1e37819a7faa2585dc4a16c1c44754b698f05251c47a148db595cf61e",
+      "all_radar_crop_values_identical": true,
+      "matched_values": 186050,
+      "grid_identical": true,
+      "all_manifest_file_hashes_verified": true
+    }
+  ],
+  "all_qualified_raster_hashes_match": true,
+  "pilot_ledger_writes_performed": false,
+  "human_evidence_created": 0
+}

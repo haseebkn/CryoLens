@@ -148,3 +148,10 @@ docs/processing-validation/v4/diagnostics/orbit-check/official-eof/
 
 # Complete corrected-output execution snapshots; raster outputs stay local.
 !docs/processing-validation/v5/**/executed-code.zip
+
+# Exact fresh optical execution records; native raster files stay local.
+!docs/optical-review/fresh-v1/**/executed-code.zip
+
+# Repeated catalogue payloads are retained exactly in the scoped manifest archive.
+docs/optical-review/fresh-v1/pair-manifests/
+!docs/optical-review/fresh-v1/pair-manifests.zip

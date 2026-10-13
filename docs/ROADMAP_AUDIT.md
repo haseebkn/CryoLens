@@ -9,6 +9,8 @@ See the [current processing report](processing-validation/v5/README.md) for
 subsequent acquisition outcomes and remaining step-2 qualifications. The table
 below retains the earlier audit snapshot rather than rewriting it.
 
+Step 3 continuation: [fresh SAFE optical review](optical-review/fresh-v1/README.md) adds receipt-bound EW/IW review locations, real optical downloads and measured visibility. The table below remains the dated audit snapshot; human reference completion is still separate.
+
 Audit date: 12 October 2026. Reviewed stack head:
 `e29986877035588f50dff47ecbdfc39df86a02f4`.
 This is an implementation and development-evidence audit, not a scientific
