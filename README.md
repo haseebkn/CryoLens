@@ -35,12 +35,14 @@ Download the HTML and open it locally; it presents recorded results, not live
 inference or surveillance.
 
 The [portable ZIP](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.3/CryoLens-v0.1.0-research.3-portable-demo.zip)
-contains a separate executable U-Net inference check. In a fresh Windows
-Python 3.11 CPU environment, installed-wheel HTTP inference reproduced one
-qualified development prediction with maximum absolute difference
-**1.19e-7**, below the unchanged **1e-5** tolerance. Follow its `START-HERE.md`;
-dependency setup needs internet, but no credentials, GPU or Docker. This
-verifies that demonstration, not fresh-SAFE model suitability or accuracy.
+contains a separate executable U-Net inference check. It reused the isolated
+Windows Python 3.11 CPU environment and installed wheel from the research.2
+verification, with unchanged dependencies rather than a new full dependency
+install this round; HTTP inference reproduced one qualified development
+prediction with maximum absolute difference **1.19e-7**, below the unchanged
+**1e-5** tolerance. Follow its `START-HERE.md`; first-time dependency setup
+needs internet, but no credentials, GPU or Docker. This verifies that
+demonstration, not fresh-SAFE model suitability or accuracy.
 
 ### Roadmap: demonstrated progress and remaining work
 
