@@ -10,6 +10,22 @@ permissions:
   contents: read
 
 jobs:
+  browser-review:
+    name: Review saving in Chromium
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tests/browser/package-lock.json
+      - run: npm ci --ignore-scripts
+        working-directory: tests/browser
+      - run: npx --no-install playwright install --with-deps chromium
+        working-directory: tests/browser
+      - run: npm test
+        working-directory: tests/browser
   lint-and-test:
     name: Lint, types, unit tests and PostGIS
     runs-on: ubuntu-latest

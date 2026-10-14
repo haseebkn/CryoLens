@@ -158,3 +158,8 @@ docs/optical-review/fresh-v1/pair-manifests/
 
 # Isolated GPU research runtime
 .venv-research/
+
+# Browser regression runtime and generated results
+node_modules/
+test-results/
+playwright-report/
