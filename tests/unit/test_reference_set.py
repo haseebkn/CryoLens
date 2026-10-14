@@ -907,6 +907,36 @@ def test_invalid_correction_package_is_atomic(workspace: Path, failure: str) -> 
         assert events(c) == before
 
 
+@pytest.mark.parametrize("failure", ["mismatch", "unknown", "duplicate", "boolean", "missing"])
+def test_correction_tiles_bind_confirmations_to_original_survey_tasks_atomically(
+    workspace: Path, failure: str
+) -> None:
+    from cryolens.reference.corrections import adopt_corrections
+
+    path, receipt, package = correction_package(workspace)
+    if failure == "duplicate":
+        package["corrections"][1]["tile"] = 1
+    else:
+        package["corrections"] = package["corrections"][:1]
+        row = package["corrections"][0]
+        if failure == "missing":
+            row.pop("tile")
+        else:
+            tile = {"mismatch": 2, "unknown": 999, "boolean": True}[failure]
+            row["tile"] = tile
+            package["confirmation"]["tiles"] = [tile]
+    reseal_correction(path, receipt, package)
+    source_bytes, receipt_bytes = path.read_bytes(), receipt.read_bytes()
+    with ledger(workspace) as c:
+        before = events(c)
+    with pytest.raises(ValueError, match="uniquely identify its original survey task"):
+        adopt_corrections(workspace, path, receipt)
+    with ledger(workspace) as c:
+        assert events(c) == before
+    assert not (workspace / "corrections").exists()
+    assert path.read_bytes() == source_bytes and receipt.read_bytes() == receipt_bytes
+
+
 def test_correction_provenance_tampering_blocks_all_downstream_consumers(workspace: Path) -> None:
     from cryolens.reference.corrections import adopt_corrections
 

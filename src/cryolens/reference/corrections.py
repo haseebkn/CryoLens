@@ -52,6 +52,31 @@ def adopt_corrections(
         t["task_id"]: t
         for t in json.loads((root / "private/tasks.json").read_text(encoding="utf-8"))
     }
+    survey_packet = "review/survey/tasks.json"
+    if survey_packet not in workspace["files_sha256"]:
+        raise ValueError("Original survey packet must be sealed")
+    survey_ids = [
+        t["task_id"]
+        for t in json.loads((root / survey_packet).read_text(encoding="utf-8"))["tasks"]
+    ]
+    if len(set(survey_ids)) != len(survey_ids) or any(
+        identifier not in tasks or tasks[identifier]["mode"] != "survey"
+        for identifier in survey_ids
+    ):
+        raise ValueError("Original survey packet has duplicate or unknown tasks")
+    original_tiles = dict(enumerate(survey_ids, start=1))
+    declared_tiles = set()
+    for row in rows:
+        tile = row.get("tile")
+        if (
+            not isinstance(tile, int)
+            or isinstance(tile, bool)
+            or tile in declared_tiles
+            or original_tiles.get(tile) != row["body"]["base_task_id"]
+            or row["body"]["response"]["task_id"] != row["body"]["base_task_id"]
+        ):
+            raise ValueError("Correction tile must uniquely identify its original survey task")
+        declared_tiles.add(tile)
     confirmation = package.get("confirmation", {})
     folder = root / "corrections" / package_hash
     package_copy = folder / "corrections.json"
