@@ -3,10 +3,12 @@
 Frozen research scope, 5 October 2026. No final test evaluation has run.
 
 This directory preserves the original hash-bound scientific snapshot, including
-its original descriptive metadata. Current project wording and AOI descriptions
-are maintained separately; editorial changes do not alter the frozen geometry,
-partitions or recorded execution hashes. This archive is provenance, not current
-project positioning or evidence of operational affiliation.
+its original descriptive metadata. `configs/aoi.geojson` is also hash-bound by
+the frozen protocol and historical marine-processing receipts, so its original
+bytes are retained. Current presentation wording is maintained separately;
+editorial changes must not alter the geometry, partitions, receipt fields or
+recorded execution hashes. These records are provenance, not current project
+positioning or evidence of operational affiliation.
 
 | Partition | Unique input records |
 |---|---:|
