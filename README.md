@@ -18,7 +18,7 @@ https://github.com/user-attachments/assets/0aae9c27-022f-4cc1-be55-71d5475b4b80
 <details>
 <summary>Linked thumbnail and direct playback fallback</summary>
 
-[![CryoLens: watch the two-minute research walkthrough](docs/media/cryolens-walkthrough-thumbnail.png)](https://github.com/user-attachments/assets/0aae9c27-022f-4cc1-be55-71d5475b4b80)
+[![CryoLens: watch the two-minute research walkthrough](docs/media/cryolens-walkthrough-thumbnail.png)](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.3/CryoLens-two-minute-walkthrough.mp4)
 
 </details>
 
