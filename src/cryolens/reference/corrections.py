@@ -10,6 +10,7 @@ from typing import Any
 import numpy as np
 
 from cryolens.eval.cohort import digest, file_digest
+from cryolens.reference.coverage import uncertain_radius
 from cryolens.reference.packet import read_workspace
 from cryolens.reference.records import (
     HumanResponse,
@@ -123,17 +124,8 @@ def adopt_corrections(
             )
             if any(body.get(name) != value for name, value in normalized.items()):
                 raise ValueError("Correction normalization differs from the source grid or policy")
+            radius = uncertain_radius(body, workspace["policy"]["uncertain_buffer_pixels"])
             if body.get("position_is_approximate"):
-                uncertainty = body.get("position_uncertainty_pixels")
-                if (
-                    not isinstance(uncertainty, int)
-                    or isinstance(uncertainty, bool)
-                    or uncertainty < 1
-                ):
-                    raise ValueError(
-                        "Approximate position needs explicit positive pixel uncertainty"
-                    )
-                radius = workspace["policy"]["uncertain_buffer_pixels"] + uncertainty
                 with np.load(root / tasks[response.task_id]["grid"], allow_pickle=False) as grid:
                     height, width = grid["survey_domain"].shape
                 for mark in response.marks:

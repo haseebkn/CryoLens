@@ -6,6 +6,20 @@ from typing import Any
 import numpy as np
 
 
+def uncertain_radius(body: dict[str, Any], protocol_radius: int) -> int:
+    approximate = body.get("position_is_approximate", False)
+    allowance = body.get("position_uncertainty_pixels")
+    if not isinstance(approximate, bool):
+        raise ValueError("Position approximation must be explicitly boolean")
+    if not approximate:
+        if allowance is not None:
+            raise ValueError("Pixel uncertainty requires an explicit approximate position")
+        return protocol_radius
+    if not isinstance(allowance, int) or isinstance(allowance, bool) or allowance < 1:
+        raise ValueError("Approximate position needs explicit positive pixel uncertainty")
+    return protocol_radius + allowance
+
+
 def survey_masks(
     root: Path,
     workspace: dict[str, Any],
@@ -16,7 +30,6 @@ def survey_masks(
     eligible = np.zeros_like(coverage)
     excluded = np.zeros_like(coverage)
     height, width = coverage.shape
-    radius = workspace["policy"]["uncertain_buffer_pixels"]
     for task in tasks:
         if task["mode"] != "survey":
             continue
@@ -28,6 +41,7 @@ def survey_masks(
             body = responses.get(task["task_id"])
             if body is None:
                 continue
+            radius = uncertain_radius(body, workspace["policy"]["uncertain_buffer_pixels"])
             response = body["response"]
             if response["status"] == "complete":
                 coverage[row : row + h, col : col + w] |= domain

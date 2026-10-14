@@ -756,7 +756,7 @@ def test_candidate_review_requires_prior_survey_and_preserves_sampling_weights(
 
 
 # Correction fixtures exercise the public importer and downstream consumers.
-def correction_package(root: Path) -> tuple[Path, Path, dict[str, Any]]:
+def correction_package(root: Path, mark_col: int = 20) -> tuple[Path, Path, dict[str, Any]]:
     from cryolens.reference.records import ManualRecheck, validate_response
 
     prepared = read_workspace(root)
@@ -769,8 +769,9 @@ def correction_package(root: Path) -> tuple[Path, Path, dict[str, Any]]:
     for index, task in enumerate(tasks(root)[:2]):
         original = next(e for e in history if e["body"]["base_task_id"] == task["task_id"])
         with np.load(root / task["grid"]) as grid:
+            grid_width = grid["core"].shape[1]
             if index == 0:
-                row, col = 20, 20
+                row, col = 20, mark_col
                 assert grid["survey_domain"][row, col] and grid["core"][row, col]
             else:
                 row, col = map(int, np.argwhere(grid["survey_domain"] & grid["core"])[40])
@@ -791,7 +792,9 @@ def correction_package(root: Path) -> tuple[Path, Path, dict[str, Any]]:
             reviewed_utc=correction_time.isoformat(),
             marks=marks,
             active_seconds=None if index == 0 else 120,
-            excluded_regions=[[row - 5, col - 5, row + 6, col + 6]] if index == 0 else [],
+            excluded_regions=[[row - 5, col - 5, row + 6, min(grid_width, col + 6)]]
+            if index == 0
+            else [],
         )
         response = (
             ManualRecheck.model_validate(value)
@@ -931,12 +934,22 @@ def test_correction_provenance_tampering_blocks_all_downstream_consumers(workspa
         )
 
 
-def test_freeze_defaults_to_corrected_records_and_preserves_uncertainty(workspace: Path) -> None:
+@pytest.mark.parametrize("mark_col", [20, 31])
+def test_freeze_defaults_to_corrected_records_and_preserves_uncertainty(
+    workspace: Path, mark_col: int
+) -> None:
     from cryolens.reference.corrections import adopt_corrections
     from cryolens.reference.records import effective_primary_events
 
-    path, receipt, _ = correction_package(workspace)
+    path, receipt, _ = correction_package(workspace, mark_col=mark_col)
+    source_bytes, receipt_bytes = path.read_bytes(), receipt.read_bytes()
+    with ledger(workspace) as c:
+        originals = events(c)
     adopt_corrections(workspace, path, receipt)
+    with ledger(workspace) as c:
+        assert events(c)[: len(originals)] == originals
+    assert path.read_bytes() == source_bytes and receipt.read_bytes() == receipt_bytes
+    assert summarize(workspace)["reviewers"][0]["surveyed_unambiguous_pixels"] == 65 * 67 - 5 - 121
     with ledger(workspace) as c:
         selected = {e["body"]["base_task_id"]: e for e in effective_primary_events(events(c))}
     issued = issue_review(
@@ -971,6 +984,9 @@ def test_freeze_defaults_to_corrected_records_and_preserves_uncertainty(workspac
     )
     assert result["human_reference_records"] == 2
     assert result["surveyed_pixels"] == 65 * 67 - 5 - 121
+    with np.load(workspace / "corrected-frozen/coverage.npz") as saved:
+        assert not saved["independently_surveyed"][15:26, mark_col - 5 : mark_col + 6].any()
+        assert saved["independently_surveyed"][20, mark_col + 6]
     assert len(result["applied_amendments"]) == 2
     labels = {
         a["target_detection"]["label"]
@@ -981,6 +997,106 @@ def test_freeze_defaults_to_corrected_records_and_preserves_uncertainty(workspac
     assert summarize(workspace)["reference_set_complete"] is True
     assert (workspace / "corrected-frozen/reference.json").read_bytes() == original_snapshot
     assert adopt_corrections(workspace, path, receipt)["inserted_amendments"] == 0
+
+
+@pytest.mark.parametrize("allowance", [None, 0, -1, True, 2.5, "2"])
+def test_unknown_or_invalid_localization_allowance_fails_closed(
+    workspace: Path, allowance: Any
+) -> None:
+    from cryolens.reference.corrections import adopt_corrections
+    from cryolens.reference.coverage import survey_masks
+
+    path, receipt, package = correction_package(workspace)
+    body = package["corrections"][0]["body"]
+    body["position_uncertainty_pixels"] = allowance
+    reseal_correction(path, receipt, package)
+    with ledger(workspace) as c:
+        before = events(c)
+    with pytest.raises(ValueError, match="positive pixel uncertainty"):
+        adopt_corrections(workspace, path, receipt)
+    with ledger(workspace) as c:
+        assert events(c) == before
+    assert not (workspace / "corrections").exists()
+    with pytest.raises(ValueError, match="positive pixel uncertainty"):
+        survey_masks(
+            workspace, read_workspace(workspace), tasks(workspace), {body["base_task_id"]: body}
+        )
+
+
+def test_freeze_chronology_includes_later_response_chosen_by_resolution(workspace: Path) -> None:
+    from unittest.mock import patch
+
+    reviewed = read_workspace(workspace)["created_at"]
+    original_tasks = tasks(workspace)
+    import_rows(workspace, [human(workspace, t, reviewed_utc=reviewed) for t in original_tasks])
+    issued = issue_review(
+        workspace, "fixture-reviewer", "independent-fixture", mode="independent", fraction=1
+    )
+    import_rows(
+        workspace,
+        [
+            human(
+                workspace,
+                t,
+                phase=issued["phase"],
+                reviewer_id="independent-fixture",
+                reviewed_utc=datetime.now(UTC).isoformat(),
+            )
+            for t in issued["tasks"]
+        ],
+        "independent.json",
+    )
+    early_date = datetime.now(UTC)
+    later_date = early_date + timedelta(seconds=1)
+    final_date = later_date + timedelta(seconds=1)
+    chosen_task = original_tasks[0]
+    import_rows(
+        workspace,
+        [
+            human(
+                workspace,
+                chosen_task,
+                reviewer_id="third-fixture",
+                reviewed_utc=later_date.isoformat(),
+            )
+        ],
+        "third-reviewer.json",
+    )
+    chosen_key = f"response:initial:third-fixture:{chosen_task['task_id']}"
+    adjudication = {
+        "reviewer_id": "fixture-adjudicator",
+        "adjudicated_utc": early_date.isoformat(),
+        "notes": "Synthetic later third-reviewer selection",
+        "target_ownership_at_core_boundaries_reviewed": True,
+        "independent_reviewer_status": "obtained",
+        "case_resolutions": [
+            {
+                "base_task_id": chosen_task["task_id"],
+                "use_response_key": chosen_key,
+                "rationale": "Retain the synthetic third-reviewer response",
+            }
+        ],
+    }
+    with ledger(workspace) as c:
+        before = events(c)
+    output = workspace / "resolved-frozen"
+    with patch("cryolens.reference.freeze.datetime") as clock:
+        clock.now.return_value = final_date
+        clock.fromisoformat.side_effect = datetime.fromisoformat
+        with pytest.raises(ValueError, match="Adjudication predates"):
+            freeze_reference(workspace, "fixture-reviewer", adjudication, output)
+        assert not output.exists()
+        with ledger(workspace) as c:
+            assert events(c) == before
+        result = freeze_reference(
+            workspace,
+            "fixture-reviewer",
+            {**adjudication, "adjudicated_utc": final_date.isoformat()},
+            output,
+        )
+    assert chosen_key in result["accepted_response_keys"]
+    assert result["reference_set_complete"] is True
+    assert (output / "reference.json").exists()
 
 
 def test_new_corrections_cannot_silently_replace_an_issued_comparison(workspace: Path) -> None:

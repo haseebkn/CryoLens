@@ -118,6 +118,7 @@ def freeze_reference(
                     "Adjudication must choose a real response for the same task with rationale"
                 )
             selected[identifier] = bodies[key]
+        considered_reviews.extend(selected.values())
         if any(
             b["mode"] == "candidate" and b["response"]["status"] != "complete"
             for b in selected.values()
