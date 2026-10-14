@@ -53,3 +53,9 @@ docs/optical-review/fresh-v1/**/*.json linguist-generated=true
 
 # Publisher XML bytes are an exact source artifact, including whitespace.
 docs/optical-review/fresh-v1/cdse-direct-verification/hosted-product.xml whitespace=-blank-at-eol,cr-at-eol
+
+# Sea-ice research execution receipts are intentional byte contracts.
+configs/seaice-development-v1.json -text whitespace=cr-at-eol
+docs/segmentation/v1/** -text whitespace=cr-at-eol
+docs/segmentation/v1/**/*.md text eol=lf
+docs/segmentation/v1/**/*.json linguist-generated=true
