@@ -138,6 +138,7 @@ test('failed saved-response persistence survives draft writes and beforeunload u
   await page.locator('button[type=submit]').click();
   await expect(page.locator('#message')).toContainText('only in memory');
   await page.locator('#notes').fill('Draft update after failed response persistence.');
+  await page.evaluate(key => navigator.locks.request(key, () => {}), storageKey);
   expect(await page.evaluate(key => {
     const draft = JSON.parse(localStorage.getItem(`${key}:drafts:v2`));
     return draft['task-0'].fields.notes;
@@ -283,11 +284,11 @@ for (const sameTask of [false, true]) {
     await expect.poll(() => page.evaluate(async key => {
       const state = await navigator.locks.query();
       return state.pending.filter(lock => lock.name === key).length;
-    }, storageKey)).toBe(2);
+    }, storageKey)).toBe(4);
     await page.evaluate(() => window.releaseSaveLock());
     await expect.poll(() => page.evaluate(async key => {
       const state = await navigator.locks.query();
-      return state.held.filter(lock => lock.name === key).length;
+      return [...state.held, ...state.pending].filter(lock => lock.name === key).length;
     }, storageKey)).toBe(0);
     const responses = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), storageKey);
     if (sameTask) {
@@ -346,6 +347,7 @@ test(`failed revised A remains saved when B persistence succeeds ${newerDraft ? 
   if (newerDraft) {
     other = await context.newPage(); await openViewer(other);
     await other.locator('#notes').fill('Newer unsaved other-tab draft.');
+    await other.evaluate(key => navigator.locks.request(key, () => {}), storageKey);
     preservedDraft = await other.evaluate(key => JSON.parse(localStorage.getItem(`${key}:drafts:v2`))['task-0'], storageKey);
   }
   await page.evaluate(() => window.restoreStorageWrites());
@@ -378,3 +380,51 @@ test(`failed revised A remains saved when B persistence succeeds ${newerDraft ? 
   expect((await exported(page)).find(row => row.task_id === 'task-0').notes).toBe('Another revision of A after recovery.');
 });
 }
+
+test('ordinary draft and navigation writes wait for a save baseline update without losing either task', async ({ page, context }) => {
+  await openViewer(page); await inspect(page); await mark(page);
+  await page.locator('button[type=submit]').click();
+  await expect(page.locator('#message')).toContainText('saved locally');
+  const other = await context.newPage(); await openViewer(other);
+  await other.locator('#next').click();
+  await expect(other.locator('#progress')).toContainText('Task 2 of 2');
+  await other.locator('#notes').fill('Earlier B draft.');
+  await other.evaluate(key => navigator.locks.request(key, () => {}), storageKey);
+  await page.locator('#notes').fill('Updated A saved response.');
+  await page.evaluate(async key => {
+    let acquired;
+    const ready = new Promise(resolve => { acquired = resolve; });
+    window.heldSaveLock = navigator.locks.request(key, () => new Promise(resolve => {
+      window.releaseSaveLock = resolve; acquired();
+    }));
+    await ready;
+  }, storageKey);
+  await page.locator('#review-form').evaluate(form => form.requestSubmit());
+  await other.locator('#notes').evaluate(input => {
+    input.value = 'New B draft during A save.';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  expect(await other.evaluate(key => JSON.parse(localStorage.getItem(`${key}:drafts:v2`))['task-1'].fields.notes, storageKey)).toBe('Earlier B draft.');
+  expect(await other.evaluate(() => {
+    const event = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(event); return event.defaultPrevented;
+  })).toBe(true);
+  await other.locator('#previous').evaluate(button => button.click());
+  await expect(other.locator('#progress')).toContainText('Task 2 of 2');
+  await page.evaluate(() => window.releaseSaveLock());
+  await expect(page.locator('#message')).toContainText('saved locally');
+  await expect(other.locator('#progress')).toContainText('Task 1 of 2');
+  await other.evaluate(key => navigator.locks.request(key, () => {}), storageKey);
+  const stores = await page.evaluate(key => ({
+    saved: JSON.parse(localStorage.getItem(key)),
+    drafts: JSON.parse(localStorage.getItem(`${key}:drafts:v2`)),
+  }), storageKey);
+  expect(stores.drafts['task-1'].fields.notes).toBe('New B draft during A save.');
+  expect(stores.drafts['task-0'].saved_baseline).toEqual(stores.saved['task-0']);
+  await page.reload();
+  await page.locator('#notes').fill('A revision after the interleaving.');
+  await page.locator('#attest').check();
+  await page.locator('button[type=submit]').click();
+  await expect(page.locator('#message')).toContainText('saved locally');
+  expect((await exported(page))[0].notes).toBe('A revision after the interleaving.');
+});

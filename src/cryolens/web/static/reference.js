@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (unreadable.has(name)) throw new Error('Existing storage is unreadable');
     localStorage.setItem(name, JSON.stringify(value));
   }
-  let saved = readStore(key), drafts = readStore(draftKey), restoring = false, storageFailed = false, saving = false;
+  let saved = readStore(key), drafts = readStore(draftKey), restoring = false, storageFailed = false, saving = false, draftWrites = 0, navigating = false;
   const pending = new Map(), pendingDrafts = new Map(), draftBaselineUpdates = new Map();
   let savedBaseline = structuredClone(saved);
   let index = 0, marks = [], regions = [], position = null, regionStart = null, image = null, imageRequest = 0, elapsed = 0, lastTick = performance.now(), viewedChannels = new Set(), active = !document.hidden;
@@ -29,20 +29,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.addEventListener('visibilitychange', () => { tick(); active = !document.hidden; if (document.hidden) persistDraft(); });
   const task = () => packet.tasks[index];
   const fields = ['reviewer', 'label', 'identity', 'rationale', 'support', 'status', 'notes'];
-  function persistDraft() {
-    if (restoring || !task()) return true;
+  function captureDraft() {
     tick();
-    const draft = {
+    return {
       saved_baseline: savedBaseline[task().task_id] || null,
       marks: structuredClone(marks), excluded_regions: structuredClone(regions),
       position: position ? [...position] : null, elapsed,
       viewed_channels: [...viewedChannels],
       fields: Object.fromEntries(fields.map(id => [id, $(id).value])),
     };
-    drafts[task().task_id] = draft;
-    if (pending.has(task().task_id)) pendingDrafts.set(task().task_id, structuredClone(draft));
+  }
+  function storeDraft(id, draft) {
     try {
-      drafts = { ...readStore(draftKey), [task().task_id]: draft };
+      if (!navigator.locks) throw new Error('Safe browser storage locking unavailable');
+      draft.saved_baseline = savedBaseline[id] || null;
+      if (pending.has(id)) pendingDrafts.set(id, structuredClone(draft));
+      drafts = { ...readStore(draftKey), [id]: draft };
       for (const [taskId, update] of draftBaselineUpdates) {
         if (JSON.stringify(drafts[taskId]) === JSON.stringify(update.draft)) {
           drafts[taskId].saved_baseline = update.baseline;
@@ -56,6 +58,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       return false;
     }
   }
+  async function persistDraft() {
+    if (restoring || !task()) return true;
+    const id = task().task_id, draft = captureDraft();
+    drafts[id] = draft;
+    draftWrites++;
+    try {
+      if (!navigator.locks) throw new Error('Safe browser storage locking unavailable');
+      return await navigator.locks.request(key, () => storeDraft(id, draft));
+    } catch {
+      storageFailed = true;
+      $('message').textContent = 'Browser storage unavailable. Stay on this task; Save and export this session before leaving. Unsaved drafts are not submissions.';
+      return false;
+    } finally { draftWrites--; }
+  }
   const editorChanged = event => {
     if (task().mode === 'candidate' && ['label', 'identity', 'rationale', 'support'].includes(event.target.id)) {
       position = [...task().centre]; $('position').value = position.join(', ');
@@ -65,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   $('review-form').addEventListener('input', editorChanged);
   $('review-form').addEventListener('change', editorChanged);
   window.addEventListener('beforeunload', event => {
-    if (!persistDraft() || storageFailed || pending.size || saving) { event.preventDefault(); event.returnValue = ''; }
+    if (draftWrites || navigating || storageFailed || pending.size || saving) { event.preventDefault(); event.returnValue = ''; }
   });
   $('queue').textContent = packet.queue;
   $('boundary').textContent = packet.identity_claim_boundary;
@@ -122,7 +138,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     list(); const request=++imageRequest; const selectedBand=$('band').value; const nextImage=new Image(); nextImage.onload=()=>{if(request===imageRequest){image=nextImage;viewedChannels.add(selectedBand);draw();persistDraft();}};nextImage.onerror=()=>{$('message').textContent='Image unavailable. Do not mark this task complete.';};nextImage.src=task()[selectedBand];
   }
   $('band').onchange=()=>{tick();const request=++imageRequest;const selectedBand=$('band').value;image=null;const nextImage=new Image();nextImage.onload=()=>{if(request===imageRequest){image=nextImage;viewedChannels.add(selectedBand);draw();persistDraft();}};nextImage.onerror=()=>{$('message').textContent='Image unavailable. Do not complete this task.';};nextImage.src=task()[selectedBand];};$('zoom').onchange=draw;
-  $('previous').onclick=()=>{if(persistDraft()){index--;load();}};$('next').onclick=()=>{if(persistDraft()){index++;load();}};
+  async function navigate(offset) {
+    if (navigating || saving) return;
+    navigating = true; document.querySelector('main').inert = true;
+    try { if (await persistDraft()) { index += offset; await load(); } }
+    finally { navigating = false; document.querySelector('main').inert = false; }
+  }
+  $('previous').onclick=()=>navigate(-1);$('next').onclick=()=>navigate(1);
   $('image').onpointerdown=event=>{if(event.shiftKey){regionStart=point(event);$('image').setPointerCapture(event.pointerId);}};
   $('image').onpointerup=event=>{if(regionStart){const end=point(event);const start=regionStart;regionStart=null;if(!inside(...start)||!inside(...end)){$('message').textContent='Uncertain region must stay inside the core.';return;}regions.push([Math.min(start[0],end[0]),Math.min(start[1],end[1]),Math.max(start[0],end[0])+1,Math.max(start[1],end[1])+1]);list();draw();persistDraft();}else if(task().mode==='survey'){const selected=point(event);if(!inside(...selected)){$('message').textContent='Context outside the core cannot be annotated.';return;}if(position&&position.some((v,i)=>v!==selected[i])){$('message').textContent='Record the selected object or Clear selected point before selecting another.';return;}position=selected;$('position').value=selected.join(', ');draw();persistDraft();}};
   function clearPoint() {
@@ -145,7 +167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   $('add-mark').onclick=()=>{recordPoint();};
   $('review-form').onsubmit=async event=>{
-    event.preventDefault(); if (saving) return;
+    event.preventDefault(); if (saving || navigating) return;
     event.preventDefault();tick();const reviewer=$('reviewer').value.trim();if(!image||!reviewer||!$('attest').checked||$('notes').value.trim().length<3){$('message').textContent='Load the image, enter your ID, inspection notes and personal-inspection attestation.';return;}
     if($('status').value==='complete'&&viewedChannels.size!==2){$('message').textContent='Inspect both HH and HV before declaring complete coverage.';return;}
     // A selected point is an explicit assessment, never an implied empty survey.
@@ -157,6 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const commit = () => {
       const latest = readStore(key);
       if (!unreadable.has(key) && JSON.stringify(latest[id]) !== JSON.stringify(savedBaseline[id])) {
+        storeDraft(id, captureDraft());
         $('message').textContent = 'This response changed in another tab. Your draft is retained; export saved responses there and resolve the conflicting review before saving here.';
         return;
       }
@@ -181,7 +204,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         pending.clear(); pendingDrafts.clear();
         $('message').textContent = `Response saved locally with ${marks.length} recorded object(s). Export and import to validate it; no server write occurred.`;
-        persistDraft();
+        storeDraft(id, captureDraft());
       } catch {
         $('message').textContent = 'Browser storage unavailable; response is only in memory. Use a local review server with browser locking support, or export this session before leaving.';
       }

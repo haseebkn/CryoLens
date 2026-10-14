@@ -15,8 +15,9 @@ viewer explains that a saved response is only in memory and must be exported.
 Export still contains only explicitly saved responses, using the existing schema.
 Both-channel inspection and independent-evidence requirements remain unchanged.
 
-Saved-response writes use an exclusive browser lock around the read, conflict
-check, merge and write. Open the local review server in a browser with Web Locks
+Saved-response and draft writes share an exclusive browser lock around the read,
+conflict check, merge and write. Navigation waits for its draft write; leaving
+while storage work is pending triggers an unload warning. Open the local review server in a browser with Web Locks
 support; when locking is unavailable, explicitly saved responses stay in memory
 for export and the viewer warns before leaving. Failed saved revisions remain
 in memory until a successful write persists them, including when saving another
