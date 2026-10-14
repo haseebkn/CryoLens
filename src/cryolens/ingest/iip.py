@@ -28,13 +28,15 @@ class IIPClient:
     def ingest_csv(self, session: Session, csv_path: str | Path) -> int:
         """Parse an IIP CSV file and ingest records into the database.
 
-        Expected columns (case-insensitive, can vary slightly by year):
-        - SIGHTING_DATE: mm/dd/yyyy or yyyy-mm-dd
-        - SIGHTING_TIME: hh:mm (UTC)
+        Required columns (case-insensitive, exactly one alias per field):
+        - SIGHTING_DATE or DATE: mm/dd/yyyy or yyyy-mm-dd
+        - SIGHTING_TIME or TIME: hh:mm or hhmm (UTC)
         - SIGHTING_LATITUDE or LATITUDE: decimal degrees
         - SIGHTING_LONGITUDE or LONGITUDE: decimal degrees
-        - SIZE: size class string (e.g., 'Small', 'Medium')
-        - SHAPE: shape string (e.g., 'Tabular', 'Non-Tabular')
+
+        SIZE and SHAPE are optional attributes. Header validation precedes all
+        writes; malformed rows are logged and skipped, but an entirely malformed
+        file raises ValueError. Valid sightings outside the NL polygon are skipped.
         """
         csv_path = Path(csv_path)
         if not csv_path.is_file():

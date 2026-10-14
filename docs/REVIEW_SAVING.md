@@ -10,18 +10,24 @@ Inspecting a genuinely empty core still permits a complete response with no mark
 Drafts, including pending points, notes and recorded marks, are backed up under a
 separate browser-storage key and recovered when navigating or reloading. Recovered
 drafts require a new personal-inspection attestation before saving. They never
-count as imported submissions. If storage fails, navigation is blocked and the
-viewer explains that a saved response is only in memory and must be exported.
+count as imported submissions. A failed draft write blocks navigation. A failed
+saved-response write leaves that response only in memory, with a warning to export
+the session before leaving; successful draft writes do not remove that protection.
 Export still contains only explicitly saved responses, using the existing schema.
 Both-channel inspection and independent-evidence requirements remain unchanged.
 
 Saved-response and draft writes share an exclusive browser lock around the read,
 conflict check, merge and write. Navigation waits for its draft write; leaving
-while storage work is pending triggers an unload warning. Open the local review server in a browser with Web Locks
-support; when locking is unavailable, explicitly saved responses stay in memory
+while storage work is pending triggers an unload warning. Open the local review
+server in a browser with Web Locks support; when locking is unavailable,
+explicitly saved responses stay in memory
 for export and the viewer warns before leaving. Failed saved revisions remain
 in memory until a successful write persists them, including when saving another
-task. Each draft retains its originating saved response for conflict checks after
+task. Each pending response retains its original saved baseline independently of
+recovered drafts; if another tab has changed that response, flushing is blocked
+and the pending response remains available for export. Unpersisted responses do
+not survive closing or reloading, so export them before leaving despite the warning.
+Each draft retains its originating saved response for conflict checks after
 reload. Older drafts without that metadata cannot replace an existing response;
 their contents remain recoverable for review.
 

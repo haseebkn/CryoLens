@@ -52,6 +52,14 @@ async function exported(page) {
   return JSON.parse(await fs.readFile(await (await download).path(), 'utf8'));
 }
 
+async function captureEvidence(page, name, responses) {
+  const directory = process.env.CRYOLENS_TEST_EVIDENCE;
+  if (!directory) return;
+  await fs.mkdir(directory, { recursive: true });
+  await page.screenshot({ path: path.join(directory, `${name}.png`), fullPage: true });
+  await fs.writeFile(path.join(directory, `${name}.json`), JSON.stringify(responses, null, 2));
+}
+
 test('Save records the explicitly selected point and exports it without Add-mark', async ({ page }) => {
   await openViewer(page); await inspect(page); await mark(page);
   await page.locator('button[type=submit]').click();
@@ -60,6 +68,7 @@ test('Save records the explicitly selected point and exports it without Add-mark
   expect(response.status).toBe('complete');
   expect(response.marks).toEqual([expect.objectContaining({ row: 40, col: 40, label: 'target', identity: 'unknown' })]);
   expect(response.viewed_channels.sort()).toEqual(['HH', 'HV']);
+  await captureEvidence(page, 'selected-point-saved', [response]);
   await page.reload();
   await expect(page.locator('#marks')).toContainText('sample 40, 40');
 });
@@ -281,10 +290,11 @@ for (const sameTask of [false, true]) {
       page.locator('#review-form').evaluate(form => form.requestSubmit()),
       other.locator('#review-form').evaluate(form => form.requestSubmit()),
     ]);
+    // Both submits queue a point draft and a save; ordinary draft writes may also be pending.
     await expect.poll(() => page.evaluate(async key => {
       const state = await navigator.locks.query();
       return state.pending.filter(lock => lock.name === key).length;
-    }, storageKey)).toBe(4);
+    }, storageKey)).toBeGreaterThanOrEqual(4);
     await page.evaluate(() => window.releaseSaveLock());
     await expect.poll(() => page.evaluate(async key => {
       const state = await navigator.locks.query();
@@ -478,5 +488,9 @@ for (const retryA of [false, true]) {
       window.dispatchEvent(event); return event.defaultPrevented;
     })).toBe(true);
     expect((await exported(other))[0].notes).toBe('A2 newer other-tab saved revision.');
+    if (!retryA) {
+      await captureEvidence(page, 'failed-revision-recoverable', recovered);
+      await captureEvidence(other, 'newer-response-protected', await exported(other));
+    }
   });
 }
