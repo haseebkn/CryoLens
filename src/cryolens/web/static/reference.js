@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     localStorage.setItem(name, JSON.stringify(value));
   }
   let saved = readStore(key), drafts = readStore(draftKey), restoring = false, storageFailed = false, saving = false;
-  const pending = new Map();
+  const pending = new Map(), pendingDrafts = new Map(), draftBaselineUpdates = new Map();
   let savedBaseline = structuredClone(saved);
   let index = 0, marks = [], regions = [], position = null, regionStart = null, image = null, imageRequest = 0, elapsed = 0, lastTick = performance.now(), viewedChannels = new Set(), active = !document.hidden;
   const tick = () => { const now = performance.now(); if (active) elapsed += (now - lastTick) / 1000; lastTick = now; };
@@ -40,9 +40,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       fields: Object.fromEntries(fields.map(id => [id, $(id).value])),
     };
     drafts[task().task_id] = draft;
+    if (pending.has(task().task_id)) pendingDrafts.set(task().task_id, structuredClone(draft));
     try {
       drafts = { ...readStore(draftKey), [task().task_id]: draft };
-      writeStore(draftKey, drafts); storageFailed = false; return true;
+      for (const [taskId, update] of draftBaselineUpdates) {
+        if (JSON.stringify(drafts[taskId]) === JSON.stringify(update.draft)) {
+          drafts[taskId].saved_baseline = update.baseline;
+        }
+      }
+      writeStore(draftKey, drafts); draftBaselineUpdates.clear(); storageFailed = false; return true;
     }
     catch {
       storageFailed = true;
@@ -155,6 +161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
       pending.set(id, response);
+      pendingDrafts.set(id, structuredClone(drafts[id]));
       const retained = Object.fromEntries(pending);
       saved = { ...saved, ...latest, ...retained };
       elapsed = 0;
@@ -166,10 +173,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!navigator.locks) throw new Error('Safe browser storage locking unavailable');
         writeStore(key, saved);
         for (const taskId of pending.keys()) {
+          if (pendingDrafts.get(taskId)) draftBaselineUpdates.set(taskId, {
+            draft: draftBaselineUpdates.get(taskId)?.draft || pendingDrafts.get(taskId),
+            baseline: structuredClone(saved[taskId]),
+          });
           savedBaseline[taskId] = structuredClone(saved[taskId]);
-          if (drafts[taskId]) drafts[taskId].saved_baseline = savedBaseline[taskId];
         }
-        pending.clear();
+        pending.clear(); pendingDrafts.clear();
         $('message').textContent = `Response saved locally with ${marks.length} recorded object(s). Export and import to validate it; no server write occurred.`;
         persistDraft();
       } catch {
@@ -181,7 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (navigator.locks) await navigator.locks.request(key, commit);
       else commit();
     } catch {
-      pending.set(id, response); saved[id] = response; elapsed = 0;
+      pending.set(id, response); pendingDrafts.set(id, structuredClone(drafts[id])); saved[id] = response; elapsed = 0;
       $('message').textContent = 'Browser storage unavailable; response is only in memory. Export this session before leaving.';
     } finally { saving = false; document.querySelector('main').inert = false; }
     $('progress').textContent=`Task ${index+1} of ${packet.tasks.length}; ${Object.keys(saved).length} responses in this session.`;
