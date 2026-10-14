@@ -7,6 +7,82 @@ Sentinel-1 HH/HV imagery to find bright radar targets, suppress common clutter,
 and show evidence for analyst review. A detected target is **unclassified and
 unverified** until reviewed. A detector score is not the probability of an iceberg.
 
+**The intended scope has not changed:** develop and evaluate an auditable
+maritime domain awareness workflow for the Newfoundland and Labrador marine
+study area, with low false positives **and measured missed-target risk**. Target
+detection, sea-ice segmentation and ship/iceberg identification remain distinct
+tasks. The current research release is an intermediate delivery toward that
+goal, not a replacement of it or a claim that the operational goal is complete.
+
+Public Sentinel imagery and AI4Arctic sea-ice chart labels have enabled real
+processing, screening, model experiments and review tooling. What is still
+missing is sufficient **verified, acquisition-matched regional target truth**
+and useful corroborating observations to establish ship/iceberg identity and
+regional detection performance. We have not established that no such public
+data exists; the evidence assembled so far is insufficient. Human reference
+review and other implementation/evaluation work also remain unfinished, so
+data availability is **not the sole explanation** for the remaining gaps.
+
+## Current research release - 14 October 2026
+
+[**v0.1.0-research.2: report, portable demo and evidence**](https://github.com/haseebkn/CryoLens/releases/tag/v0.1.0-research.2)
+packages software from merged PR #18, including the review-saving and IIP
+publisher CSV fixes. Start with the
+[five-page evidence report](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.2/CryoLens-v0.1.0-research.2-portfolio.pdf),
+[five-minute offline demo](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.2/CryoLens-v0.1.0-research.2-demo.html)
+and [speaker script](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.2/CryoLens-v0.1.0-research.2-five-minute-script.txt).
+Download the HTML and open it locally; it presents recorded results, not live
+inference or surveillance.
+
+The [portable ZIP](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.2/CryoLens-v0.1.0-research.2-portable-demo.zip)
+contains a separate executable U-Net inference check. In a fresh Windows
+Python 3.11 CPU environment, installed-wheel HTTP inference reproduced one
+qualified development prediction with maximum absolute difference
+**1.19e-7**, below the unchanged **1e-5** tolerance. Follow its `START-HERE.md`;
+dependency setup needs internet, but no credentials, GPU or Docker. This
+verifies that demonstration, not fresh-SAFE model suitability or accuracy.
+
+### Roadmap: demonstrated progress and remaining work
+
+| Step | Demonstrated by this release | Still remaining |
+|---|---|---|
+| **1. Scope and evaluation rules** | Versioned NL polygon, grouped acquisition partitions, task/annotation rules and provenance tracking. | Preserve the protected model test; disclose reference-only and AI-assisted exposure. |
+| **2. Fresh Sentinel-1 processing** | Representative complete EW and IW outputs passed recorded SNAP comparisons and quality checks; fixed 5% HV non-positive limit unchanged. | Regional/seasonal operational qualification and the separate fresh-target deployment gate remain open work. |
+| **3. Sentinel-2 paired review** | Planetary Computer and CDSE ingestion, quality layers, paired review and provenance. Of 18 predeclared review locations, 5 had optical context, 1 passed strict visibility, and 0 had a strict useful view covering the full assumed movement envelope. | Useful matched optical coverage and human corroboration remain limited; these locations are not confirmed detections. |
+| **4. Independent reference set - partial** | 64 accepted pilot primary dispositions, including 5 adopted corrections: 62 complete cores, 1 partial, 1 unusable; 1 observable target and 1 uncertainty, both identity unknown. | 13-tile consistency review, adjudication and freeze; separate 193 development survey tiles and 96 candidate reviews have no formal human submissions. AI assistance is disclosed. |
+| **5. U-Net / frozen CROMA - preliminary** | Executed chart-proxy experiment: 960 training chips, 160 validation chips, grouped acquisitions, one seed, six epochs. | Representative multi-seed evaluation and protected final-test evaluation; 149/160 validation chips contain one chart class, so no reliable winner is established. |
+| **6. Full-pipeline measurement - incomplete** | Candidate counts, suppression accounting and evaluation tooling. | Reference-backed precision, recall, per-stage recall and empirical false alarms with uncertainty; iceberg-identification accuracy is also unknown. |
+| **7. ML lifecycle - research demonstration** | MLflow tracking, registry/signatures, CPU serving and witnessed promotion/rollback. | Operational monitoring, shadow evaluation and justified retraining require qualified deployment and evidence. |
+| **8. Research packaging - delivered** | Tagged prerelease, model card, checksums, clean CPU demonstration, evidence report and timed walkthrough. | Continued scientific validation; this is not an operational or navigational release. |
+
+The pilot's concealed consistency review is eligible after **20 October 2026,
+22:50 Newfoundland time**, under the recorded review dates; further genuine
+reviews can move that date. Accepted pilot work is retained, not discarded.
+The release preserves historical scientific receipts with their original
+execution identities; packaging did not rerun training or evaluate the
+protected final model test.
+
+### Why the remaining gaps exist
+
+- **Target truth:** AI4Arctic labels sea ice, not individual ships or icebergs.
+  IIP reports provide context; they are not automatically acquisition-matched
+  target truth. Obtain suitably matched, traceable observations and expert
+  review; permissioned partner data may help if public sources prove inadequate.
+- **Optical visibility and timing:** Sentinel-2 is public, but clouds, shadows,
+  resolution, acquisition separation and movement restrict useful corroboration.
+  Expand matched searches and report unavailable evidence explicitly; a missing
+  optical counterpart must never automatically make a radar target false.
+- **Human reference work:** existing imagery can support more review now.
+  Finish consistency review, retained/rejected sampling and independent area
+  searches, then adjudicate and freeze scored coverage. This is unfinished work,
+  not solely a public-data access problem.
+- **Model and deployment maturity:** chart-proxy/domain limitations, limited
+  experiments, unconnected AIS, absent trained ship/iceberg identification,
+  disabled drift and unimplemented operational monitoring need further engineering
+  and validation. None becomes complete merely by downloading more imagery.
+
+## Historical screening result - not target accuracy
+
 The September 2026 audit found errors in preprocessing, geographic coverage,
 classification claims and evaluation. Earlier headline results are withdrawn;
 see [benchmark status](docs/BENCHMARK.md) and the [audit](docs/AUDIT.md).
@@ -18,10 +94,12 @@ candidates** over **1,670,147 km²** of cumulative eligible coverage, or 0.186
 per 1,000 km². This is a reproducible screening result, not a validated regional
 false-alarm budget.
 
-It supersedes an earlier three-acquisition smoke run, and is **worse**, not
-better: retained density rose from 0.108 to 0.186 per 1,000 km² and the
-suppression factor fell from 38.9x to 19.4x once coverage grew five-fold. Small
-samples flattered the result.
+It supersedes an earlier three-acquisition smoke run: retained density rose
+from 0.108 to 0.186 per 1,000 km² and the suppression factor fell from 38.9x
+to 19.4x once coverage grew five-fold. These changes show sensitivity to
+coverage; without target truth, they do not establish better or worse accuracy.
+They are historical screening measurements, not new measurements from the
+research.2 release.
 
 ## Relevance to C-CORE
 
@@ -165,8 +243,11 @@ surveys before retained/rejected candidate review, records sampling probabilitie
 and supports concealed repeats, adjudication and exact coverage masks. The
 [real pilot](docs/reference-set/v1/README.md) has 193 development survey tiles,
 28 retained and 68 sampled rejected reviews, and 64 held-out survey tiles.
-See the [validated pilot corrections](docs/reference-set/corrections-v1/README.md)
-for the held-out review and pending adoption status. **Reference completion
+The [correction implementation report](docs/reference-set/corrections-v1/README.md)
+retains its historical pre-adoption status. The later
+[research.2 evidence report and receipts](https://github.com/haseebkn/CryoLens/releases/tag/v0.1.0-research.2)
+record 64 accepted pilot primary dispositions and five adopted amendments,
+not 69 independent reviews. **Reference completion
 remains pending; no reference-derived precision, recall or false-alarm rate is
 available.** January test SAR was prepared for human reference review
 only; its chart labels and model evaluation remain sealed.
