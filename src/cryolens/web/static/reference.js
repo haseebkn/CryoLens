@@ -48,12 +48,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       return false;
     }
   }
-  $('review-form').addEventListener('input', event => {
+  const editorChanged = event => {
     if (task().mode === 'candidate' && ['label', 'identity', 'rationale', 'support'].includes(event.target.id)) {
       position = [...task().centre]; $('position').value = position.join(', ');
     }
     persistDraft();
-  });
+  };
+  $('review-form').addEventListener('input', editorChanged);
+  $('review-form').addEventListener('change', editorChanged);
   window.addEventListener('beforeunload', event => {
     if (!persistDraft() || storageFailed) { event.preventDefault(); event.returnValue = ''; }
   });

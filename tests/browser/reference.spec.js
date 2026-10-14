@@ -206,3 +206,16 @@ test('another tab response is preserved and same-task conflicts cannot overwrite
   await expect(page.locator('#message')).toContainText('changed in another tab');
   expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key))['task-0'].notes, storageKey)).toBe('Changed concurrently');
 });
+
+test('a change-only candidate dropdown edit replaces the recorded assessment on Save', async ({ page }) => {
+  const candidate = structuredClone(packet);
+  candidate.tasks.forEach(task => { task.mode = 'candidate'; task.centre = [32, 32]; });
+  await openViewer(page, candidate); await inspect(page);
+  await page.locator('#rationale').fill('Candidate inspected; later assessment revised.');
+  await page.locator('#add-mark').click();
+  await page.locator('#label').evaluate(select => {
+    select.value = 'target'; select.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await page.locator('button[type=submit]').click();
+  expect((await exported(page))[0].marks).toEqual([expect.objectContaining({ label: 'target', row: 32, col: 32 })]);
+});
