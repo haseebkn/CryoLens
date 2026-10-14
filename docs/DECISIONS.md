@@ -26,6 +26,10 @@ This document records the foundational architectural decisions, scientific const
 
 ## ADR-002: Multi-Channel Polarimetric and Geometric Input Stacking
 
+The four-band feature stack below remains the detection preprocessing contract.
+The later chart-proxy segmentation experiment uses its separately declared
+input contract; see the [authoritative experiment protocol](segmentation/v1/protocol.md).
+
 * **Date:** 2026-08-19
 * **Status:** Accepted
 * **Context:** Icebergs exhibit volume scattering and high cross-polarization backscatter in HV, whereas open ocean backscatter drops significantly in HV, especially at medium-to-high incidence angles. However, wind-roughened sea clutter increases HH backscatter.

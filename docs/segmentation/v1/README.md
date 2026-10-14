@@ -3,7 +3,8 @@
 Executed 14 October 2026 on real, existing AI4Arctic data. This completes the
 requested bounded baseline/frozen-encoder experiment and local research
 lifecycle demonstration. Final test evaluation, operational target metrics and
-the independent reference set remain incomplete.
+the independent reference set remain incomplete. See the [model card](MODEL_CARD.md)
+for intended uses and serving constraints.
 
 ## Measured chart agreement
 
@@ -105,7 +106,11 @@ not permission to enable the separately closed fresh-target deployment gate.
 ## Reproduce
 
 Create a new versioned configuration with your raw-data/cache/output paths and
-the same scientific rules. Install the locked research extra on CPU for software
+the same scientific rules. Save it as `configs/seaice-development-local.json`;
+set `dataset_root` to the absolute preparation output (`E:/new-dataset` below)
+and `tracking_uri` to a new local database before preparation. Keep that
+configuration unchanged through training and lifecycle registration so its
+receipt hashes agree. Install the locked research extra on CPU for software
 verification; CUDA scientific training uses the separately recorded official
 PyTorch CUDA build. No ordinary environment is silently converted to GPU.
 
@@ -113,9 +118,9 @@ PyTorch CUDA build. No ordinary environment is silently converted to GPU.
 uv sync --frozen --extra dev --extra tracking --extra research
 uv run --frozen pytest tests/unit/test_segmentation_research.py tests/research/test_segmentation_torch.py
 # Use a CUDA-enabled Python for the fixed scientific configuration.
-python -m cryolens.segmentation prepare --config configs/seaice-development-v1.json --project . --output E:/new-dataset
-python -m cryolens.segmentation train --config configs/seaice-development-v1.json --project . --dataset E:/new-dataset --output E:/new-training
-python -m cryolens.segmentation lifecycle --config configs/seaice-development-v1.json --project . --dataset E:/new-training --output E:/new-registry
+python -m cryolens.segmentation prepare --config configs/seaice-development-local.json --project . --output E:/new-dataset
+python -m cryolens.segmentation train --config configs/seaice-development-local.json --project . --dataset E:/new-dataset --output E:/new-training
+python -m cryolens.segmentation lifecycle --config configs/seaice-development-local.json --project . --dataset E:/new-training --output E:/new-registry
 python validation/validate_research_container.py --registry E:/new-registry/registry.json --output E:/new-container-validation --image your-qualified-image
 ```
 
@@ -127,7 +132,8 @@ artifact and its checksum; the 778 MB CROMA base download is not embedded.
 
 The container recipe is in `deployment/seaice.Dockerfile`, with a pinned base and
 runtime requirements. Build from a minimal context containing that recipe as
-`Dockerfile`, `deployment/seaice-requirements.txt`, and `service.py` copied from
+`Dockerfile`, `seaice-requirements.txt` copied from
+`deployment/seaice-requirements.txt`, and `service.py` copied from
 `src/cryolens/segmentation/service.py`. Bind only the qualified model read-only;
 publish its inference port on 127.0.0.1. The full source repository or `.env`
 must not enter the image context.

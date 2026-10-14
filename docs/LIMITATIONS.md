@@ -2,10 +2,10 @@
 
 The [independent reference pilot](reference-set/v1/README.md) now has real
 survey packets, a full development raw-component frame, probability samples of
-rejected components, and a human review/repeat/adjudication workflow. It has
-**zero accepted human responses** at preparation. Surveyed coverage, reviewer
-consistency, reference labels and effort estimates are therefore unmeasured.
-An independent second reviewer has not been obtained. Prepared imagery and
+rejected components, and a human review/repeat/adjudication workflow. That
+report owns its preparation snapshot and points to subsequent review and
+correction status. Reference completion and adjudication remain pending. An
+independent second reviewer has not been obtained. Prepared imagery and
 available-area counts must not be reported as completed annotation coverage.
 
 Reviewed 2026-10-05. CryoLens is a research screening and review project, not an
