@@ -183,5 +183,5 @@ input contract; see the [authoritative experiment protocol](segmentation/v1/prot
   evidence. Disable fabricated orbit/preprocessing/forecast successes and
   protect analyst writes with configured identity. Preserve measured unknowns.
 * Consequences: Prior headline numbers are withdrawn. Reduced candidate density
-  is not proof of fewer false positives or maintained recall. No C-CORE or
+  is not proof of fewer false positives or maintained recall. No operational or
   MANICE certification is claimed. See the audit for executable verification.

@@ -11,8 +11,8 @@ fabrication was removed rather than improved.
 
 What is required before this can be implemented, per the project plan's Phase 4:
 
-* **Training labels.** The ship/iceberg discriminator is trained on the
-  Statoil/C-CORE Kaggle dual-pol chips; detection training uses xView3-SAR.
+* **Training labels.** The planned ship/iceberg discriminator would use
+  Kaggle iceberg-classification dual-pol chips; detection training would use xView3-SAR.
   Both are behind terms acceptance, so both are operator-supplied.
 * **Architecture changes for tiny objects.** At 40 m pixel spacing a 100 m
   iceberg is 2-3 pixels across and YOLOv8's finest stride is 8, so a P2
@@ -57,7 +57,7 @@ class YoloSARDetector:
         """
         raise NotImplementedError(
             "YoloSARDetector has no trained weights and no adapted architecture. "
-            "Training requires the xView3-SAR and Statoil/C-CORE datasets, which are "
+            "Training requires the xView3-SAR and Kaggle iceberg-classification datasets, which are "
             "behind terms acceptance and must be supplied by the operator. "
             "Use the CFAR detector (cryolens.detect.cfar) for the measured baseline."
         )

@@ -35,7 +35,7 @@ The machine-readable policy is
 Normalized human observations reuse the frozen `Annotation` contract, while
 the full supporting-observation declarations are preserved in the reference
 ledger. These are analyst-derived observable-target references, not field truth
-or a C-CORE protocol.
+or a certified operational protocol.
 
 ## Frame and sampling
 

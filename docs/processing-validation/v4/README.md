@@ -27,7 +27,7 @@ Its [processing report](iw-december-qualified/report.json) contains nine fixed 5
 
 Its [source-bound marine scan](iw-december-qualified/marine-quality.json) checks every source pixel centre within the shared NL polygon and outside GSHHG land with the unchanged 500 m coastal buffer. It reports **2.337% HV non-positive power and 96.014% finite coverage**. For this wholly marine footprint, the whole-grid and marine counts coincide. Negative observations remain counted; they are not clipped, omitted or treated as nodata to secure acceptance.
 
-The 5% rule is this project's frozen research policy, not a published C-CORE or ESA certification standard. These percentages are processing-quality statistics, **not false-alarm rates or iceberg-identification accuracy**. The report's single-product processing gate is distinct from the enclosing regional and scientific-release gates.
+The 5% rule is this project's frozen research policy, not a published external operational or ESA certification standard. These percentages are processing-quality statistics, **not false-alarm rates or iceberg-identification accuracy**. The report's single-product processing gate is distinct from the enclosing regional and scientific-release gates.
 
 [Current source-bound status](current-status.json) Â· [Coverage GeoJSON](current-coverage.geojson)
 

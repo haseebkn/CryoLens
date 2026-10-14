@@ -148,4 +148,4 @@ class TestReportContent:
 
     def test_disclaims_operational_certification(self) -> None:
         out = render(_report())
-        assert "No certified C-CORE operating point" in out
+        assert "No certified operating point" in out

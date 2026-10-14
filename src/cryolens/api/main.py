@@ -14,7 +14,7 @@ from cryolens.geo.aoi import load_aoi
 
 app = FastAPI(
     title="CryoLens Maritime Domain Awareness API",
-    description="Research portfolio API for unverified SAR candidates in the Newfoundland and Labrador shelf study area. Not a navigation service or C-CORE certified product. Scores are uncalibrated; drift and AIS discrimination are unavailable.",
+    description="Research portfolio API for unverified SAR candidates in the Newfoundland and Labrador shelf study area. Not a navigation service or operationally certified product. Scores are uncalibrated; drift and AIS discrimination are unavailable.",
     version="0.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
@@ -47,7 +47,7 @@ def capabilities() -> dict[str, Any]:
         "ais": "unavailable",
         "drift": "unavailable_unvalidated",
         "optical_review": "Sentinel-2 paired chips and separate analyst evidence; availability measured per generated pair",
-        "affiliation": "Independent portfolio project; no C-CORE affiliation or certification",
+        "affiliation": "Independent portfolio project; no third-party endorsement or operational certification",
     }
 
 

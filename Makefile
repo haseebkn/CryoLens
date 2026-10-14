@@ -82,7 +82,7 @@ train-yolo:
 	@echo "No trained YOLO model exists. See docs/LIMITATIONS.md section 7."
 	@echo "Chip extraction needs a band_loader callable plus analyst-validated"
 	@echo "detections in the database; call cryolens.detect.dataset.DatasetBuilder"
-	@echo "directly once xView3-SAR and Statoil/C-CORE data are available."
+	@echo "directly once xView3-SAR and Kaggle iceberg-classification data are available."
 	@exit 1
 
 benchmark:

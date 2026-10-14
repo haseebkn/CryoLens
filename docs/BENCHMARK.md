@@ -130,4 +130,4 @@ Candidate density counts all retained returns regardless of their true identity.
 
 Machine-readable evidence with per-scene assumptions, source checksums and suppression ledgers: [audited_results.json](benchmarks/audited_results.json). See [DATA.md](DATA.md), [AUDIT.md](AUDIT.md) and [LIMITATIONS.md](LIMITATIONS.md).
 
-No certified C-CORE operating point, MANICE confidence code or navigational hazard assessment is established by this experiment.
+No certified operating point, MANICE confidence code or navigational hazard assessment is established by this experiment.
