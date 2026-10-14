@@ -242,3 +242,13 @@ src/cryolens/
 
 Software: [MIT](LICENSE). Source datasets retain their own terms.
 No output is suitable for navigation or an ice-hazard advisory.
+
+## Preliminary sea-ice model research
+
+The [development comparison and model card](docs/segmentation/v1/README.md)
+record actual U-Net and frozen-CROMA training on chart proxies, followed by a
+local MLflow/Docker promotion and rollback. Pooled validation mean IoU was
+0.9185 and 0.9309, but 149/160 chips are homogeneous chart interiors; mixed-chip
+results are much lower and group macro scores are essentially tied. Test data
+remain protected. This is preliminary chart agreement, not target accuracy,
+regional operating performance or an iceberg classifier.

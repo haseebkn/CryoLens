@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "experiment_id": "seaice-development-v1",
+  "manifest": "docs/evaluation/v1/manifest.json",
+  "data_root": "E:/CryoLens/data/raw",
+  "dataset_root": "E:/CryoLens/data/processed/seaice-development-v1/dataset",
+  "shoreline_cache": "E:/CryoLens/data/cache/gshhg/nl_shoreline.gpkg",
+  "shoreline_sha256": "c3d44eb262868d63ab8d3a16f926d2360636f7a7c52d5db233eb7e729d802e28",
+  "coastal_buffer_m": 500,
+  "patch_size": 128,
+  "patches_per_scene": {
+    "train": 32,
+    "validation": 16
+  },
+  "minimum_scored_fraction": 0.75,
+  "seed": 42,
+  "epochs": 6,
+  "batch_size": 8,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "require_cuda": true,
+  "croma_checkpoint": "E:/CryoLens/data/cache/croma/CROMA_base.pt",
+  "tracking_uri": "sqlite:///E:/CryoLens/data/processed/seaice-development-v1/mlflow.db",
+  "claim_boundary": "Bounded one-seed development chart-proxy experiment, no protected test access or target metrics"
+}

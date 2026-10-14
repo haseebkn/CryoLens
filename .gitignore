@@ -155,3 +155,6 @@ docs/processing-validation/v4/diagnostics/orbit-check/official-eof/
 # Repeated catalogue payloads are retained exactly in the scoped manifest archive.
 docs/optical-review/fresh-v1/pair-manifests/
 !docs/optical-review/fresh-v1/pair-manifests.zip
+
+# Isolated GPU research runtime
+.venv-research/

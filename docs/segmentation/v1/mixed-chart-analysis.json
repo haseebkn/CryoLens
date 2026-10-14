@@ -1,0 +1,77 @@
+{
+  "kind": "exploratory_post_training_mixed_chart_subset",
+  "patches": 11,
+  "total_patches": 160,
+  "selected_by": "Both chart classes present, never model error; same indices for both models",
+  "used_for_model_selection": false,
+  "models": {
+    "unet": {
+      "confusion": [
+        [
+          52816,
+          40831
+        ],
+        [
+          12407,
+          72407
+        ]
+      ],
+      "scored_pixels": 178461,
+      "classes": [
+        {
+          "label": "open_water",
+          "truth_pixels": 93647,
+          "predicted_pixels": 65223,
+          "precision": 0.8097756926237677,
+          "recall": 0.5639903040140101,
+          "f1": 0.6648958267766099,
+          "iou": 0.4980104475078733
+        },
+        {
+          "label": "ice_affected",
+          "truth_pixels": 84814,
+          "predicted_pixels": 113238,
+          "precision": 0.6394231618361328,
+          "recall": 0.8537151885301955,
+          "f1": 0.7311918082119847,
+          "iou": 0.5762823829042143
+        }
+      ],
+      "mean_iou": 0.5371464152060438
+    },
+    "croma_frozen": {
+      "confusion": [
+        [
+          76700,
+          16947
+        ],
+        [
+          25502,
+          59312
+        ]
+      ],
+      "scored_pixels": 178461,
+      "classes": [
+        {
+          "label": "open_water",
+          "truth_pixels": 93647,
+          "predicted_pixels": 102202,
+          "precision": 0.7504745504001878,
+          "recall": 0.8190331777846594,
+          "f1": 0.7832564884170968,
+          "iou": 0.6437317980008225
+        },
+        {
+          "label": "ice_affected",
+          "truth_pixels": 84814,
+          "predicted_pixels": 76259,
+          "precision": 0.7777704926631611,
+          "recall": 0.6993185087367652,
+          "f1": 0.7364611076965103,
+          "iou": 0.5828559074694628
+        }
+      ],
+      "mean_iou": 0.6132938527351426
+    }
+  }
+}

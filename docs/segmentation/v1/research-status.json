@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "step5": "bounded preliminary U-Net/frozen-CROMA development comparison executed",
+  "step7": "local research tracking/signatures/registry/Docker inference/promotion/rollback demonstrated",
+  "step8": "research release candidate in preparation; final code review/CI pending",
+  "step4_complete": false,
+  "step6_target_metrics_measured": false,
+  "test_access": false,
+  "field_truth": false,
+  "published_release": false,
+  "container_image": "sha256:104973411da7f79a6a6421522afa2238619bf0fad4feaa5730e0aced591e54aa",
+  "evidence_sha256": {
+    "comparison.json": "88bebe78b266b909196e92c7fb9b58cef055a37943f3fd37f14e0c28b4fc4d62",
+    "dataset-summary.json": "fb345e77a4ed7a4574789fa3e0d0122bed7a436913c893683c804c90c2c1e2c3",
+    "frozen-encoder.json": "7fcefef0805ec8b19ea1d991d304e8a64fc34c042426120c7aba71a5718960a4",
+    "registry.json": "af37d51bbcfe5eb1c698a6e35ab585e7fd8fca19013dbb96828f3ef6f7358980",
+    "container-verification.json": "4bcae33486af058b46c45d427b17ae5da0b81515f3ad4fa9d6e82d9cab3d0193",
+    "mixed-chart-analysis.json": "42b574f8f8e27648f647b23a2c3f0a52a75fbcaa60074809f969ad6e5a830c48",
+    "training-source.zip": "d2ae35a5d299ac9c94fc70690fad36c301f48285bd4e8ceb340e10b85789d845"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "research_only": true,
+  "test_access": false,
+  "registry_sha256": "8ca3328d9889649592e3f4477aaa9749dcecd2743efdcd45693b5d9c837b06c7",
+  "driver_sha256": "ad070e13b570fdd31721258ad616843fdff582f2b9aea3eb988d53c19da4b846",
+  "image_id": "sha256:104973411da7f79a6a6421522afa2238619bf0fad4feaa5730e0aced591e54aa",
+  "request_sha256": "5e8f53fb62cf203aed032ddd9b48c69ae230ac332ec025d970d622758e758d09",
+  "numerical_tolerance_absolute": 1e-05,
+  "transitions": [
+    {
+      "action": "initial",
+      "version": "1",
+      "model_sha256": "a7c51dec686f8965d9e507675c608682c0e787f1c6bc447a35f95f9ef75d416a",
+      "container_id": "ec2d05f4c45601a134f5355e7639628343be9fb9cae2fb268f4da75433afce64",
+      "image_id": "sha256:104973411da7f79a6a6421522afa2238619bf0fad4feaa5730e0aced591e54aa",
+      "max_absolute_prediction_error": 1.7881393432617188e-07,
+      "shape": [
+        1,
+        2,
+        128,
+        128
+      ],
+      "malformed_input_status": 422,
+      "oversized_header_status": 422,
+      "research_only": true,
+      "passed": true
+    },
+    {
+      "action": "promotion",
+      "version": "2",
+      "model_sha256": "3681614e20cc764110bf38fd8f0b4d213907831e3d23908ec6447fe89bf7f172",
+      "container_id": "1174c818c2981722b3320a4f8ca3e1c6088937eb298646688e8db7d5f1ca699a",
+      "image_id": "sha256:104973411da7f79a6a6421522afa2238619bf0fad4feaa5730e0aced591e54aa",
+      "max_absolute_prediction_error": 1.1920928955078125e-07,
+      "shape": [
+        1,
+        2,
+        128,
+        128
+      ],
+      "malformed_input_status": 422,
+      "oversized_header_status": 422,
+      "research_only": true,
+      "passed": true
+    },
+    {
+      "action": "rollback",
+      "version": "1",
+      "model_sha256": "a7c51dec686f8965d9e507675c608682c0e787f1c6bc447a35f95f9ef75d416a",
+      "container_id": "716be8ae290cd32b3ecb6117349a3073e499bcdef7781170af7731113d4e7324",
+      "image_id": "sha256:104973411da7f79a6a6421522afa2238619bf0fad4feaa5730e0aced591e54aa",
+      "max_absolute_prediction_error": 1.7881393432617188e-07,
+      "shape": [
+        1,
+        2,
+        128,
+        128
+      ],
+      "malformed_input_status": 422,
+      "oversized_header_status": 422,
+      "research_only": true,
+      "passed": true
+    }
+  ],
+  "complete": true
+}

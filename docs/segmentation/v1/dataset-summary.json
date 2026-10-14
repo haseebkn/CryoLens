@@ -1,0 +1,341 @@
+{
+  "schema_version": 1,
+  "task": "sea_ice_segmentation",
+  "test_access": false,
+  "manifest_sha256": "fab81f3438142aedfcc01cce27b836412c9d29e82f85c294b48d7315521d60ee",
+  "configuration_sha256": "63cd825693b5f03e14253df07f284762069dcf065bf3e85d6a0b6d29c7b9aba3",
+  "code_sha256": "2d00e99bdc47aa963fc52aae2357165dfe42c5a6eb068507d37ce0a136b8d8f6",
+  "labels": [
+    "open_water",
+    "ice_affected"
+  ],
+  "ignore_index": 255,
+  "partitions": {
+    "train": {
+      "file": "train.npz",
+      "sha256": "0afe57a33639327656871cebf8dd4927f9d88aa1eac1b7cae783e1f9f4aa262f",
+      "patches": 960,
+      "scored_pixels": 15640983,
+      "class_counts": [
+        11073979,
+        4567004
+      ],
+      "scenes": [
+        {
+          "scene_id": "20180331T212355_cis_prep.nc",
+          "group_id": "cfeed6bbc0e4ee21882b1eadc475b7e7ce624c5f39aff89ed60e6f657ed59f7e",
+          "selected_patches": 32,
+          "considered_grid_positions": 45,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20180619T104303_cis_prep.nc",
+          "group_id": "ade1cf285683a29374ea709aad090a2ab0917b97be0084b532f03b90644ff0ff",
+          "selected_patches": 0,
+          "considered_grid_positions": 1600,
+          "exclusion_reason": "No chip met the predeclared valid NL/chart support"
+        },
+        {
+          "scene_id": "20180621T214028_cis_prep.nc",
+          "group_id": "ade1cf285683a29374ea709aad090a2ab0917b97be0084b532f03b90644ff0ff",
+          "selected_patches": 32,
+          "considered_grid_positions": 76,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20180621T214132_cis_prep.nc",
+          "group_id": "ade1cf285683a29374ea709aad090a2ab0917b97be0084b532f03b90644ff0ff",
+          "selected_patches": 32,
+          "considered_grid_positions": 366,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20190206T212401_cis_prep.nc",
+          "group_id": "36230b8fa4d1fe4c3385491bfed26c8455f8a77ab95d2d64f7ca9ba81b25d4c7",
+          "selected_patches": 32,
+          "considered_grid_positions": 55,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20190216T214030_cis_prep.nc",
+          "group_id": "92ac98319494735aec52cf2f4c5dd909979bcad0b8a11c6f45689904785f5bdb",
+          "selected_patches": 32,
+          "considered_grid_positions": 99,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20190228T214134_cis_prep.nc",
+          "group_id": "66089887bc6f32561656731c9529a4fed0a5f972ece61722245bc52bf243e0e0",
+          "selected_patches": 32,
+          "considered_grid_positions": 410,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20190306T102725_cis_prep.nc",
+          "group_id": "66089887bc6f32561656731c9529a4fed0a5f972ece61722245bc52bf243e0e0",
+          "selected_patches": 32,
+          "considered_grid_positions": 92,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20190308T101217_cis_prep.nc",
+          "group_id": "b8f64514a625f3818eeb933012eb82ac04995aff415d7e529257bd924eedadcc",
+          "selected_patches": 32,
+          "considered_grid_positions": 68,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20190326T212401_cis_prep.nc",
+          "group_id": "8926e4ca45f1ccf25cfca7f862d76a205ecfbcbd8a7525770a2cafbbe6133ee8",
+          "selected_patches": 32,
+          "considered_grid_positions": 66,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20190401T101117_cis_prep.nc",
+          "group_id": "8926e4ca45f1ccf25cfca7f862d76a205ecfbcbd8a7525770a2cafbbe6133ee8",
+          "selected_patches": 32,
+          "considered_grid_positions": 34,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20190405T214031_cis_prep.nc",
+          "group_id": "8926e4ca45f1ccf25cfca7f862d76a205ecfbcbd8a7525770a2cafbbe6133ee8",
+          "selected_patches": 32,
+          "considered_grid_positions": 67,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20190411T102726_cis_prep.nc",
+          "group_id": "8926e4ca45f1ccf25cfca7f862d76a205ecfbcbd8a7525770a2cafbbe6133ee8",
+          "selected_patches": 32,
+          "considered_grid_positions": 93,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20190524T101931_cis_prep.nc",
+          "group_id": "330d1b58a627c9fb91fcd836f9340a8730d17476857fdfae86f9662d0a0dcc83",
+          "selected_patches": 32,
+          "considered_grid_positions": 43,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20190612T101120_cis_prep.nc",
+          "group_id": "4f7136c13148ea701b4e1116959946b6672f90f1c84807be23fbb1a23f3fb47b",
+          "selected_patches": 32,
+          "considered_grid_positions": 42,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20190612T101220_cis_prep.nc",
+          "group_id": "4f7136c13148ea701b4e1116959946b6672f90f1c84807be23fbb1a23f3fb47b",
+          "selected_patches": 32,
+          "considered_grid_positions": 56,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200201T212408_cis_prep.nc",
+          "group_id": "e406eeb1734d2e19fc2e81be53ca080037bd072443574996450323bf77ff9ae9",
+          "selected_patches": 32,
+          "considered_grid_positions": 44,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200203T104354_cis_prep.nc",
+          "group_id": "fcbd9514ade7196386007463b7a3a5aaa68a10f3263ebce32f4e4038d3e911ee",
+          "selected_patches": 0,
+          "considered_grid_positions": 1600,
+          "exclusion_reason": "No chip met the predeclared valid NL/chart support"
+        },
+        {
+          "scene_id": "20200224T102034_cis_prep.nc",
+          "group_id": "7e8d9e2ab0cfabeba1125e81591897b85529fefcab8e42cb6c7902e1c8b53d22",
+          "selected_patches": 32,
+          "considered_grid_positions": 78,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200306T214036_cis_prep.nc",
+          "group_id": "d37b857b8d9bc6647c1878c4dc466726890c625ce80edde8db5054b0f6b67112",
+          "selected_patches": 32,
+          "considered_grid_positions": 75,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200319T102035_cis_prep.nc",
+          "group_id": "dc5bcad06797b7dbdc6261f70f97f7f6fbbc2576666d6e032781adca28d818a5",
+          "selected_patches": 32,
+          "considered_grid_positions": 77,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200412T101835_cis_prep.nc",
+          "group_id": "72c852ad5d0a1949be7a226f004b025860cab4b7fbbc8753636a6542d016bc45",
+          "selected_patches": 32,
+          "considered_grid_positions": 875,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200415T104354_cis_prep.nc",
+          "group_id": "72c852ad5d0a1949be7a226f004b025860cab4b7fbbc8753636a6542d016bc45",
+          "selected_patches": 0,
+          "considered_grid_positions": 1600,
+          "exclusion_reason": "No chip met the predeclared valid NL/chart support"
+        },
+        {
+          "scene_id": "20200423T214037_cis_prep.nc",
+          "group_id": "5b6ff574026d5ea98766f20bc977721c83b226b29e967bbaea19d7c7efd3697c",
+          "selected_patches": 32,
+          "considered_grid_positions": 81,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200424T101936_cis_prep.nc",
+          "group_id": "5b6ff574026d5ea98766f20bc977721c83b226b29e967bbaea19d7c7efd3697c",
+          "selected_patches": 32,
+          "considered_grid_positions": 44,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200424T102036_cis_prep.nc",
+          "group_id": "5b6ff574026d5ea98766f20bc977721c83b226b29e967bbaea19d7c7efd3697c",
+          "selected_patches": 32,
+          "considered_grid_positions": 58,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200506T101936_cis_prep.nc",
+          "group_id": "c8561599d014e5b23e0ff2bc6907f76e7cbbf93bf23546fad805e74dd7cf624f",
+          "selected_patches": 32,
+          "considered_grid_positions": 55,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200506T102036_cis_prep.nc",
+          "group_id": "c8561599d014e5b23e0ff2bc6907f76e7cbbf93bf23546fad805e74dd7cf624f",
+          "selected_patches": 32,
+          "considered_grid_positions": 73,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200610T214040_cis_prep.nc",
+          "group_id": "661274b059bacd189690a8f1927f27b76e5af9f18187ead04eb277135db57f8e",
+          "selected_patches": 32,
+          "considered_grid_positions": 78,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200624T212516_cis_prep.nc",
+          "group_id": "3d15584280bbed5fc687bf6bd699da2580429e407988252a6aafd0c673686baa",
+          "selected_patches": 32,
+          "considered_grid_positions": 65,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20210205T214147_cis_prep.nc",
+          "group_id": "f1b22d3b4a2d10f8e506cc5e1860f39dd2051e4914fd349bfbae04dd2424c8f6",
+          "selected_patches": 32,
+          "considered_grid_positions": 352,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20210407T101841_cis_prep.nc",
+          "group_id": "7c2a62c56f07e4aea00f5ee6b3951e7191057939462bddaf8f57ba53ef790dfd",
+          "selected_patches": 32,
+          "considered_grid_positions": 890,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20210407T101941_cis_prep.nc",
+          "group_id": "7c2a62c56f07e4aea00f5ee6b3951e7191057939462bddaf8f57ba53ef790dfd",
+          "selected_patches": 32,
+          "considered_grid_positions": 49,
+          "exclusion_reason": null
+        }
+      ]
+    },
+    "validation": {
+      "file": "validation.npz",
+      "sha256": "f6093401fa73d3eda438cf3cba23bee63410589b1c80baf4cd8875f4bbcebb01",
+      "patches": 160,
+      "scored_pixels": 2598634,
+      "class_counts": [
+        2253795,
+        344839
+      ],
+      "scenes": [
+        {
+          "scene_id": "20180410T214024_cis_prep.nc",
+          "group_id": "274ce0a7ba3e3ebdf1386552bcaca93040c8e396e333d7fca245e76f0bb42939",
+          "selected_patches": 16,
+          "considered_grid_positions": 23,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20180428T093937_cis_prep.nc",
+          "group_id": "1110a65cf5e812147e597813ad16959f67c16169c66fc84d4fe199897cca6ec3",
+          "selected_patches": 16,
+          "considered_grid_positions": 17,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20190430T101830_cis_prep.nc",
+          "group_id": "0c0319b096dadf2e0f02c7472e73b7cc32a28f27b462c3ea4a4ffea299dbfa21",
+          "selected_patches": 16,
+          "considered_grid_positions": 280,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20190507T101118_cis_prep.nc",
+          "group_id": "0c0319b096dadf2e0f02c7472e73b7cc32a28f27b462c3ea4a4ffea299dbfa21",
+          "selected_patches": 16,
+          "considered_grid_positions": 17,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20190507T101218_cis_prep.nc",
+          "group_id": "0c0319b096dadf2e0f02c7472e73b7cc32a28f27b462c3ea4a4ffea299dbfa21",
+          "selected_patches": 16,
+          "considered_grid_positions": 21,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200413T212408_cis_prep.nc",
+          "group_id": "11b7caa2a57f6467ceac676370896200d35ddf8dfdcb5a0e46d821dfd66f6cc6",
+          "selected_patches": 16,
+          "considered_grid_positions": 20,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200517T214039_cis_prep.nc",
+          "group_id": "2a68bd15b0b0311d1eedc67aefac07df48a2fb28aa5f1564567cef76243ed6cd",
+          "selected_patches": 16,
+          "considered_grid_positions": 43,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200523T102734_cis_prep.nc",
+          "group_id": "2a68bd15b0b0311d1eedc67aefac07df48a2fb28aa5f1564567cef76243ed6cd",
+          "selected_patches": 16,
+          "considered_grid_positions": 35,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20200728T214147_cis_prep.nc",
+          "group_id": "3137c961115d8fe911a86b3c9a7cf54a4ebe4565d5172aeb692728d2723628fe",
+          "selected_patches": 16,
+          "considered_grid_positions": 235,
+          "exclusion_reason": null
+        },
+        {
+          "scene_id": "20210530T102740_cis_prep.nc",
+          "group_id": "23285cc108e079fb50334c02fdd8f1e6b606a335c610f223452954c12b046b70",
+          "selected_patches": 16,
+          "considered_grid_positions": 34,
+          "exclusion_reason": null
+        }
+      ]
+    }
+  },
+  "claim_boundary": "Sampled development chips; chart agreement, not field truth or target accuracy"
+}

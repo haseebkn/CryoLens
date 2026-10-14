@@ -1,0 +1,30 @@
+{
+  "train": {
+    "encoder_state_sha256_before": "795136a326c2dac1a76267631b104bb2b8988287281268032e26ad1a197d0eb0",
+    "encoder_state_sha256_after": "795136a326c2dac1a76267631b104bb2b8988287281268032e26ad1a197d0eb0",
+    "frozen": true,
+    "feature_shape": [
+      960,
+      768,
+      16,
+      16
+    ],
+    "seconds": 2.323068200000307,
+    "checkpoint_sha256": "0238d814b53108f3574bf1ea240e38a0a6edd46173816d9a6962070561893b63",
+    "weights_loading": "weights_only=True; CPU map; strict state dict"
+  },
+  "validation": {
+    "encoder_state_sha256_before": "795136a326c2dac1a76267631b104bb2b8988287281268032e26ad1a197d0eb0",
+    "encoder_state_sha256_after": "795136a326c2dac1a76267631b104bb2b8988287281268032e26ad1a197d0eb0",
+    "frozen": true,
+    "feature_shape": [
+      160,
+      768,
+      16,
+      16
+    ],
+    "seconds": 0.7370086000000811,
+    "checkpoint_sha256": "0238d814b53108f3574bf1ea240e38a0a6edd46173816d9a6962070561893b63",
+    "weights_loading": "weights_only=True; CPU map; strict state dict"
+  }
+}
