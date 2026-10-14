@@ -153,3 +153,20 @@ and [container verification](container-guarded-verification.json) repeated the
 actual 1 -> 2 -> 1 rollout with the same trained model bytes and unchanged 1e-5
 inference tolerance. [Execution binding](guarded-execution.json) records the
 receipts. Original training, registry-v2 and container-v3 records remain intact.
+
+## Additive portable-candidate verification
+
+The [independent portability receipt](portability-verification.json) verifies the
+candidate ZIP checksum, CRCs and all seven manifest hashes, then a fresh wheel
+installation and qualified U-Net inference outside the checkout. Both model
+hashes match the guarded registry; all 100 packaged Python modules match submitted
+head `548dc2f3` after newline normalization. The real development request matches
+saved predictions within `1.19e-7` at unchanged `atol=1e-5`, `rtol=0`; malformed
+and hostile-header requests return 422, and research metadata is verified.
+
+This check reuses separately installed research/geospatial dependencies through
+a `.pth` file and runs inference on CPU with the existing PyTorch CUDA build. It
+does not establish clean dependency resolution or a CPU-only installation; locked
+CPU dependency resolution remains a CI check. No protected test arrays were
+opened and no training or preprocessing was rerun. Final reviewed-head release
+assembly and CI remain pending; this receipt is local research-candidate evidence.

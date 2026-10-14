@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "purpose": "Independent installed-wheel and qualified-weight portability check",
+  "verified_at_utc": "2026-10-14T04:45:42.318027+00:00",
+  "software_head": "548dc2f3d5e3a4cfc079fed9a526d6212ed3dc70",
+  "candidate_zip_sha256": "075aa9d8291b544b61661492a3668c782c1fd440425926a5b0bd7f75bd02906c",
+  "zip_crc_verified": true,
+  "bundle_manifest": {
+    "verify.py": "ea8f2046dbdc3747090b5cf03491767c49f4c56eaabfbe439dccfffe0341f4a9",
+    "dist\\.gitignore": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1",
+    "dist\\cryolens-0.1.0-py3-none-any.whl": "c34b62708f4948e5367bde9e7c9d6936f6fb89eacf6d2a9fc95f7bfafb3d102c",
+    "inference\\example-input.npy": "5e8f53fb62cf203aed032ddd9b48c69ae230ac332ec025d970d622758e758d09",
+    "inference\\expected.npy": "2788fb9c4274ce57a3bc2ad387a2a9a9554d660e0a6f3f8b0745c915c2549ceb",
+    "models\\unet-best.pt": "3681614e20cc764110bf38fd8f0b4d213907831e3d23908ec6447fe89bf7f172",
+    "models\\unet-previous.pt": "a7c51dec686f8965d9e507675c608682c0e787f1c6bc447a35f95f9ef75d416a"
+  },
+  "manifest_hashes_verified": 7,
+  "wheel_source_verification": {
+    "python_modules": 100,
+    "comparison": "All submitted Python modules match wheel after CRLF/LF normalization; installed modules match wheel bytes"
+  },
+  "installation": {
+    "fresh_venv": true,
+    "pip_arguments": [
+      "--no-deps",
+      "--no-index"
+    ],
+    "python": "C:\\Users\\hasee\\.no-mistakes\\evidence\\01M4WAS30JRQ0MAG24QXACP19F\\portability-independent\\runtime\\Scripts\\python.exe",
+    "python_version": "3.11.15",
+    "torch_version": "2.8.0+cu128",
+    "numpy_version": "2.4.6",
+    "installed_module": "C:\\Users\\hasee\\.no-mistakes\\evidence\\01M4WAS30JRQ0MAG24QXACP19F\\portability-independent\\runtime\\Lib\\site-packages\\cryolens\\segmentation\\service.py",
+    "cwd": "C:\\Users\\hasee\\.no-mistakes\\evidence\\01M4WAS30JRQ0MAG24QXACP19F\\portability-independent",
+    "isolated_mode": true
+  },
+  "qualified_models_match": "registry-guarded.json versions 1 and 2",
+  "model_sha256": "3681614e20cc764110bf38fd8f0b4d213907831e3d23908ec6447fe89bf7f172",
+  "inference": {
+    "status_code": 200,
+    "shape": [
+      1,
+      2,
+      128,
+      128
+    ],
+    "dtype": "float32",
+    "finite": true,
+    "class_scores_sum_to_one": true,
+    "max_absolute_error": 1.1920928955078125e-07,
+    "atol": 1e-05,
+    "rtol": 0,
+    "malformed_status": 422,
+    "hostile_header_status": 422,
+    "checksum_mismatch_rejected": true,
+    "research_metadata_verified": true
+  },
+  "test_access": false,
+  "training_or_preprocessing_rerun": false,
+  "dependency_scope": "Fresh wheel installation reuses separately installed research/geospatial dependencies through a .pth file; not clean dependency resolution or CPU-only dependency installation. Locked CPU dependency resolution remains for CI.",
+  "claim_boundary": "Local research candidate portability only; final reviewed-head release assembly and CI remain pending; no operational target qualification or public release",
+  "complete": true,
+  "verification_command": "runtime/Scripts/python.exe -I -B independent-check.py <submitted-worktree>",
+  "verification_script_sha256": "77881e21f36447448c986ab72ab2f7024cbbce69627d9fcce1ba5fbfefcd003f",
+  "verification_script_evidence": "C:\\Users\\hasee\\.no-mistakes\\evidence\\01M4WAS30JRQ0MAG24QXACP19F\\portability-independent\\independent-check.py"
+}
