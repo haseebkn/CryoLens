@@ -5,12 +5,89 @@ document.addEventListener('DOMContentLoaded', async () => {
   try { const response = await fetch('tasks.json'); if (!response.ok) throw new Error('Packet unavailable'); packet = await response.json(); }
   catch { $('progress').textContent = 'Review packet unavailable. Open the verified local review server.'; return; }
   const key = `cryolens-reference:${packet.workspace_id}:${packet.phase}:${packet.queue}`;
-  let saved = {};
-  try { saved = JSON.parse(localStorage.getItem(key) || '{}'); } catch { $('message').textContent = 'Local drafts could not be read; no labels were inferred.'; }
+  const draftKey = `${key}:drafts:v2`, unreadable = new Set();
+  function readStore(name) {
+    try {
+      const value = JSON.parse(localStorage.getItem(name) || '{}');
+      if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error();
+      return value;
+    } catch {
+      unreadable.add(name);
+      $('message').textContent = 'Existing browser storage could not be read and will not be overwritten. Export this session before leaving.';
+      return {};
+    }
+  }
+  function writeStore(name, value) {
+    if (unreadable.has(name)) throw new Error('Existing storage is unreadable');
+    localStorage.setItem(name, JSON.stringify(value));
+  }
+  let saved = readStore(key), drafts = readStore(draftKey), restoring = false, storageFailed = false, saving = false, draftWrites = 0, navigating = false;
+  const pending = new Map(), pendingDrafts = new Map(), draftBaselineUpdates = new Map();
+  function retainResponse(id, response, baseline) {
+    const existing = pending.get(id);
+    if (existing && JSON.stringify(existing.baseline) !== JSON.stringify(baseline)) return;
+    pending.set(id, { response, baseline: existing ? existing.baseline : structuredClone(baseline) });
+  }
+  let savedBaseline = structuredClone(saved);
   let index = 0, marks = [], regions = [], position = null, regionStart = null, image = null, imageRequest = 0, elapsed = 0, lastTick = performance.now(), viewedChannels = new Set(), active = !document.hidden;
   const tick = () => { const now = performance.now(); if (active) elapsed += (now - lastTick) / 1000; lastTick = now; };
-  document.addEventListener('visibilitychange', () => { tick(); active = !document.hidden; });
+  document.addEventListener('visibilitychange', () => { tick(); active = !document.hidden; if (document.hidden) persistDraft(); });
   const task = () => packet.tasks[index];
+  const fields = ['reviewer', 'label', 'identity', 'rationale', 'support', 'status', 'notes'];
+  function captureDraft() {
+    tick();
+    return {
+      saved_baseline: savedBaseline[task().task_id] || null,
+      marks: structuredClone(marks), excluded_regions: structuredClone(regions),
+      position: position ? [...position] : null, elapsed,
+      viewed_channels: [...viewedChannels],
+      fields: Object.fromEntries(fields.map(id => [id, $(id).value])),
+    };
+  }
+  function storeDraft(id, draft) {
+    try {
+      if (!navigator.locks) throw new Error('Safe browser storage locking unavailable');
+      draft.saved_baseline = savedBaseline[id] || null;
+      if (pending.has(id)) pendingDrafts.set(id, structuredClone(draft));
+      drafts = { ...readStore(draftKey), [id]: draft };
+      for (const [taskId, update] of draftBaselineUpdates) {
+        if (JSON.stringify(drafts[taskId]) === JSON.stringify(update.draft)) {
+          drafts[taskId].saved_baseline = update.baseline;
+        }
+      }
+      writeStore(draftKey, drafts); draftBaselineUpdates.clear(); storageFailed = false; return true;
+    }
+    catch {
+      storageFailed = true;
+      $('message').textContent = 'Browser storage unavailable. Stay on this task; Save and export this session before leaving. Unsaved drafts are not submissions.';
+      return false;
+    }
+  }
+  async function persistDraft() {
+    if (restoring || !task()) return true;
+    const id = task().task_id, draft = captureDraft();
+    drafts[id] = draft;
+    draftWrites++;
+    try {
+      if (!navigator.locks) throw new Error('Safe browser storage locking unavailable');
+      return await navigator.locks.request(key, () => storeDraft(id, draft));
+    } catch {
+      storageFailed = true;
+      $('message').textContent = 'Browser storage unavailable. Stay on this task; Save and export this session before leaving. Unsaved drafts are not submissions.';
+      return false;
+    } finally { draftWrites--; }
+  }
+  const editorChanged = event => {
+    if (task().mode === 'candidate' && ['label', 'identity', 'rationale', 'support'].includes(event.target.id)) {
+      position = [...task().centre]; $('position').value = position.join(', ');
+    }
+    persistDraft();
+  };
+  $('review-form').addEventListener('input', editorChanged);
+  $('review-form').addEventListener('change', editorChanged);
+  window.addEventListener('beforeunload', event => {
+    if (draftWrites || navigating || storageFailed || pending.size || saving) { event.preventDefault(); event.returnValue = ''; }
+  });
   $('queue').textContent = packet.queue;
   $('boundary').textContent = packet.identity_claim_boundary;
   if (packet.assignment) { $('reviewer').value = packet.assignment; $('reviewer').readOnly = true; }
@@ -31,15 +108,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   function list() {
     $('marks').replaceChildren(); $('regions').replaceChildren();
-    for (const [i,mark] of marks.entries()) { const li = document.createElement('li'); li.textContent = `${mark.label}; identity ${mark.identity}; sample ${mark.row}, ${mark.col} — ${mark.rationale} `; const remove = document.createElement('button'); remove.type='button'; remove.textContent='Remove draft'; remove.onclick=()=>{marks.splice(i,1);list();draw();}; li.append(remove); $('marks').append(li); }
-    for (const [i,region] of regions.entries()) { const li=document.createElement('li'); li.textContent=`Samples ${region.join(', ')} `;const remove=document.createElement('button');remove.type='button';remove.textContent='Remove draft';remove.onclick=()=>{regions.splice(i,1);list();draw();};li.append(remove);$('regions').append(li); }
+    for (const [i,mark] of marks.entries()) { const li = document.createElement('li'); li.textContent = `${mark.label}; identity ${mark.identity}; sample ${mark.row}, ${mark.col} — ${mark.rationale} `; const remove = document.createElement('button'); remove.type='button'; remove.textContent='Remove draft'; remove.onclick=()=>{marks.splice(i,1);list();draw();persistDraft();}; li.append(remove); $('marks').append(li); }
+    for (const [i,region] of regions.entries()) { const li=document.createElement('li'); li.textContent=`Samples ${region.join(', ')} `;const remove=document.createElement('button');remove.type='button';remove.textContent='Remove draft';remove.onclick=()=>{regions.splice(i,1);list();draw();persistDraft();};li.append(remove);$('regions').append(li); }
   }
   async function load() {
     if (!task()) { $('progress').textContent = 'No tasks in this packet.'; return; }
+    restoring = true;
     lastTick = performance.now(); elapsed = 0; image = null; $('image').getContext('2d').clearRect(0,0,$('image').width,$('image').height); viewedChannels = new Set(); position = task().mode === 'candidate' ? task().centre : null;
     const existing = saved[task().task_id]; marks = existing ? structuredClone(existing.marks) : []; regions = existing ? structuredClone(existing.excluded_regions) : [];
     $('status').value = existing?.status || 'partial'; $('notes').value=existing?.notes || ''; $('attest').checked=false;
     $('position').value=position ? position.join(', ') : ''; $('rationale').value='';$('identity').value='unknown';$('support').value='';$('label').value='uncertain';
+    if (task().mode === 'candidate' && marks.length === 1) {
+      const mark = marks[0];
+      $('label').value = mark.label; $('identity').value = mark.identity;
+      $('rationale').value = mark.rationale; $('support').value = JSON.stringify(mark.supporting_observations);
+    }
+    const draft = drafts[task().task_id];
+    if (draft) {
+      savedBaseline[task().task_id] = draft.saved_baseline || undefined;
+      marks = structuredClone(draft.marks); regions = structuredClone(draft.excluded_regions);
+      position = draft.position; elapsed = draft.elapsed; viewedChannels = new Set(draft.viewed_channels);
+      for (const id of fields) if (id !== 'reviewer' || !packet.assignment) $(id).value = draft.fields[id];
+      $('position').value = position ? position.join(', ') : '';
+      $('message').textContent = 'Recovered a local draft. Check the assessment and attest again before saving; drafts are not submissions.';
+    }
     $('label').querySelector('option[value="non_target"]').disabled = task().mode === 'survey';
     $('instructions').textContent=task().mode === 'survey' ? 'Click a valid core pixel, then record a target or uncertainty. Shift-drag to exclude an ambiguous region. Do not apply the detector’s size threshold.' : 'Assess the white centre square. Retained/rejected status and previous answers are hidden. Record exactly one assessment for this candidate.';
     $('metadata').textContent=`Acquired ${task().acquired_utc}; ${task().spacing_m} m native samples; HH fixed −30 to −5 dB / HV −40 to −10 dB display. Zoom creates no finer measurements.`;
@@ -47,24 +139,92 @@ document.addEventListener('DOMContentLoaded', async () => {
     $('previous').disabled=index===0;$('next').disabled=index===packet.tasks.length-1;
     $('optical').replaceChildren();
     for(const evidence of task().optical){const p=document.createElement('p');p.textContent=`Optical context: ${evidence.provider}; ${evidence.acquired_utc}; separation ${(evidence.signed_time_separation_seconds/3600).toFixed(2)} h; ${evidence.visibility.status}. ${evidence.full_movement_envelope_in_chip?'Assumed envelope shown.':'Movement envelope exceeds chip.'} Missing counterpart is not a negative label.`;const link=document.createElement('a');link.href=evidence.image;link.target='_blank';link.rel='noopener';link.textContent='Inspect supporting radar/optical pair';$('optical').append(p,link);}
-    list(); const request=++imageRequest; const selectedBand=$('band').value; const nextImage=new Image(); nextImage.onload=()=>{if(request===imageRequest){image=nextImage;viewedChannels.add(selectedBand);draw();}};nextImage.onerror=()=>{$('message').textContent='Image unavailable. Do not mark this task complete.';};nextImage.src=task()[selectedBand];
+    restoring = false;
+    list(); const request=++imageRequest; const selectedBand=$('band').value; const nextImage=new Image(); nextImage.onload=()=>{if(request===imageRequest){image=nextImage;viewedChannels.add(selectedBand);draw();persistDraft();}};nextImage.onerror=()=>{$('message').textContent='Image unavailable. Do not mark this task complete.';};nextImage.src=task()[selectedBand];
   }
-  $('band').onchange=()=>{tick();const request=++imageRequest;const selectedBand=$('band').value;image=null;const nextImage=new Image();nextImage.onload=()=>{if(request===imageRequest){image=nextImage;viewedChannels.add(selectedBand);draw();}};nextImage.onerror=()=>{$('message').textContent='Image unavailable. Do not complete this task.';};nextImage.src=task()[selectedBand];};$('zoom').onchange=draw;
-  $('previous').onclick=()=>{index--;load();};$('next').onclick=()=>{index++;load();};
+  $('band').onchange=()=>{tick();const request=++imageRequest;const selectedBand=$('band').value;image=null;const nextImage=new Image();nextImage.onload=()=>{if(request===imageRequest){image=nextImage;viewedChannels.add(selectedBand);draw();persistDraft();}};nextImage.onerror=()=>{$('message').textContent='Image unavailable. Do not complete this task.';};nextImage.src=task()[selectedBand];};$('zoom').onchange=draw;
+  async function navigate(offset) {
+    if (navigating || saving) return;
+    navigating = true; document.querySelector('main').inert = true;
+    try { if (await persistDraft()) { index += offset; await load(); } }
+    finally { navigating = false; document.querySelector('main').inert = false; }
+  }
+  $('previous').onclick=()=>navigate(-1);$('next').onclick=()=>navigate(1);
   $('image').onpointerdown=event=>{if(event.shiftKey){regionStart=point(event);$('image').setPointerCapture(event.pointerId);}};
-  $('image').onpointerup=event=>{if(regionStart){const end=point(event);const start=regionStart;regionStart=null;if(!inside(...start)||!inside(...end)){$('message').textContent='Uncertain region must stay inside the core.';return;}regions.push([Math.min(start[0],end[0]),Math.min(start[1],end[1]),Math.max(start[0],end[0])+1,Math.max(start[1],end[1])+1]);list();draw();}else if(task().mode==='survey'){const selected=point(event);if(!inside(...selected)){$('message').textContent='Context outside the core cannot be annotated.';return;}position=selected;$('position').value=selected.join(', ');draw();}};
-  $('add-mark').onclick=()=>{
-    $('message').textContent='';if(!image||!position){$('message').textContent='Load the image and select a core pixel first.';return;}const rationale=$('rationale').value.trim();if(rationale.length<3){$('message').textContent='Record an object rationale.';return;}
-    let observations=[];try{observations=$('support').value.trim()?JSON.parse($('support').value):[];if(!Array.isArray(observations))throw new Error();}catch{$('message').textContent='Supporting observations must be a JSON array.';return;}
-    if($('identity').value!=='unknown'&&($('label').value!=='target'||!observations.length)){$('message').textContent='A resolved identity requires a target and independent positive evidence.';return;}
-    const mark={row:position[0],col:position[1],label:$('label').value,identity:$('identity').value,rationale,supporting_observations:observations};if(task().mode==='candidate')marks=[mark];else{marks=marks.filter(m=>m.row!==mark.row||m.col!==mark.col);marks.push(mark);}list();draw();
-  };
-  $('review-form').onsubmit=event=>{
+  $('image').onpointerup=event=>{if(regionStart){const end=point(event);const start=regionStart;regionStart=null;if(!inside(...start)||!inside(...end)){$('message').textContent='Uncertain region must stay inside the core.';return;}regions.push([Math.min(start[0],end[0]),Math.min(start[1],end[1]),Math.max(start[0],end[0])+1,Math.max(start[1],end[1])+1]);list();draw();persistDraft();}else if(task().mode==='survey'){const selected=point(event);if(!inside(...selected)){$('message').textContent='Context outside the core cannot be annotated.';return;}if(position&&position.some((v,i)=>v!==selected[i])){$('message').textContent='Record the selected object or Clear selected point before selecting another.';return;}position=selected;$('position').value=selected.join(', ');draw();persistDraft();}};
+  function clearPoint() {
+    position = null; $('position').value = ''; $('rationale').value = '';
+    $('support').value = ''; $('identity').value = 'unknown'; $('label').value = 'uncertain';
+    draw(); persistDraft();
+  }
+  $('clear-point').onclick = clearPoint;
+  function recordPoint() {
+    $('message').textContent='';if(!image||!position){$('message').textContent='Load the image and select a core pixel first.';return false;}const rationale=$('rationale').value.trim();if(rationale.length<3){$('message').textContent='Record an object rationale, or Clear selected point if no object is intended.';return false;}
+    let observations=[];try{observations=$('support').value.trim()?JSON.parse($('support').value):[];if(!Array.isArray(observations))throw new Error();}catch{$('message').textContent='Supporting observations must be a JSON array. Put interpretation in Object rationale; leave this evidence field empty when identity is unknown.';return false;}
+    if($('identity').value!=='unknown'&&($('label').value!=='target'||!observations.length)){$('message').textContent='A resolved identity requires a target and independent positive evidence.';return false;}
+    const mark={row:position[0],col:position[1],label:$('label').value,identity:$('identity').value,rationale,supporting_observations:observations};if(task().mode==='candidate')marks=[mark];else{marks=marks.filter(m=>m.row!==mark.row||m.col!==mark.col);marks.push(mark);}
+    position = null; $('position').value = '';
+    if (task().mode === 'survey') {
+      $('rationale').value = ''; $('support').value = '';
+      $('identity').value = 'unknown'; $('label').value = 'uncertain';
+    }
+    list(); draw(); persistDraft(); return true;
+  }
+  $('add-mark').onclick=()=>{recordPoint();};
+  $('review-form').onsubmit=async event=>{
+    event.preventDefault(); if (saving || navigating) return;
     event.preventDefault();tick();const reviewer=$('reviewer').value.trim();if(!image||!reviewer||!$('attest').checked||$('notes').value.trim().length<3){$('message').textContent='Load the image, enter your ID, inspection notes and personal-inspection attestation.';return;}
     if($('status').value==='complete'&&viewedChannels.size!==2){$('message').textContent='Inspect both HH and HV before declaring complete coverage.';return;}
+    // A selected point is an explicit assessment, never an implied empty survey.
+    // Validate and record it atomically with Save, or leave the response unsaved.
+    if(position&&!recordPoint())return;
     if(task().mode==='candidate'&&$('status').value==='complete'&&marks.length!==1){$('message').textContent='Record one explicit candidate assessment before completing.';return;}
-    saved[task().task_id]={workspace_id:packet.workspace_id,task_id:task().task_id,phase:packet.phase,reviewer_id:reviewer,reviewed_utc:new Date().toISOString(),status:$('status').value,active_seconds:Math.min(86400,Math.max(1,elapsed+(saved[task().task_id]?.active_seconds||0))),personally_inspected:true,viewed_channels:[...viewedChannels],notes:$('notes').value.trim(),marks:structuredClone(marks),excluded_regions:structuredClone(regions)};
-    try{localStorage.setItem(key,JSON.stringify(saved));$('message').textContent='Response saved locally. Export and import to validate it; no server write occurred.';}catch{$('message').textContent='Browser storage unavailable; export this session before leaving.';}elapsed=0;$('progress').textContent=`Task ${index+1} of ${packet.tasks.length}; ${Object.keys(saved).length} responses saved locally.`;
+    const id = task().task_id;
+    const baseline = structuredClone(savedBaseline[id]);
+    const response = {workspace_id:packet.workspace_id,task_id:id,phase:packet.phase,reviewer_id:reviewer,reviewed_utc:new Date().toISOString(),status:$('status').value,active_seconds:Math.min(86400,Math.max(1,elapsed+(saved[id]?.active_seconds||0))),personally_inspected:true,viewed_channels:[...viewedChannels],notes:$('notes').value.trim(),marks:structuredClone(marks),excluded_regions:structuredClone(regions)};
+    const commit = () => {
+      const latest = readStore(key);
+      const originatingBaseline = pending.has(id) ? pending.get(id).baseline : baseline;
+      if (!unreadable.has(key) && JSON.stringify(latest[id]) !== JSON.stringify(originatingBaseline)) {
+        storeDraft(id, captureDraft());
+        $('message').textContent = 'This response changed in another tab. Your draft is retained; export saved responses there and resolve the conflicting review before saving here.';
+        return;
+      }
+      retainResponse(id, response, originatingBaseline);
+      pendingDrafts.set(id, structuredClone(drafts[id]));
+      const retained = Object.fromEntries([...pending].map(([taskId, entry]) => [taskId, entry.response]));
+      saved = { ...saved, ...latest, ...retained };
+      elapsed = 0;
+      if ([...pending].some(([taskId, entry]) => JSON.stringify(latest[taskId]) !== JSON.stringify(entry.baseline))) {
+        $('message').textContent = 'This response changed in another tab. Unpersisted responses remain in memory; export this session before leaving.';
+        return;
+      }
+      try {
+        if (!navigator.locks) throw new Error('Safe browser storage locking unavailable');
+        writeStore(key, saved);
+        for (const taskId of pending.keys()) {
+          if (pendingDrafts.get(taskId)) draftBaselineUpdates.set(taskId, {
+            draft: draftBaselineUpdates.get(taskId)?.draft || pendingDrafts.get(taskId),
+            baseline: structuredClone(saved[taskId]),
+          });
+          savedBaseline[taskId] = structuredClone(saved[taskId]);
+        }
+        pending.clear(); pendingDrafts.clear();
+        $('message').textContent = `Response saved locally with ${marks.length} recorded object(s). Export and import to validate it; no server write occurred.`;
+        storeDraft(id, captureDraft());
+      } catch {
+        $('message').textContent = 'Browser storage unavailable; response is only in memory. Use a local review server with browser locking support, or export this session before leaving.';
+      }
+    };
+    saving = true; document.querySelector('main').inert = true;
+    try {
+      if (navigator.locks) await navigator.locks.request(key, commit);
+      else commit();
+    } catch {
+      retainResponse(id, response, baseline); pendingDrafts.set(id, structuredClone(drafts[id])); saved[id] = pending.get(id).response; elapsed = 0;
+      $('message').textContent = 'Browser storage unavailable; response is only in memory. Export this session before leaving.';
+    } finally { saving = false; document.querySelector('main').inert = false; }
+    $('progress').textContent=`Task ${index+1} of ${packet.tasks.length}; ${Object.keys(saved).length} responses in this session.`;
   };
   $('export').onclick=()=>{const rows=Object.values(saved);if(!rows.length){$('message').textContent='No personally inspected responses have been saved.';return;}const blob=new Blob([JSON.stringify(rows,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=`reference-${packet.workspace_id.slice(0,12)}-${packet.phase}.json`;link.click();URL.revokeObjectURL(url);};
   await load();

@@ -175,9 +175,9 @@ uv run --frozen python -m cryolens.reference serve --workspace data/processed/re
 Open `http://127.0.0.1:8012/`. Enter your own reviewer ID, inspect HH and HV,
 zoom without inferring finer measurements, mark targets/uncertainties and record
 inspection notes. A complete response requires explicit personal-inspection
-attestation and both viewed channels. Save each response before changing tasks;
-export saved responses before closing. No browser response is sent to a server.
-Local drafts remain separate from validated accepted annotations.
+attestation and both viewed channels. Follow the [review saving guide](REVIEW_SAVING.md)
+for selected-point validation, local draft recovery, explicit saving and export,
+storage failures and conflicting reviews. No browser response is sent to a server.
 
 Import the exported JSON and measure progress/effort:
 
