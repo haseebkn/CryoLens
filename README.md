@@ -25,16 +25,16 @@ data availability is **not the sole explanation** for the remaining gaps.
 
 ## Current research release - 14 October 2026
 
-[**v0.1.0-research.2: report, portable demo and evidence**](https://github.com/haseebkn/CryoLens/releases/tag/v0.1.0-research.2)
+[**v0.1.0-research.3: report, portable demo and evidence**](https://github.com/haseebkn/CryoLens/releases/tag/v0.1.0-research.3)
 packages software from merged PR #18, including the review-saving and IIP
 publisher CSV fixes. Start with the
-[five-page evidence report](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.2/CryoLens-v0.1.0-research.2-portfolio.pdf),
-[five-minute offline demo](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.2/CryoLens-v0.1.0-research.2-demo.html)
-and [speaker script](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.2/CryoLens-v0.1.0-research.2-five-minute-script.txt).
+[five-page evidence report](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.3/CryoLens-v0.1.0-research.3-portfolio.pdf),
+[five-minute offline demo](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.3/CryoLens-v0.1.0-research.3-demo.html)
+and [speaker script](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.3/CryoLens-v0.1.0-research.3-five-minute-script.txt).
 Download the HTML and open it locally; it presents recorded results, not live
 inference or surveillance.
 
-The [portable ZIP](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.2/CryoLens-v0.1.0-research.2-portable-demo.zip)
+The [portable ZIP](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.3/CryoLens-v0.1.0-research.3-portable-demo.zip)
 contains a separate executable U-Net inference check. In a fresh Windows
 Python 3.11 CPU environment, installed-wheel HTTP inference reproduced one
 qualified development prediction with maximum absolute difference
@@ -99,14 +99,14 @@ from 0.108 to 0.186 per 1,000 km² and the suppression factor fell from 38.9x
 to 19.4x once coverage grew five-fold. These changes show sensitivity to
 coverage; without target truth, they do not establish better or worse accuracy.
 They are historical screening measurements, not new measurements from the
-research.2 release.
+research.3 release.
 
-## Relevance to C-CORE
+## Maritime domain awareness
 
-The design is informed by C-CORE's public work on SAR target detection,
-ship/iceberg discrimination and human quality control. This is an independent
-project, with no C-CORE affiliation, endorsement or certification. The
-[MDA alignment](docs/MDA_ALIGNMENT.md) maps public sources to implemented
+The project separates SAR target detection, ship/iceberg identification and
+human quality control. It is an independent research project, with no claim
+of operational certification or third-party endorsement. The
+[MDA alignment](docs/MDA_ALIGNMENT.md) maps public guidance to implemented
 behavior and identifies the missing operational capabilities.
 
 ## What you can inspect
@@ -245,7 +245,7 @@ and supports concealed repeats, adjudication and exact coverage masks. The
 28 retained and 68 sampled rejected reviews, and 64 held-out survey tiles.
 The [correction implementation report](docs/reference-set/corrections-v1/README.md)
 retains its historical pre-adoption status. The later
-[research.2 evidence report and receipts](https://github.com/haseebkn/CryoLens/releases/tag/v0.1.0-research.2)
+[research.3 evidence report and receipts](https://github.com/haseebkn/CryoLens/releases/tag/v0.1.0-research.3)
 record 64 accepted pilot primary dispositions and five adopted amendments,
 not 69 independent reviews. **Reference completion
 remains pending; no reference-derived precision, recall or false-alarm rate is

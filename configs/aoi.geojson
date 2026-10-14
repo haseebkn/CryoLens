@@ -6,7 +6,7 @@
     "properties": {
       "id": "newfoundland_labrador_marine",
       "name": "Newfoundland and Labrador shelf study area",
-      "description": "Hand-defined research polygon covering the Labrador coastal corridor, Northeast Newfoundland Shelf and Grand Banks. Not a provincial boundary, EEZ, navigation chart or C-CORE operational area. Land and coastal buffers are excluded separately. Analysis is clipped at pixel centres.",
+      "description": "Hand-defined research polygon covering the Labrador coastal corridor, Northeast Newfoundland Shelf and Grand Banks. Not a provincial boundary, EEZ, navigation chart or customer operational area. Land and coastal buffers are excluded separately. Analysis is clipped at pixel centres.",
       "bbox": [-60.5, 42.5, -44.0, 60.5],
       "source": "CryoLens study design, 2026-09-05; not an authoritative boundary"
     },

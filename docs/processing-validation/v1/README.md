@@ -77,7 +77,7 @@ before processing begins.
 The report contains matched counts, signed residual agreement, per-window
 errors, stripe profiles, rejection reasons and COG validation results. The
 engineering limits are deliberately conservative project presets, not ESA,
-C-CORE or navigational standards:
+external operational or navigational standards:
 
 - At most 5% non-positive corrected power and at least 10% finite measurement
   coverage per channel; actual annotations must supply plausible incidence

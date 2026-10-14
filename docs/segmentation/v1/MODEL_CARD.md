@@ -44,7 +44,7 @@ appropriate development data or a separately authorized, locked evaluation.
 **Unsupported use:** automatic fresh-SAFE sea-ice masking, target identification,
 ship/iceberg detection accuracy claims, operational maritime decisions,
 navigation, live AIS/RF fusion or drift forecasting. The model does not resolve
-step 4 or establish low target false positives. No C-CORE affiliation or
+step 4 or establish low target false positives. No third-party endorsement or
 proprietary protocol certification is claimed.
 
 **Provenance/licenses:** see protocol.md and comparison.json for exact checkpoint,

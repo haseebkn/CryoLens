@@ -110,7 +110,7 @@ def render(report: dict[str, Any], has_plot: bool = False) -> str:
             "and suppression ledgers: [audited_results.json](benchmarks/audited_results.json). "
             "See [DATA.md](DATA.md), [AUDIT.md](AUDIT.md) and [LIMITATIONS.md](LIMITATIONS.md).",
             "",
-            "No certified C-CORE operating point, MANICE confidence code or navigational "
+            "No certified operating point, MANICE confidence code or navigational "
             "hazard assessment is established by this experiment.",
             "",
         ]

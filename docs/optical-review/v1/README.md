@@ -93,7 +93,7 @@ The possible displacement radius is:
   + 0.5 m/s × absolute acquisition time separation
 ```
 
-These are explicit research presets, not measured geolocation errors, a C-CORE
+These are explicit research presets, not measured geolocation errors, an operational
 protocol, or a validated movement limit. Vessels can move much faster; an
 unexpected displacement requires ambiguity or an independently justified policy.
 Radar extent is not physical iceberg size. The review radius is at least 1 km

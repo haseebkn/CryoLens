@@ -1,17 +1,14 @@
 # Maritime domain awareness alignment
 
-Reviewed 2026-10-05. This is a requirements traceability note, not a compliance
-certificate. No C-CORE internal operating procedure, acceptance threshold or
-contractual interface specification was provided. The implementation is an
-independent research demonstration.
+This is a requirements traceability note for an independent research
+demonstration, not a compliance certificate. No customer operating procedure,
+acceptance threshold or contractual interface specification has been validated.
 
 ## Public basis
 
-[C-CORE maritime surveillance](https://c-core.ca/solutions/maritime-surveillance/)
-describes satellite target detection, ship/iceberg discrimination, analyst
-quality control, visualization and reporting. CryoLens follows the separation
-between detecting a radar return and deciding its identity. It does not claim
-to implement Coresight or C-CORE's proprietary algorithms.
+CryoLens separates detecting a radar return from deciding its identity, and
+preserves analyst judgments and their evidence. These are project design
+choices, not claims of equivalence to a proprietary operational system.
 
 [Transport Canada's MDA description](https://tc.canada.ca/en/marine-transportation/marine-security/maritime-domain-awareness)
 emphasizes timely, accurate information and shared situational awareness.

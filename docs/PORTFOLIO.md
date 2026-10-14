@@ -2,7 +2,7 @@
 
 ## Current presentation package - 14 October 2026
 
-Use [v0.1.0-research.2](https://github.com/haseebkn/CryoLens/releases/tag/v0.1.0-research.2)
+Use [v0.1.0-research.3](https://github.com/haseebkn/CryoLens/releases/tag/v0.1.0-research.3)
 for the final five-page evidence report, offline HTML walkthrough, timed speaker
 script and portable installed-wheel CPU demonstration. The HTML presents
 recorded results; actual inference is a separate executable check documented
@@ -58,7 +58,7 @@ use the release package above; empty dashboards must not be filled with mock res
 
 ## Claims to avoid
 
-- C-CORE certified/compliant, a clone of Coresight, or endorsed by C-CORE.
+- Certified for operational use, equivalent to a proprietary system, or endorsed by a third party.
 - A proven false-positive reduction, precision, recall or operational Pfa.
 - A trained iceberg classifier, live AIS integration or validated drift forecast.
 - Radar component lengths as measured iceberg dimensions.

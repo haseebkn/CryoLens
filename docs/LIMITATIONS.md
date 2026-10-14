@@ -122,7 +122,7 @@ deployment gate remains closed, and rejected products write machine-readable
 reasons before detection. Negative
 residuals are retained for diagnostics; no positive floor manufactures data.
 The 5% non-positive threshold is a research acceptance preset, not a published
-ESA or C-CORE requirement.
+ESA or other external operational requirement.
 
 The report also records the unqualified NERSC experiment. It is not
 adopted or assumed to solve this problem. Sentinel-1C/D coefficient qualification
@@ -167,7 +167,7 @@ real PostGIS check and CI service cover the actual spatial query path.
 
 ## 10. No operational certification
 
-No C-CORE internal protocol, certification, endorsement or proprietary
+No third-party endorsement, operational certification or proprietary
 implementation is claimed. GeoJSON exchange is not a claim of MANICE or STAC
 compliance. CryoLens outputs are not navigation products, ice warnings,
 search-and-rescue advice or assertions of suspicious/illegal vessel activity.

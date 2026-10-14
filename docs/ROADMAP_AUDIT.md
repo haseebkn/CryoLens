@@ -19,7 +19,7 @@ audit snapshot.
 Audit date: 12 October 2026. Reviewed stack head:
 `e29986877035588f50dff47ecbdfc39df86a02f4`.
 This is an implementation and development-evidence audit, not a scientific
-release, independent iceberg ground truth, or certification against C-CORE standards.
+release, independent iceberg ground truth, or certification against external operational standards.
 The existing review workspaces and human submissions were inspected read-only.
 
 ## What is actually complete

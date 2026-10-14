@@ -5,7 +5,7 @@
 CryoLens has been audited as an independent Newfoundland and Labrador SAR
 research portfolio. The audit covered all tracked Python modules, API/database
 paths, migrations, dashboard assets, configuration, packaging, CI and project
-claims. It does not establish operational reliability, C-CORE certification,
+claims. It does not establish operational reliability, operational certification,
 precision or recall. The current limits are explicit rather than filled with
 synthetic successful results.
 
@@ -86,7 +86,7 @@ agreed false-alarm/recall criteria. Fresh satellite downloads need CDSE or Earth
 locally; CDSE credentials were subsequently configured and the SAFE reader
 was cross-checked against NERSC processing of the same acquisition (see
 LIMITATIONS.md section 6). No private credentials were added to
-Git. No C-CORE internal procedures or proprietary interfaces were supplied.
+Git. No customer internal procedures or proprietary interfaces were supplied.
 
 See [MDA_ALIGNMENT.md](MDA_ALIGNMENT.md), [DATA.md](DATA.md),
 [LIMITATIONS.md](LIMITATIONS.md) and [PORTFOLIO.md](PORTFOLIO.md).

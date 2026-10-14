@@ -2,6 +2,12 @@
 
 Frozen research scope, 5 October 2026. No final test evaluation has run.
 
+This directory preserves the original hash-bound scientific snapshot, including
+its original descriptive metadata. Current project wording and AOI descriptions
+are maintained separately; editorial changes do not alter the frozen geometry,
+partitions or recorded execution hashes. This archive is provenance, not current
+project positioning or evidence of operational affiliation.
+
 | Partition | Unique input records |
 |---|---:|
 | Train | 39 |

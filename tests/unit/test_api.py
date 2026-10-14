@@ -332,5 +332,5 @@ def test_dashboard_uses_honest_labels(api_test_client: TestClient) -> None:
     response = api_test_client.get("/")
     assert response.status_code == 200
     assert "Unverified SAR candidates" in response.text
-    assert "No C-CORE affiliation" in response.text
+    assert "No operational certification or third-party endorsement" in response.text
     assert "Analyst-confirmed icebergs only" in response.text

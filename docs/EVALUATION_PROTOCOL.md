@@ -1,7 +1,7 @@
 # Frozen Newfoundland and Labrador evaluation protocol
 
 Protocol **nl-mda-v1**, frozen 5 October 2026. This is a research evaluation
-design. It is not an operational C-CORE protocol or a navigation product.
+design. It is not a certified operational protocol or a navigation product.
 
 ## Scope and separate tasks
 

@@ -14,7 +14,7 @@ sample. Follow-up acquisitions were selected using metadata and earlier rejected
 results, with each selection recorded before examining its measurement arrays.
 Every rejected outcome is retained. No held-out SAR or chart arrays, pilot
 submissions, frozen partitions, classifier labels or detection thresholds were changed.
-The 5% preset is this project's research policy, not a published ESA or C-CORE standard.
+The 5% preset is this project's research policy, not a published ESA or other external operational standard.
 
 ## Current outcomes
 
