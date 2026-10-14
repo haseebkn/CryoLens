@@ -12,6 +12,37 @@ from cryolens.eval.cohort import digest, file_digest
 from cryolens.segmentation.data import write_json
 
 
+def validation_example(config: dict[str, Any], comparison: dict[str, Any]) -> Any:
+    """Fail before reading arrays unless the exact training cache is verified."""
+    root = Path(config["dataset_root"]).resolve()
+    receipt_path = root / "dataset.json"
+    if file_digest(receipt_path) != comparison["dataset_receipt_sha256"]:
+        raise ValueError("Validation cache receipt differs from the actual training run")
+    receipt = json.loads(receipt_path.read_text())
+    if (
+        receipt["test_access"] is not False
+        or receipt["manifest_sha256"] != comparison["manifest_sha256"]
+        or receipt["configuration_sha256"] != comparison["configuration_sha256"]
+        or digest(config) != comparison["configuration_sha256"]
+    ):
+        raise ValueError("Validation cache is not bound to this development configuration")
+    info = receipt["partitions"]["validation"]
+    path = (root / info["file"]).resolve()
+    if not path.is_relative_to(root) or file_digest(path) != info["sha256"]:
+        raise ValueError("Validation cache checksum mismatch")
+    with np.load(path, allow_pickle=False) as arrays:
+        example = arrays["inputs_db"][:1].copy()
+    if (
+        example.dtype != np.float32
+        or example.shape != (1, 2, 128, 128)
+        or not np.isfinite(example).all()
+    ):
+        raise ValueError("Invalid qualified validation example")
+    if file_digest(path) != info["sha256"]:
+        raise ValueError("Validation cache changed during reading")
+    return example
+
+
 def demonstrate(training: Path, output: Path) -> dict[str, Any]:
     """Register actual trained artifacts; no operational performance claim is made."""
     import mlflow
@@ -24,6 +55,7 @@ def demonstrate(training: Path, output: Path) -> dict[str, Any]:
     config = json.loads((training / "configuration.json").read_text())
     if comparison["test_access"] or not comparison["development_only"]:
         raise ValueError("Expected a completed development-only comparison")
+    example = validation_example(config, comparison)
     output.mkdir(parents=True, exist_ok=False)
     mlflow.set_tracking_uri(config["tracking_uri"])
     client = MlflowClient(tracking_uri=config["tracking_uri"])
@@ -77,8 +109,6 @@ def demonstrate(training: Path, output: Path) -> dict[str, Any]:
     if file_digest(first) == file_digest(candidate):
         candidate = training / "unet/final-inference.pt"
     versions = []
-    with np.load(Path(config["dataset_root"]) / "validation.npz", allow_pickle=False) as z:
-        example = z["inputs_db"][:1].astype(np.float32)
     np.save(output / "request.npy", example, allow_pickle=False)
     for path in [first, candidate]:
         with mlflow.start_run(

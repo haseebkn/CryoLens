@@ -1,5 +1,8 @@
 """Behavioral protection, unknown masking and confusion accounting."""
 
+from pathlib import Path
+from typing import Any
+
 import numpy as np
 import pytest
 
@@ -39,3 +42,49 @@ def test_confusion_ignores_unknown_and_reports_absent_class() -> None:
     result = summarize(m)
     assert result["scored_pixels"] == 3 and result["mean_iou"] == 0.5
     assert summarize(np.array([[4, 0], [0, 0]]))["classes"][1]["recall"] is None
+
+
+@pytest.mark.parametrize("case", ["changed_array", "test_receipt", "escaped_file"])
+def test_registry_rejects_unqualified_cache_before_array_read(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str
+) -> None:
+    import json
+
+    from cryolens.eval.cohort import digest, file_digest
+    from cryolens.segmentation.lifecycle import validation_example
+
+    root = tmp_path / "cache"
+    root.mkdir()
+    data = root / "validation.npz"
+    data.write_bytes(b"synthetic cache content; never an array")
+    config = {"dataset_root": str(root)}
+    receipt = {
+        "test_access": case == "test_receipt",
+        "manifest_sha256": "b" * 64,
+        "configuration_sha256": digest(config),
+        "partitions": {
+            "validation": {
+                "file": "../reserved.npz" if case == "escaped_file" else "validation.npz",
+                "sha256": file_digest(data),
+            }
+        },
+    }
+    receipt_path = root / "dataset.json"
+    receipt_path.write_text(json.dumps(receipt))
+    comparison = {
+        "dataset_receipt_sha256": file_digest(receipt_path),
+        "manifest_sha256": "b" * 64,
+        "configuration_sha256": digest(config),
+    }
+    if case == "changed_array":
+        data.write_bytes(b"changed bytes")
+    opened = []
+
+    def forbidden_array_read(*args: Any, **kwargs: Any) -> None:
+        opened.append(True)
+        raise AssertionError("Unqualified array was opened")
+
+    monkeypatch.setattr(np, "load", forbidden_array_read)
+    with pytest.raises(ValueError):
+        validation_example(config, comparison)
+    assert opened == []

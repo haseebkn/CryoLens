@@ -94,15 +94,36 @@ def test_real_registry_signature_promotion_and_rollback(tmp_path: Path) -> None:
     )
     training_run = client.create_run(experiment_id)
     client.set_terminated(training_run.info.run_id)
-    (training / "configuration.json").write_text(
-        json.dumps({"tracking_uri": uri, "dataset_root": str(dataset)})
+    from cryolens.eval.cohort import digest
+
+    config = {"tracking_uri": uri, "dataset_root": str(dataset)}
+    (training / "configuration.json").write_text(json.dumps(config))
+    (dataset / "dataset.json").write_text(
+        json.dumps(
+            {
+                "test_access": False,
+                "manifest_sha256": "b" * 64,
+                "configuration_sha256": digest(config),
+                "partitions": {
+                    "validation": {
+                        "file": "validation.npz",
+                        "sha256": hashlib.sha256(
+                            (dataset / "validation.npz").read_bytes()
+                        ).hexdigest(),
+                    }
+                },
+            }
+        )
     )
     (training / "comparison.json").write_text(
         json.dumps(
             {
                 "test_access": False,
                 "development_only": True,
-                "configuration_sha256": "a" * 64,
+                "configuration_sha256": digest(config),
+                "dataset_receipt_sha256": hashlib.sha256(
+                    (dataset / "dataset.json").read_bytes()
+                ).hexdigest(),
                 "manifest_sha256": "b" * 64,
                 "models": {
                     "unet": {"run_id": training_run.info.run_id, "inference_artifacts": artifacts}

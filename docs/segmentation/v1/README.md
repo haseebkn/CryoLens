@@ -142,3 +142,14 @@ MLOps remains unclaimed. Step 8 is a research release candidate, subject to fina
 review, CI and delivery. Step 4 consistency/adjudication and step 6 target metrics
 are still pending. The protected January/September test cohort remains closed
 to this experiment; pilot annotations and processing-quality thresholds are unchanged.
+
+## Additive cache-bound lifecycle verification
+
+Registration now verifies the exact training dataset receipt, frozen manifest and
+configuration binding, validation-cache checksum and bounded path before any
+array read or registry write. Changed arrays, test-marked receipts and escaped
+cache paths fail closed. A new [guarded registry execution](registry-guarded.json)
+and [container verification](container-guarded-verification.json) repeated the
+actual 1 -> 2 -> 1 rollout with the same trained model bytes and unchanged 1e-5
+inference tolerance. [Execution binding](guarded-execution.json) records the
+receipts. Original training, registry-v2 and container-v3 records remain intact.
