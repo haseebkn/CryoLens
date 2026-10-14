@@ -13,7 +13,15 @@ import numpy as np
 from cryolens.eval.annotations import ReferencePoint, match_targets
 from cryolens.eval.cohort import digest, file_digest
 from cryolens.reference.packet import install_viewer, read_workspace
-from cryolens.reference.records import append_event, events, ledger, phase_tasks
+from cryolens.reference.records import (
+    append_event,
+    effective_primary_events,
+    events,
+    ledger,
+    phase_tasks,
+    response_events,
+    verify_amendment_assets,
+)
 
 
 def issue_review(
@@ -50,12 +58,11 @@ def issue_review(
     with ledger(root) as connection:
         connection.execute("BEGIN IMMEDIATE")
         history = events(connection)
+        verify_amendment_assets(root, history)
         initial = [
             e
-            for e in history
-            if e["kind"] == "response"
-            and e["body"]["response"]["phase"] == "initial"
-            and e["body"]["response"]["reviewer_id"] == original_reviewer
+            for e in effective_primary_events(history)
+            if e["body"]["response"]["reviewer_id"] == original_reviewer
         ]
         if not initial:
             raise ValueError("No personally inspected initial responses are available")
@@ -170,7 +177,7 @@ def issue_review(
 
 def agreement(history: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Candidate label agreement/kappa and surveyed-tile target correspondence, never accuracy."""
-    by_key = {e["key"]: e["body"] for e in history if e["kind"] == "response"}
+    by_key = {e["key"]: e["body"] for e in response_events(history)}
     reports = []
     for issue_event in (e for e in history if e["kind"] == "issue"):
         issue = issue_event["body"]

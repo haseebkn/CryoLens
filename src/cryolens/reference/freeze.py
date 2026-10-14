@@ -12,7 +12,15 @@ import numpy as np
 from cryolens.eval.cohort import digest, file_digest
 from cryolens.reference.coverage import survey_masks
 from cryolens.reference.packet import read_workspace, write_json
-from cryolens.reference.records import append_event, events, ledger, review_exposure
+from cryolens.reference.records import (
+    append_event,
+    effective_primary_events,
+    events,
+    ledger,
+    response_events,
+    review_exposure,
+    verify_amendment_assets,
+)
 
 
 def freeze_reference(
@@ -37,15 +45,21 @@ def freeze_reference(
         connection.execute("BEGIN IMMEDIATE")
         history = events(connection)
         tasks = json.loads((root / "private/tasks.json").read_text())
-        bodies = {e["key"]: e["body"] for e in history if e["kind"] == "response"}
+        verify_amendment_assets(root, history)
+        bodies = {e["key"]: e["body"] for e in response_events(history)}
+        primary = {
+            e["body"]["base_task_id"]: e
+            for e in effective_primary_events(history)
+            if e["body"]["response"]["reviewer_id"] == reviewer
+        }
         selected = {}
         for task in tasks:
-            key = f"response:initial:{reviewer}:{task['task_id']}"
-            if key not in bodies:
+            event = primary.get(task["task_id"])
+            if event is None:
                 raise ValueError(
                     "Every survey/candidate task needs an explicit primary reviewer disposition"
                 )
-            selected[task["task_id"]] = bodies[key]
+            selected[task["task_id"]] = event["body"]
         exposure = review_exposure(history)
         if (
             exposure["ai_assistance_recorded"]
@@ -177,6 +191,16 @@ def freeze_reference(
                 if any(body is selected_body for selected_body in selected.values())
             ],
             "review_consistency": comparisons,
+            "applied_amendments": [
+                {
+                    "event_key": e["key"],
+                    "event_sha256": e["sha256"],
+                    "provenance": e["body"]["amendment_provenance"],
+                }
+                for e in history
+                if e["kind"] == "reference_amendment"
+                and any(e["body"] is body for body in selected.values())
+            ],
             "independent_reviewer_obtained": independent,
             "review_exposure": exposure,
             "surveyed_pixels": int(coverage.sum()),

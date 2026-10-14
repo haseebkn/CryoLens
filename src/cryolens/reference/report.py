@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +14,13 @@ from cryolens.reference.consistency import agreement
 from cryolens.reference.coverage import survey_masks
 from cryolens.reference.design import finite_population_interval
 from cryolens.reference.packet import read_workspace
-from cryolens.reference.records import events, ledger, review_exposure
+from cryolens.reference.records import (
+    effective_primary_events,
+    events,
+    ledger,
+    review_exposure,
+    verify_amendment_assets,
+)
 
 
 def summarize(root: Path) -> dict[str, Any]:
@@ -43,11 +49,8 @@ def summarize(root: Path) -> dict[str, Any]:
                 "reference_set_complete": True,
             }
         )
-    initial = [
-        e["body"]
-        for e in history
-        if e["kind"] == "response" and e["body"]["response"]["phase"] == "initial"
-    ]
+    verify_amendment_assets(root, history)
+    initial = [e["body"] for e in effective_primary_events(history)]
     reviewers = sorted({b["response"]["reviewer_id"] for b in initial})
     tasks = json.loads((root / "private/tasks.json").read_text())
     reviewer_reports = []
@@ -60,10 +63,16 @@ def summarize(root: Path) -> dict[str, Any]:
             ("survey", survey, workspace["survey_task_count"]),
             ("candidate", candidates, workspace["candidate_task_count"]),
         ):
-            seconds = [b["response"]["active_seconds"] for b in values]
+            seconds = [
+                b["response"]["active_seconds"]
+                for b in values
+                if b["response"]["active_seconds"] is not None
+            ]
             effort[mode] = {
                 "responded_tasks": len(values),
                 "available_tasks": total,
+                "tasks_with_measured_time": len(seconds),
+                "tasks_with_unmeasured_time": len(values) - len(seconds),
                 "measured_active_minutes": sum(seconds) / 60,
                 "median_seconds_per_task": float(np.median(seconds)) if seconds else None,
                 "mean_seconds_per_task": float(np.mean(seconds)) if seconds else None,
@@ -122,6 +131,10 @@ def summarize(root: Path) -> dict[str, Any]:
         reviewer_reports.append(
             {
                 "reviewer_id": reviewer,
+                "repeat_not_before_utc": (
+                    max(datetime.fromisoformat(b["response"]["reviewed_utc"]) for b in bodies)
+                    + timedelta(days=workspace["policy"]["repeat_delay_days"])
+                ).isoformat(),
                 "survey_dispositions": len(survey),
                 "complete_survey_tasks": sum(b["response"]["status"] == "complete" for b in survey),
                 "whole_scene_all_tasks_dispositioned": len(survey)
@@ -159,6 +172,13 @@ def summarize(root: Path) -> dict[str, Any]:
         "reference_only_test_access": workspace["reference_only_test_access"],
         "human_responses": sum(e["kind"] == "response" for e in history),
         "reviewer_count": len(reviewers),
+        "effective_primary_responses": len(initial),
+        "reference_amendments": sum(e["kind"] == "reference_amendment" for e in history),
+        "amendment_events": [
+            {"key": e["key"], "sha256": e["sha256"]}
+            for e in history
+            if e["kind"] == "reference_amendment"
+        ],
         "review_exposure": review_exposure(history),
         "reviewers": reviewer_reports,
         "consistency": agreement(history),

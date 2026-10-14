@@ -290,3 +290,44 @@ Precision, recall, per-stage recall and false detections per 1,000 km² await
 actual frozen references and locked full-chain evaluation. SAR review alone may
 support observable-target detection metrics while **iceberg-identification
 accuracy remains unestablished**.
+
+
+## Additive corrections before consistency review
+
+Human corrections may be adopted without replacing initial submissions. Use the
+validated package and its recorded SHA256 receipt:
+
+```text
+python -m cryolens.reference adopt-corrections --workspace <workspace> --package <corrections.json> --receipt <verification.json> --dry-run
+python -m cryolens.reference adopt-corrections --workspace <workspace> --package <corrections.json> --receipt <verification.json>
+```
+
+Adoption revalidates native source grids, labels, source association, prior-response
+hashes, review chronology and human attestations. It appends `reference_amendment`
+events and preserves the original response events and hashes. Repeating the same
+package is idempotent; duplicate tasks, stale packages, absent confirmations or
+changed receipts fail before any ledger insert. Source packages and their receipts
+are copied into an exclusive, hash-bound correction folder and are rechecked by
+reporting, consistency issuance and freezing.
+
+Reporting, repeat selection, agreement and freeze selection use the same effective
+primary responses. Amendments add no reviewed area or extra primary tasks. Repeats
+wait seven days after the latest effective review, including later manual confirmation.
+Comparison packets bind the actual amended answer; freezing defaults to the corrected
+records and preserves amendment provenance. New amendments after a comparison packet
+or frozen snapshot require a new reference version; existing comparisons and scientific
+snapshots are never silently repointed.
+
+The `manual-recheck-v1` response variant requires explicit personal inspection,
+HH/HV and whole-valid-core confirmation. `active_seconds` is null because recheck
+labour was not measured. Standard initial/repeat imports still reject null durations.
+Reports count unmeasured timing separately and omit it from measured means; null is
+never converted to zero. The manual review timestamp is the registration time of the
+confirmation, disclosed as such, rather than an invented exact inspection time.
+
+A screenshot-derived point remains uncertain with unknown identity. Its exclusion
+must cover the protocol uncertainty radius **plus** the declared localization
+allowance. This is additional unscored area, not target-free water or a new identity
+label. Empty completed surveys require actual human full-core/dual-channel attestation.
+Adoption does not itself perform consistency review, adjudicate disagreements, freeze
+the reference, release test evaluation, or establish iceberg identity.

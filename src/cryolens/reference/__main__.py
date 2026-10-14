@@ -9,6 +9,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from cryolens.reference.consistency import issue_review
+from cryolens.reference.corrections import adopt_corrections
 from cryolens.reference.freeze import freeze_reference
 from cryolens.reference.packet import prepare, read_workspace, write_json
 from cryolens.reference.records import completed_survey, events, ingest, ledger, phase_tasks
@@ -29,6 +30,11 @@ def main() -> int:
     load = sub.add_parser("ingest")
     load.add_argument("--workspace", type=Path, required=True)
     load.add_argument("--input", type=Path, required=True)
+    corrections = sub.add_parser("adopt-corrections")
+    corrections.add_argument("--workspace", type=Path, required=True)
+    corrections.add_argument("--package", type=Path, required=True)
+    corrections.add_argument("--receipt", type=Path, required=True)
+    corrections.add_argument("--dry-run", action="store_true")
     repeat = sub.add_parser("issue")
     repeat.add_argument("--workspace", type=Path, required=True)
     repeat.add_argument("--original-reviewer", required=True)
@@ -84,6 +90,12 @@ def main() -> int:
         )
     elif args.command == "ingest":
         print(json.dumps(ingest(args.workspace, args.input)))
+    elif args.command == "adopt-corrections":
+        print(
+            json.dumps(
+                adopt_corrections(args.workspace, args.package, args.receipt, dry_run=args.dry_run)
+            )
+        )
     elif args.command == "issue":
         result = issue_review(
             args.workspace, args.original_reviewer, args.reviewer, args.mode, args.fraction

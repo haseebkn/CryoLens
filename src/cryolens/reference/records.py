@@ -6,7 +6,7 @@ import json
 import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Literal, Self
+from typing import Any, ClassVar, Literal, Self
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -76,7 +76,8 @@ class HumanResponse(BaseModel):
     reviewer_id: str = Field(min_length=1)
     reviewed_utc: datetime
     status: Literal["complete", "partial", "unusable"]
-    active_seconds: float = Field(gt=0, le=24 * 3600, allow_inf_nan=False)
+    active_seconds: float | None = Field(gt=0, le=24 * 3600, allow_inf_nan=False)
+    manual_duration: ClassVar[bool] = False
     personally_inspected: Literal[True]
     viewed_channels: list[Literal["HH", "HV"]]
     notes: str = Field(min_length=3)
@@ -85,6 +86,8 @@ class HumanResponse(BaseModel):
 
     @model_validator(mode="after")
     def aware(self) -> Self:
+        if self.active_seconds is None and not self.manual_duration:
+            raise ValueError("Standard human responses require measured active_seconds")
         if self.reviewed_utc.tzinfo is None or not self.reviewer_id.strip():
             raise ValueError("Reviewer identity and timezone-aware review time are required")
         if len({(m.row, m.col) for m in self.marks}) != len(self.marks):
@@ -92,6 +95,55 @@ class HumanResponse(BaseModel):
         if self.status == "complete" and set(self.viewed_channels) != {"HH", "HV"}:
             raise ValueError("Complete SAR inspection requires both polarizations")
         return self
+
+
+class ManualRecheck(HumanResponse):
+    """Explicit manual amendment variant; unknown duration must never become zero."""
+
+    manual_duration: ClassVar[bool] = True
+
+    @model_validator(mode="after")
+    def unmeasured_duration(self) -> Self:
+        if self.active_seconds is not None:
+            raise ValueError("Manual recheck duration must be explicitly unmeasured")
+        return self
+
+
+def response_events(history: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [e for e in history if e["kind"] in {"response", "reference_amendment"}]
+
+
+def effective_primary_events(history: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Resolve additive amendments while keeping originals available for audit."""
+    selected: dict[tuple[str, str], dict[str, Any]] = {}
+    for event in response_events(history):
+        body = event["body"]
+        response = body["response"]
+        key = (response["reviewer_id"], body["base_task_id"])
+        if event["kind"] == "response" and response["phase"] == "initial":
+            selected[key] = event
+        elif event["kind"] == "reference_amendment":
+            previous = selected.get(key)
+            if previous is None or body["previous_response_key"] != previous["key"]:
+                raise ValueError("Amendment does not extend the active primary response")
+            selected[key] = event
+    return list(selected.values())
+
+
+def verify_amendment_assets(root: Path, history: list[dict[str, Any]]) -> None:
+    checked: set[tuple[str, str]] = set()
+    for event in (e for e in history if e["kind"] == "reference_amendment"):
+        for name, checksum in event["body"]["amendment_provenance"]["files_sha256"].items():
+            if (name, checksum) in checked:
+                continue
+            path = (root / name).resolve()
+            if (
+                not path.is_relative_to(root.resolve())
+                or not path.is_file()
+                or file_digest(path) != checksum
+            ):
+                raise ValueError("Reference amendment provenance changed")
+            checked.add((name, checksum))
 
 
 def ledger(root: Path) -> sqlite3.Connection:
