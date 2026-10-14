@@ -23,6 +23,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   let saved = readStore(key), drafts = readStore(draftKey), restoring = false, storageFailed = false, saving = false, draftWrites = 0, navigating = false;
   const pending = new Map(), pendingDrafts = new Map(), draftBaselineUpdates = new Map();
+  function retainResponse(id, response, baseline) {
+    const existing = pending.get(id);
+    if (existing && JSON.stringify(existing.baseline) !== JSON.stringify(baseline)) return;
+    pending.set(id, { response, baseline: existing ? existing.baseline : structuredClone(baseline) });
+  }
   let savedBaseline = structuredClone(saved);
   let index = 0, marks = [], regions = [], position = null, regionStart = null, image = null, imageRequest = 0, elapsed = 0, lastTick = performance.now(), viewedChannels = new Set(), active = !document.hidden;
   const tick = () => { const now = performance.now(); if (active) elapsed += (now - lastTick) / 1000; lastTick = now; };
@@ -175,20 +180,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     if(position&&!recordPoint())return;
     if(task().mode==='candidate'&&$('status').value==='complete'&&marks.length!==1){$('message').textContent='Record one explicit candidate assessment before completing.';return;}
     const id = task().task_id;
+    const baseline = structuredClone(savedBaseline[id]);
     const response = {workspace_id:packet.workspace_id,task_id:id,phase:packet.phase,reviewer_id:reviewer,reviewed_utc:new Date().toISOString(),status:$('status').value,active_seconds:Math.min(86400,Math.max(1,elapsed+(saved[id]?.active_seconds||0))),personally_inspected:true,viewed_channels:[...viewedChannels],notes:$('notes').value.trim(),marks:structuredClone(marks),excluded_regions:structuredClone(regions)};
     const commit = () => {
       const latest = readStore(key);
-      if (!unreadable.has(key) && JSON.stringify(latest[id]) !== JSON.stringify(savedBaseline[id])) {
+      const originatingBaseline = pending.has(id) ? pending.get(id).baseline : baseline;
+      if (!unreadable.has(key) && JSON.stringify(latest[id]) !== JSON.stringify(originatingBaseline)) {
         storeDraft(id, captureDraft());
         $('message').textContent = 'This response changed in another tab. Your draft is retained; export saved responses there and resolve the conflicting review before saving here.';
         return;
       }
-      pending.set(id, response);
+      retainResponse(id, response, originatingBaseline);
       pendingDrafts.set(id, structuredClone(drafts[id]));
-      const retained = Object.fromEntries(pending);
+      const retained = Object.fromEntries([...pending].map(([taskId, entry]) => [taskId, entry.response]));
       saved = { ...saved, ...latest, ...retained };
       elapsed = 0;
-      if ([...pending.keys()].some(taskId => JSON.stringify(latest[taskId]) !== JSON.stringify(savedBaseline[taskId]))) {
+      if ([...pending].some(([taskId, entry]) => JSON.stringify(latest[taskId]) !== JSON.stringify(entry.baseline))) {
         $('message').textContent = 'This response changed in another tab. Unpersisted responses remain in memory; export this session before leaving.';
         return;
       }
@@ -214,7 +221,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (navigator.locks) await navigator.locks.request(key, commit);
       else commit();
     } catch {
-      pending.set(id, response); pendingDrafts.set(id, structuredClone(drafts[id])); saved[id] = response; elapsed = 0;
+      retainResponse(id, response, baseline); pendingDrafts.set(id, structuredClone(drafts[id])); saved[id] = pending.get(id).response; elapsed = 0;
       $('message').textContent = 'Browser storage unavailable; response is only in memory. Export this session before leaving.';
     } finally { saving = false; document.querySelector('main').inert = false; }
     $('progress').textContent=`Task ${index+1} of ${packet.tasks.length}; ${Object.keys(saved).length} responses in this session.`;

@@ -428,3 +428,55 @@ test('ordinary draft and navigation writes wait for a save baseline update witho
   await expect(page.locator('#message')).toContainText('saved locally');
   expect((await exported(page))[0].notes).toBe('A revision after the interleaving.');
 });
+
+for (const retryA of [false, true]) {
+  test(`a failed A1 cannot overwrite saved A2 after draft restoration ${retryA ? 'even when A is retried' : 'when B is saved'}`, async ({ page, context }) => {
+    await openViewer(page); await inspect(page); await mark(page);
+    await page.locator('#notes').fill('A0 initial saved response.');
+    await page.locator('button[type=submit]').click();
+    await expect(page.locator('#message')).toContainText('saved locally');
+    const other = await context.newPage(); await openViewer(other); await inspect(other);
+    await page.evaluate(key => {
+      const setItem = Storage.prototype.setItem;
+      Storage.prototype.setItem = function (name, value) {
+        if (name === key) throw new Error('quota');
+        return setItem.call(this, name, value);
+      };
+      window.restoreStorageWrites = () => { Storage.prototype.setItem = setItem; };
+    }, storageKey);
+    await page.locator('#notes').fill('A1 failed saved revision.');
+    await page.locator('button[type=submit]').click();
+    await expect(page.locator('#message')).toContainText('only in memory');
+    await page.locator('#next').click();
+    await expect(page.locator('#progress')).toContainText('Task 2 of 2');
+    await other.locator('#notes').fill('A2 newer other-tab saved revision.');
+    await other.locator('button[type=submit]').click();
+    await expect(other.locator('#message')).toContainText('saved locally');
+    const a2 = await other.evaluate(key => localStorage.getItem(key), storageKey);
+    await page.locator('#previous').click();
+    await expect(page.locator('#notes')).toHaveValue('A2 newer other-tab saved revision.');
+    await page.evaluate(() => window.restoreStorageWrites());
+    if (retryA) {
+      await page.locator('#attest').check();
+      await page.locator('button[type=submit]').click();
+      await expect(page.locator('#message')).toContainText('changed in another tab');
+      expect((await exported(page)).find(row => row.task_id === 'task-0').notes).toBe('A1 failed saved revision.');
+    }
+    await page.locator('#next').click();
+    await expect(page.locator('#progress')).toContainText('Task 2 of 2');
+    await page.locator('#band').selectOption('HV');
+    await page.waitForFunction(key => JSON.parse(localStorage.getItem(`${key}:drafts:v2`))['task-1']?.viewed_channels.includes('HV'), storageKey);
+    await inspect(page); await mark(page, 20, 20);
+    await page.locator('button[type=submit]').click();
+    await expect(page.locator('#message')).toContainText('Unpersisted responses remain in memory');
+    expect(await page.evaluate(key => localStorage.getItem(key), storageKey)).toBe(a2);
+    const recovered = await exported(page);
+    expect(recovered.find(row => row.task_id === 'task-0').notes).toBe('A1 failed saved revision.');
+    expect(recovered.find(row => row.task_id === 'task-1').marks[0].row).toBe(20);
+    expect(await page.evaluate(() => {
+      const event = new Event('beforeunload', { cancelable: true });
+      window.dispatchEvent(event); return event.defaultPrevented;
+    })).toBe(true);
+    expect((await exported(other))[0].notes).toBe('A2 newer other-tab saved revision.');
+  });
+}
