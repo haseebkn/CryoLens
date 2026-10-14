@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (unreadable.has(name)) throw new Error('Existing storage is unreadable');
     localStorage.setItem(name, JSON.stringify(value));
   }
-  let saved = readStore(key), drafts = readStore(draftKey), restoring = false, storageFailed = false;
+  let saved = readStore(key), drafts = readStore(draftKey), restoring = false, storageFailed = false, savedStorageFailed = false;
   let savedBaseline = structuredClone(saved);
   let index = 0, marks = [], regions = [], position = null, regionStart = null, image = null, imageRequest = 0, elapsed = 0, lastTick = performance.now(), viewedChannels = new Set(), active = !document.hidden;
   const tick = () => { const now = performance.now(); if (active) elapsed += (now - lastTick) / 1000; lastTick = now; };
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   $('review-form').addEventListener('input', editorChanged);
   $('review-form').addEventListener('change', editorChanged);
   window.addEventListener('beforeunload', event => {
-    if (!persistDraft() || storageFailed) { event.preventDefault(); event.returnValue = ''; }
+    if (!persistDraft() || storageFailed || savedStorageFailed) { event.preventDefault(); event.returnValue = ''; }
   });
   $('queue').textContent = packet.queue;
   $('boundary').textContent = packet.identity_claim_boundary;
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     saved = { ...saved, ...latest };
     saved[task().task_id]={workspace_id:packet.workspace_id,task_id:task().task_id,phase:packet.phase,reviewer_id:reviewer,reviewed_utc:new Date().toISOString(),status:$('status').value,active_seconds:Math.min(86400,Math.max(1,elapsed+(saved[task().task_id]?.active_seconds||0))),personally_inspected:true,viewed_channels:[...viewedChannels],notes:$('notes').value.trim(),marks:structuredClone(marks),excluded_regions:structuredClone(regions)};
     let persisted=false;
-    try{writeStore(key,saved);savedBaseline=structuredClone(saved);persisted=true;$('message').textContent=`Response saved locally with ${marks.length} recorded object(s). Export and import to validate it; no server write occurred.`;}catch{storageFailed=true;$('message').textContent='Browser storage unavailable; response is only in memory. Export this session before leaving.';}
+    try{writeStore(key,saved);savedBaseline=structuredClone(saved);savedStorageFailed=false;persisted=true;$('message').textContent=`Response saved locally with ${marks.length} recorded object(s). Export and import to validate it; no server write occurred.`;}catch{savedStorageFailed=true;$('message').textContent='Browser storage unavailable; response is only in memory. Export this session before leaving.';}
     elapsed=0;
     // Update the draft after saving so restored drafts never reintroduce a pending
     // point or double count elapsed time. This does not alter the submission schema.

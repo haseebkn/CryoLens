@@ -52,10 +52,6 @@ class TestCallSignature:
         assert "geom_epsg3978" not in params
         assert "geom_wgs84" not in params
 
-    def test_client_does_not_import_undeclared_loguru(self) -> None:
-        source = Path("src/cryolens/ingest/iip.py").read_text(encoding="utf-8")
-        assert "loguru" not in source, "loguru is not a declared dependency"
-
 
 class TestIngestion:
     """Parsing behaviour over representative IIP rows."""

@@ -125,6 +125,42 @@ test('changing the selected point requires recording or clearing the previous on
   await expect(page.locator('#message')).toContainText('Record');
 });
 
+test('failed saved-response persistence survives draft writes and beforeunload until Save succeeds', async ({ page }) => {
+  await openViewer(page); await inspect(page); await mark(page);
+  await page.evaluate(key => {
+    const setItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (name, value) {
+      if (name === key) throw new Error('saved-response quota');
+      return setItem.call(this, name, value);
+    };
+    window.restoreStorageWrites = () => { Storage.prototype.setItem = setItem; };
+  }, storageKey);
+  await page.locator('button[type=submit]').click();
+  await expect(page.locator('#message')).toContainText('only in memory');
+  await page.locator('#notes').fill('Draft update after failed response persistence.');
+  expect(await page.evaluate(key => {
+    const draft = JSON.parse(localStorage.getItem(`${key}:drafts:v2`));
+    return draft['task-0'].fields.notes;
+  }, storageKey)).toBe('Draft update after failed response persistence.');
+  const unloadPrevented = () => page.evaluate(() => {
+    const event = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(event);
+    return event.defaultPrevented;
+  });
+  expect(await unloadPrevented()).toBe(true);
+  expect(await page.evaluate(key => localStorage.getItem(key), storageKey)).toBeNull();
+  expect((await exported(page))[0].marks).toEqual([
+    expect.objectContaining({ row: 40, col: 40, label: 'target' }),
+  ]);
+  expect(await unloadPrevented()).toBe(true);
+  await page.evaluate(() => window.restoreStorageWrites());
+  await page.locator('button[type=submit]').click();
+  await expect(page.locator('#message')).toContainText('saved locally');
+  expect(await unloadPrevented()).toBe(false);
+  await page.reload();
+  expect((await exported(page))[0].marks).toHaveLength(1);
+});
+
 test('candidate Save records the centre assessment; it never invents identity evidence', async ({ page }) => {
   const candidate = structuredClone(packet);
   candidate.tasks.forEach(task => { task.mode = 'candidate'; task.centre = [32, 32]; });
