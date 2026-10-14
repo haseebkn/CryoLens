@@ -2,6 +2,33 @@
 
 **Auditable satellite radar candidate screening for the Newfoundland and Labrador shelf.**
 
+## Watch the two-minute walkthrough
+
+**Research prototype:** the reference set remains incomplete. Target precision,
+recall and empirical false alarms are unmeasured; ship/iceberg identification is
+unvalidated. No operational or navigational use is claimed.
+
+https://github.com/user-attachments/assets/0aae9c27-022f-4cc1-be55-71d5475b4b80
+
+[**Download the original 2:00 video**](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.3/CryoLens-two-minute-walkthrough.mp4)
+· [Transcript](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.3/TRANSCRIPT.txt)
+· [Subtitles](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.3/CryoLens-walkthrough.srt)
+· [Evidence report](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.3/CryoLens-v0.1.0-research.3-portfolio.pdf)
+
+<details>
+<summary>Linked thumbnail and direct playback fallback</summary>
+
+[![CryoLens: watch the two-minute research walkthrough](docs/media/cryolens-walkthrough-thumbnail.png)](https://github.com/haseebkn/CryoLens/releases/download/v0.1.0-research.3/CryoLens-two-minute-walkthrough.mp4)
+
+</details>
+
+The captioned walkthrough shows real review interfaces, recorded processing/model
+evidence and an actual CPU inference request. Narration is synthetic; the review
+interaction is a demonstration draft, not a human submission or live surveillance.
+
+The U-Net/frozen-CROMA experiment measures sea-ice chart agreement, with no
+reliable winner or protected final-test result. Status shown: **14 October 2026**.
+
 CryoLens is a research portfolio project for maritime remote sensing. It uses
 Sentinel-1 HH/HV imagery to find bright radar targets, suppress common clutter,
 and show evidence for analyst review. A detected target is **unclassified and
