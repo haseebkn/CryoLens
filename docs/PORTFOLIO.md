@@ -42,3 +42,13 @@ Read [MDA alignment](MDA_ALIGNMENT.md), [audit](AUDIT.md),
 [benchmark evidence](BENCHMARK.md) and [limitations](LIMITATIONS.md) before
 presenting. Source data and records used in a demo should have provenance and
 should be clearly distinguished from the automated test fixtures.
+
+## Model development evidence (14 October 2026)
+
+[U-Net versus frozen CROMA](segmentation/v1/README.md) is now an executed,
+tracked development experiment. Its model card discloses chart proxies,
+homogeneous-chip bias, mixed-chip performance, polarization/domain transfer
+and untouched final-test evaluation. The local registry/signature/container
+promotion and rollback have actual receipts. These improve the foundation-model
+evaluation and ML lifecycle evidence; they do not establish operational MLOps
+or resolve independent target reference/accuracy requirements.

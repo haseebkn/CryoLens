@@ -1,0 +1,23 @@
+name: Research segmentation
+on:
+  push:
+    branches: ['codex/**', main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  research-cpu:
+    name: CPU learning and serving contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.8.19'
+      - run: uv sync --frozen --extra dev --extra tracking --extra research
+      - name: Test real model learning and inference
+        run: uv run --frozen pytest tests/unit/test_segmentation_research.py tests/research/test_segmentation_torch.py

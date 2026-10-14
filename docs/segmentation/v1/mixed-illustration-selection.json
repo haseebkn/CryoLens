@@ -1,0 +1,33 @@
+{
+  "selection": "Exploratory post-training display only: first four chips with both chart classes, in original dataset order; not used for checkpoint selection or tuning",
+  "positions": [
+    {
+      "scene_id": "20180410T214024_cis_prep.nc",
+      "group_id": "274ce0a7ba3e3ebdf1386552bcaca93040c8e396e333d7fca245e76f0bb42939",
+      "source_sha256": "0f17c24835e225b58fb71fda70453892ced392d1ef53515c27eca4fa69140251",
+      "row": 3456,
+      "col": 3840
+    },
+    {
+      "scene_id": "20180410T214024_cis_prep.nc",
+      "group_id": "274ce0a7ba3e3ebdf1386552bcaca93040c8e396e333d7fca245e76f0bb42939",
+      "source_sha256": "0f17c24835e225b58fb71fda70453892ced392d1ef53515c27eca4fa69140251",
+      "row": 4352,
+      "col": 3712
+    },
+    {
+      "scene_id": "20190507T101118_cis_prep.nc",
+      "group_id": "0c0319b096dadf2e0f02c7472e73b7cc32a28f27b462c3ea4a4ffea299dbfa21",
+      "source_sha256": "c5e4d8ea6948d07a881b4bfe2f52c62134efd19772405c1c2336bdc8645c030b",
+      "row": 3712,
+      "col": 4736
+    },
+    {
+      "scene_id": "20190507T101118_cis_prep.nc",
+      "group_id": "0c0319b096dadf2e0f02c7472e73b7cc32a28f27b462c3ea4a4ffea299dbfa21",
+      "source_sha256": "c5e4d8ea6948d07a881b4bfe2f52c62134efd19772405c1c2336bdc8645c030b",
+      "row": 2816,
+      "col": 4352
+    }
+  ]
+}

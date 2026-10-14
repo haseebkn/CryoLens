@@ -1,0 +1,33 @@
+{
+  "selection": "First eligible chip in each of the first four validation scenes, by predeclared scene order; no performance ranking",
+  "positions": [
+    {
+      "scene_id": "20180410T214024_cis_prep.nc",
+      "group_id": "274ce0a7ba3e3ebdf1386552bcaca93040c8e396e333d7fca245e76f0bb42939",
+      "source_sha256": "0f17c24835e225b58fb71fda70453892ced392d1ef53515c27eca4fa69140251",
+      "row": 768,
+      "col": 3584
+    },
+    {
+      "scene_id": "20180428T093937_cis_prep.nc",
+      "group_id": "1110a65cf5e812147e597813ad16959f67c16169c66fc84d4fe199897cca6ec3",
+      "source_sha256": "cf26a69f2d42ecca8c9ba5a11d4f19d22313d73b3a64e57b199a540c561ee58e",
+      "row": 640,
+      "col": 2560
+    },
+    {
+      "scene_id": "20190430T101830_cis_prep.nc",
+      "group_id": "0c0319b096dadf2e0f02c7472e73b7cc32a28f27b462c3ea4a4ffea299dbfa21",
+      "source_sha256": "ba931c76a4b7320d067e3f8353ce0517c1fbc9d48af1a38e70153530e27cade1",
+      "row": 4864,
+      "col": 3328
+    },
+    {
+      "scene_id": "20190507T101118_cis_prep.nc",
+      "group_id": "0c0319b096dadf2e0f02c7472e73b7cc32a28f27b462c3ea4a4ffea299dbfa21",
+      "source_sha256": "c5e4d8ea6948d07a881b4bfe2f52c62134efd19772405c1c2336bdc8645c030b",
+      "row": 3584,
+      "col": 1152
+    }
+  ]
+}

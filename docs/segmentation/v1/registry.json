@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "registered_model": "cryolens-seaice-research-63cd825693b5-43d90de5",
+  "tracking_uri": "sqlite:///E:/CryoLens/data/processed/seaice-development-v1/mlflow.db",
+  "research_only": true,
+  "test_access": false,
+  "training_run_id": "d55dcef8c88f4eaa909df58a7d005729",
+  "versions": [
+    {
+      "version": "1",
+      "run_id": "4bb321ba958c4a519375580003c40cb4",
+      "model_uri": "models:/m-96457f974fcf4276a5842a36a1ba5707",
+      "artifact": "E:\\CryoLens\\data\\processed\\seaice-development-v1\\training\\unet\\epoch1-inference.pt",
+      "model_sha256": "a7c51dec686f8965d9e507675c608682c0e787f1c6bc447a35f95f9ef75d416a",
+      "signature_verified": true
+    },
+    {
+      "version": "2",
+      "run_id": "ce1eb015ccac4a1786b9d485aed25550",
+      "model_uri": "models:/m-1e2d4a6d86824f2db2523bd7181c7a2d",
+      "artifact": "E:\\CryoLens\\data\\processed\\seaice-development-v1\\training\\unet\\best-inference.pt",
+      "model_sha256": "3681614e20cc764110bf38fd8f0b4d213907831e3d23908ec6447fe89bf7f172",
+      "signature_verified": true
+    }
+  ],
+  "transitions": [
+    {
+      "action": "initial",
+      "alias": "research-champion",
+      "version": "1",
+      "model_sha256": "a7c51dec686f8965d9e507675c608682c0e787f1c6bc447a35f95f9ef75d416a",
+      "prediction_verified": true
+    },
+    {
+      "action": "promotion",
+      "alias": "research-champion",
+      "version": "2",
+      "model_sha256": "3681614e20cc764110bf38fd8f0b4d213907831e3d23908ec6447fe89bf7f172",
+      "prediction_verified": true
+    },
+    {
+      "action": "rollback",
+      "alias": "research-champion",
+      "version": "1",
+      "model_sha256": "a7c51dec686f8965d9e507675c608682c0e787f1c6bc447a35f95f9ef75d416a",
+      "prediction_verified": true
+    }
+  ],
+  "signature": {
+    "inputs": "[{\"type\": \"tensor\", \"tensor-spec\": {\"dtype\": \"float32\", \"shape\": [-1, 2, 128, 128]}}]",
+    "outputs": "[{\"type\": \"tensor\", \"tensor-spec\": {\"dtype\": \"float32\", \"shape\": [-1, 2, 128, 128]}}]",
+    "params": null
+  },
+  "container_demonstration_complete": false,
+  "claim_boundary": "Actual local research lifecycle, not operational staged maritime deployment or automatic retraining"
+}
