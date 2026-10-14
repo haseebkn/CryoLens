@@ -108,10 +108,13 @@ observable targets and uncertainties, including isolated small returns. Use
 the context to decide ownership of objects near core boundaries and mark each
 object once. Shift-drag ambiguous regions to exclude them from scored coverage.
 Uncertain points additionally exclude the neighbourhood declared by the
-[reference policy](../configs/reference/protocol-v1.json). Exclusions are assembled
-in scene coordinates and applied after completed cores are combined, so a
-neighbouring completed tile cannot restore uncertain pixels. Progress totals,
-frozen scored coverage and annotation membership use this same exclusion mask.
+[reference policy](../configs/reference/protocol-v1.json), plus any explicit
+localization allowance for an approximate point. The combined radius extends
+across core and display-grid boundaries and is clipped only at scene bounds.
+An approximate point with a missing or invalid allowance is rejected.
+Exclusions are assembled in scene coordinates and applied after completed cores
+are combined, so a neighbouring completed tile cannot restore uncertain pixels.
+Progress totals, frozen scored coverage and annotation membership use this same exclusion mask.
 `partial` and `unusable` dispositions exclude the entire core from scoring;
 they are never interpreted as target-free. Unreviewed cores remain unreviewed.
 
@@ -245,6 +248,10 @@ adjudicator ID/time, uncertainty notes, reviewed object ownership across core
 boundaries, actual independent-reviewer status and a retained response key with
 rationale for every differing task. It never silently averages labels. See
 [the template](../configs/reference/adjudication-template.json).
+The adjudication time must be at least as late as every primary and comparison
+review considered and every final response selected by a case resolution,
+including a response from another reviewer. Earlier adjudications are rejected
+before any snapshot is written.
 
 ```text
 uv run --frozen python -m cryolens.reference freeze --workspace <workspace> --reviewer <primary-id> --adjudication <completed-adjudication.json> --output <workspace>/frozen-v1
@@ -291,7 +298,6 @@ actual frozen references and locked full-chain evaluation. SAR review alone may
 support observable-target detection metrics while **iceberg-identification
 accuracy remains unestablished**.
 
-
 ## Additive corrections before consistency review
 
 Human corrections may be adopted without replacing initial submissions. Use the
@@ -305,10 +311,14 @@ python -m cryolens.reference adopt-corrections --workspace <workspace> --package
 Adoption revalidates native source grids, labels, source association, prior-response
 hashes, review chronology and human attestations. It appends `reference_amendment`
 events and preserves the original response events and hashes. Repeating the same
-package is idempotent; duplicate tasks, stale packages, absent confirmations or
-changed receipts fail before any ledger insert. Source packages and their receipts
-are copied into an exclusive, hash-bound correction folder and are rechecked by
-reporting, consistency issuance and freezing.
+package is idempotent, including after consistency issuance or freezing.
+Declared tile numbers must uniquely match response task IDs in the sealed original
+`review/survey/tasks.json` ordering; manual confirmation authorizes those actual
+tasks. Unknown, mismatched or duplicated task/tile associations are rejected.
+Stale packages, absent confirmations or changed receipts fail before any ledger
+insert. Source packages and their receipts are copied into an exclusive,
+hash-bound correction folder and are rechecked by reporting, consistency issuance
+and freezing.
 
 Reporting, repeat selection, agreement and freeze selection use the same effective
 primary responses. Amendments add no reviewed area or extra primary tasks. Repeats
@@ -325,9 +335,9 @@ Reports count unmeasured timing separately and omit it from measured means; null
 never converted to zero. The manual review timestamp is the registration time of the
 confirmation, disclosed as such, rather than an invented exact inspection time.
 
-A screenshot-derived point remains uncertain with unknown identity. Its exclusion
-must cover the protocol uncertainty radius **plus** the declared localization
-allowance. This is additional unscored area, not target-free water or a new identity
-label. Empty completed surveys require actual human full-core/dual-channel attestation.
+A screenshot-derived point remains uncertain with unknown identity and follows
+the [scene coverage exclusion rules](#independent-area-search-and-exact-coverage).
+This is additional unscored area, not target-free water or a new identity label.
+Empty completed surveys require actual human full-core/dual-channel attestation.
 Adoption does not itself perform consistency review, adjudicate disagreements, freeze
 the reference, release test evaluation, or establish iceberg identity.

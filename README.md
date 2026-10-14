@@ -165,8 +165,10 @@ surveys before retained/rejected candidate review, records sampling probabilitie
 and supports concealed repeats, adjudication and exact coverage masks. The
 [real pilot](docs/reference-set/v1/README.md) has 193 development survey tiles,
 28 retained and 68 sampled rejected reviews, and 64 held-out survey tiles.
-**Human review is pending; no reference-derived precision, recall or false-alarm
-rate is available.** January test SAR was prepared for human reference review
+See the [validated pilot corrections](docs/reference-set/corrections-v1/README.md)
+for the held-out review and pending adoption status. **Reference completion
+remains pending; no reference-derived precision, recall or false-alarm rate is
+available.** January test SAR was prepared for human reference review
 only; its chart labels and model evaluation remain sealed.
 
 See the [current SAFE processing evidence](docs/processing-validation/v5/README.md)

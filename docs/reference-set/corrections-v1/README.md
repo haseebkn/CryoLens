@@ -34,13 +34,11 @@ Use the [documented correction command](../../REFERENCE_SET.md#additive-correcti
 with a receipt-bound package. Successful adoption appends five amendments;
 progress still contains 64 effective primary tasks, not 69 independent reviews.
 Repeat selection then waits seven days after the latest corrected confirmation
-and binds its comparisons to the amended answers. The current conservative
+under the linked protocol. The current conservative
 not-before time from the package is 20 October 2026 at 22:50:06 Newfoundland
 time. It must be recomputed if genuine further reviews occur.
 
-Original response bytes and event hashes are preserved. New corrections after
-consistency issuance or freezing require a new reference version. No actual
-held-out repeat, final freeze, CFAR run or model evaluation was performed by
-this implementation. Final adoption and its dated verification receipt are a
+No actual held-out repeat, final freeze, CFAR run or model evaluation was performed
+by this implementation. Final adoption and its dated verification receipt are a
 separate execution after software validation; the initial dry run must not be
 represented as an already applied correction.

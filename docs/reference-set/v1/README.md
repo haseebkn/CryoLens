@@ -100,8 +100,11 @@ the [adjudication template](../../../configs/reference/adjudication-template.jso
   tree, before processing. Source hashes are checked again before sealing.
   They preserve what actually executed rather than claiming a future commit ran.
 
-Software and real packet preparation are complete. **Actual annotations,
-consistency checks and adjudicated reference freezing remain pending.**
+Software and real packet preparation are complete. See the
+[pilot correction report](../corrections-v1/README.md) for subsequent held-out
+review and pending adoption status, and the
+[review protocol](../../REFERENCE_SET.md#blinded-consistency-and-adjudication)
+for the remaining consistency and freeze gates.
 Precision, recall, per-stage recall and empirical false alarms per 1,000 km²
 remain unmeasured. SAR inspection may support observable-target metrics after
 locked evaluation; iceberg-identification accuracy needs independent evidence.
