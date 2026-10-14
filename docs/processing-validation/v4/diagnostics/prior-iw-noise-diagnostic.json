@@ -1,0 +1,383 @@
+{
+  "schema_version": 1,
+  "product": "S1A_IW_GRDH_1SDH_20260328T094823_20260328T094848_063826_0806C8_672E_COG.SAFE",
+  "source_files_sha256": {
+    "manifest.safe": "d0060edcf3f1f6ab3db997d0616f9e96ea4bb497dff367c84a14f0ea5a987e14",
+    "measurement/s1a-iw-grd-hh-20260328t094823-20260328t094848-063826-0806c8-001-cog.tiff": "195a0fbbabe40750155e2cd9fa644e0ac31aaa3704c708bc26063093338b49d5",
+    "measurement/s1a-iw-grd-hv-20260328t094823-20260328t094848-063826-0806c8-002-cog.tiff": "0af3685e40a0687709c018321edb866eaf81601606340653b0a194b692cc2588",
+    "annotation/calibration/calibration-s1a-iw-grd-hh-20260328t094823-20260328t094848-063826-0806c8-001-cog.xml": "c9eda01d38321b0180e03684db5e84935a5f880f349b7c1a77dc36042f36d11d",
+    "annotation/calibration/calibration-s1a-iw-grd-hv-20260328t094823-20260328t094848-063826-0806c8-002-cog.xml": "8f5670ac9173e3eb800f8dea2a9ea4016c19b8105f62f57e0b1ee23193c09570",
+    "annotation/calibration/noise-s1a-iw-grd-hh-20260328t094823-20260328t094848-063826-0806c8-001-cog.xml": "53f0384466ba3919ca225501bd249cc91b38933d462b4a51e6a811ede0886cbc",
+    "annotation/calibration/noise-s1a-iw-grd-hv-20260328t094823-20260328t094848-063826-0806c8-002-cog.xml": "ecb718a3cfa1330bedc28ee56a79de3cb8d7126f9c88a4ae3d8207687e089a17",
+    "annotation/rfi/rfi-s1a-iw-grd-hh-20260328t094823-20260328t094848-063826-0806c8-001-cog.xml": "b76966a432e7928f3dfd5649ac038ccdbcaa22098bcf80805edfd216f784b758",
+    "annotation/rfi/rfi-s1a-iw-grd-hv-20260328t094823-20260328t094848-063826-0806c8-002-cog.xml": "d29f8041ca8f16ae5e39307549fc0771401cff14d3b3c58f08fe40155459590a",
+    "annotation/s1a-iw-grd-hh-20260328t094823-20260328t094848-063826-0806c8-001-cog.xml": "dfd3780b1fa32bab2b2609f6be051049219eeff3784e9a956a564663e1405a9f",
+    "annotation/s1a-iw-grd-hv-20260328t094823-20260328t094848-063826-0806c8-002-cog.xml": "31929e91878d81242b466e7ce9e90aaef7e0d7de800f6f630daa870b48eca2b1"
+  },
+  "source_inventory_verified_after_scan": true,
+  "driver_sha256": "edcf5a1ad970b3419c7d4895dc47d770ed309de1b16849903320f3244651f1da",
+  "reader_sha256": "9c5d38340b7da8a90221adfc602f3cddc0c9dc6b65d7da21fc6a3e227d2f3dd4",
+  "windows": [
+    {
+      "window": [
+        1615,
+        2532,
+        512,
+        512
+      ],
+      "fractions": [
+        0.1,
+        0.1
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 0.0,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            19.479269969380223,
+            52.61153685824507,
+            126.59933052603019
+          ],
+          "mean_signed_corrected_power": 0.2766646420024149,
+          "mean_annotated_noise_power": 0.00428677772461504,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 32.22142791748047
+        },
+        "HV": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 0.0740814208984375,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            1.1093600067170375,
+            2.249922013379801,
+            4.165511411870757
+          ],
+          "mean_signed_corrected_power": 0.005913272796073277,
+          "mean_annotated_noise_power": 0.003975199204586343,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 32.22142791748047
+        }
+      }
+    },
+    {
+      "window": [
+        1615,
+        12658,
+        512,
+        512
+      ],
+      "fractions": [
+        0.1,
+        0.5
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 0.0,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            22.52065727137066,
+            57.60181677864317,
+            129.40834961890434
+          ],
+          "mean_signed_corrected_power": 0.14366011200584072,
+          "mean_annotated_noise_power": 0.002112445465074053,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 38.72096252441406
+        },
+        "HV": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 0.01407623291015625,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            1.833724527010234,
+            3.8296660237775795,
+            7.241510305935353
+          ],
+          "mean_signed_corrected_power": 0.0060700102251963735,
+          "mean_annotated_noise_power": 0.0018601655732742878,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 38.72096252441406
+        }
+      }
+    },
+    {
+      "window": [
+        1615,
+        22784,
+        512,
+        512
+      ],
+      "fractions": [
+        0.1,
+        0.9
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 1.52587890625e-05,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            10.523013044875807,
+            30.36225328553863,
+            97.34644515558196
+          ],
+          "mean_signed_corrected_power": 0.06437761812932753,
+          "mean_annotated_noise_power": 0.0014731483988140587,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 44.40767288208008
+        },
+        "HV": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 0.037769317626953125,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            1.414480140154757,
+            3.494453635868876,
+            9.688153067187736
+          ],
+          "mean_signed_corrected_power": 0.005450745769944502,
+          "mean_annotated_noise_power": 0.001458819155276321,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 44.40767288208008
+        }
+      }
+    },
+    {
+      "window": [
+        8077,
+        2532,
+        512,
+        512
+      ],
+      "fractions": [
+        0.5,
+        0.1
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 0.0,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            20.100939266470174,
+            54.158602519073334,
+            128.64595509491662
+          ],
+          "mean_signed_corrected_power": 0.26903920440721363,
+          "mean_annotated_noise_power": 0.004088878417120245,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 32.24078369140625
+        },
+        "HV": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 0.08297348022460938,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            1.0629561503430278,
+            2.1394200120656275,
+            3.95341981793424
+          ],
+          "mean_signed_corrected_power": 0.005191731229981623,
+          "mean_annotated_noise_power": 0.003803685485986973,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 32.24078369140625
+        }
+      }
+    },
+    {
+      "window": [
+        8077,
+        12658,
+        512,
+        512
+      ],
+      "fractions": [
+        0.5,
+        0.5
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 0.0,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            23.632766613027375,
+            49.94002270994077,
+            95.70556762607454
+          ],
+          "mean_signed_corrected_power": 0.12605617801371105,
+          "mean_annotated_noise_power": 0.002293129868632615,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 38.73883819580078
+        },
+        "HV": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 0.024265289306640625,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            1.5271775075961478,
+            3.0522471773675526,
+            5.459583674547032
+          ],
+          "mean_signed_corrected_power": 0.004727346760502212,
+          "mean_annotated_noise_power": 0.0020331205496834353,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 38.73883819580078
+        }
+      }
+    },
+    {
+      "window": [
+        8077,
+        22784,
+        512,
+        512
+      ],
+      "fractions": [
+        0.5,
+        0.9
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 3.814697265625e-06,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            12.496188603748958,
+            28.68820513660487,
+            66.52350860330064
+          ],
+          "mean_signed_corrected_power": 0.053249335447329835,
+          "mean_annotated_noise_power": 0.0015193310047100922,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 44.424007415771484
+        },
+        "HV": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 0.03508758544921875,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            1.407174638663444,
+            2.995947363924862,
+            6.306106852257588
+          ],
+          "mean_signed_corrected_power": 0.003919110461613163,
+          "mean_annotated_noise_power": 0.0015079283923187022,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 44.424007415771484
+        }
+      }
+    },
+    {
+      "window": [
+        14539,
+        2532,
+        512,
+        512
+      ],
+      "fractions": [
+        0.9,
+        0.1
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 0.0,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            19.163839284299762,
+            45.78224889568139,
+            100.64543727438593
+          ],
+          "mean_signed_corrected_power": 0.23270198378940687,
+          "mean_annotated_noise_power": 0.0043352461381021,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 32.26019287109375
+        },
+        "HV": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 0.1498565673828125,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            0.8707965921028915,
+            1.7264105117129256,
+            3.08422512126909
+          ],
+          "mean_signed_corrected_power": 0.0035357504398877576,
+          "mean_annotated_noise_power": 0.0040219323808159246,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 32.26019287109375
+        }
+      }
+    },
+    {
+      "window": [
+        14539,
+        12658,
+        512,
+        512
+      ],
+      "fractions": [
+        0.9,
+        0.5
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 3.814697265625e-06,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            15.67642933135451,
+            40.11530637441282,
+            94.38648731668044
+          ],
+          "mean_signed_corrected_power": 0.1058107620628348,
+          "mean_annotated_noise_power": 0.0021810730724658445,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 38.75676727294922
+        },
+        "HV": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 0.0319671630859375,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            1.471009723816818,
+            3.2343597104877926,
+            7.124058650505664
+          ],
+          "mean_signed_corrected_power": 0.005690822330624408,
+          "mean_annotated_noise_power": 0.0019470797401460113,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 38.75676727294922
+        }
+      }
+    },
+    {
+      "window": [
+        14539,
+        22784,
+        512,
+        512
+      ],
+      "fractions": [
+        0.9,
+        0.9
+      ],
+      "channels": {
+        "HH": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 0.0,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            15.326372389372505,
+            33.195103759034524,
+            64.2009676157721
+          ],
+          "mean_signed_corrected_power": 0.056212914301893124,
+          "mean_annotated_noise_power": 0.0015534167464476,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 44.44038391113281
+        },
+        "HV": {
+          "finite_pixels": 262144,
+          "nonpositive_fraction": 0.03028106689453125,
+          "raw_to_annotated_noise_ratio_percentiles": [
+            1.4870972812561194,
+            3.1963474422961973,
+            6.159550658227261
+          ],
+          "mean_signed_corrected_power": 0.003977087072207576,
+          "mean_annotated_noise_power": 0.0015468159518356333,
+          "noise_positive_support_pixels": 262144,
+          "incidence_median_deg": 44.44038391113281
+        }
+      }
+    }
+  ],
+  "claim_boundary": "Nine fixed source windows only. Ratio is measured raw backscatter divided by its annotated noise power; it is not an independent estimate of true signal or noise-model accuracy. No clipping, denoising, acceptance or performance measurement."
+}

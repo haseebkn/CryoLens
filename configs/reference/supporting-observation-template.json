@@ -1,0 +1,15 @@
+{
+  "kind": "optical",
+  "reference": "REPLACE_WITH_ACTUAL_PRODUCT_AND_EVIDENCE_REFERENCE",
+  "source_sha256": "REPLACE_WITH_SOURCE_SHA256",
+  "acquired_utc": "REPLACE_WITH_ACTUAL_UTC_TIMESTAMP",
+  "rationale": "REPLACE: positive object evidence, clouds/ice, time separation, movement and matching uncertainty",
+  "longitude": null,
+  "latitude": null,
+  "matching_radius_m": null,
+  "position_uncertainty_m": null,
+  "positive_observation": false,
+  "visibility": "uncertain",
+  "valid_optical_pixels": false,
+  "resolution_m": null
+}

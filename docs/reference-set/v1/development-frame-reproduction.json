@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "development_frame_reproduction_no_annotations",
+  "checked_at": "2026-10-06T01:39:18.494745+00:00",
+  "workspace_id": "a2b7dc7e5cfc43456b17b78b0a9825a1d9b12c8f748715ab012d0b191472317f",
+  "source_sha256": "cf26a69f2d42ecca8c9ba5a11d4f19d22313d73b3a64e57b199a540c561ee58e",
+  "recorded_frame_sha256": "b4b752c30b5d7e724da2cec5cbb06acab85080c972f05a38857494d708604835",
+  "executing_audit_source_sha256": "774634f6ed1bca5f522a54d0047d8a596d1ed371eb5a27d90132c855e1d3f286",
+  "executing_check_source_sha256": "6f8ab1ff3b367910fc614356837eca33e13a4a28aac555ee17fa8e05edc52d97",
+  "raw_components_checked": 311,
+  "exact_frame_reproduced": true,
+  "exact_detection_summary_reproduced": true,
+  "human_responses_modified": false,
+  "heldout_access": false
+}

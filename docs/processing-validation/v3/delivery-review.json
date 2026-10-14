@@ -1,0 +1,18 @@
+{
+  "run_id": "01M4R2HTZYB13ZH1G0SFYRC5D4",
+  "review_agent": "Codex",
+  "status": "failed during rereview on external model capacity; completed automatic fixes recovered",
+  "recovered_commit": "8ebe1843ea05c4bb7b49830e8e650db86b016c53",
+  "fixed": [
+    "R3: preserve recorded v2 graph bytes across checkouts",
+    "R4: correct Windows UNC path prefix handling"
+  ],
+  "pending_human_decision": [
+    "R1: reject occupied reference output prefixes before any Docker/output mutation",
+    "R2: bind new marine receipts to the original processing input inventory"
+  ],
+  "pushed": false,
+  "new_pr": null,
+  "pipeline_checks_passed": false,
+  "strict_quality_policy_changed": false
+}

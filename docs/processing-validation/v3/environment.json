@@ -1,0 +1,11 @@
+{
+  "numpy": "2.4.6",
+  "scipy": "1.17.1",
+  "rasterio": "1.4.4",
+  "pyproj": "3.7.2",
+  "scikit-image": "0.26.0",
+  "rio-cogeo": "7.0.2",
+  "mlflow-skinny": "3.16.1",
+  "httpx": "0.28.1",
+  "purpose": "Post-hoc environment inventory for the completed processing investigations, not an installation guarantee"
+}

@@ -1,0 +1,11 @@
+{
+  "authorization": "Human explicitly approved R1 and R2 via the approval prompt",
+  "remedies": [
+    "Reject occupied reference prefixes before processing, retain failed reservations, use exclusive logs/receipts, and keep existing validation reports immutable",
+    "Bind schema-2 marine evidence to original manifest, measurements and annotations; verify unchanged inputs before/after scan and strict input join"
+  ],
+  "historic_scientific_records_rewritten": false,
+  "quality_thresholds_changed": false,
+  "source_bound_EW_pass": true,
+  "step2_complete": false
+}

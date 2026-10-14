@@ -1,0 +1,120 @@
+[
+  {
+    "product": "S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG",
+    "output": "E:\\CryoLens\\data\\processed\\step2-complete-20261013-r1\\products\\S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG\\S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG_4band_EPSG3978.tif",
+    "overviews": [
+      {
+        "scale": 2,
+        "shape": [
+          7126,
+          7159
+        ],
+        "pixels": 51015034,
+        "valid": 23217861,
+        "nonfinite": 0,
+        "mask_errors": 0,
+        "ratio_errors": 0,
+        "incidence_errors": 0
+      },
+      {
+        "scale": 4,
+        "shape": [
+          3563,
+          3580
+        ],
+        "pixels": 12755540,
+        "valid": 5804278,
+        "nonfinite": 0,
+        "mask_errors": 0,
+        "ratio_errors": 0,
+        "incidence_errors": 0
+      },
+      {
+        "scale": 8,
+        "shape": [
+          1782,
+          1790
+        ],
+        "pixels": 3189780,
+        "valid": 1451503,
+        "nonfinite": 0,
+        "mask_errors": 0,
+        "ratio_errors": 0,
+        "incidence_errors": 0
+      },
+      {
+        "scale": 16,
+        "shape": [
+          891,
+          895
+        ],
+        "pixels": 797445,
+        "valid": 362936,
+        "nonfinite": 0,
+        "mask_errors": 0,
+        "ratio_errors": 0,
+        "incidence_errors": 0
+      }
+    ],
+    "overview_pixels_valid": true
+  },
+  {
+    "product": "S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG",
+    "output": "E:\\CryoLens\\data\\processed\\step2-complete-20261013-r1\\products\\S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG\\S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG_4band_EPSG3978.tif",
+    "overviews": [
+      {
+        "scale": 2,
+        "shape": [
+          3503,
+          3935
+        ],
+        "pixels": 13784305,
+        "valid": 6315977,
+        "nonfinite": 0,
+        "mask_errors": 0,
+        "ratio_errors": 0,
+        "incidence_errors": 0
+      },
+      {
+        "scale": 4,
+        "shape": [
+          1752,
+          1968
+        ],
+        "pixels": 3447936,
+        "valid": 1580083,
+        "nonfinite": 0,
+        "mask_errors": 0,
+        "ratio_errors": 0,
+        "incidence_errors": 0
+      },
+      {
+        "scale": 8,
+        "shape": [
+          876,
+          984
+        ],
+        "pixels": 861984,
+        "valid": 394966,
+        "nonfinite": 0,
+        "mask_errors": 0,
+        "ratio_errors": 0,
+        "incidence_errors": 0
+      },
+      {
+        "scale": 16,
+        "shape": [
+          438,
+          492
+        ],
+        "pixels": 215496,
+        "valid": 98719,
+        "nonfinite": 0,
+        "mask_errors": 0,
+        "ratio_errors": 0,
+        "incidence_errors": 0
+      }
+    ],
+    "overview_pixels_valid": true
+  }
+]

@@ -1,6 +1,14 @@
 # Known limitations
 
-Reviewed 2026-09-05. CryoLens is a research screening and review project, not an
+The [independent reference pilot](reference-set/v1/README.md) now has real
+survey packets, a full development raw-component frame, probability samples of
+rejected components, and a human review/repeat/adjudication workflow. It has
+**zero accepted human responses** at preparation. Surveyed coverage, reviewer
+consistency, reference labels and effort estimates are therefore unmeasured.
+An independent second reviewer has not been obtained. Prepared imagery and
+available-area counts must not be reported as completed annotation coverage.
+
+Reviewed 2026-10-05. CryoLens is a research screening and review project, not an
 operational iceberg surveillance service. The current benchmark evidence and
 its exclusions are described in [BENCHMARK.md](BENCHMARK.md).
 
@@ -32,6 +40,24 @@ Automated candidates are unclassified. A heuristic detector score is not
 calibrated iceberg confidence and is not a MANICE confidence code. Analyst
 judgments are attributed review evidence, not automatically independent
 physical ground truth.
+
+Sentinel-2 paired review now supplies real RGB/NIR/SCL crops and independent
+optical evidence records ([availability report](optical-review/v1/README.md)).
+Current qualified EW/IW review coverage and its separate analyst interface are
+documented in the [fresh review report](optical-review/fresh-v1/README.md). Tile
+footprints can contain extensive nodata; a catalogue match is not clear imagery.
+The 20 m SCL layer can confuse ice and clouds and cannot resolve every small
+object visible in 10 m bands. Time-separated moving targets are not expected
+at the same pixel. The default movement and geolocation allowances are research
+assumptions, not measured accuracy or a validated vessel/iceberg drift bound.
+Chips are capped at 6 km radius and explicitly flag larger assumed envelopes.
+An absent counterpart never automatically changes the radar verdict.
+
+The [historical CDSE report](optical-review/cdse-v1/README.md) owns the
+reprocessed-product comparisons; the fresh report above owns its later
+exact-product verification. Matching acquisition, orbit and tile alone does not
+establish product or pixel equivalence. Verified alternative-provider access
+does not supply missing target truth or validate fresh SAR processing.
 
 ## 3. Data units and labels
 
@@ -68,11 +94,53 @@ physical ice boundaries with artifacts. Masks can suppress real targets.
 ## 6. Raw SAFE processing
 
 The Python path reads actual measurements, calibration and noise LUTs and
-uses annotation geolocation. It does not apply precise orbit correction or
-constitute a validated terrain-corrected operational chain. It requires
+uses marine range-Doppler mapping from annotated orbit/range metadata. It does
+not apply precise orbit correction or constitute a validated terrain-corrected
+operational chain. It requires
 comparison with trusted processing on real SAFE products. Running SNAP and
 then ignoring its output is no longer presented as a successful SNAP pipeline.
 Unsupported engines and missing inputs fail explicitly.
+
+### Validation outcome, 2026-10-13
+
+The [current processing report](processing-validation/v5/README.md) owns the
+representative EW/IW outcomes and remaining qualifications. Representative
+development observations do not establish seasonal availability, absolute field
+accuracy or a regional false-alarm budget. Historical failures remain retained.
+
+
+The [reproducible processing report](processing-validation/v2/README.md)
+supersedes the earlier scene-median comparison. Similar extents and medians
+did not confirm calibration or absolute geolocation accuracy.
+
+That historical report owns the earlier comparison results, full-product quality
+rejections and historical short-block invalidation with its separately executed
+replacement.
+Comparisons against SNAP do not establish surveyed absolute accuracy. Current
+complete-output qualification is owned by the report linked above. The fresh SAFE
+deployment gate remains closed, and rejected products write machine-readable
+reasons before detection. Negative
+residuals are retained for diagnostics; no positive floor manufactures data.
+The 5% non-positive threshold is a research acceptance preset, not a published
+ESA or C-CORE requirement.
+
+The report also records the unqualified NERSC experiment. It is not
+adopted or assumed to solve this problem. Sentinel-1C/D coefficient qualification
+and a defensible noise workflow remain open. Benchmark results in BENCHMARK.md
+use the separate AI4Arctic processing path and do not depend on fresh SAFE data.
+
+Precise and restituted orbit products (POEORB/RESORB) can be acquired without
+credentials from the public ESA STEP and ASF auxiliary-data mirrors, selected by
+the validity window encoded in the product filename. Downloaded and cached EOFs
+must match the mission and orbit type and contain finite position/velocity vectors
+whose timestamps cover the acquisition. Download, archive-decoding and candidate
+validation failures continue to the next mirror. **Acquiring an orbit is not
+applying one.** Marine geocoding uses the annotated orbit, no precise-orbit
+correction is computed, and `orbit_correction_applied` stays `False` in
+provenance. Applying a precise orbit means recomputing geolocation, which cannot
+responsibly be implemented until the resulting geolocation can be checked
+against trusted processing. Matched calibration comparisons are now done; an
+orbit-correction comparison is not, and remains future work.
 
 ## 7. Machine learning
 

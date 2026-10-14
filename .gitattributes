@@ -1,0 +1,55 @@
+# Generated catalogue/provenance receipts remain downloadable, with code emphasized in reviews.
+docs/optical-review/v1/*.json linguist-generated=true
+docs/optical-review/cdse-v1/*.json linguist-generated=true
+docs/reference-set/v1/*.json linguist-generated=true
+docs/evaluation/v1/*.json linguist-generated=true
+docs/evaluation/v1/*.geojson linguist-generated=true
+docs/processing-validation/v1/*.json linguist-generated=true
+docs/processing-validation/v1/reference-receipts/*.json linguist-generated=true
+docs/audits/pr6-9/*.json linguist-generated=true
+docs/audits/pr6-9/reference-receipts/*.json linguist-generated=true
+docs/processing-validation/v2/*.json linguist-generated=true
+docs/processing-validation/v2/reference-receipts/*.json linguist-generated=true
+
+docs/processing-validation/v3/**/*.json linguist-generated=true
+docs/processing-validation/v3/metadata/**/*.xml linguist-generated=true
+
+# Scientific receipts and source snapshots are intentional byte contracts.
+# Marine evidence binds the AOI's original CRLF bytes on every platform.
+configs/aoi.geojson text eol=crlf
+docs/processing-validation/v3/** -text whitespace=cr-at-eol
+docs/processing-validation/v1/** -text whitespace=cr-at-eol
+docs/processing-validation/v2/** -text whitespace=cr-at-eol
+docs/audits/pr6-9/** -text whitespace=cr-at-eol
+configs/sentinel1-validation-v1.json -text whitespace=cr-at-eol
+configs/sentinel1-validation-v2.json -text whitespace=cr-at-eol
+configs/sentinel1-short-block-validation.json -text whitespace=cr-at-eol
+configs/snap/validation-reference.xml -text whitespace=cr-at-eol
+configs/snap/validation-reference-v2.xml -text whitespace=cr-at-eol
+
+# Human-readable prose is not a hashed execution artifact.
+docs/processing-validation/v3/**/*.md text eol=lf
+docs/processing-validation/v2/**/*.md text eol=lf
+docs/processing-validation/v1/**/*.md text eol=lf
+docs/audits/pr6-9/**/*.md text eol=lf
+# Southern IW scientific records are intentional byte contracts.
+docs/processing-validation/v4/** -text whitespace=cr-at-eol
+docs/processing-validation/v4/**/*.json linguist-generated=true
+docs/processing-validation/v4/**/*.xml linguist-generated=true
+docs/processing-validation/v4/**/*.md text eol=lf
+
+# Complete corrected product evidence is a byte contract.
+configs/sentinel1-complete-output-v1.json -text whitespace=cr-at-eol
+configs/snap/validation-corrected-output-v1.xml -text whitespace=cr-at-eol
+docs/processing-validation/v5/** -text whitespace=cr-at-eol
+docs/processing-validation/v5/**/*.md text eol=lf
+docs/processing-validation/v5/**/*.json linguist-generated=true
+
+# Fresh optical scientific receipts are preserved byte for byte.
+configs/optical-review-fresh-v1.json -text whitespace=cr-at-eol
+docs/optical-review/fresh-v1/** -text whitespace=cr-at-eol
+docs/optical-review/fresh-v1/**/*.md text eol=lf
+docs/optical-review/fresh-v1/**/*.json linguist-generated=true
+
+# Publisher XML bytes are an exact source artifact, including whitespace.
+docs/optical-review/fresh-v1/cdse-direct-verification/hosted-product.xml whitespace=-blank-at-eol,cr-at-eol

@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from shapely.geometry import mapping
 
-from cryolens.api.routes import detections, drift, health, iip, scenes
+from cryolens.api.routes import detections, drift, health, iip, optical, scenes
 from cryolens.config.settings import get_settings
 from cryolens.geo.aoi import load_aoi
 
@@ -26,6 +26,7 @@ app.include_router(scenes.router, prefix="/api/v1")
 app.include_router(detections.router, prefix="/api/v1")
 app.include_router(iip.router, prefix="/api/v1")
 app.include_router(drift.router, prefix="/api/v1")
+app.include_router(optical.router, prefix="/api/v1")
 
 
 @app.get("/api/v1/capabilities", tags=["Project"])
@@ -45,6 +46,7 @@ def capabilities() -> dict[str, Any]:
         "confidence": "uncalibrated detector scores; no measured operational false-positive rate",
         "ais": "unavailable",
         "drift": "unavailable_unvalidated",
+        "optical_review": "Sentinel-2 paired chips and separate analyst evidence; availability measured per generated pair",
         "affiliation": "Independent portfolio project; no C-CORE affiliation or certification",
     }
 

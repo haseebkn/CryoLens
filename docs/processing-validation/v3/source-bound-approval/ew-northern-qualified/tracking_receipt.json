@@ -1,0 +1,11 @@
+{
+  "run_id": "12b2bb1d7b024cdbaf57e165a33e2b1c",
+  "experiment": "cryolens-processing-ew-northern-pass-20261012",
+  "report_sha256": "68ffef2703d05172a3435a96af44430b20cf59cdab4c15fcd6423e8db023684c",
+  "recipe_id": "ew-northern-pass-20261012",
+  "configuration_sha256": "1eea272dcc847cf597aea60eece2bfeef3280518c2fce109b30e42adff8f1f46",
+  "graph_sha256": "266c615e0dfb96b1cb56aefe363f7ffdea4171c9589d4a691615619e4a63d0db",
+  "purpose": "Completed processing investigation; no precision, recall or false-alarm measurement",
+  "git_commit": "7991af59c98d6a36684f4fb3e6110f7c9f6bf553",
+  "git_dirty": "true"
+}

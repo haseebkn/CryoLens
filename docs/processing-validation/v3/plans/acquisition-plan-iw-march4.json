@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "purpose": "Additive development processing suitability search. Initial failures retained.",
+  "selection_rule": "March4 S1A IW closest footprint to the March28 scene that yielded 6.20%; same platform and track earlier in March. Selected from metadata before inspecting this acquisition. Zero reference heights required.",
+  "aoi_path": "configs/aoi.geojson",
+  "frozen_manifest": "docs/evaluation/v1/manifest.json",
+  "quality_policy": "safe-quality-v1 (unchanged)",
+  "selected": [
+    {
+      "id": "8ab72956-8c72-4399-bfe3-c5b092a86284",
+      "name": "S1A_IW_GRDH_1SDH_20260304T094831_20260304T094856_063476_07F9A7_1908_COG.SAFE",
+      "mode": "IW",
+      "date": "2026-03-04T09:48:31.350668Z",
+      "bytes": 1052035216,
+      "aoi_fraction": 1.0,
+      "overlap_centroid": [
+        -53.431640974145274,
+        53.22431650759414
+      ],
+      "attributes": {
+        "origin": "CLOUDFERRO",
+        "datatakeID": 522663,
+        "timeliness": "NRT-3h",
+        "cycleNumber": 377,
+        "orbitNumber": 63476,
+        "sliceNumber": 21,
+        "productClass": "S",
+        "processorName": "Sentinel-1 IPF",
+        "orbitDirection": "DESCENDING",
+        "processingDate": "2026-03-04T12:52:12.028000Z",
+        "operationalMode": "IW",
+        "processingLevel": "LEVEL1",
+        "swathIdentifier": "IW",
+        "processingCenter": "S1 Production Service-SERCO",
+        "processorVersion": "004.03",
+        "platformShortName": "SENTINEL-1",
+        "instrumentShortName": "SAR",
+        "relativeOrbitNumber": 54,
+        "polarisationChannels": "HH&HV",
+        "platformSerialIdentifier": "A",
+        "startTimeFromAscendingNode": 2076964.0,
+        "completionTimeFromAscendingNode": 2101962.0,
+        "productType": "IW_GRDH_1S-COG",
+        "beginningDateTime": "2026-03-04T09:48:31.350668Z",
+        "endingDateTime": "2026-03-04T09:48:56.348256Z"
+      },
+      "catalogue": {
+        "@odata.mediaContentType": "application/octet-stream",
+        "Id": "8ab72956-8c72-4399-bfe3-c5b092a86284",
+        "Name": "S1A_IW_GRDH_1SDH_20260304T094831_20260304T094856_063476_07F9A7_1908_COG.SAFE",
+        "ContentType": "application/octet-stream",
+        "ContentLength": 1052035216,
+        "OriginDate": "2026-03-04T10:50:20.310314Z",
+        "PublicationDate": "2026-03-04T11:52:29.329332Z",
+        "ModificationDate": "2026-03-04T11:52:29.329332Z",
+        "Online": true,
+        "EvictionDate": "9999-12-31T23:59:59.999999Z",
+        "S3Path": "/eodata/Sentinel-1/SAR/IW_GRDH_1S-COG/2026/03/04/S1A_IW_GRDH_1SDH_20260304T094831_20260304T094856_063476_07F9A7_1908_COG.SAFE",
+        "Checksum": [
+          {
+            "Value": "285e7820687f39864976497f92c3bbbb",
+            "Algorithm": "MD5",
+            "ChecksumDate": "2026-03-04T11:52:26.918529Z"
+          },
+          {
+            "Value": "cec51531dd44aaece147ad647393e53883d92809a365fc96a939c51cc7059157",
+            "Algorithm": "BLAKE3",
+            "ChecksumDate": "2026-03-04T11:52:28.452749Z"
+          }
+        ],
+        "ContentDate": {
+          "Start": "2026-03-04T09:48:31.350668Z",
+          "End": "2026-03-04T09:48:56.348256Z"
+        },
+        "Footprint": "geography'SRID=4326;POLYGON ((-51.758591 52.269741, -51.244251 53.761204, -55.178719 54.172478, -55.55941 52.678059, -51.758591 52.269741))'",
+        "GeoFootprint": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -51.758591,
+                52.269741
+              ],
+              [
+                -51.244251,
+                53.761204
+              ],
+              [
+                -55.178719,
+                54.172478
+              ],
+              [
+                -55.55941,
+                52.678059
+              ],
+              [
+                -51.758591,
+                52.269741
+              ]
+            ]
+          ]
+        },
+        "Attributes": [
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "origin",
+            "Value": "CLOUDFERRO",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.IntegerAttribute",
+            "Name": "datatakeID",
+            "Value": 522663,
+            "ValueType": "Integer"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "timeliness",
+            "Value": "NRT-3h",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.IntegerAttribute",
+            "Name": "cycleNumber",
+            "Value": 377,
+            "ValueType": "Integer"
+          },
+          {
+            "@odata.type": "#OData.CSC.IntegerAttribute",
+            "Name": "orbitNumber",
+            "Value": 63476,
+            "ValueType": "Integer"
+          },
+          {
+            "@odata.type": "#OData.CSC.IntegerAttribute",
+            "Name": "sliceNumber",
+            "Value": 21,
+            "ValueType": "Integer"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "productClass",
+            "Value": "S",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "processorName",
+            "Value": "Sentinel-1 IPF",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "orbitDirection",
+            "Value": "DESCENDING",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+            "Name": "processingDate",
+            "Value": "2026-03-04T12:52:12.028000Z",
+            "ValueType": "DateTimeOffset"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "operationalMode",
+            "Value": "IW",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "processingLevel",
+            "Value": "LEVEL1",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "swathIdentifier",
+            "Value": "IW",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "processingCenter",
+            "Value": "S1 Production Service-SERCO",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "processorVersion",
+            "Value": "004.03",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "platformShortName",
+            "Value": "SENTINEL-1",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "instrumentShortName",
+            "Value": "SAR",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.IntegerAttribute",
+            "Name": "relativeOrbitNumber",
+            "Value": 54,
+            "ValueType": "Integer"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "polarisationChannels",
+            "Value": "HH&HV",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "platformSerialIdentifier",
+            "Value": "A",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.DoubleAttribute",
+            "Name": "startTimeFromAscendingNode",
+            "Value": 2076964.0,
+            "ValueType": "Double"
+          },
+          {
+            "@odata.type": "#OData.CSC.DoubleAttribute",
+            "Name": "completionTimeFromAscendingNode",
+            "Value": 2101962.0,
+            "ValueType": "Double"
+          },
+          {
+            "@odata.type": "#OData.CSC.StringAttribute",
+            "Name": "productType",
+            "Value": "IW_GRDH_1S-COG",
+            "ValueType": "String"
+          },
+          {
+            "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+            "Name": "beginningDateTime",
+            "Value": "2026-03-04T09:48:31.350668Z",
+            "ValueType": "DateTimeOffset"
+          },
+          {
+            "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+            "Name": "endingDateTime",
+            "Value": "2026-03-04T09:48:56.348256Z",
+            "ValueType": "DateTimeOffset"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata_screen_annotation_sha256": "3bc8af50bb49a779db7dfa3c6dd22f403383bd31aa35c16433c0567731258a7f"
+}

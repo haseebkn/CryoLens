@@ -1,0 +1,10 @@
+{
+  "product": "S1C_IW_GRDH_1SDH_20260927T093334_20260927T093359_009631_0132BC_E3E9_COG.SAFE",
+  "catalogue_id": "81792387-6d48-4b03-a546-000ac9314e43",
+  "bytes": 796613745,
+  "md5": "f9a34eb9c4e4d7c66a29b40d90ed8a92",
+  "sha256": "234b3b9455677ae7ef22f72b9b89168c6a07dfaa6f03fe1c2178310f7063b172",
+  "zip_crc_passed": true,
+  "exposure": "analytical_development",
+  "reason": "Acquired for processing validation, excluded from frozen v1 test."
+}

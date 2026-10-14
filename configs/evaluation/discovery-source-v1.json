@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "catalogue_url": "https://api.figshare.com/v2/articles/21316608",
+  "publisher_doi": "10.11583/DTU.21316608.v3",
+  "publisher_article_version": 3,
+  "scene_id": "20210530T102740_cis_prep.nc",
+  "acquisition_id": "S1A_EW_GRDM_1SDH_20210530T102740_20210530T102842_038116_047F9A",
+  "download_url": "https://ndownloader.figshare.com/files/38621498",
+  "source_bytes": 106818104,
+  "publisher_md5": "7382a90f5efd1bbf537f30a899a305d1",
+  "source_sha256": "9efe2de662a2de617fb03664acc0f12cef3be877c04f2eacab8b7f2568167fa5",
+  "initial_exposure": "metadata_integrity_only",
+  "exposure": "analytical",
+  "reason": "Initially inspected for metadata/integrity only. Subsequently selected by the legacy integration fixture and processed through the detection chain during setup. This source is development-only."
+}

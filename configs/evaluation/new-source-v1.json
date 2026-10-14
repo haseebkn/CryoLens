@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "catalogue_url": "https://api.figshare.com/v2/articles/21316608",
+  "publisher_doi": "10.11583/DTU.21316608.v3",
+  "publisher_article_version": 3,
+  "scene_id": "20190119T101218_cis_prep.nc",
+  "source_path": "evaluation_holdout/ai4arctic/20190119T101218_cis_prep.nc",
+  "acquisition_id": "S1A_EW_GRDM_1SDH_20190119T101218_20190119T101250_025545_02D565",
+  "download_url": "https://ndownloader.figshare.com/files/38619863",
+  "source_bytes": 65703844,
+  "publisher_md5": "b394c77e7f0a7c172c1fe39ec2fd6c6f",
+  "source_sha256": "f34065eac7732b4f81f602662b515adeba9736d5f0ed924f1b332eb552c84308",
+  "exposure": "metadata_integrity_only",
+  "reason": "New download selected by acquisition time/name; only file integrity and NetCDF metadata inspected. SAR and chart arrays remain uninspected."
+}

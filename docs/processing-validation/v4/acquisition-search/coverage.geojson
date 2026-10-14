@@ -1,0 +1,149 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -51.963638,
+              44.832577
+            ],
+            [
+              -51.540939,
+              46.33065
+            ],
+            [
+              -54.852821,
+              46.727802
+            ],
+            [
+              -55.188023,
+              45.229591
+            ],
+            [
+              -51.963638,
+              44.832577
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1C_IW_GRDH_1SDH_20260116T094124_20260116T094149_005927_00BE31_B041_COG.SAFE",
+        "mode": "IW",
+        "status": "radiometric_reject",
+        "map_label": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -51.285053,
+              47.214256
+            ],
+            [
+              -50.838593,
+              48.710438
+            ],
+            [
+              -54.29771,
+              49.107983
+            ],
+            [
+              -54.645214,
+              47.610928
+            ],
+            [
+              -51.285053,
+              47.214256
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1A_IW_GRDH_1SDH_20260122T094143_20260122T094208_062878_07E32B_F0E0_COG.SAFE",
+        "mode": "IW",
+        "status": "radiometric_reject",
+        "map_label": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -47.389526,
+              46.433277
+            ],
+            [
+              -46.951153,
+              47.93
+            ],
+            [
+              -50.373867,
+              48.328903
+            ],
+            [
+              -50.716854,
+              46.831562
+            ],
+            [
+              -47.389526,
+              46.433277
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1A_IW_GRDH_1SDH_20260124T092528_20260124T092553_062907_07E428_2AC0_COG.SAFE",
+        "mode": "IW",
+        "status": "radiometric_reject",
+        "map_label": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -49.779423,
+              45.266544
+            ],
+            [
+              -49.352558,
+              46.764229
+            ],
+            [
+              -52.746326,
+              47.16737
+            ],
+            [
+              -53.082211,
+              45.669453
+            ],
+            [
+              -49.779423,
+              45.266544
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "product": "S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG.SAFE",
+        "mode": "IW",
+        "status": "radiometric_pass",
+        "map_label": 4
+      }
+    }
+  ]
+}

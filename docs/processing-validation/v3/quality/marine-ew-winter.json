@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "product": "S1C_EW_GRDM_1SDH_20260325T212331_20260325T212436_006926_00E035_18A7_COG.SAFE",
+  "scope": "nl_aoi_marine_measurement_grid",
+  "coastal_buffer_m": 500,
+  "shoreline_sha256": "c3d44eb262868d63ab8d3a16f926d2360636f7a7c52d5db233eb7e729d802e28",
+  "aoi_sha256": "716d94c53b241b5ff955f5e4e39145a44a6d5b8ab7e26b139c0eaed15405aa85",
+  "policy": {
+    "version": "safe-quality-v1",
+    "max_nonpositive_fraction": 0.05,
+    "min_valid_fraction": 0.1,
+    "incidence_min_deg": 15.0,
+    "incidence_max_deg": 50.0,
+    "max_polarization_geolocation_error_m": 20.0
+  },
+  "driver_sha256": "2b29d1bbb56dd0e534b3762954c52d87bd588ed51f1ffc0600bf9f109368ee27",
+  "reader_sha256": "535f4c4e685d808da335931366cf73d7588ef1ff643a2cedeb718d2101710612",
+  "channels": {
+    "HH": {
+      "marine_pixel_centres": 105338917,
+      "finite_pixels": 101002326,
+      "nonpositive_pixels": 1978,
+      "invalid_incidence_pixels": 0,
+      "nonpositive_fraction": 1.95837074088769e-05,
+      "valid_fraction": 0.958832014572544
+    },
+    "HV": {
+      "marine_pixel_centres": 105338917,
+      "finite_pixels": 101002326,
+      "nonpositive_pixels": 2008134,
+      "invalid_incidence_pixels": 0,
+      "nonpositive_fraction": 0.019882056973618608,
+      "valid_fraction": 0.958832014572544
+    }
+  },
+  "passed": true,
+  "reasons": [],
+  "claim_boundary": "Full source-grid marine-domain quality only; no sea-ice exclusion, CFAR support, surveyed eligible area or detection performance. Buffered shoreline and pixel centres use annotation geolocation; absolute field accuracy remains unestablished."
+}

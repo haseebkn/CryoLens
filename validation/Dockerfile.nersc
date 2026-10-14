@@ -1,0 +1,6 @@
+# Published algorithm remains an external GPL dependency in an isolated image.
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y --no-install-recommends python3-gdal python3-scipy python3-bs4 python3-requests python3-setuptools ca-certificates curl && rm -rf /var/lib/apt/lists/*
+RUN curl -fsSL https://codeload.github.com/nansencenter/sentinel1denoised/tar.gz/8259f0560b79c49177d865ba10d213c0ce25fe7c | tar -xz -C /opt && cd /opt/sentinel1denoised-* && python3 setup.py install
+ENV XDG_DATA_HOME=/output
+ENTRYPOINT ["python3"]

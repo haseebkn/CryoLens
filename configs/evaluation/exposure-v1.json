@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "policy": "Conservatively treat the existing AI4Arctic archive as development data because prior exploration, benchmark and chart-mask use are not completely reconstructible. Raw integrity inspection alone is not analytical evaluation.",
+  "family_defaults": {"ai4arctic": "unknown", "sentinel1_safe": "unknown"},
+  "acquisitions": {
+    "S1A_EW_GRDM_1SDH_20210530T102740_20210530T102842_038116_047F9A": {"exposure": "analytical", "reason": "Initially downloaded for reservation, but a legacy integration fixture selected it by folder order and ran the detection chain during setup. Quarantined to development; cannot be claimed untouched."},
+    "S1C_EW_GRDM_1SDH_20260911T211525_20260911T211630_009405_012B51": {"exposure": "metadata_integrity_only", "reason": "Download integrity checked; no recorded calibration, candidate evaluation or annotation."},
+    "S1C_EW_GRDM_1SDH_20260912T090816_20260912T090908_009412_012B82": {"exposure": "metadata_integrity_only", "reason": "Download integrity checked; no recorded calibration, candidate evaluation or annotation."},
+    "S1C_EW_GRDM_1SDH_20260916T212442_20260916T212542_009478_012DA6": {"exposure": "analytical", "reason": "Previously processed and inspected for SAFE validation."},
+    "S1B_EW_GRDM_1SDH_20180428T093937_20180428T094037_010682_013815": {"exposure": "analytical", "reason": "Matched SAFE and AI4Arctic calibration comparison published."}
+  }
+}

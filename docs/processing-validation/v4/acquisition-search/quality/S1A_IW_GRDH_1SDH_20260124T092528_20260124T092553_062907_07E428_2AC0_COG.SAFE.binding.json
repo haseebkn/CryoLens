@@ -1,0 +1,44 @@
+{
+  "inputs_and_code": {
+    "safe_files_sha256": {
+      "annotation/calibration/calibration-s1a-iw-grd-hh-20260124t092528-20260124t092553-062907-07e428-001-cog.xml": "07d035b95632d55d235273806de8682ee8d4d85d3d90a64e3b05a1129508a908",
+      "annotation/calibration/calibration-s1a-iw-grd-hv-20260124t092528-20260124t092553-062907-07e428-002-cog.xml": "834d13dc7fc0ec77f8141edfdfe8cc2e6ee25bbe156ef66c5cae7582c96db862",
+      "annotation/calibration/noise-s1a-iw-grd-hh-20260124t092528-20260124t092553-062907-07e428-001-cog.xml": "4e22f014dc6b6d552450748bc5cfda90b4cf17cf48cf61bfed099906ef9ba120",
+      "annotation/calibration/noise-s1a-iw-grd-hv-20260124t092528-20260124t092553-062907-07e428-002-cog.xml": "de7b9a95d00787f48699d3e69eea57954e7a5b095188d2f463359f936faea1f5",
+      "annotation/rfi/rfi-s1a-iw-grd-hh-20260124t092528-20260124t092553-062907-07e428-001-cog.xml": "6563e9be83f13d6a61b95ae129a9af9488a5e922db1cacc3be84590978d49c38",
+      "annotation/rfi/rfi-s1a-iw-grd-hv-20260124t092528-20260124t092553-062907-07e428-002-cog.xml": "262a9102bbe6c643146c841087591e8054e320d060357b79c829b5ca58545201",
+      "annotation/s1a-iw-grd-hh-20260124t092528-20260124t092553-062907-07e428-001-cog.xml": "9a7ca5559e00e5db7d921fd7be8c3559f688cdb7598126a572c19939f6780bb1",
+      "annotation/s1a-iw-grd-hv-20260124t092528-20260124t092553-062907-07e428-002-cog.xml": "ba00f649b2823f2c66558fb56a9856c8fd62ad0274d572d5be03563b88336449",
+      "manifest.safe": "5f7e2404f16377cfce7bd2f98f5caf13516fba0d892c754d9ddee130715c1e3a",
+      "measurement/s1a-iw-grd-hh-20260124t092528-20260124t092553-062907-07e428-001-cog.tiff": "8002620b6c8737d4b604ad146075166531d417af9e0440b74bf8b62ac5ace461",
+      "measurement/s1a-iw-grd-hv-20260124t092528-20260124t092553-062907-07e428-002-cog.tiff": "34ed2463dffed709a5c9c7bcebcade351abe8e6e56406f382aabe78e00ff05a8",
+      "preview/icons/logo.png": "3c515b23f2f508704a5451c0d8d86057215edab26a3d16fb2e5abe0a88c043e5",
+      "preview/map-overlay.kml": "3f97d94101ade0bc604109bd597dca6f742393f14069c15783930dcbbcd77988",
+      "preview/product-preview.html": "3e4e4f789badae624d91684d833a478847eaadf81e97c26ed92ade14c78145fe",
+      "preview/quick-look.png": "f3bf1df284bceb9d5e98283c3f37ce6fff68a1c66e8cc18f3139c84d86f04752",
+      "preview/thumbnail.png": "180f67fc1871cc2e0e088ee213a40334d2320f2dabfbd2aa26981cffee44e7cb",
+      "S1A_IW_GRDH_1SDH_20260124T092528_20260124T092553_062907_07E428_A7FD.SAFE-report-20260124T111452.pdf": "40647530a9d9187f7289c4fdd7b60b7ed4401e58f139a8f576f027e7fbd42679",
+      "support/s1-level-1-calibration.xsd": "6e81a81e501fbe90afc523ceb266177e5cfd5c798ec633c3f56bab70cdba1b63",
+      "support/s1-level-1-measurement.xsd": "c0c1dd52ca353cc5046b87e8c1be1e9abfb7a546dadd293d1f9d591831bc1524",
+      "support/s1-level-1-noise.xsd": "715d34d8c59dd575604838b310e6fda9c397c90fa6377a0daab4527d94ae8ae3",
+      "support/s1-level-1-product.xsd": "05b71da914fc100524fa7fec01928f869a5e160bf1ae04e4cec5db5a23da5d6f",
+      "support/s1-level-1-quicklook.xsd": "88f59322d2372e958b850c49ff40cb8fba8c6eccef569acbbfb87f322d432d2d",
+      "support/s1-level-1-rfi.xsd": "63eb491df437adcbdc5cd9b0b796cdebc2635be27893871f981123bd108ce723",
+      "support/s1-map-overlay.xsd": "c9e9c41b11bdedad81fbebc234030f513a4c6cc7998c2dffaac05a40000aeb8f",
+      "support/s1-object-types.xsd": "198d2e5b79ef1b8a4ff3111f566e2f0f4316f48170bfefc34f75989b52df30d5",
+      "support/s1-product-preview.xsd": "967f7ad405a3c911b4b59525ba6bac134e9fd3742efd0c4e32648f67f4689c0e"
+    },
+    "policy": {
+      "version": "safe-quality-v1",
+      "max_nonpositive_fraction": 0.05,
+      "min_valid_fraction": 0.1,
+      "incidence_min_deg": 15.0,
+      "incidence_max_deg": 50.0,
+      "max_polarization_geolocation_error_m": 20.0
+    },
+    "safe_reader_sha256": "9c5d38340b7da8a90221adfc602f3cddc0c9dc6b65d7da21fc6a3e227d2f3dd4",
+    "quality_code_sha256": "0630433f240d23ed51e127c8cfa0820a9a6f7c0474aad959ec05c34f21fec50d",
+    "scan_block_rows": 32
+  },
+  "report_sha256": "037b7d9ae42a92149825f4df24e8c28048c8d1d10ead167d3ea466032654e6a9"
+}

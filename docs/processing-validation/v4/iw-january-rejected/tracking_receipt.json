@@ -1,0 +1,15 @@
+{
+  "run_id": "bf5eaef47b524a0f879ca83fdbd852b0",
+  "experiment": "cryolens-processing-v2",
+  "report_sha256": "ddafc3cb10557af80789ea67af8154403fa9aa8bf99503e1581d2dfb49660f19",
+  "recipe_id": "v2",
+  "configuration_sha256": "2193f665cc35ad4af37606d32fb9cbb3791cf482061f5eb7a774aa5216a169e8",
+  "graph_sha256": "266c615e0dfb96b1cb56aefe363f7ffdea4171c9589d4a691615619e4a63d0db",
+  "logging_checkout_recipe_sha256": {
+    "configuration_sha256": "2193f665cc35ad4af37606d32fb9cbb3791cf482061f5eb7a774aa5216a169e8",
+    "graph_sha256": "266c615e0dfb96b1cb56aefe363f7ffdea4171c9589d4a691615619e4a63d0db"
+  },
+  "purpose": "Completed processing investigation; no precision, recall or false-alarm measurement",
+  "git_commit": "eaee130dbf7574185603b67888559269449976ce",
+  "git_dirty": "true"
+}

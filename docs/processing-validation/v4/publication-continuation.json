@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "initial_acquisition_report_sha256": "8b83981c57956c81c58f316242dcf81cc91ef052da09b217d5686b7ef22c4d7a",
+  "reason": "Initial explicit-plan publication used identical basenames and archived only the second plan. Original acquisition measurements and authenticity checks are unaffected; initial bytes remain unchanged. Verified publication has unique plan names and actual retry plan.",
+  "december_selection_text_caveat": "The executed selector used --maximum 1 and selected one input before measurement inspection. Its inherited first-three wording is preserved as an historical metadata text bug; future selector records maximum_selected_products explicitly.",
+  "completed_products": 4,
+  "regional_scientific_release": false
+}

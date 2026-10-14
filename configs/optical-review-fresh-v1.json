@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "purpose": "Qualified corrected EW/IW optical availability and analyst review, no detector execution, unchanged thresholds, no pilot mutations",
+  "validation_report": "C:\\Users\\hasee\\.codex\\worktrees\\step3-fresh-optical\\CryoLens\\docs\\processing-validation\\v5\\report.json",
+  "validation_report_sha256": "634682e30eafa862a1db553aaf5746799887cb79b154e54b5cce8ca6eed56d14",
+  "frozen_manifest": "C:\\Users\\hasee\\.codex\\worktrees\\step3-fresh-optical\\CryoLens\\docs\\evaluation\\v1\\manifest.json",
+  "shoreline_cache": "E:\\CryoLens\\data\\cache\\gshhg\\nl_shoreline.gpkg",
+  "shoreline_sha256": "c3d44eb262868d63ab8d3a16f926d2360636f7a7c52d5db233eb7e729d802e28",
+  "cdse_cache": "E:/CryoLens/data/raw/sentinel2-cdse",
+  "pairing_policy": {
+    "version": "s1-s2-review-v1",
+    "search_hours": 12,
+    "motion_speed_m_s": 0.5,
+    "sar_geolocation_allowance_m": 100,
+    "optical_geolocation_allowance_m": 20,
+    "minimum_review_radius_m": 1000,
+    "maximum_review_radius_m": 6000,
+    "review_grid_spacing_m": 10,
+    "cloud_buffer_m": 60,
+    "useful_visible_fraction": 0.8,
+    "max_items_per_candidate": 3
+  },
+  "products": [
+    {
+      "product": "S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG.SAFE",
+      "corrected_output": "E:\\CryoLens\\data\\processed\\step2-complete-20261013-r1\\repackaged-r2\\S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG\\S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG_4band_EPSG3978.tif"
+    },
+    {
+      "product": "S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG.SAFE",
+      "corrected_output": "E:\\CryoLens\\data\\processed\\step2-complete-20261013-r1\\repackaged-r2\\S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG\\S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG_4band_EPSG3978.tif"
+    }
+  ]
+}

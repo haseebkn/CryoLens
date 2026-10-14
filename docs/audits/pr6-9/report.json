@@ -1,0 +1,3385 @@
+{
+  "generated_at": "2026-10-12T05:59:07.609514+00:00",
+  "reviewed_stack_head": "e29986877035588f50dff47ecbdfc39df86a02f4",
+  "published_processing_report_sha256": "4f95226983e97ad04bbf93ae816157ebf14a93728300e0f7ba0b8b4ec4025d10",
+  "audit_script_sha256": "325b90dcef04e3bb4fe20aeb4978d3767b2a3f6fa189182032eb79ddc18eaa9d",
+  "processing_code_sha256": {
+    "masks.py": "4dc39d30abb25b7032b6a902dd7002470e487b9e7b554bd6ee7d919eac1d554f",
+    "orbits.py": "54af4bb20cd1f08d88212b4d60d2babd22f44978eed787bf54c23c7b5a6bcfa1",
+    "python_chain.py": "ebd419c2e443e7652a598b9d7dd336800890fde7dcc7d50514569b23ee15b052",
+    "quality.py": "0630433f240d23ed51e127c8cfa0820a9a6f7c0474aad959ec05c34f21fec50d",
+    "s1denoise.py": "6ffdf9ae6aec856439c71103528b07e8cf38bae3e3a632e597011d7723f64fab",
+    "safe_reader.py": "6c92f0c0a7a2475a60136049276dce5659061d512c26cf6ac8c770d479f11d74",
+    "snap_chain.py": "aeecee58abfe1d727909d07b6d647b0ccde4e02d2d03682bd6c328acb785e3cf",
+    "stack.py": "3fb3bbf38e7e1a3a58879b9a1e9816c4ccb63dff9f76e0a74ab50d9c362fc45e",
+    "validation.py": "0d643d81983c7fddaab44199c718ea194d4823c0e96acc3b05fa1adca0b5803a",
+    "__init__.py": "2be256b16d1cdf0a65cc9f14638f7e30ccd51940e0c447bed88091a89b145577",
+    "__main__.py": "2a85174456e092a500e6fe190c3342a7c441e6fc607849ae7bd32ea4f4cdb603"
+  },
+  "fresh_snap_execution_requested": true,
+  "full_product_quality_rescanned": false,
+  "sentinel1": [
+    {
+      "product": "S1B_EW_GRDM_1SDH_20180428T093937_20180428T094037_010682_013815_03AF_COG.SAFE",
+      "mode": "EW",
+      "source_hashes_verified": true,
+      "historical_quality_code_and_sources_match": true,
+      "code_comparison": "historical exact bytes match the published receipt; current quality/reader content matches after CRLF-to-LF normalization",
+      "historical_quality_passed": false,
+      "historical_hv_nonpositive_fraction": 0.45734863069375903,
+      "windows": [
+        {
+          "window": [
+            949,
+            1024,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.635631265144261e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.142999726280518e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.652853772132835e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 236836,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 3.0000425095573104e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 0.49877146876231115,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 3.4332275390625e-05,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "fc1a9742fd3db0e82d078a071c416cfb27a12300fa127646063b4d299071b17a"
+            },
+            "registration_HH": {
+              "shift_rows_px": -1.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 56.568542494923804,
+              "passed": false
+            },
+            "reprojection_HH": {
+              "matched_pixels": 259431,
+              "median_bias_db": 0.005715847015380859,
+              "p95_absolute_error_db": 1.8026618957519531,
+              "passed": false
+            },
+            "registration_HV": {
+              "shift_rows_px": -1.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 56.568542494923804,
+              "passed": false
+            },
+            "reprojection_HV": {
+              "matched_pixels": 259431,
+              "median_bias_db": 0.01296234130859375,
+              "p95_absolute_error_db": 1.700495719909668,
+              "passed": false
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": false,
+          "nonpositive_fraction": {
+            "HH": 0.0,
+            "HV": 0.0965423583984375
+          },
+          "reference_receipt_sha256": "c650638340f330665e657de58dfc47a0748b77dc068268a6279346511ca19a31"
+        },
+        {
+          "window": [
+            949,
+            5122,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.65424990151247e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.203494950518419e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.653408978922336e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 102481,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 1.2718615795695176e-05,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 0.8878998461506243,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 0.000179290771484375,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "68528c4353a6366e8eab3e9fc86df40e91369c600319e2d174e47485ba0fce86"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 40.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 258286,
+              "median_bias_db": 0.011600494384765625,
+              "p95_absolute_error_db": 1.2980918884277344,
+              "passed": false
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 40.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 258286,
+              "median_bias_db": 0.009225845336914062,
+              "p95_absolute_error_db": 1.2585258483886719,
+              "passed": false
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": false,
+          "nonpositive_fraction": {
+            "HH": 0.0,
+            "HV": 0.6090660095214844
+          },
+          "reference_receipt_sha256": "691034ec12da853caf6d47465528be2f156d5a5f63bacae555c830da1a85b278"
+        },
+        {
+          "window": [
+            949,
+            9219,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.820262850553405e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 226594,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 1.3260445717760839e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.826890346248387e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 90329,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 1.3418159423629472e-05,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 1.2994456361759539,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 0.000270843505859375,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "8f5dc854599662560fc42993b7d6f6fdc87205795dc7757093d631539359095f"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 256745,
+              "median_bias_db": 0.010013580322265625,
+              "p95_absolute_error_db": 0.7606544494628906,
+              "passed": true
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 256745,
+              "median_bias_db": 0.0096893310546875,
+              "p95_absolute_error_db": 0.7535721063613892,
+              "passed": true
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": true,
+          "nonpositive_fraction": {
+            "HH": 0.13561248779296875,
+            "HV": 0.6554222106933594
+          },
+          "reference_receipt_sha256": "9711b5d2dcd0f7a691a0ab126fc3684bfd076c336abe8c474a36eaccc1f8dd16"
+        },
+        {
+          "window": [
+            4745,
+            1024,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.510023784585592e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.076594473527453e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.645924190109227e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 227611,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 3.802698703915454e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 0.6859301155711047,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 3.4332275390625e-05,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "0b44b9482925fb1c0c6a71ecd695f4c22408454f33259960d28397a22e7f3090"
+            },
+            "registration_HH": {
+              "shift_rows_px": -1.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 56.568542494923804,
+              "passed": false
+            },
+            "reprojection_HH": {
+              "matched_pixels": 261882,
+              "median_bias_db": 0.0015406608581542969,
+              "p95_absolute_error_db": 1.6721495389938354,
+              "passed": false
+            },
+            "registration_HV": {
+              "shift_rows_px": -1.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 56.568542494923804,
+              "passed": false
+            },
+            "reprojection_HV": {
+              "matched_pixels": 261882,
+              "median_bias_db": 0.007241249084472656,
+              "p95_absolute_error_db": 1.6330692768096924,
+              "passed": false
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": false,
+          "nonpositive_fraction": {
+            "HH": 0.0,
+            "HV": 0.13173294067382812
+          },
+          "reference_receipt_sha256": "d67fb118a0ccd94ecbd15dae8ada5d2b019d13bcf31392480791d639ee278581"
+        },
+        {
+          "window": [
+            4745,
+            5122,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.64489533080861e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 262041,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.448885904669832e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.683680412992986e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 65167,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 1.6846701384544605e-05,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 0.6833471741789944,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 0.000179290771484375,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "d90682195f7b4771788ebc945d2a6b7a0f5b04824f6abaf3f025f8f2849abde1"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 40.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 260657,
+              "median_bias_db": 0.008815765380859375,
+              "p95_absolute_error_db": 1.2508907318115234,
+              "passed": false
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 40.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 260657,
+              "median_bias_db": 0.01201629638671875,
+              "p95_absolute_error_db": 1.230486273765564,
+              "passed": false
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": false,
+          "nonpositive_fraction": {
+            "HH": 0.000392913818359375,
+            "HV": 0.7514076232910156
+          },
+          "reference_receipt_sha256": "21d95fa6d0e7807c49a8d7a4908f754942b346d559d12f78b63d6295bcf34ee3"
+        },
+        {
+          "window": [
+            4745,
+            9219,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.825178732268566e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 219504,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 2.387672638297071e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.826420317791501e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 131335,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 8.302347491138861e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 1.0018858647740028,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 0.000270843505859375,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "f9330e04f25bb5de0c80bb315e0fd3310b629b6b12567f4f3667c0cbcba2a938"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 259070,
+              "median_bias_db": 0.03136634826660156,
+              "p95_absolute_error_db": 0.9536690711975098,
+              "passed": true
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 259070,
+              "median_bias_db": 0.01428985595703125,
+              "p95_absolute_error_db": 0.748884379863739,
+              "passed": true
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": true,
+          "nonpositive_fraction": {
+            "HH": 0.16265869140625,
+            "HV": 0.4989967346191406
+          },
+          "reference_receipt_sha256": "3a2034dc0d024a3e0a5cad90d9ee80460d6de13d03f48adf4eb0f2c4ed83371e"
+        },
+        {
+          "window": [
+            8541,
+            1024,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.520787076020248e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.068479530195165e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.644255238423073e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 228401,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 3.6554646320187237e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 0.9341820949617599,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 3.4332275390625e-05,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "df0029cccbfaa907afbb2d0ab7a7a8a060716706ecb351a91f1fbce2cd8f2068"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 40.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 264576,
+              "median_bias_db": 0.002956390380859375,
+              "p95_absolute_error_db": 1.589967966079712,
+              "passed": false
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 40.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 264576,
+              "median_bias_db": 0.009195327758789062,
+              "p95_absolute_error_db": 1.568772315979004,
+              "passed": false
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": false,
+          "nonpositive_fraction": {
+            "HH": 0.0,
+            "HV": 0.12871932983398438
+          },
+          "reference_receipt_sha256": "227f5a39723851cd3ec52f23d8e0709517a5bd9756418d631e35afb326d12bcb"
+        },
+        {
+          "window": [
+            8541,
+            5122,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.667567205791628e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 160722,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.740420227015082e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.681058869145605e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 58852,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 1.7730016559086196e-05,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 1.011982254257937,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 0.000179290771484375,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "f1b6ce8088d8cd7f90e6fa16b6d8c3920a2ff0e5b0278b2d4112cf5c2228027d"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 40.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 263246,
+              "median_bias_db": 0.008620262145996094,
+              "p95_absolute_error_db": 1.2610063552856445,
+              "passed": false
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 40.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 263246,
+              "median_bias_db": 0.009857177734375,
+              "p95_absolute_error_db": 1.236332893371582,
+              "passed": false
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": false,
+          "nonpositive_fraction": {
+            "HH": 0.38689422607421875,
+            "HV": 0.7754974365234375
+          },
+          "reference_receipt_sha256": "cb558ce7b5df649067618525ba440e64819841511dd7a2f70c07bd0dbcb3eee0"
+        },
+        {
+          "window": [
+            8541,
+            9219,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.82645062676411e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 243101,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 1.1516958920062857e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.827318406446587e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 78978,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 1.369020000486253e-05,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 1.0103540634818848,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 0.000270843505859375,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "9989cc0b4536736150d4e296814722b4a752d2c51a93bfa7332b2d1283321dca"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 261627,
+              "median_bias_db": 0.011632919311523438,
+              "p95_absolute_error_db": 0.7011693716049194,
+              "passed": true
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 261627,
+              "median_bias_db": 0.01004791259765625,
+              "p95_absolute_error_db": 0.6970561742782593,
+              "passed": true
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": true,
+          "nonpositive_fraction": {
+            "HH": 0.07264328002929688,
+            "HV": 0.6987228393554688
+          },
+          "reference_receipt_sha256": "237d1831d3243c5a343899429d5b14b921faa0498a5fc246790074fb0578dcc5"
+        }
+      ],
+      "scientific_comparison_passed": false
+    },
+    {
+      "product": "S1C_EW_GRDM_1SDH_20260916T212442_20260916T212542_009478_012DA6_90E4_COG.SAFE",
+      "mode": "EW",
+      "source_hashes_verified": true,
+      "historical_quality_code_and_sources_match": true,
+      "code_comparison": "historical exact bytes match the published receipt; current quality/reader content matches after CRLF-to-LF normalization",
+      "historical_quality_passed": false,
+      "historical_hv_nonpositive_fraction": 0.26094066125476956,
+      "windows": [
+        {
+          "window": [
+            948,
+            1011,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.074416060113834e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.488090823919991e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.031207164692167e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 147384,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 1.0592550855116939e-05,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 0.879450060831046,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 0.000110626220703125,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "d9ecb370cb4fe05d44de85dfbb9cafbda1e87bd79380ba760c2298c49904be5e"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 252553,
+              "median_bias_db": 0.004512786865234375,
+              "p95_absolute_error_db": 0.5628207921981812,
+              "passed": true
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 252553,
+              "median_bias_db": 0.005077362060546875,
+              "p95_absolute_error_db": 0.5632255673408508,
+              "passed": true
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": true,
+          "nonpositive_fraction": {
+            "HH": 0.0,
+            "HV": 0.437774658203125
+          },
+          "reference_receipt_sha256": "2cc3ac9618706866a8f7ef8d5b9f2b3a0e8557e3de66e9064f99875ff2153fcc"
+        },
+        {
+          "window": [
+            948,
+            5056,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.750618625018606e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.302216043903897e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.618238278544896e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 225037,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 3.5034492893271374e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 2.306655959032316,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 0.000591278076171875,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "8397c991a23e35415bcde5aae7d2b85cf95fb6273f0bc434b2278c49ded34eea"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 251176,
+              "median_bias_db": 0.0045032501220703125,
+              "p95_absolute_error_db": 0.7667198181152344,
+              "passed": true
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 251176,
+              "median_bias_db": 0.006091117858886719,
+              "p95_absolute_error_db": 0.7704000473022461,
+              "passed": true
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": true,
+          "nonpositive_fraction": {
+            "HH": 0.0,
+            "HV": 0.14155197143554688
+          },
+          "reference_receipt_sha256": "c4009abd951823c2ba1c30b4d9536cd76641859e6b2ab21c3495ff59fe39fe18"
+        },
+        {
+          "window": [
+            948,
+            9100,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.071185901384469e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.531961659432167e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.10170477836793e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 235414,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 2.519283896510539e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 3.577379261422735,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 0.000888824462890625,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "75953aceb8de8e8b7356aea14f38fd8af6957737aab3c5aa11c874f1cbd5724b"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 249721,
+              "median_bias_db": 0.010168075561523438,
+              "p95_absolute_error_db": 0.8252182006835938,
+              "passed": true
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 249721,
+              "median_bias_db": 0.008182525634765625,
+              "p95_absolute_error_db": 0.8369483947753906,
+              "passed": true
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": true,
+          "nonpositive_fraction": {
+            "HH": 0.0,
+            "HV": 0.10196685791015625
+          },
+          "reference_receipt_sha256": "6d00805debd9f1cc55a7debd5ad98ecefde3f6f555cbb21b6b93e8cd57c83e74"
+        },
+        {
+          "window": [
+            4742,
+            1011,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.069734388427427e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 260463,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.344677078834173e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.053113123820624e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 116928,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 1.2699024851528396e-05,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 0.8772097255331092,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 0.000110626220703125,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "399a83d145a26f149926b635cc62699319098b504cf51f4587c0fffd73995d1c"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 251415,
+              "median_bias_db": 0.014458656311035156,
+              "p95_absolute_error_db": 0.7160545587539673,
+              "passed": true
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 251415,
+              "median_bias_db": 0.0077190399169921875,
+              "p95_absolute_error_db": 0.6217619180679321,
+              "passed": true
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": true,
+          "nonpositive_fraction": {
+            "HH": 0.006412506103515625,
+            "HV": 0.553955078125
+          },
+          "reference_receipt_sha256": "87ff410d577676d39d256523ae473d854f7f4afbe9df6ef958436a2a4c2d8506"
+        },
+        {
+          "window": [
+            4742,
+            5056,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.720874320931093e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.30309098765805e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.602406392278655e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 171431,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 7.015224958017478e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 2.2939126642486296,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 0.00058746337890625,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "dd5cafa4ff9cddf2c978b8af792dd3571bb1f88a8e787c0683a2b155622403cb"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 250127,
+              "median_bias_db": 0.00917816162109375,
+              "p95_absolute_error_db": 0.8175086975097656,
+              "passed": true
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 250127,
+              "median_bias_db": 0.006351470947265625,
+              "p95_absolute_error_db": 0.8201373815536499,
+              "passed": true
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": true,
+          "nonpositive_fraction": {
+            "HH": 0.0,
+            "HV": 0.3460426330566406
+          },
+          "reference_receipt_sha256": "9204664cb6b9916ff855b14a674b1deaeab5b9e230e7a1f5b4af80bfc8386472"
+        },
+        {
+          "window": [
+            4742,
+            9100,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.06515709397851e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.627688942625453e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.096599725909688e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 241255,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 2.1136395343890617e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 3.971494960439062,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 0.00089263916015625,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "2e21d3d9a08dece25b86f65ea032a529b2bd91e04162467bf9c063a65ad1fcc8"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 248701,
+              "median_bias_db": 0.011505126953125,
+              "p95_absolute_error_db": 0.8177642822265625,
+              "passed": true
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 248701,
+              "median_bias_db": 0.011226654052734375,
+              "p95_absolute_error_db": 0.8296279907226562,
+              "passed": true
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": true,
+          "nonpositive_fraction": {
+            "HH": 0.0,
+            "HV": 0.07968521118164062
+          },
+          "reference_receipt_sha256": "f5deaf659b3840ed9afbab447d25e382ee43c03349185a5d23ff657a26e0facd"
+        },
+        {
+          "window": [
+            8536,
+            1011,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.05987938299739e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.496196164128463e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.03282219102675e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 188880,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.9979611236787346e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 0.8752959335656387,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 0.000110626220703125,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "39029e35e6c307747dc72109e16b345c322c1b6bb588ab60bec2b055594f3ec5"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 250517,
+              "median_bias_db": 0.005259513854980469,
+              "p95_absolute_error_db": 0.6379831433296204,
+              "passed": true
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 250517,
+              "median_bias_db": 0.0055389404296875,
+              "p95_absolute_error_db": 0.6419246792793274,
+              "passed": true
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": true,
+          "nonpositive_fraction": {
+            "HH": 0.0,
+            "HV": 0.27947998046875
+          },
+          "reference_receipt_sha256": "caa9ce6f8efb5d641879c958c004ad9019f17257fd6af4cc6dfc651ac2aefd3a"
+        },
+        {
+          "window": [
+            8536,
+            5056,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.764002975750811e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.32948500271481e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.62393086053777e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 201668,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 4.9961443459308745e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 2.362872487743416,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 0.000591278076171875,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "e89221432e6a2145e213a82bb8f4a42f9d42491eb43f16e211680998ee31ce1e"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 249445,
+              "median_bias_db": 0.006549835205078125,
+              "p95_absolute_error_db": 0.8256267309188843,
+              "passed": true
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 249445,
+              "median_bias_db": 0.006328582763671875,
+              "p95_absolute_error_db": 0.8220351934432983,
+              "passed": true
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": true,
+          "nonpositive_fraction": {
+            "HH": 0.0,
+            "HV": 0.2306976318359375
+          },
+          "reference_receipt_sha256": "e88d66cb433a3867cc67f23e339c79f862cf5a3fc6a43b4add072e78248fb0ae"
+        },
+        {
+          "window": [
+            8536,
+            9100,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.070961849509569e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.583297285198698e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.093721191138667e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 240596,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 2.2216834272161657e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 4.0196453389106335,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 0.000888824462890625,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "6611cf68c731e21310507fbc879bb94fbe5e5df10654d2016299fc6fc5418c36"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 247945,
+              "median_bias_db": 0.005741119384765625,
+              "p95_absolute_error_db": 0.8705413937568665,
+              "passed": true
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 247945,
+              "median_bias_db": 0.0070953369140625,
+              "p95_absolute_error_db": 0.8825244903564453,
+              "passed": true
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": true,
+          "nonpositive_fraction": {
+            "HH": 0.0,
+            "HV": 0.0821990966796875
+          },
+          "reference_receipt_sha256": "df0bb14b46ec97e2c54162ff82a30661c32e68e558c5dd1f18961e095ad02d42"
+        }
+      ],
+      "scientific_comparison_passed": true
+    },
+    {
+      "product": "S1C_IW_GRDH_1SDH_20260927T093334_20260927T093359_009631_0132BC_E3E9_COG.SAFE",
+      "mode": "IW",
+      "source_hashes_verified": true,
+      "historical_quality_code_and_sources_match": true,
+      "code_comparison": "historical exact bytes match the published receipt; current quality/reader content matches after CRLF-to-LF normalization",
+      "historical_quality_passed": false,
+      "historical_hv_nonpositive_fraction": 0.5432159634828548,
+      "windows": [
+        {
+          "window": [
+            1614,
+            2568,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.598283726328556e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 260256,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 8.063584894187565e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.59306691162935e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 120568,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 2.878963707097167e-07,
+              "p95_absolute_error_db": 6.922624361943057e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 1.2729636180121497,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 7.62939453125e-06,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "4284b1d1bf3df09aa7e4e62498f145701c8a1fc7ef043b494a25c965142fa60f"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 40.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 17087,
+              "median_bias_db": 0.3215312957763672,
+              "p95_absolute_error_db": 4.063576698303223,
+              "passed": false
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 40.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 17087,
+              "median_bias_db": 0.17918014526367188,
+              "p95_absolute_error_db": 3.2331643104553223,
+              "passed": false
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": false,
+          "nonpositive_fraction": {
+            "HH": 0.0072021484375,
+            "HV": 0.540069580078125
+          },
+          "reference_receipt_sha256": "92fe1bb170d6a3cc4b4f9c1865f8c6de50dd25f29f35b060014d41ad1b2f81e6"
+        },
+        {
+          "window": [
+            1614,
+            12842,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 7.692167723785682e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 255616,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 9.569574446998075e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 7.356333817871283e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 116258,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 4.703075127434122e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 0.9929139872113798,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 2.288818359375e-05,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "ec1bf72da5017cefaebadfc9f0d13bbfd024623e543a40ba3aef23a5c2d446b8"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 17052,
+              "median_bias_db": 0.28345203399658203,
+              "p95_absolute_error_db": 3.550717830657959,
+              "passed": false
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 17052,
+              "median_bias_db": 0.20379161834716797,
+              "p95_absolute_error_db": 3.169980525970459,
+              "passed": false
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": false,
+          "nonpositive_fraction": {
+            "HH": 0.02490234375,
+            "HV": 0.5565109252929688
+          },
+          "reference_receipt_sha256": "7b8bee3b97cef900a86918c4239fe811011bffc9542d8b54b26d363d0dd1c2ef"
+        },
+        {
+          "window": [
+            1614,
+            23116,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 8.489620642364964e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 212913,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 2.432765808520717e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 8.504452528174982e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 122473,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 8.719481798626705e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 0.7322131003663404,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 3.4332275390625e-05,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "2a34657817ba406986458324e26946a7a1ac46a345210f8b3fa9da73c16ce456"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 17001,
+              "median_bias_db": 0.22484207153320312,
+              "p95_absolute_error_db": 3.0863609313964844,
+              "passed": false
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 17001,
+              "median_bias_db": 0.20477867126464844,
+              "p95_absolute_error_db": 2.9175167083740234,
+              "passed": false
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": false,
+          "nonpositive_fraction": {
+            "HH": 0.18780136108398438,
+            "HV": 0.5328025817871094
+          },
+          "reference_receipt_sha256": "167c7bf622a425e7dac863fa35fbddb2dab4a96b5b178dbcac747f9dd10e4230"
+        },
+        {
+          "window": [
+            8071,
+            2568,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.596193705341345e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 195781,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 2.321985730677553e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.589358662118486e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 115963,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.275031259557926e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 2.759503894324891,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 7.62939453125e-06,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "f26310e180b8eee9f834fa68cff0939cdc71ecbc3a61d365bcad2f7861ab7175"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 40.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 17193,
+              "median_bias_db": 0.26755332946777344,
+              "p95_absolute_error_db": 3.5806593894958496,
+              "passed": false
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 40.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 17193,
+              "median_bias_db": 0.18661880493164062,
+              "p95_absolute_error_db": 3.251349925994873,
+              "passed": false
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": false,
+          "nonpositive_fraction": {
+            "HH": 0.2531547546386719,
+            "HV": 0.5576362609863281
+          },
+          "reference_receipt_sha256": "e141c61b6c5d8c30d3c8d9ea380d3752437f02bcafbaafd936dfc03e288c9a31"
+        },
+        {
+          "window": [
+            8071,
+            12842,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 7.364204233015355e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 184498,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 2.879479049108769e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 7.354724885982213e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 109958,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 5.553890974188291e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 2.1569469507025163,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 2.288818359375e-05,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "4addd944da79bb389b99648277b2d3c9ac158fc4bdcbc5081961e746d85b9a7b"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 17149,
+              "median_bias_db": 0.2088642120361328,
+              "p95_absolute_error_db": 3.279984951019287,
+              "passed": false
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 17149,
+              "median_bias_db": 0.19546890258789062,
+              "p95_absolute_error_db": 3.1588540077209473,
+              "passed": false
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": false,
+          "nonpositive_fraction": {
+            "HH": 0.29619598388671875,
+            "HV": 0.5805435180664062
+          },
+          "reference_receipt_sha256": "ae6dda33c5129cc5d2edc1450ad570399c04d948b2fab4cc2abf41f26409962d"
+        },
+        {
+          "window": [
+            8071,
+            23116,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 8.476512711044757e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 236230,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 1.755075421475607e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 8.510235263610062e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 125044,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.285352188054887e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 1.5654579517936236,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 3.814697265625e-05,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "20d252e920a2779f9269fd01b3dc4a498c4fa651e5830d401d8d70d7d405465e"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 17101,
+              "median_bias_db": 0.20778656005859375,
+              "p95_absolute_error_db": 3.065288543701172,
+              "passed": false
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 17101,
+              "median_bias_db": 0.20227813720703125,
+              "p95_absolute_error_db": 2.9723949432373047,
+              "passed": false
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": false,
+          "nonpositive_fraction": {
+            "HH": 0.09885406494140625,
+            "HV": 0.5229949951171875
+          },
+          "reference_receipt_sha256": "a6282a2b79f87af55b9918d93935ff9fe41bf06062cbbc14c9ac9bf355181014"
+        },
+        {
+          "window": [
+            14528,
+            2568,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.722148417477051e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 261107,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 7.761133643311464e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.595130521370636e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 121913,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 6.01007397131358e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 1.8026295858312094,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 3.814697265625e-06,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "1b3d91d8a8563d3c66741eed8918a665e7c7db7a583e9b6dd7f886b92829c71b"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 40.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 17298,
+              "median_bias_db": 0.31119632720947266,
+              "p95_absolute_error_db": 3.9633214473724365,
+              "passed": false
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 1.0,
+              "relative_displacement_m": 40.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 17298,
+              "median_bias_db": 0.19777297973632812,
+              "p95_absolute_error_db": 3.190211057662964,
+              "passed": false
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": false,
+          "nonpositive_fraction": {
+            "HH": 0.003955841064453125,
+            "HV": 0.5349388122558594
+          },
+          "reference_receipt_sha256": "90a5702ecfdfb7c6f3e6e42fe7fc021545265ae35902f8fd931151ae46eed28f"
+        },
+        {
+          "window": [
+            14528,
+            12842,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 7.67876304197341e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 206285,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 2.4652336928766642e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 7.354724885982213e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 108376,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 3.823027075713036e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 1.4106414944284666,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 2.288818359375e-05,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "23f832631b3ac2a9bdbef78aed794d22619e4ca2160738f79498291f56af48cf"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 17254,
+              "median_bias_db": 0.24161911010742188,
+              "p95_absolute_error_db": 3.2530200481414795,
+              "passed": false
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 17254,
+              "median_bias_db": 0.19353294372558594,
+              "p95_absolute_error_db": 3.113100290298462,
+              "passed": false
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": false,
+          "nonpositive_fraction": {
+            "HH": 0.21308517456054688,
+            "HV": 0.586578369140625
+          },
+          "reference_receipt_sha256": "0d4080d1e84351d7a1c669d2c69eed49b09fca5a2fad241ada27a6990fe578a8"
+        },
+        {
+          "window": [
+            14528,
+            23116,
+            512,
+            512
+          ],
+          "checks": {
+            "calibration_HH": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 8.502894594166429e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HH": {
+              "positive_matched_pixels": 188386,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 3.8077995384746074e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "calibration_HV": {
+              "positive_matched_pixels": 262144,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 8.558091653255271e-07,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "noise_HV": {
+              "positive_matched_pixels": 118592,
+              "finite_matched_pixels": 262144,
+              "median_bias_db": 0.0,
+              "p95_absolute_error_db": 9.322198907813661e-06,
+              "sign_mismatch_fraction": 0.0,
+              "passed": true
+            },
+            "annotation_geolocation": {
+              "max_error_m": 1.8016064757101036,
+              "passed": true
+            },
+            "incidence": {
+              "max_error_deg": 3.4332275390625e-05,
+              "passed": true
+            },
+            "cog_integrity": {
+              "passed": true,
+              "errors": [],
+              "warnings": [],
+              "sha256": "9d277c3bf8d6e1e9aef75e0a505a056c3eb22fcbe2619a0d17befc49a91203f4"
+            },
+            "registration_HH": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HH": {
+              "matched_pixels": 17207,
+              "median_bias_db": 0.2169971466064453,
+              "p95_absolute_error_db": 3.0079078674316406,
+              "passed": false
+            },
+            "registration_HV": {
+              "shift_rows_px": 0.0,
+              "shift_columns_px": 0.0,
+              "relative_displacement_m": 0.0,
+              "passed": true
+            },
+            "reprojection_HV": {
+              "matched_pixels": 17207,
+              "median_bias_db": 0.20976829528808594,
+              "p95_absolute_error_db": 2.954866409301758,
+              "passed": false
+            },
+            "diagnostic_scope": {
+              "passed": true,
+              "thermal_noise_corrected": false,
+              "fresh_detection_allowed": false
+            }
+          },
+          "scientific_comparison_passed": false,
+          "nonpositive_fraction": {
+            "HH": 0.28136444091796875,
+            "HV": 0.547607421875
+          },
+          "reference_receipt_sha256": "53cce2eaae9ce0db59f26d305b0f216c04e305201c3cf05a56cd5c3b9f5816b7"
+        }
+      ],
+      "scientific_comparison_passed": false
+    }
+  ],
+  "sentinel2": [
+    {
+      "product_name": "S2B_MSIL2A_20180428T145729_N0500_R082_T22UCC_20230705T144556.SAFE",
+      "archive_sha256": "7a9c07a0d0694abf5ac3ce4fa153d454b02f2a683e8277518e48e3ff10a2a1b0",
+      "archive_bytes": 71211558,
+      "catalogue_checksums_verified": [
+        {
+          "algorithm": "MD5",
+          "value": "107a442a37ea98be126bcab42961d91a"
+        }
+      ],
+      "catalogue_checksum_algorithms_unchecked": [
+        "BLAKE3"
+      ],
+      "zip_crc_verified": true,
+      "manifest_checksums_verified": 86
+    },
+    {
+      "product_name": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYT_20230705T144556.SAFE",
+      "archive_sha256": "85d11f4785cf0341e51a934590810d040d99d17873ac6a4afedeb2a0f97dd0d3",
+      "archive_bytes": 150011773,
+      "catalogue_checksums_verified": [
+        {
+          "algorithm": "MD5",
+          "value": "926cb5abbce6ed3d6ffcd5a1b3236bae"
+        }
+      ],
+      "catalogue_checksum_algorithms_unchecked": [
+        "BLAKE3"
+      ],
+      "zip_crc_verified": true,
+      "manifest_checksums_verified": 86
+    }
+  ],
+  "optical_pairs": [
+    {
+      "id": "011637a22c78abac216b0f1308315ffea5af40fd900ae2783c119bf9a4a0628a",
+      "manifest_sha256": "3c2090bc2f78bc9ff122853ca9be55ce4175f608bf6c81eeea03574e63b14e12",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "035394e6135b3afcd00c2b742ebcfb410ac0185ce1ae2bd74eafa394062d8674",
+      "manifest_sha256": "328effe04354f7fa8efad3541d1b18b437409d725e300dbdb9d416db92113be7",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "042442a18e12db9c2d8533554a4ed9ec7ebc283245f0a4991be32ca65fb477da",
+      "manifest_sha256": "caa340b56454073052890aaf66d0cf9f928efebbabc1eb1cb157f7f3601a7112",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "04391a510258d4be5bd0c6fc272629bee9630f573f9c9afd6d8f700c13ba684f",
+      "manifest_sha256": "29f752910167898724f660b56586b6cf6e787acdcfd4a1d86c30ce3fb2ca053d",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "0800ab93158df207421e8ca88be452e58b34a967a92c83596c38ee225e8e18d5",
+      "manifest_sha256": "4503d33bec909cb46d8849bc5459770fad56bb4085424bb7f8d6fc23f9efac4b",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "0d6274ea8821e7920717a35484c7a06fc99c971c161829973c8feba895c2c66e",
+      "manifest_sha256": "e2a7322cba6d2c5c6ffe6118443cec8ea27fec3e4535a45d2b62fe44400e155b",
+      "provider": "cdse",
+      "optical_item_id": "S2B_MSIL2A_20180428T145729_N0500_R082_T22UCC_20230705T144556",
+      "files_verified": 10,
+      "useful_for_review": false
+    },
+    {
+      "id": "0ee42fef81570ed11bad21a281b589396e2511b949030fdf86c1e4e8c0ba7879",
+      "manifest_sha256": "33140addcaa4e174e07aa7b2679942597a940216af4d93320a27847b46d2a7b0",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "0fb1201795fbca9946df80d51addd509d671ede12949c7007145ba40041cd2bc",
+      "manifest_sha256": "e2e52f56cac421df79d67361c9b024158de8e37e6bb6c1e31d844c304f0beeb4",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "133a2c0b9b76e947d744e2becb697f71ed143f5db28c464cd29368363d403f88",
+      "manifest_sha256": "25eeb43a1a58a8dbb2fd8ec88c739ccf3e0985d90f4295ad4290c8f8af31cc8b",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "14cd90146a90e22098695fb73507ed83f76f8c0192379c1452f0e07079c37e40",
+      "manifest_sha256": "cade634549efdd83bc003816dfff0d7f42230fe3df3ca1bdbf241f3fcbf9f854",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "1909846e4b57267cd16dab08a297bc6100cc83b2c7f9517e3d40454250174662",
+      "manifest_sha256": "612e4a0755d581e1d769766a61728f6b1cf7ac0dea66dab1f01291766d0e31a2",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "1a485f66127b20cc0afdecade4af43e9d62f13c74a6047f2dfe1c999f294d8bb",
+      "manifest_sha256": "e77e7a57544f08430472412ff73e3027469f45fed5ffe5fdb3c2f67657857f20",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "1a5291d4b893e6ea7701fa7688e81a7893895d28a0f3fa49a214abd6bd3bd5ab",
+      "manifest_sha256": "e13468aa2ac8b0f6ab2557a3a3dfed5865ccd7cccaab82ba23af220486b4e710",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "1ddb623372be03094b0597e3dbd6333d780fb7dbb643f4af3d35eff7f6570765",
+      "manifest_sha256": "420ac5bcf1ff5d88cf4d34cb577932092f6949a79a533ee62e91f6935127d335",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "22159b40ea1bd297fb317788eba5f8860762e1779c8fa8a74ff24f8fa5e55104",
+      "manifest_sha256": "6543084d8708319ee541f2c17c86e629f053b36285619d1f9c2558d389bd5527",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "25a169e33a6c4291e5e592b69a0819d1f5623a68f613e309d9ac7ab2ff0a860f",
+      "manifest_sha256": "c2a4f0af45ac9815055486ee51e29b331fdd2a91238f425fca7af0e304120904",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "2c6c908ff6f1dcd98e694b148ae8f3cf9e21bcaa1444d5e33281ed3c221d132b",
+      "manifest_sha256": "1838e558e283ce7fb7c01f643e6c835b555a6115e51844e28142f5267c8203c6",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "2d46c805779b3880ff9461803724dd7544e7d6935834080b960fe1ba3e089add",
+      "manifest_sha256": "891b69cb485810ac7e2c4a5e8c07fd8f6808ad3c2623548764757412a4f6992a",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "3208ec75b3644b3e577d0e5ed60fa463f7c8688f2890d27d0ef695fe4f5b450f",
+      "manifest_sha256": "dcc62b26c70b0b12744478b9bb0035c7dc70f2af88fd1e33968170031db9efe8",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "3582c0ad03368c5f05841a838bae58a228622818f5431e4ebca9588aab39478c",
+      "manifest_sha256": "8949532e46f068d5c39f60a6d68554c27f29a898090706ac0185b92915857d8c",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "368c9f5811ab33d67a83eeaf96bfe8e9a7c2997b09beb5a81d0edb56e3b9cd5b",
+      "manifest_sha256": "d73122e3ba4b88bd4edc45dc11ec7557e7514fe721e8d962c8868342373c36d6",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "3c6d61bba3b53f5970b5c12f61d1df66e34c8a5a984eba44f60c04c1289673ff",
+      "manifest_sha256": "2f2ad9e469214452dba2403aea68dffa614c3cf4817f5ba23da941ef880e8ca8",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "3c963fc2749004cb2f3a0473e9407325403f353d964debde64eccec816076558",
+      "manifest_sha256": "5106d848e68bd82ebd13089ee798a4d6f8eff265a30f34b167a2749b5992ce1a",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "3d226f1b6131878e73da3b0dae0cda22d9c3b396368f184ef181184183450bd5",
+      "manifest_sha256": "10a8fed6f8391f7e28565ed657d3dcb19d27af236061832bc80c6f5c02913885",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "3e89e622e29393e5ce7da0bb01341931cd0d1d2f6638fd707aef1e857c07fb60",
+      "manifest_sha256": "6facfe5a2afd24c89bd176dc4d367724a687cf50bf6c64ab5b11a7760e31caed",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "41f3ced053c3815f3c3ea091c50443b47b3ba4072b695f56a9f1b5d3c3e86694",
+      "manifest_sha256": "694ae5e56be711bf48b255a92c81f9ff2ad1972c2ef3adf762a82105e3f837ca",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "438d957600cea763272aa44942529a8cb6dbd6f3a5849e6b09824f3507d6a7a7",
+      "manifest_sha256": "2644f9d2ae40e00249eb67180fe9b6e9a5027d39a53a34d4f092d39a81afc0e8",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "442e24bbeb75e4d470b020299f2ef13fbbfab4792b9eec677d153e4a124fc766",
+      "manifest_sha256": "ab2399c7d8778e29850304d3fcf3f0327654ad39321e42c80c79cde91f93dbcd",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "443b73f9384c9afc491426611961392ebb388c8efa40535e92b057d2b141f30f",
+      "manifest_sha256": "53839177decfe233ee04dbb1a39fbc915959d944718787ff8e474d4b7d453ff8",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "44a0e55cd2f7794a782386927dc5d31b383c4d7be577991e22cc9770235878c2",
+      "manifest_sha256": "9ab6913e7f716901e855daf411c337be3d9f14738b17342587f0c895bcd46ea5",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "458bbb94c84f77fe0e158a9f14b39e9c652abe7f19e8d1f1928ea444d80f1d04",
+      "manifest_sha256": "2f2b154ac58dc380915fac74f04559d730467728cab99fc410aa635417125ca9",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "47692af9c09f19c0d67ff2a988ffb87dd2f69ee34421e965075de1ef95c7dd4a",
+      "manifest_sha256": "07ce88e30474e5d89d5d8f91aa1327f5094cb6e4a22367dd91a648b5a82f986e",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "489a6011c23bc2024630a1e515e291d9bdcdc06fe3fac72ba7d755929c0c0810",
+      "manifest_sha256": "fd03912d4dbc7fcea6351dfe9c0dc813fcf5fa79bd7ac040abfed27c7284db9a",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "4b6abcb9af0b0ea83a927f6b69b0dff4f4cec13a3e80e9dabfa765158989c31b",
+      "manifest_sha256": "3762c7b366b2aa28ea17e042ef6051e0b50f615ba9f3519a78958c23f322c98b",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "4f377c1f3761399202643cf8fb3a65afad2c1e58c38fa1b6652024a81c910904",
+      "manifest_sha256": "2356f214639b795b9232627f2d64672a024a48a15fa931ddf3264d222792f7cb",
+      "provider": "planetary-computer",
+      "optical_item_id": "S2B_MSIL2A_20180428T145729_R082_T22UCC_20201013T035444",
+      "files_verified": 9,
+      "useful_for_review": false
+    },
+    {
+      "id": "50ce4917142ea5c5097ede04463d276fefb110309c44c53525c7b7479e1b9b00",
+      "manifest_sha256": "6b38d55c64ed9c9abfd958a41afc69b733e43803bf3530f835a32e86fc385d1e",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "5223b2e56d1a16331f499c8e35be851dafbd2e609b038b91bda314fa5ded57cb",
+      "manifest_sha256": "d0075387899dea29c724cf81d87d0a0793b79ceb934c72b5907cc11d7007fe7e",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "5a1d240570e9c85bc330d3def6bf7785753e40c266929e54969ccf30abc429af",
+      "manifest_sha256": "7e2d751fc0164a387cb8bb4ef4ab6c14410512cf7bddf81b3376b7ba8919f509",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "5af05caf0ede206a89be7ca7aff210153687d0bfc3ab8a6a80a900593179469f",
+      "manifest_sha256": "03690f5b4290b60e801d96e38b45c9782a440545fe00408cd52b65bd7179b88f",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "5ba6495e90c75e4ec743f92c5260c1d0df152585c8e5e2d732e22e04461f4fa7",
+      "manifest_sha256": "826a0c76cbbe2961baf0dbc62843bb644a822a2f329180061e8e9620857782f4",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "5c67271597f40d698926897655ed6ea708279c319d993b085211649a881b8e34",
+      "manifest_sha256": "1006f783ea9eaf4aae6e8eab1dded647a386e759ab2f819d5c668decdea0c0d2",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "633bd4dcbf792eb5926fa02ddf2781c8ab223d20716af25e3b4ae0287237862b",
+      "manifest_sha256": "8eed9633674c63b36ada110919ace51c827f01aabaafddf8738547b4f8be6fdc",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "6383fd01ad9b74375f3e86100c687111255cde0e8f1b93a5e94d87bc85b7a3f3",
+      "manifest_sha256": "77801196ad6ff213d9cea56f24ac7043989a9c915b7ff9dfeebf05f8538248f1",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "6a6069b6691a171ad80fa2f61acc1892960b4e3884ad0f87e154c39b592020f9",
+      "manifest_sha256": "249d48239a4eb96b450d32766977202aa8c6dca7be8e37699d71a5f32180aa26",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "6b6ed8aceac5040446c5282cd19aa02e01c712b9607f782a49a56ddc45382f55",
+      "manifest_sha256": "fca412373dc4b93376239e77cba5be041c15cdccea87fb5dd6fdb6ff37b3d912",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "6bbb1dc7e23e75f69f47da4d51d1e1dc352da83917bfcc7cb714d1764c8f131d",
+      "manifest_sha256": "ac6ebeb2c53cfcb4b350b438111fc65ca364989dc2f879d3ace7d6b3649da571",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "6fab3ac25841d97edf19f73155991cb0926a9bc82b2c973e22a249d80f8c6ccc",
+      "manifest_sha256": "f78f2512743984b8914532c1f8dc99b984d0b235a99ce447c286b3554977e9a1",
+      "provider": "planetary-computer",
+      "optical_item_id": "S2B_MSIL2A_20180428T145729_R082_T22UCC_20201013T035444",
+      "files_verified": 9,
+      "useful_for_review": false
+    },
+    {
+      "id": "70d23f1f23a5e2ee1e198e500a1642b4c62e2c120e14b46480b424a81b69a21e",
+      "manifest_sha256": "a545972ac656e3d605c8c5b0f266d3ecc5111d1c4ea7935406eef643e271530a",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "747accf6103dbe39537f1ba916c77e166789c2aaeaf965722dbf6dd47d2a5112",
+      "manifest_sha256": "ca69201a2ab8cf58d717161ee78f2845e1d35bacfab3ec36e4f07a2f0caceb71",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "76a888a9db157ddbec385c4cc4ec782c15f1764c62990c25d2226d813c4ab958",
+      "manifest_sha256": "c5bf10c6458d9893873c9a5e60ce6836b18a0c92dedebf40587e5193fcf632b0",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "829c6acedfad506afb741871bfb5edd90ed9a65d8ff73762177a8639526b88e8",
+      "manifest_sha256": "9a6c55684fbde1bb62bcda7e7eff4913e58f31554e7b9d75146835a2ea4b30fd",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "82a0c1bcc6df284d6bea4b887ca35aa31a9ac02951cedd01f61b9cfc24fc8df0",
+      "manifest_sha256": "37c34b31eb140f3677d9cde23deb0c854876e342e44c6faa50eaf7b7cf51be9f",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "8632a5ca05ed5d38958116f9e4c921f9e5cd211bb3b68e0ccf2528bf299e995f",
+      "manifest_sha256": "1b05f4adbb80d79753bb68d452bd3c43b76dd5353cc5578f7ddf9938b30e4432",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "86cd03fcc5145899b4fb7123681cf55ca261245b0c598ab938031947c08cd762",
+      "manifest_sha256": "6ee2ac62f504a65cb34fec1a2966a2fd31cd8163d12b3107517486b7de34d904",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "87425e38a7ca9ac2ae0fdefa2628a4ce8ef06d33bdfc6f829a70827f2af4989d",
+      "manifest_sha256": "fcf51fecbb7a51793154bcb534e17b4290392f367a648ce80ade9fc87a147dc6",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "8c5987e4edb5559f0a6f417fb5f5078112409eb1790a794ffd7826704c7a2dfa",
+      "manifest_sha256": "11a303b0b3ae6287854e3b35798030406d4cfb36b3ee18b87156472f8951fa30",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "8cd3ac48ae34a1d08a63884a9b1c561bcc96187009da788342aa28f09a42656d",
+      "manifest_sha256": "ac516b4534c574bc86d7f08ef20cd36555f2e5c003ab670d8c8816e8e5a5d8d9",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "8e52aeeb6253f68ddb478a066bbe91aedcc682644b3113529f1294cb4b8e36ba",
+      "manifest_sha256": "bbff74963a40c2028cd15edcdc50d4527765fe626e537a6cdd90e591759c7339",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "8f4bf90f2130a5f4a338a11d8c3e9a103f8d80bfb71c40ff2e5e800107a1b54c",
+      "manifest_sha256": "7204250864969fd68738e733320fe66f93e75f7cd481ae1f3d1d3013840b9ad1",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "9236dbce952e125745d133ce78e6a5a15ca3a6de68dafab077e648b395235f29",
+      "manifest_sha256": "634a3e4df9b58c1e82c68bea69c1d29d40e396dce46f231682bb0746802a0084",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "9274da73ff54baa93b963d13edae6ac15e6fec493c4d60ff2b6c987908aa4a60",
+      "manifest_sha256": "9baa756d512db748b3b1abcc68c361e512f2aa64ad9eed34082e0d15fe83d78d",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "94f09f1f77059403a4fabcbca884f48ed3081ba271d74f29ec1d81fff7d7cce2",
+      "manifest_sha256": "85fbb068fd415e2cb4562e6d0f32c21c6980c0cb0da5a804be4eaf26871cc953",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "98bf90862669ba08487d0440ac9ecaa32002c35b4585ce1404b0b33c8bb76718",
+      "manifest_sha256": "5c332eef88be7819c0a26f96096828f205beb7acdbef5001dbef87d23d35ded4",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "9a1c9fbdeae632112b38b1280f22a3e03adbc2c1a09b5eed1a4e082f79cdc543",
+      "manifest_sha256": "81cd4a8f8d7a7e51af32ae0939c94aa0ecafff0ffb1a07757e33b62b6f53f399",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "9ae435c5c90a77874734247e3689228e43324b4101f0256b6f13b0e3acbaf886",
+      "manifest_sha256": "fb99b97894358e83d71261ed05d3ab6689315c2c9ad9ef66f66edee25870c30e",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "a08962137610e1ceeaf75c68e02367305d86c0566085a45ce6da26396176da65",
+      "manifest_sha256": "ffca69007dbc66838e26a0c0ece398e9da5cae36b49009c8844c23b921dbfd4d",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "a0a20672c8c97beb410c52ada793eb339be01d633ccb0ff01cd5ef744074e64a",
+      "manifest_sha256": "72bfd198cf0e0ef16a79dcfa8a48c86e2e4e0b26f3141abbaf98c2a33645fb55",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "a2314af593a3aed812040a496bb09b427826e4f1c83bcc345a2949846c1dda45",
+      "manifest_sha256": "5aac09f47722a0ce975679d73ee13cd483efa0a12ffe66a778eebe5f2fc69b8e",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "a7dec1fd9fd628084f4aecda6010371030fa4a156f24e5ed9e833d73002ec4b2",
+      "manifest_sha256": "61f97370926b439d44931db6ab497135bcd2a184dc45ec304d2e4810e0c87178",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "ac1fb8bfc3493a9984452a87a001e54e17415be1bd10ae679d3def1a3f81ef3c",
+      "manifest_sha256": "ce876acfb71a7d61761e058006efcdc2cd23e99fadfd63487dc62229d65b2d42",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "ad10e8da568e29f57d0c57da9efa3f67f5c07fd9fe298594b75421bceb32e8f0",
+      "manifest_sha256": "b0c044fd81aa446be2e7421cc5d6427924d2929fcc0a212ed4236f9e9e97e0b0",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "b7296f79f891a0249d5a8e0092234be2636fcf1b4c1f3515b2eb13cfe1ed69fe",
+      "manifest_sha256": "be1debe535f1d9924d2c48d2926dff3dd7f0525f273fc47698611cb9ec3d0c93",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "ba5cfac720d7f06ccfcca8e35b2ee26b08507b6753be831a6ed688e4d8ed725b",
+      "manifest_sha256": "91db6e1ac7f296e6431283198bdc8e4b544fdf4282c9d159e8261b91308cfdcd",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "bb15c2ce6c2240023d71dfd4068586beec5c4cc478336f2382d2f635055ee06b",
+      "manifest_sha256": "031c1168d47aaa331975ef880af4aced08e91088b2f3a0dad4a261dbfaa9d0ae",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "bccc9651991a58a17d961019bea787d87d0dc960f2c331af2a7d9830ee1c9803",
+      "manifest_sha256": "3701d5d65b7badf6e74d33fd7075d1a98ab33c15cc2948580f3cda29b52146c9",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "bcd0aeb4b8217b99c17784e358a1abeaba0683e92d07d3cda2c161fd8f3ab7da",
+      "manifest_sha256": "cccd2918901063e2c6ea618820d7c3a7faeb9a8e4f4980338d5053cc745f61db",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "c18e09d29b010736021d048b00c4a83ac100de2749602b83e67a624893f67a46",
+      "manifest_sha256": "bba89ed48d19f61ffd05c19feda3421263d90a76cf7bb2c696095809fd3ec60b",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "c7059f0e43a1de579777aaf07219f49037934bb54eee91edee94b2921a426ba4",
+      "manifest_sha256": "8f0ccc1ae455d95239b62b4b72f15503a83ec991d413f5a0ffc54bb4719fb69d",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "ca4f61004d07e4fc32e9c1b43d8e55011d10a2e6db0d7707c57b2548f4dacc6b",
+      "manifest_sha256": "1786d4ada72ab2f11ca17ede3551d51e5e9d5bba392a4ebed0e606b0597ddcda",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "ca59b31872f22e67997c43fac7c2bad7b639b43afe01252bfea31140e8cae3d9",
+      "manifest_sha256": "59b3191d2c359083ce3a7d6b40d250f86c254d70c3a8f88fe07e1e4b41657cd8",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "ccd51fcb5ff16e7deeab17e51f6f3d48858b2cea28a54de9e479c09f930826ec",
+      "manifest_sha256": "d9b0f30690671afbbdbf20de2d591efe0bda7c2d8c54fae79941b22467fa8ca7",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "ccf1fac24045f11c7abc2a1c162c25b5661e1f6d23cf3d2e896d58f658f283f8",
+      "manifest_sha256": "09ccaae4b52ad1dbe2d0b783c1fd9cd2ea2c9764b8b3e249e0b129f95c3a6dec",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "cf114686c9ff09b8fe2bc00a28e98f6ac56dc5496e85b713a1105c53e9f90486",
+      "manifest_sha256": "0ed27e7dc88ba9a6ebe913919d3f7a674e56b0045940daea4ec71854329f590a",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "d00664dc3447ae55a2a1e59f2efbc7abadc9efde851d539ad5fa8c3288db3e43",
+      "manifest_sha256": "353e8c5e9f75ad53b8c301394d7d4cd06c1477845104947c4eb3e78daaa94753",
+      "provider": "planetary-computer",
+      "optical_item_id": "S2B_MSIL2A_20180428T145729_R082_T21UYT_20201013T035446",
+      "files_verified": 9,
+      "useful_for_review": false
+    },
+    {
+      "id": "d06d79666d6fe2a7dbf7e75d37eff90088dd00e103d59a476ba3de6b032f2e91",
+      "manifest_sha256": "a071651b6a694f8233ee817457efea0e72543b4903802b93afb6271b9ee7301b",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "d1c2b70fe757074f488b5485eedcefdfe95d09741081af7942a93c7a425e5240",
+      "manifest_sha256": "6913dadcb554413bfe56d23587b55eb0267abce1cf060eee45b5d3c0bac0962c",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "dd5a710e7b1585c0e1ea34350a8f3d6d3acef17b0fb619a3ba8a7100402232d9",
+      "manifest_sha256": "8b6df733fdc371a0561401ecb316aac8affcb704553fc450a272d0d311fe8e1f",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "e8ce541d0c111b70c6e8c9980e4286aa1e45d89c0ca2722f6c9307e560ddbd85",
+      "manifest_sha256": "5018f4c0fbce176c78cb92ead7c1e60e095eecb4d95b62269ace116b0cfc29f7",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "ecf377d188a6a6df075042eba87e20a385c492af0b2d8a282a1f17aba0d1ae78",
+      "manifest_sha256": "f35ed83f49b35762b3f7c7e0d55ca6e2943e8e14c098f0a52e532d57dacfb52b",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "eee2dcb71e8f65030831cd47f85ba92c821ae4b52c28d7a6e7e87030aac5ac00",
+      "manifest_sha256": "20003b8e5e8f5c4d0807ec0950c85b9290304fd493a9b845abb42e5b180332e0",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "ef8adbcc5503ccbfea0b74f007e60c2dc535992f9bbada79a7493c8d7f05f2e9",
+      "manifest_sha256": "5be26ed02aa8c5f7944900344a684c77be0025d7971fbe516c47c2d681ae8c63",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "efc7ce565f76a5fef511cefad29b168edab69b00e2a3fb888429816e28c4c0f6",
+      "manifest_sha256": "3d91b32b585e1be9fb0dd8f0c16bd2dfadf772f357b74987563db6bc787b6b9d",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "f34ea8f0fd3a0d6dcc21ad7e8fc792977ff51be0466c3249576fb024be3b223b",
+      "manifest_sha256": "2f403fa1bdd85774df41aa6d634a93c7ad0d03523351a2a7cd1d58450edbfc01",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "f5d06d9f7a784c2aa4f6b902ec7bea2f4cf6d555d2ffa614dd6299cf879718fb",
+      "manifest_sha256": "47da984ccb5da307f48d34ea849c2c03a00881627fda78842b06f55837645cb1",
+      "provider": "planetary-computer",
+      "optical_item_id": "S2B_MSIL2A_20180428T145729_R082_T21UYT_20201013T035446",
+      "files_verified": 9,
+      "useful_for_review": false
+    },
+    {
+      "id": "f79be58d0d57ea56fc4acd6f55ef215d3e833e8b564bd0dc824072829f3d3af3",
+      "manifest_sha256": "d79738ecf264c9a7dedabb9b019c7775d48d67a02bea5f7397b75580a1544cff",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "f96825f3740a81263950f7f526d151bb747857a58e5f189b679001bbfaaabdea",
+      "manifest_sha256": "6f2066a5a0eedb82473f2171151e5e65fe2f7e01c24564e3e9bb560ab181ad3c",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "f9e9f28c13b778048524b9cf6e09a8ba22b4c60b42859eb8cc5dace330577779",
+      "manifest_sha256": "4a35743daf0047a8202c2f687fa5f0075a38064c3b6a8c12252a4a770beaf06d",
+      "provider": "cdse",
+      "optical_item_id": "S2B_MSIL2A_20180428T145729_N0500_R082_T21UYT_20230705T144556",
+      "files_verified": 10,
+      "useful_for_review": false
+    },
+    {
+      "id": "fc1142e1b9cc5d6f2bc6e8d5781153e0ef49bab60acb760e266f499f64b8bb65",
+      "manifest_sha256": "365bfe342205994931a243fb0647f8012fe9185f29bb0b0786fa59a411590479",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "fdeb787ea3f944728c79d59b53a3e54d7d361f7488097a51a74de3b46a798393",
+      "manifest_sha256": "b75fd57355c57bfd458d366459d12b2900b99c7218b2da204a5ca858a25bdffa",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    },
+    {
+      "id": "fe7823e8549e903246c66257f244f4aee6f68bc9fade7b9001ae33d70337206f",
+      "manifest_sha256": "aff06e3741c29b2adbe7bf6b27fcf4a1ccfef6e38042c772bdf202835f23dac8",
+      "provider": "planetary-computer",
+      "optical_item_id": null,
+      "files_verified": 2,
+      "useful_for_review": false
+    }
+  ],
+  "reference_workspaces": [
+    {
+      "name": "development",
+      "workspace_id": "a2b7dc7e5cfc43456b17b78b0a9825a1d9b12c8f748715ab012d0b191472317f",
+      "artifact_hashes_verified": true,
+      "ledger_chain_verified": true,
+      "observed_at": "2026-10-12T06:11:45.186427+00:00",
+      "ledger_head_sha256": "2a30f6cb289596c2ba9d2987cc9c36021c9d26cb8501f1ff0208af7ac4511427",
+      "prepared_survey_tasks": 193,
+      "prepared_candidate_tasks": 96,
+      "primary_human_responses": 0,
+      "ai_review_events": 1,
+      "consistency_issues": 0,
+      "freeze_events": 0
+    },
+    {
+      "name": "heldout",
+      "workspace_id": "2fb9e4920d6db4bf9176a8cca29cdb0af6b398579802ff501f60e95726be1fbf",
+      "artifact_hashes_verified": true,
+      "ledger_chain_verified": true,
+      "observed_at": "2026-10-12T06:11:45.386924+00:00",
+      "ledger_head_sha256": "c349247311f75e7a3e7900cfcac8416bcae2fccacdb15337d5050926fb28ece6",
+      "prepared_survey_tasks": 64,
+      "prepared_candidate_tasks": 0,
+      "primary_human_responses": 46,
+      "ai_review_events": 2,
+      "consistency_issues": 0,
+      "freeze_events": 0
+    }
+  ],
+  "deployment_gate_open": false,
+  "claim_boundary": "Development processing/integrity audit only. Cached full scans are source/code-bound historical measurements. No pilot images, human labels, detector tuning, accuracy metrics or scientific release are produced.",
+  "completed_at": "2026-10-12T06:11:45.386924+00:00"
+}

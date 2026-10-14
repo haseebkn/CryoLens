@@ -1,0 +1,7 @@
+{
+  "detector": "gamma",
+  "pfa": 0.000001,
+  "suppression": {
+    "exclude_sea_ice": true
+  }
+}

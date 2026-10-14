@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "product": "S1C_IW_GRDH_1SDH_20260116T094124_20260116T094149_005927_00BE31_B041_COG.SAFE",
+  "driver_sha256": "e30ded055fbdea392e3023950fb0fb57f7f2d5f9a58011426b944d918d1536dc",
+  "channels": {
+    "HH": {
+      "annotation_sha256": "aaa3f1b44c3e8a5fae9221fd1baa21aebe98d8c3fc042efe1a0cf124003a9f7e",
+      "grid_points": 210,
+      "supported_points": 180,
+      "pixel_spacing_m": [
+        10.0,
+        10.0
+      ],
+      "row_error_px_percentiles": [
+        0.17888765683765612,
+        0.49893016049809374,
+        0.5401528264792432
+      ],
+      "column_error_px_percentiles": [
+        0.8525276117234171,
+        1.7384579186270424,
+        2.0761391752010105
+      ],
+      "nominal_source_distance_error_m_percentiles": [
+        8.666148170300051,
+        17.47632849898354,
+        20.83841807028691
+      ],
+      "grid_extent": {
+        "rows": [
+          0.0,
+          16663.0
+        ],
+        "columns": [
+          0.0,
+          25788.0
+        ]
+      },
+      "geometry": {
+        "geolocation_method": "marine_range_doppler",
+        "height_datum": "EGM96_mean_sea_surface",
+        "geoid_archive_sha256": "b5db7a14c3062decb8daaaf60f257ff374084be79aeda9ce333dd5b9c815751c",
+        "geometry_annotation_sha256": "aaa3f1b44c3e8a5fae9221fd1baa21aebe98d8c3fc042efe1a0cf124003a9f7e",
+        "orbit_source": "product_annotation",
+        "bistatic_timing": "declared_bulk_plus_range_dependent_residual",
+        "resampling_kernel": "bilinear_point"
+      }
+    },
+    "HV": {
+      "annotation_sha256": "ccf1d4417673adde9952a37648eca2c9c92da7866e3b87be92f51f4c84e7e76a",
+      "grid_points": 210,
+      "supported_points": 180,
+      "pixel_spacing_m": [
+        10.0,
+        10.0
+      ],
+      "row_error_px_percentiles": [
+        0.17888765683765612,
+        0.49893016049809374,
+        0.5401528264792432
+      ],
+      "column_error_px_percentiles": [
+        0.8525276117234171,
+        1.7384579186270424,
+        2.0761391752010105
+      ],
+      "nominal_source_distance_error_m_percentiles": [
+        8.666148170300051,
+        17.47632849898354,
+        20.83841807028691
+      ],
+      "grid_extent": {
+        "rows": [
+          0.0,
+          16663.0
+        ],
+        "columns": [
+          0.0,
+          25788.0
+        ]
+      },
+      "geometry": {
+        "geolocation_method": "marine_range_doppler",
+        "height_datum": "EGM96_mean_sea_surface",
+        "geoid_archive_sha256": "b5db7a14c3062decb8daaaf60f257ff374084be79aeda9ce333dd5b9c815751c",
+        "geometry_annotation_sha256": "ccf1d4417673adde9952a37648eca2c9c92da7866e3b87be92f51f4c84e7e76a",
+        "orbit_source": "product_annotation",
+        "bistatic_timing": "declared_bulk_plus_range_dependent_residual",
+        "resampling_kernel": "bilinear_point"
+      }
+    }
+  },
+  "scope": "all manufacturer annotation grid points across original footprint; sparse metadata, not every image pixel",
+  "claim_boundary": "Consistency with product geolocation metadata using the same annotated orbit. Nominal source-grid metres are not independently measured ground error. No absolute field accuracy or scientific release is established."
+}

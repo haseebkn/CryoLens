@@ -1,0 +1,17 @@
+{
+  "observed_at": "2026-10-12T13:55:52.308671+00:00",
+  "result": "rejected_before_Docker_execution",
+  "reason": "Reference prefix occupied; preserve evidence and choose a new prefix",
+  "before": {
+    "ew-northern-pass-r0.1-c0.1.log": "e696c1c1eee3b5e9510b4134f49b775777464521711a84536b45733c698a1f06",
+    "ew-northern-pass-r0.1-c0.1-receipt.json": "ee404961ffbf6a66d119d87f974335cee8bad9770049f5030c67a28ecb6b0562",
+    "ew-northern-pass-r0.1-c0.1_geo.tif": "a0db5b85d9a23ffc794e61ba8f52126e7405efbcbddb36df4e7677371437a453"
+  },
+  "after": {
+    "ew-northern-pass-r0.1-c0.1.log": "e696c1c1eee3b5e9510b4134f49b775777464521711a84536b45733c698a1f06",
+    "ew-northern-pass-r0.1-c0.1-receipt.json": "ee404961ffbf6a66d119d87f974335cee8bad9770049f5030c67a28ecb6b0562",
+    "ew-northern-pass-r0.1-c0.1_geo.tif": "a0db5b85d9a23ffc794e61ba8f52126e7405efbcbddb36df4e7677371437a453"
+  },
+  "unchanged": true,
+  "validation_source_sha256": "b2a04f5369eacae86556786a215f5f0b95de136bb212f6b3a463048c0d6d4400"
+}

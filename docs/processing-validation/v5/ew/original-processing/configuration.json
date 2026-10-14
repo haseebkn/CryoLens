@@ -1,0 +1,21 @@
+{
+  "recipe_id": "complete-corrected-safe-v1",
+  "policy": {
+    "version": "safe-quality-v1",
+    "max_nonpositive_fraction": 0.05,
+    "min_valid_fraction": 0.1,
+    "incidence_min_deg": 15.0,
+    "incidence_max_deg": 50.0,
+    "max_polarization_geolocation_error_m": 20.0
+  },
+  "target_crs": "EPSG:3978",
+  "pixel_spacing_m": 40,
+  "block_size": 256,
+  "scan_rows": 32,
+  "maximum_source_window_pixels": 4000000,
+  "extent": "all projected annotation knots plus two-pixel margin",
+  "reference_grid_sha256": "03587cb4605b0a898a31faa010126c770a732fc5bb92eb90b832c01547ab798c",
+  "grid_phase": "SNAP reference grid phase",
+  "resampling": "bilinear point in linear power; positive joint four-neighbor support",
+  "scope": "complete source footprint; subsequent target analysis restricted to NL marine AOI"
+}

@@ -47,7 +47,7 @@ This document records the foundational architectural decisions, scientific const
   * UTM Zone 22N ($54^\circ\text{W}$ to $48^\circ\text{W}$)
   * UTM Zone 23N ($48^\circ\text{W}$ to $42^\circ\text{W}$, outer Flemish Cap)
 * **Decision:** Use **`EPSG:3978` (NAD83 / Canada Atlas Lambert)** as the unified project CRS.
-* **Rationale:** 
+* **Rationale:**
   * Lambert Conformal Conic (LCC) is a **conformal** projection (preserves local angles and shapes).
   * Preserving angular fidelity is critical for drift trajectory modeling, force-balance vector additions, and shape-ratio estimation of targets.
   * Avoids boundary discontinuities, tile seam distortion, and multi-CRS joins across the $54^\circ\text{W}$ and $48^\circ\text{W}$ meridians.
@@ -94,7 +94,7 @@ This document records the foundational architectural decisions, scientific const
 ## ADR-007: Sentinel-1 EW Subswath Noise Removal — SNAP vs. s1denoise
 
 * **Date:** 2026-08-19
-* **Status:** Accepted (Recommendation: NERSC `s1denoise`)
+* **Status:** Historical recommendation superseded; see the [processing investigation](processing-validation/v2/README.md) for the unqualified NERSC outcome and current denoising limits.
 * **Context:** Sentinel-1 Extra Wide (EW) swath SAR imagery consists of 5 subswaths (EW1 to EW5). Thermal noise floor variations (NESZ scalloping between $-28\text{ dB}$ and $-24\text{ dB}$) in the cross-polarization channel (HV) exceed calm ocean backscatter ($<-32\text{ dB}$). Standard ESA SNAP `ThermalNoiseRemoval` operator removes standard metadata noise vectors but frequently leaves residual inter-subswath boundary steps and scalloping streaks, triggering false-alarm stripes along range seams in CFAR and object detection.
 * **Evaluation & Decision:**
   * **ESA SNAP Standard TNR:** Suitable for high-backscatter land surfaces, but insufficient for low-clutter maritime open ocean.

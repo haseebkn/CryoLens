@@ -7,6 +7,8 @@ import subprocess
 from pathlib import Path
 
 from cryolens.config.settings import PreprocessingConfig, get_app_config
+from cryolens.preprocess.quality import assess_safe_product
+from cryolens.preprocess.safe_reader import SAFEProductReader
 
 logger = logging.getLogger(__name__)
 
@@ -55,15 +57,23 @@ class SNAPChainRunner:
         if not graph_xml_path.exists():
             raise FileNotFoundError(f"SNAP graph XML not found at: {graph_xml_path}")
 
+        docker_available = self.is_docker_available()
+        local_available = self.is_local_gpt_available()
+        if not docker_available and not local_available:
+            raise RuntimeError(
+                "SNAP processing requires a working Docker daemon or local SNAP GPT."
+            )
+        assess_safe_product(SAFEProductReader(input_safe), out_root / "processing-quality.json")
+
         logger.info(
             "Starting SNAP preprocessing on %s (format=%s)...", input_safe.name, output_format
         )
 
         output_product = out_root / f"{input_safe.stem}_calibrated"
 
-        if self.is_docker_available():
+        if docker_available:
             self._run_via_docker(input_safe, out_root, graph_xml_path, output_product)
-        elif self.is_local_gpt_available():
+        elif local_available:
             self._run_via_local_gpt(input_safe, graph_xml_path, output_product)
         else:
             raise RuntimeError(

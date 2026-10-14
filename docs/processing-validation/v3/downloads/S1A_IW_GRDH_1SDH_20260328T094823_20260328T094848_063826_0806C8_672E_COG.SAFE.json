@@ -1,0 +1,347 @@
+{
+  "observed_at": "2026-10-12T10:20:50.734754+00:00",
+  "provider": "CDSE",
+  "catalogue": {
+    "@odata.mediaContentType": "application/octet-stream",
+    "Id": "478d9078-6c47-4a3f-adba-b3094b674298",
+    "Name": "S1A_IW_GRDH_1SDH_20260328T094823_20260328T094848_063826_0806C8_672E_COG.SAFE",
+    "ContentType": "application/octet-stream",
+    "ContentLength": 1126520613,
+    "OriginDate": "2026-03-28T10:57:06.988254Z",
+    "PublicationDate": "2026-03-28T12:01:31.725598Z",
+    "ModificationDate": "2026-03-28T12:01:31.725598Z",
+    "Online": true,
+    "EvictionDate": "9999-12-31T23:59:59.999999Z",
+    "S3Path": "/eodata/Sentinel-1/SAR/IW_GRDH_1S-COG/2026/03/28/S1A_IW_GRDH_1SDH_20260328T094823_20260328T094848_063826_0806C8_672E_COG.SAFE",
+    "Checksum": [
+      {
+        "Value": "38a3fec3b44fa07537cc57c4032428de",
+        "Algorithm": "MD5",
+        "ChecksumDate": "2026-03-28T12:01:28.064174Z"
+      },
+      {
+        "Value": "7fa57d0fa4a3c9ab7dcc183bccbd860f3ebd58169b3e543a1c7ca7c6cc020ce7",
+        "Algorithm": "BLAKE3",
+        "ChecksumDate": "2026-03-28T12:01:29.831535Z"
+      }
+    ],
+    "ContentDate": {
+      "Start": "2026-03-28T09:48:23.852957Z",
+      "End": "2026-03-28T09:48:48.852129Z"
+    },
+    "Footprint": "geography'SRID=4326;POLYGON ((-51.600964 52.73547, -51.0788 54.226543, -54.997101 54.633686, -55.384026 53.139412, -51.600964 52.73547))'",
+    "GeoFootprint": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -51.600964,
+            52.73547
+          ],
+          [
+            -51.0788,
+            54.226543
+          ],
+          [
+            -54.997101,
+            54.633686
+          ],
+          [
+            -55.384026,
+            53.139412
+          ],
+          [
+            -51.600964,
+            52.73547
+          ]
+        ]
+      ]
+    },
+    "Attributes": [
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "origin",
+        "Value": "CLOUDFERRO",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.IntegerAttribute",
+        "Name": "datatakeID",
+        "Value": 526024,
+        "ValueType": "Integer"
+      },
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "timeliness",
+        "Value": "NRT-3h",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.IntegerAttribute",
+        "Name": "cycleNumber",
+        "Value": 379,
+        "ValueType": "Integer"
+      },
+      {
+        "@odata.type": "#OData.CSC.IntegerAttribute",
+        "Name": "orbitNumber",
+        "Value": 63826,
+        "ValueType": "Integer"
+      },
+      {
+        "@odata.type": "#OData.CSC.IntegerAttribute",
+        "Name": "sliceNumber",
+        "Value": 8,
+        "ValueType": "Integer"
+      },
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "productClass",
+        "Value": "S",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "processorName",
+        "Value": "Sentinel-1 COGifier",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "orbitDirection",
+        "Value": "DESCENDING",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+        "Name": "processingDate",
+        "Value": "2026-03-28T11:57:42.481610Z",
+        "ValueType": "DateTimeOffset"
+      },
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "operationalMode",
+        "Value": "IW",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "processingLevel",
+        "Value": "LEVEL1",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "swathIdentifier",
+        "Value": "IW",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "processingCenter",
+        "Value": "Copernicus Data Space Ecosystem-CloudFerro",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "processorVersion",
+        "Value": "001.00",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.BooleanAttribute",
+        "Name": "sliceProductFlag",
+        "Value": true,
+        "ValueType": "Boolean"
+      },
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "platformShortName",
+        "Value": "SENTINEL-1",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "productComposition",
+        "Value": "Slice",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "instrumentShortName",
+        "Value": "SAR",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.IntegerAttribute",
+        "Name": "relativeOrbitNumber",
+        "Value": 54,
+        "ValueType": "Integer"
+      },
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "polarisationChannels",
+        "Value": "HH&HV",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "platformSerialIdentifier",
+        "Value": "A",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.IntegerAttribute",
+        "Name": "instrumentConfigurationID",
+        "Value": 7,
+        "ValueType": "Integer"
+      },
+      {
+        "@odata.type": "#OData.CSC.DoubleAttribute",
+        "Name": "startTimeFromAscendingNode",
+        "Value": 2069153.0,
+        "ValueType": "Double"
+      },
+      {
+        "@odata.type": "#OData.CSC.DoubleAttribute",
+        "Name": "completionTimeFromAscendingNode",
+        "Value": 2094152.0,
+        "ValueType": "Double"
+      },
+      {
+        "@odata.type": "#OData.CSC.StringAttribute",
+        "Name": "productType",
+        "Value": "IW_GRDH_1S-COG",
+        "ValueType": "String"
+      },
+      {
+        "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+        "Name": "beginningDateTime",
+        "Value": "2026-03-28T09:48:23.852957Z",
+        "ValueType": "DateTimeOffset"
+      },
+      {
+        "@odata.type": "#OData.CSC.DateTimeOffsetAttribute",
+        "Name": "endingDateTime",
+        "Value": "2026-03-28T09:48:48.852129Z",
+        "ValueType": "DateTimeOffset"
+      }
+    ]
+  },
+  "download_url": "https://download.dataspace.copernicus.eu/odata/v1/Products(478d9078-6c47-4a3f-adba-b3094b674298)/$value",
+  "http_content_length": "1126520613",
+  "archive_bytes": 1126520613,
+  "archive_sha256": "8ac039ebf079081694873de7ec28c5f879d6366bc37459840e3f3cbc6139baa2",
+  "archive_md5": "38a3fec3b44fa07537cc57c4032428de",
+  "catalogue_checksums_recorded_without_assuming_archive_semantics": [
+    {
+      "Value": "38a3fec3b44fa07537cc57c4032428de",
+      "Algorithm": "MD5",
+      "ChecksumDate": "2026-03-28T12:01:28.064174Z"
+    },
+    {
+      "Value": "7fa57d0fa4a3c9ab7dcc183bccbd860f3ebd58169b3e543a1c7ca7c6cc020ce7",
+      "Algorithm": "BLAKE3",
+      "ChecksumDate": "2026-03-28T12:01:29.831535Z"
+    }
+  ],
+  "zip_crc_passed": true,
+  "manifest_checks": [
+    {
+      "member": "annotation/s1a-iw-grd-hh-20260328t094823-20260328t094848-063826-0806c8-001-cog.xml",
+      "algorithm": "md5",
+      "matched": true
+    },
+    {
+      "member": "annotation/calibration/noise-s1a-iw-grd-hh-20260328t094823-20260328t094848-063826-0806c8-001-cog.xml",
+      "algorithm": "md5",
+      "matched": true
+    },
+    {
+      "member": "annotation/rfi/rfi-s1a-iw-grd-hh-20260328t094823-20260328t094848-063826-0806c8-001-cog.xml",
+      "algorithm": "md5",
+      "matched": true
+    },
+    {
+      "member": "annotation/calibration/calibration-s1a-iw-grd-hh-20260328t094823-20260328t094848-063826-0806c8-001-cog.xml",
+      "algorithm": "md5",
+      "matched": true
+    },
+    {
+      "member": "annotation/s1a-iw-grd-hv-20260328t094823-20260328t094848-063826-0806c8-002-cog.xml",
+      "algorithm": "md5",
+      "matched": true
+    },
+    {
+      "member": "annotation/calibration/noise-s1a-iw-grd-hv-20260328t094823-20260328t094848-063826-0806c8-002-cog.xml",
+      "algorithm": "md5",
+      "matched": true
+    },
+    {
+      "member": "annotation/rfi/rfi-s1a-iw-grd-hv-20260328t094823-20260328t094848-063826-0806c8-002-cog.xml",
+      "algorithm": "md5",
+      "matched": true
+    },
+    {
+      "member": "annotation/calibration/calibration-s1a-iw-grd-hv-20260328t094823-20260328t094848-063826-0806c8-002-cog.xml",
+      "algorithm": "md5",
+      "matched": true
+    },
+    {
+      "member": "preview/map-overlay.kml",
+      "algorithm": "md5",
+      "matched": true
+    },
+    {
+      "member": "preview/product-preview.html",
+      "algorithm": "md5",
+      "matched": true
+    },
+    {
+      "member": "measurement/s1a-iw-grd-hh-20260328t094823-20260328t094848-063826-0806c8-001-cog.tiff",
+      "algorithm": "md5",
+      "matched": true
+    },
+    {
+      "member": "measurement/s1a-iw-grd-hv-20260328t094823-20260328t094848-063826-0806c8-002-cog.tiff",
+      "algorithm": "md5",
+      "matched": true
+    },
+    {
+      "member": "preview/quick-look.png",
+      "algorithm": "md5",
+      "matched": true
+    }
+  ],
+  "plan_sha256": "661992de0c1912c59105a2ed57dd6f387a71dbe66a6457c0f7811246bddd82c2",
+  "frozen_manifest_sha256": "c40603c8622c177867183edf49b4dcd9987d64cdb4cd83ef2e2c2f9c14b80aa3",
+  "purpose": "processing development only; excluded from frozen test groups",
+  "safe_files_sha256": {
+    "annotation/calibration/calibration-s1a-iw-grd-hh-20260328t094823-20260328t094848-063826-0806c8-001-cog.xml": "c9eda01d38321b0180e03684db5e84935a5f880f349b7c1a77dc36042f36d11d",
+    "annotation/calibration/calibration-s1a-iw-grd-hv-20260328t094823-20260328t094848-063826-0806c8-002-cog.xml": "8f5670ac9173e3eb800f8dea2a9ea4016c19b8105f62f57e0b1ee23193c09570",
+    "annotation/calibration/noise-s1a-iw-grd-hh-20260328t094823-20260328t094848-063826-0806c8-001-cog.xml": "53f0384466ba3919ca225501bd249cc91b38933d462b4a51e6a811ede0886cbc",
+    "annotation/calibration/noise-s1a-iw-grd-hv-20260328t094823-20260328t094848-063826-0806c8-002-cog.xml": "ecb718a3cfa1330bedc28ee56a79de3cb8d7126f9c88a4ae3d8207687e089a17",
+    "annotation/rfi/rfi-s1a-iw-grd-hh-20260328t094823-20260328t094848-063826-0806c8-001-cog.xml": "b76966a432e7928f3dfd5649ac038ccdbcaa22098bcf80805edfd216f784b758",
+    "annotation/rfi/rfi-s1a-iw-grd-hv-20260328t094823-20260328t094848-063826-0806c8-002-cog.xml": "d29f8041ca8f16ae5e39307549fc0771401cff14d3b3c58f08fe40155459590a",
+    "annotation/s1a-iw-grd-hh-20260328t094823-20260328t094848-063826-0806c8-001-cog.xml": "dfd3780b1fa32bab2b2609f6be051049219eeff3784e9a956a564663e1405a9f",
+    "annotation/s1a-iw-grd-hv-20260328t094823-20260328t094848-063826-0806c8-002-cog.xml": "31929e91878d81242b466e7ce9e90aaef7e0d7de800f6f630daa870b48eca2b1",
+    "manifest.safe": "d0060edcf3f1f6ab3db997d0616f9e96ea4bb497dff367c84a14f0ea5a987e14",
+    "measurement/s1a-iw-grd-hh-20260328t094823-20260328t094848-063826-0806c8-001-cog.tiff": "195a0fbbabe40750155e2cd9fa644e0ac31aaa3704c708bc26063093338b49d5",
+    "measurement/s1a-iw-grd-hv-20260328t094823-20260328t094848-063826-0806c8-002-cog.tiff": "0af3685e40a0687709c018321edb866eaf81601606340653b0a194b692cc2588",
+    "preview/icons/logo.png": "3c515b23f2f508704a5451c0d8d86057215edab26a3d16fb2e5abe0a88c043e5",
+    "preview/map-overlay.kml": "ddd55ad715a6749f786a7f8ab10ed12dda0ec7e580d9ae4c0f43c617244654f0",
+    "preview/product-preview.html": "6517b88001f1c9d34c6800c97a7e169049690ad4c56c1e933817f30ec886c8c9",
+    "preview/quick-look.png": "27647a10e17a41ad41569b0c4b78bfb67b1a140f5246867e64e718a6dcf6fffe",
+    "preview/thumbnail.png": "9a257e86e6e3cfae1013b1e7252d5092c9e608b4c43eecd8a6bb5df7010143a8",
+    "S1A_IW_GRDH_1SDH_20260328T094823_20260328T094848_063826_0806C8_A464.SAFE-report-20260328T113854.pdf": "56c8c0bffd04d17d95c75580e2b036e0aa8522f867560e96e2c8a343aa8a77c8",
+    "support/s1-level-1-calibration.xsd": "6e81a81e501fbe90afc523ceb266177e5cfd5c798ec633c3f56bab70cdba1b63",
+    "support/s1-level-1-measurement.xsd": "c0c1dd52ca353cc5046b87e8c1be1e9abfb7a546dadd293d1f9d591831bc1524",
+    "support/s1-level-1-noise.xsd": "715d34d8c59dd575604838b310e6fda9c397c90fa6377a0daab4527d94ae8ae3",
+    "support/s1-level-1-product.xsd": "05b71da914fc100524fa7fec01928f869a5e160bf1ae04e4cec5db5a23da5d6f",
+    "support/s1-level-1-quicklook.xsd": "88f59322d2372e958b850c49ff40cb8fba8c6eccef569acbbfb87f322d432d2d",
+    "support/s1-level-1-rfi.xsd": "63eb491df437adcbdc5cd9b0b796cdebc2635be27893871f981123bd108ce723",
+    "support/s1-map-overlay.xsd": "c9e9c41b11bdedad81fbebc234030f513a4c6cc7998c2dffaac05a40000aeb8f",
+    "support/s1-object-types.xsd": "198d2e5b79ef1b8a4ff3111f566e2f0f4316f48170bfefc34f75989b52df30d5",
+    "support/s1-product-preview.xsd": "967f7ad405a3c911b4b59525ba6bac134e9fd3742efd0c4e32648f67f4689c0e"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "source": "S1B_EW_GRDM_1SDH_20180428T093937_20180428T094037_010682_013815_03AF_COG.SAFE",
+  "upstream_commit": "8259f0560b79c49177d865ba10d213c0ce25fe7c",
+  "algorithm": "NERSC",
+  "ipf_version": 2.9,
+  "metadata_adapter": {
+    "original_library_read_version": 1.0,
+    "actual_named_ipf_version": 2.9,
+    "reason": "First software is COGifier, not IPF"
+  },
+  "negative_gap_filling_enabled": false,
+  "angular_correction_applied": false,
+  "finite_pixels": 103406598,
+  "nonpositive_fraction": 0.5959160942515487
+}

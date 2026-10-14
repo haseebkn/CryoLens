@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "purpose": "Development-only processing verification; not detector performance evaluation",
+  "frozen_manifest": "docs/evaluation/v1/manifest.json",
+  "graph": "configs/snap/validation-reference.xml",
+  "window_size_px": 512,
+  "sampling_fractions": [[0.1, 0.1], [0.1, 0.5], [0.1, 0.9], [0.5, 0.1], [0.5, 0.5], [0.5, 0.9], [0.9, 0.1], [0.9, 0.5], [0.9, 0.9]],
+  "products": [
+    {"name": "old-ew", "path": "data/raw/safe/S1B_EW_GRDM_1SDH_20180428T093937_20180428T094037_010682_013815_03AF_COG.SAFE"},
+    {"name": "fresh-ew", "path": "data/raw/safe/S1C_EW_GRDM_1SDH_20260916T212442_20260916T212542_009478_012DA6_90E4_COG.SAFE"},
+    {"name": "iw", "path": "data/raw/safe/S1C_IW_GRDH_1SDH_20260927T093334_20260927T093359_009631_0132BC_E3E9_COG.SAFE"}
+  ]
+}

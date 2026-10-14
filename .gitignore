@@ -8,6 +8,15 @@ build/
 develop-eggs/
 dist/
 downloads/
+!docs/processing-validation/v3/downloads/
+docs/processing-validation/v3/downloads/*
+!docs/processing-validation/v3/downloads/*.json
+!docs/processing-validation/v3/continuation/downloads/
+docs/processing-validation/v3/continuation/downloads/*
+!docs/processing-validation/v3/continuation/downloads/*.json
+!docs/processing-validation/v3/source-bound-approval/continuation/downloads/
+docs/processing-validation/v3/source-bound-approval/continuation/downloads/*
+!docs/processing-validation/v3/source-bound-approval/continuation/downloads/*.json
 eggs/
 .eggs/
 lib/
@@ -102,6 +111,47 @@ CryoLens Data/
 # Cached geospatial derivatives
 *.gpkg
 *.zip
+!configs/auxdata/egm96/ww15mgh_b.zip
+!docs/processing-validation/v2/executed-code.zip
+!docs/processing-validation/v2/short-block-v3/executed-code.zip
 
 # Published benchmark artefacts are part of the deliverable and are tracked.
 !docs/benchmarks/
+
+# Exact execution snapshots for the additive Sentinel-1 suitability investigation.
+!docs/processing-validation/v3/initial-execution-snapshot/executed-code.zip
+!docs/processing-validation/v3/ew-northern-qualified/executed-code.zip
+!docs/processing-validation/v3/iw-northern-reference/executed-code.zip
+!docs/processing-validation/v3/iw-noise-edge/executed-code.zip
+!docs/processing-validation/v3/iw-april9/executed-code.zip
+
+!docs/processing-validation/v3/source-bound-approval/ew-northern-qualified/executed-code.zip
+!docs/processing-validation/v3/source-bound-approval/iw-northern-reference/executed-code.zip
+# Exact execution snapshots and JSON-only download receipts for southern IW validation.
+!docs/processing-validation/v4/selection-execution/executed-code.zip
+!docs/processing-validation/v4/evidence-assembly-execution/executed-code.zip
+!docs/processing-validation/v4/iw-january-rejected/executed-code.zip
+!docs/processing-validation/v4/iw-december-qualified/executed-code.zip
+!docs/processing-validation/v4/acquisition-search/downloads/
+docs/processing-validation/v4/acquisition-search/downloads/*
+!docs/processing-validation/v4/acquisition-search/downloads/*.json
+!docs/processing-validation/v4/acquisition-search-verified/downloads/
+docs/processing-validation/v4/acquisition-search-verified/downloads/*
+!docs/processing-validation/v4/acquisition-search-verified/downloads/*.json
+
+# Large ancillary XML/catalogue/weather payloads remain byte-exact in the scoped archive.
+docs/processing-validation/v4/acquisition-search/metadata/
+docs/processing-validation/v4/acquisition-search-verified/metadata/
+docs/processing-validation/v4/selection/
+docs/processing-validation/v4/diagnostics/orbit-check/official-eof/
+!docs/processing-validation/v4/ancillary-evidence.zip
+
+# Complete corrected-output execution snapshots; raster outputs stay local.
+!docs/processing-validation/v5/**/executed-code.zip
+
+# Exact fresh optical execution records; native raster files stay local.
+!docs/optical-review/fresh-v1/**/executed-code.zip
+
+# Repeated catalogue payloads are retained exactly in the scoped manifest archive.
+docs/optical-review/fresh-v1/pair-manifests/
+!docs/optical-review/fresh-v1/pair-manifests.zip

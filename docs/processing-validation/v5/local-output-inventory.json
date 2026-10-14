@@ -1,0 +1,20 @@
+[
+  {
+    "product": "S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG.SAFE",
+    "local_output": "E:\\CryoLens\\data\\processed\\step2-complete-20261013-r1\\repackaged-r2\\S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG\\S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG_4band_EPSG3978.tif",
+    "output_sha256": "4f4414849920eb2b0b62bf1d56261acf7d064ae157d7929cbc5ff7ed100d7bb5",
+    "output_bytes": 1451205101,
+    "full_resolution_pixels_compared": 204045884,
+    "all_corrected_pixels_identical": true,
+    "original_output_sha256": "ec587b122b1f1fd72cc4e22620f01a18aa6f8e64a25d7a4619e7c89d75ca0eb9"
+  },
+  {
+    "product": "S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG.SAFE",
+    "local_output": "E:\\CryoLens\\data\\processed\\step2-complete-20261013-r1\\repackaged-r2\\S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG\\S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG_4band_EPSG3978.tif",
+    "output_sha256": "0db029df9511f788c81f56458b19ae56e198f6573df9f306f680f14f695ba166",
+    "output_bytes": 427163466,
+    "full_resolution_pixels_compared": 55129350,
+    "all_corrected_pixels_identical": true,
+    "original_output_sha256": "9db494c9efc1c082f9e646f379b73f346a8edc43827191dcdf71e8f2f48c3269"
+  }
+]

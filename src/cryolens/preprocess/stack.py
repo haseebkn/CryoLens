@@ -35,10 +35,17 @@ class COGStackBuilder:
         transform: Any,
         crs: str = "EPSG:3978",
         nodata: float = -9999.0,
+        provenance: dict[str, str] | None = None,
     ) -> Path:
         """Write calibrated bands to intermediate GeoTIFF and convert to validated COG."""
         if not re.fullmatch(r"[A-Za-z0-9_.-]+", scene_id) or scene_id in {".", ".."}:
             raise ValueError("Scene identifier must be a safe basename.")
+        if (
+            re.match(r"S1[A-D]_(EW|IW)_GRD", scene_id)
+            and (provenance or {}).get("source_kind") != "synthetic"
+        ):
+            if not provenance or provenance.get("processing_quality") != "passed":
+                raise ValueError("Fresh SAFE export requires a passed processing-quality receipt")
         target_scene_dir = self.output_dir / scene_id
         if not target_scene_dir.resolve().is_relative_to(self.output_dir):
             raise ValueError("Output path must remain inside the configured output directory.")
@@ -58,6 +65,15 @@ class COGStackBuilder:
         valid = np.ones((h, w), dtype=bool)
         for name in BAND_NAMES:
             valid &= np.isfinite(bands[name]) & (bands[name] != nodata)
+        if not valid.any():
+            raise ValueError("COG contains no valid observations.")
+        if np.any((bands["incidence_angle"][valid] <= 0) | (bands["incidence_angle"][valid] >= 90)):
+            raise ValueError("COG incidence angles must be physical degrees.")
+        ratio_error = bands["ratio_hh_hv"][valid] - (
+            bands["sigma0_hh_db"][valid] - bands["sigma0_hv_db"][valid]
+        )
+        if np.any(np.abs(ratio_error) > 0.001):
+            raise ValueError("COG ratio must equal calibrated HH minus HV in dB.")
 
         logger.info(
             "Writing interim 4-band raster for scene %s (size: %dx%d, CRS: %s)...",
@@ -79,9 +95,12 @@ class COGStackBuilder:
             "tiled": True,
             "blockxsize": 256,
             "blockysize": 256,
+            "bigtiff": "YES",
         }
 
         with rasterio.open(interim_tif, "w", **profile) as dst:
+            if provenance:
+                dst.update_tags(**provenance)
             for idx, name in enumerate(BAND_NAMES, start=1):
                 dst.write(np.where(valid, bands[name], nodata).astype(np.float32), idx)
                 dst.set_band_description(idx, name)

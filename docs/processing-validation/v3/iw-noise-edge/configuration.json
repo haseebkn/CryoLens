@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "recipe_id": "iw-measured-zero-edge-20261012",
+  "purpose": "Additional short-block diagnostic only; not the fixed nine-window qualification and not a passing product.",
+  "frozen_manifest": "docs/evaluation/v1/manifest.json",
+  "graph": "configs\\snap\\validation-reference-v2.xml",
+  "products": [
+    {
+      "name": "iw-noise-edge",
+      "path": "\\\\?\\D:\\CryoLens-data\\sentinel1-step2-20261012\\raw\\S1A_IW_GRDH_1SDH_20260218T100337_20260218T100406_063272_07F1DB_285F_COG\\S1A_IW_GRDH_1SDH_20260218T100337_20260218T100406_063272_07F1DB_285F_COG.SAFE"
+    }
+  ],
+  "diagnostic_window": [
+    18929,
+    17204,
+    213,
+    8286
+  ]
+}

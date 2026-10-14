@@ -1,0 +1,52 @@
+{
+  "schema_version": 2,
+  "purpose": "Predeclared December Grand Banks IW follow-up. Same nine fixed windows and strict policy; no operational or detector performance claim.",
+  "frozen_manifest": "docs/evaluation/v1/manifest.json",
+  "graph": "configs/snap/validation-reference-v2.xml",
+  "window_size_px": 512,
+  "sampling_fractions": [
+    [
+      0.1,
+      0.1
+    ],
+    [
+      0.1,
+      0.5
+    ],
+    [
+      0.1,
+      0.9
+    ],
+    [
+      0.5,
+      0.1
+    ],
+    [
+      0.5,
+      0.5
+    ],
+    [
+      0.5,
+      0.9
+    ],
+    [
+      0.9,
+      0.1
+    ],
+    [
+      0.9,
+      0.5
+    ],
+    [
+      0.9,
+      0.9
+    ]
+  ],
+  "products": [
+    {
+      "name": "southern-iw-4",
+      "path": "C:\\CryoLens-data\\sentinel1-south-20261012\\raw\\S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG\\S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG.SAFE"
+    }
+  ],
+  "scan_block_rows": 32
+}

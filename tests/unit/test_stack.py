@@ -30,6 +30,7 @@ def test_build_and_export_cog_validity(tmp_path: Path) -> None:
         bands=bands,
         transform=transform,
         crs="EPSG:3978",
+        provenance={"source_kind": "synthetic"},
     )
 
     assert cog_file.exists()

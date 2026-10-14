@@ -1,0 +1,612 @@
+{
+  "schema_version": 1,
+  "execution_kind": "strict_buffer_rescreen_v1",
+  "executed_at": "2026-10-13T09:30:52.915548+00:00",
+  "source_root": "E:\\CryoLens\\data\\processed\\step3-fresh-optical-20261013-r1\\planetary-computer",
+  "source_report_sha256": "8a77c835b856573e81774b902797091b5e2b9a42394ff261d6e3a07c5316a9d0",
+  "executed_code_sha256": "3f3660815a3c43c1c096a2d52043b729ac50245217bb5cf53658885c55b2b539",
+  "scope": "Existing aligned pixels only; no new queries, downloads, annotations or source mutations",
+  "denominator": "predeclared valid NL marine review locations, not target candidates or regional area",
+  "locations": [
+    {
+      "id": "25ca0b649c1e282ec42205e2639ced22ef6dcbe2b09c64ba6db054005d9d79e6",
+      "mode": "EW",
+      "pairs": [
+        {
+          "id": "edfd05410e0099fbc5670b5706cf557bc6a024f8dd4f31fe0d63bfa7a4455048",
+          "manifest_sha256": "01eced2bc6cc618c44f64308f14079e021f2b259e288e26e05a7b1cf9490f89a",
+          "optical_item_id": null,
+          "original_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "strict_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "full_movement_envelope_in_chip": true
+        }
+      ]
+    },
+    {
+      "id": "fdc0676b5e46d223b17977efc589b89785174b6ded3bac50204dff5908ef5dd9",
+      "mode": "EW",
+      "pairs": [
+        {
+          "id": "11e832e0211b2cdb69329fe77cda8aebde049c54aa13d7bae3642c300dfbf301",
+          "manifest_sha256": "ac109e9b6c10e9330a7bc6003c9bb4bdc7b1d71bf23bf29c510b6cdb9b913919",
+          "optical_item_id": null,
+          "original_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "strict_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "full_movement_envelope_in_chip": true
+        }
+      ]
+    },
+    {
+      "id": "ad937ee5b26a0b5461032cc74a5b41ef6c55d75e8d21e1f3af4a73dca82f44ef",
+      "mode": "EW",
+      "pairs": [
+        {
+          "id": "c9085ac544ca2258ca98cb2dcf6563f5e4a545f4ed365579d3d514d12c24fe8a",
+          "manifest_sha256": "5612d4606b24be817f7bbb634ca0f2b36308670ee1b683772087669289ff08ac",
+          "optical_item_id": null,
+          "original_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "strict_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "full_movement_envelope_in_chip": true
+        }
+      ]
+    },
+    {
+      "id": "0eae715240faa92c5345d15f44da69cf874f661aa72d3e0836d50e4685bca1f6",
+      "mode": "EW",
+      "pairs": [
+        {
+          "id": "5d8a43de4f950ce99a7e033d41bfaae1129a3b8a947cdcadab0c8f64aa44fac1",
+          "manifest_sha256": "9fe25ec616f76676801961a8ac0f34f80dae2fd3e45bcfc67128b4c6cfd273c7",
+          "optical_item_id": null,
+          "original_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "strict_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "full_movement_envelope_in_chip": true
+        }
+      ]
+    },
+    {
+      "id": "1cd2a032b1c83520148e13f6f837c594436cee8eb70f26f4db138a0c2f934eed",
+      "mode": "EW",
+      "pairs": [
+        {
+          "id": "5385b774d8e2c92e4935e88836128beeb0e27bd35efa19052988f449982ae219",
+          "manifest_sha256": "7f2769883916dedf5a28f2a9d86dbaed432238b0cf50b31b7fc86415b42741ea",
+          "optical_item_id": null,
+          "original_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "strict_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "full_movement_envelope_in_chip": true
+        }
+      ]
+    },
+    {
+      "id": "3fb4514396b95e6c9becc59999fe1c5d1ebdbc0620b9f6c438d13867546ee414",
+      "mode": "EW",
+      "pairs": [
+        {
+          "id": "1c85aa6976ac5006ff96cadce393d8cb512063dd3a82f4031f4bb9911a303fef",
+          "manifest_sha256": "b3101a636f4c0d41ed3ba9a67a9ac1fdfcecb34b7e37c1ffc4b0567580f10d57",
+          "optical_item_id": null,
+          "original_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "strict_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "full_movement_envelope_in_chip": true
+        }
+      ]
+    },
+    {
+      "id": "a5d5204a3dba1af74be8ec1e8b3daff13675076df00d1c431419a26df75354a3",
+      "mode": "EW",
+      "pairs": [
+        {
+          "id": "f234ea58ee5926892803a5a5b32d9aeecba0b0f15475a350b9d37d358e5fcd81",
+          "manifest_sha256": "ae1813d44b56f6b69809ce39b08c56ff51715d56cbdb2b976beff369299d7371",
+          "optical_item_id": null,
+          "original_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "strict_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "full_movement_envelope_in_chip": true
+        }
+      ]
+    },
+    {
+      "id": "8709c3ded5a2ffeec9a0bcbb6d3f63cf04f5675768a14fb1bcd95740ca5d4e9e",
+      "mode": "EW",
+      "pairs": [
+        {
+          "id": "60d68109465e4202af1f34e757fbc6c66542f15a44b3231c218ecb41b62cb658",
+          "manifest_sha256": "5bd5e3192d56e6719b864f626bcb16cbbe06f34782539f501470cb71967c019f",
+          "optical_item_id": null,
+          "original_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "strict_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "full_movement_envelope_in_chip": true
+        }
+      ]
+    },
+    {
+      "id": "1e1c26ec44bcd1fa1bf481d049c06830156597734cadd7a1bd62f5af77aaed9a",
+      "mode": "IW",
+      "pairs": [
+        {
+          "id": "f3abc6487acb1f6f61db1f12ea48f7e1a15408f9e6a559fac16d370c4bbecf9b",
+          "manifest_sha256": "a0ed63b92c3657e73b6ac3239340c325315c110a8af6e4b38fe8a6233cf862a4",
+          "optical_item_id": "S2C_MSIL2A_20251206T143831_R139_T22TDT_20251206T160513",
+          "original_visibility": {
+            "status": "limited_visibility",
+            "useful_for_review": false,
+            "visible_fraction": 0.08490065569364182,
+            "valid_fraction": 1.0,
+            "cloud_or_shadow_buffered_fraction": 0.9150993443063582,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 0.0,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "strict_visibility": {
+            "status": "limited_visibility",
+            "useful_for_review": false,
+            "visible_fraction": 0.08490065569364182,
+            "valid_fraction": 1.0,
+            "cloud_or_shadow_buffered_fraction": 0.9150993443063582,
+            "incomplete_buffer_support_fraction": 0.002404917348649356,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 0.0,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "full_movement_envelope_in_chip": false
+        },
+        {
+          "id": "c398aa7e84148372d42655cfc9152640fc89b42abfc94c25264eed7b5ee2837d",
+          "manifest_sha256": "f15b5248ac2c004c06418c34995b9cf81f40489ba805cabf20f3da38c2b580b7",
+          "optical_item_id": "S2C_MSIL2A_20251206T143831_R139_T22TDS_20251206T160513",
+          "original_visibility": {
+            "status": "limited_visibility",
+            "useful_for_review": false,
+            "visible_fraction": 0.07097247076964429,
+            "valid_fraction": 0.3015598364656203,
+            "cloud_or_shadow_buffered_fraction": 0.23559348408864242,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 0.0,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "strict_visibility": {
+            "status": "limited_visibility",
+            "useful_for_review": false,
+            "visible_fraction": 0.07025187972583942,
+            "valid_fraction": 0.3015598364656203,
+            "cloud_or_shadow_buffered_fraction": 0.23559348408864242,
+            "incomplete_buffer_support_fraction": 0.7054347595436316,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 0.0,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "full_movement_envelope_in_chip": false
+        }
+      ]
+    },
+    {
+      "id": "0fcb7c98dc68480e84ee038531a448679d41f9ebaf651f8b45f760637542e17d",
+      "mode": "IW",
+      "pairs": [
+        {
+          "id": "6f2bfb37d3b924837bbf36a3f875ae10df2ed6f87d8e169f3ce0691b9d825cd5",
+          "manifest_sha256": "358d5c9b89ecb1846faf60a42bb0692af2c1cedba553c4a9c876b2f5b483a467",
+          "optical_item_id": null,
+          "original_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "strict_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "full_movement_envelope_in_chip": true
+        }
+      ]
+    },
+    {
+      "id": "5ece8cebb83cfeb297ddbde58cf7f050e1d336d4fcd2b5bbe1007f182ebaf4c5",
+      "mode": "IW",
+      "pairs": [
+        {
+          "id": "a936a2d49c14a9164334f15a1549fdd4152277c24615451463f1e12b512fd566",
+          "manifest_sha256": "54ad4584251d7bfcf746af62afd71f9a0c49140cef81728e79bab1423625ff68",
+          "optical_item_id": null,
+          "original_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "strict_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "full_movement_envelope_in_chip": true
+        }
+      ]
+    },
+    {
+      "id": "79e10a02e306830bc6b03b7698d63d61124bc24fca229c1cfe55c6a32addd55c",
+      "mode": "IW",
+      "pairs": [
+        {
+          "id": "783a6bf9d3edae9f380d9757d6dbf256d0be5529ad16e8e6dad84b1fbd717dd5",
+          "manifest_sha256": "703133088c0e9184db2d32959674ab87db60fb04c1a6ea17b94e77a42f313206",
+          "optical_item_id": "S2C_MSIL2A_20251206T143831_R139_T22TCS_20251206T160513",
+          "original_visibility": {
+            "status": "limited_visibility",
+            "useful_for_review": false,
+            "visible_fraction": 0.6395320667435297,
+            "valid_fraction": 0.6399847570679813,
+            "cloud_or_shadow_buffered_fraction": 0.00045269032445164345,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 4.155555712739696e-05,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "strict_visibility": {
+            "status": "limited_visibility",
+            "useful_for_review": false,
+            "visible_fraction": 0.6324207615100051,
+            "valid_fraction": 0.6399847570679813,
+            "cloud_or_shadow_buffered_fraction": 0.00045269032445164345,
+            "incomplete_buffer_support_fraction": 0.36719286022478903,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 4.155555712739696e-05,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "full_movement_envelope_in_chip": false
+        },
+        {
+          "id": "31ba0e01957c1a1c694260512a3b01f7e2f1ab2ea56aa716e8d84dd8be47fd42",
+          "manifest_sha256": "81a023185381ca6525b77fa291d657d2844b63ab783f615f51a8f0f4d8db205e",
+          "optical_item_id": "S2C_MSIL2A_20251206T143831_R139_T22TCT_20251206T160513",
+          "original_visibility": {
+            "status": "screened_useful",
+            "useful_for_review": true,
+            "visible_fraction": 0.9989575744286553,
+            "valid_fraction": 0.999936340423124,
+            "cloud_or_shadow_buffered_fraction": 0.00097876599446869,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 5.216548660673235e-05,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "strict_visibility": {
+            "status": "screened_useful",
+            "useful_for_review": true,
+            "visible_fraction": 0.9907118909016318,
+            "valid_fraction": 0.999936340423124,
+            "cloud_or_shadow_buffered_fraction": 0.00097876599446869,
+            "incomplete_buffer_support_fraction": 0.008375655163145349,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 5.216548660673235e-05,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "full_movement_envelope_in_chip": false
+        }
+      ]
+    },
+    {
+      "id": "e91ee3736f93430d733f84987ebb32db84a89ab0944f50c04beae99cd1968d80",
+      "mode": "IW",
+      "pairs": [
+        {
+          "id": "d9e0af7367497061619e2c0f94c5209c451be69cc9cb5e0c978dc60b7f2329dd",
+          "manifest_sha256": "a4cbce5ebcda58728ebf44533f62e2513f83e961de77f54e66e133402a079f9d",
+          "optical_item_id": "S2C_MSIL2A_20251206T143831_R139_T22TDS_20251206T160513",
+          "original_visibility": {
+            "status": "limited_visibility",
+            "useful_for_review": false,
+            "visible_fraction": 0.7592041138233234,
+            "valid_fraction": 1.0,
+            "cloud_or_shadow_buffered_fraction": 0.24079588617667655,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 0.0,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "strict_visibility": {
+            "status": "limited_visibility",
+            "useful_for_review": false,
+            "visible_fraction": 0.7572960948386229,
+            "valid_fraction": 1.0,
+            "cloud_or_shadow_buffered_fraction": 0.24079588617667655,
+            "incomplete_buffer_support_fraction": 0.002404917348649356,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 0.0,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "full_movement_envelope_in_chip": false
+        }
+      ]
+    },
+    {
+      "id": "3b7a51ab8ded9387a26fa940be0340b385cde20b4881ea3a4c8c4aecda38fe41",
+      "mode": "IW",
+      "pairs": [
+        {
+          "id": "b0c8377fc11ddfd802f9f2a7e9121239fd091bce964c3d5a09402354da0096e0",
+          "manifest_sha256": "eb3b50676c544ab3a4f5d6caf9900809f7cd60030ad04fc0c0d44ec971acbe53",
+          "optical_item_id": null,
+          "original_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "strict_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "full_movement_envelope_in_chip": true
+        }
+      ]
+    },
+    {
+      "id": "2cb6f8609066f66a37c2d3cd93221f110d71429f4f89048366cc3057fc452b0c",
+      "mode": "IW",
+      "pairs": [
+        {
+          "id": "8ef680e92a719c71f6fb3c474b0f68d7e3667c5c71f2972394c002b021ebebca",
+          "manifest_sha256": "abd7b593e5fb76af398eedb998f0de40cbc8c6c568838b3e611a278c6117cc53",
+          "optical_item_id": null,
+          "original_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "strict_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "full_movement_envelope_in_chip": true
+        }
+      ]
+    },
+    {
+      "id": "57c52067c0e933d82dee2b66cb04fda1f4957b97ca7fa94f9af821956725b14f",
+      "mode": "IW",
+      "pairs": [
+        {
+          "id": "c1d44e2e7154de7c61df3b6d68a2a0fb79ab470999c02289d9b6a5515c27fd9c",
+          "manifest_sha256": "35294bbf78c4d936618a699b816acad456f1711b2c613751424e2694e9f1e2b4",
+          "optical_item_id": "S2C_MSIL2A_20251206T143831_R139_T22TCS_20251206T160513",
+          "original_visibility": {
+            "status": "limited_visibility",
+            "useful_for_review": false,
+            "visible_fraction": 0.21968124235200917,
+            "valid_fraction": 1.0,
+            "cloud_or_shadow_buffered_fraction": 0.7803187576479909,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 0.0,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "strict_visibility": {
+            "status": "limited_visibility",
+            "useful_for_review": false,
+            "visible_fraction": 0.21908001301484684,
+            "valid_fraction": 1.0,
+            "cloud_or_shadow_buffered_fraction": 0.7803187576479909,
+            "incomplete_buffer_support_fraction": 0.002404917348649356,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 0.0,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "full_movement_envelope_in_chip": false
+        },
+        {
+          "id": "1a80e7f4db843851708c1815237f9e868eaac66f59c9a3802306a302b2ff7005",
+          "manifest_sha256": "ac5beaf8584155f24a72122da0cd6e2fd76c2e74ee0da3fa588f267bfc52aed8",
+          "optical_item_id": "S2C_MSIL2A_20251206T143831_R139_T22TDS_20251206T160513",
+          "original_visibility": {
+            "status": "limited_visibility",
+            "useful_for_review": false,
+            "visible_fraction": 0.09171046209779525,
+            "valid_fraction": 0.4111144316260778,
+            "cloud_or_shadow_buffered_fraction": 0.32260286326630216,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 0.0,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "strict_visibility": {
+            "status": "limited_visibility",
+            "useful_for_review": false,
+            "visible_fraction": 0.0882869915191297,
+            "valid_fraction": 0.4111144316260778,
+            "cloud_or_shadow_buffered_fraction": 0.32260286326630216,
+            "incomplete_buffer_support_fraction": 0.5961427601377877,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 0.0,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "full_movement_envelope_in_chip": false
+        }
+      ]
+    },
+    {
+      "id": "1e5b79683daaa60c7cdfb0d4988de3e14fcf5e3a63e266e0ee6d0a78a3fee08e",
+      "mode": "IW",
+      "pairs": [
+        {
+          "id": "ec194065d4d4383595cc1163d2121191828fe2f35473dcfcbd6a16c1910de6be",
+          "manifest_sha256": "94242aaa2eec13e60f7ac29203c6ed5ca92f1739bd124f69f4767c3f817b2f8e",
+          "optical_item_id": "S2C_MSIL2A_20251206T143831_R139_T22TDR_20251206T160513",
+          "original_visibility": {
+            "status": "limited_visibility",
+            "useful_for_review": false,
+            "visible_fraction": 0.23012494960283497,
+            "valid_fraction": 0.8810193666579429,
+            "cloud_or_shadow_buffered_fraction": 0.6524823698338486,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 0.0,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "strict_visibility": {
+            "status": "limited_visibility",
+            "useful_for_review": false,
+            "visible_fraction": 0.22618866576600155,
+            "valid_fraction": 0.8810193666579429,
+            "cloud_or_shadow_buffered_fraction": 0.6524823698338486,
+            "incomplete_buffer_support_fraction": 0.1258717825388854,
+            "ambiguous_scl_fraction": 0.0,
+            "snow_ice_fraction": 0.0,
+            "inspected_pixels": 1131016,
+            "quality_native_spacing_m": 20,
+            "analyst_inspection_required": true,
+            "interpretation": "SCL screening only; cloud/ice confusion, haze and subpixel targets remain possible"
+          },
+          "full_movement_envelope_in_chip": false
+        }
+      ]
+    },
+    {
+      "id": "fb3a1cab93874f17a87669e3b0f9ec0453aeb0f101c0d52f580c094e8e5d9fb2",
+      "mode": "IW",
+      "pairs": [
+        {
+          "id": "9c4286f1e37819a7faa2585dc4a16c1c44754b698f05251c47a148db595cf61e",
+          "manifest_sha256": "38c2b7e04e908c3b1497103f4ddadee9bb1698f61b5096e3f1ebc076277ee27d",
+          "optical_item_id": null,
+          "original_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "strict_visibility": {
+            "status": "unavailable",
+            "useful_for_review": false,
+            "reason": "No overlapping optical tile in the fixed temporal window"
+          },
+          "full_movement_envelope_in_chip": true
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "EW": {
+      "locations": 8,
+      "optical_context": 0,
+      "strict_useful": 0,
+      "strict_full_movement": 0
+    },
+    "IW": {
+      "locations": 10,
+      "optical_context": 5,
+      "strict_useful": 1,
+      "strict_full_movement": 0
+    },
+    "combined": {
+      "locations": 18,
+      "optical_context": 5,
+      "strict_useful": 1,
+      "strict_full_movement": 0
+    }
+  }
+}

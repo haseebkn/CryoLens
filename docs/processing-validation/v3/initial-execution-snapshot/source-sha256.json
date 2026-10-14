@@ -1,0 +1,19 @@
+{
+  "src/cryolens/preprocess/marine_geocoding.py": "2d1e16f8cd9097d1b6f472b2fafc9e377e52897e2c1122d7c6273e2559aad0a4",
+  "src/cryolens/preprocess/masks.py": "4dc39d30abb25b7032b6a902dd7002470e487b9e7b554bd6ee7d919eac1d554f",
+  "src/cryolens/preprocess/orbits.py": "4a799364bbc8647a89997e9c7a12ef1beef0605b6cc719173f1ae961cf7be9b6",
+  "src/cryolens/preprocess/python_chain.py": "b261fe9461a516e94af1b2b76356107072842eac7fb3c5740b51d496b5f8386b",
+  "src/cryolens/preprocess/quality.py": "0630433f240d23ed51e127c8cfa0820a9a6f7c0474aad959ec05c34f21fec50d",
+  "src/cryolens/preprocess/s1denoise.py": "6ffdf9ae6aec856439c71103528b07e8cf38bae3e3a632e597011d7723f64fab",
+  "src/cryolens/preprocess/safe_reader.py": "535f4c4e685d808da335931366cf73d7588ef1ff643a2cedeb718d2101710612",
+  "src/cryolens/preprocess/snap_chain.py": "aeecee58abfe1d727909d07b6d647b0ccde4e02d2d03682bd6c328acb785e3cf",
+  "src/cryolens/preprocess/stack.py": "3fb3bbf38e7e1a3a58879b9a1e9816c4ccb63dff9f76e0a74ab50d9c362fc45e",
+  "src/cryolens/preprocess/validation.py": "ea9e58b10bbe5f2ecac89b4a8f5ab49a10a2d4921057601567aff753ccb2ac10",
+  "src/cryolens/preprocess/__init__.py": "2be256b16d1cdf0a65cc9f14638f7e30ccd51940e0c447bed88091a89b145577",
+  "src/cryolens/preprocess/__main__.py": "1ef13a54a7382015fec08e6e706e3d58a3f245b83e6882cc923cd25a1d432ab0",
+  "validation/acquire_sentinel1.py": "9bf3e8a7cdb1ecaf1f011c8a661925fa688066b6417d879af90a946122d18001",
+  "validation/assess_marine_domain.py": "2b29d1bbb56dd0e534b3762954c52d87bd588ed51f1ffc0600bf9f109368ee27",
+  "configs/snap/validation-reference-v2.xml": "266c615e0dfb96b1cb56aefe363f7ffdea4171c9589d4a691615619e4a63d0db",
+  "data/processed/acquisition-plan.json": "661992de0c1912c59105a2ed57dd6f387a71dbe66a6457c0f7811246bddd82c2",
+  "data/processed/validation-ew-winter.json": "8459fb8874d781ee9c3f3d223028706aec8ad5f5b21a12ea549cf55601f02afd"
+}

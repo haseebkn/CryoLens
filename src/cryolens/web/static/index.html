@@ -55,6 +55,29 @@
           <p id="target-observed" class="helper"></p>
           <dl class="target-data"><div><dt>Detector / raw class</dt><dd id="target-detector">—</dd></div><div><dt>Uncalibrated score</dt><dd id="target-score">—</dd></div><div><dt>Peak / mean σ⁰ HV</dt><dd id="target-hv">—</dd></div><div><dt>Peak σ⁰ HH / HH:HV</dt><dd id="target-hh">—</dd></div><div><dt>Radar extent</dt><dd id="target-size">—</dd></div><div><dt>Radar area</dt><dd id="target-area">—</dd></div><div><dt>Position (WGS84)</dt><dd id="target-position">—</dd></div><div><dt>IIP association</dt><dd id="target-iip">—</dd></div></dl>
           <p class="helper">Radar extent is not a measured iceberg length or draft. No validated drift track is available.</p>
+          <section class="optical-review" aria-label="Paired radar and optical evidence">
+            <h3>Radar / optical review</h3>
+            <p id="optical-status" class="helper" role="status">Select a candidate to load paired evidence.</p>
+            <label for="optical-pair-select">Optical observation</label>
+            <select id="optical-pair-select" disabled><option>No generated pairs</option></select>
+            <div id="optical-pair-content" hidden>
+              <a id="optical-image-link" target="_blank" rel="noopener"><img id="optical-pair-image" alt="Paired radar and optical chips with acquisition times, scale and visibility"></a>
+              <p id="optical-metadata" class="helper"></p>
+              <p id="optical-visibility" class="helper"></p>
+              <div id="optical-native-links" class="native-links"></div>
+              <p class="helper">A missing optical counterpart does not make a radar candidate false. Movement assumptions are not a drift forecast. Inspect cloud, shadow, ice and target resolution before recording evidence.</p>
+              <p id="optical-history" class="helper"></p>
+              <label for="optical-assessment">Optical evidence</label>
+              <select id="optical-assessment"><option value="ambiguous">Ambiguous</option><option value="corroborating">Corroborating observation</option><option value="unavailable">Evidence unavailable</option><option value="no_visible_counterpart">No visible counterpart (not a false-target label)</option></select>
+              <label for="optical-inspection">Visibility after your inspection</label>
+              <select id="optical-inspection"><option value="uncertain">Uncertain</option><option value="clear">Clear</option><option value="obscured">Obscured</option><option value="unavailable">Unavailable</option></select>
+              <label for="optical-lon">Optical object longitude (required for corroboration)</label><input id="optical-lon" type="number" step="any" min="-180" max="180">
+              <label for="optical-lat">Optical object latitude</label><input id="optical-lat" type="number" step="any" min="-90" max="90">
+              <label for="optical-notes">Supporting evidence and uncertainty</label><textarea id="optical-notes" rows="3" maxlength="4000" placeholder="Describe what is visible, possible movement, resolution and competing interpretations."></textarea>
+              <button id="optical-save" type="button">Save optical evidence</button>
+              <p class="helper">Uses the analyst key below. This records evidence separately and leaves the radar target verdict unchanged.</p>
+            </div>
+          </section>
           <div class="review-block"><h3>Analyst review</h3><p id="review-history" class="helper">No review recorded.</p><p id="review-access" class="helper">Checking write access…</p><label for="analyst-key">Analyst API key</label><input type="password" id="analyst-key" autocomplete="off" spellcheck="false" placeholder="Held only in this page"><label for="review-notes">Evidence and rationale</label><textarea id="review-notes" rows="3" maxlength="4000" placeholder="Describe supporting evidence and its source. Radar brightness alone does not confirm an iceberg."></textarea><div class="review-actions"><button data-verdict="CONFIRMED_ICEBERG">Confirm iceberg</button><button data-verdict="VESSEL">Vessel</button><button data-verdict="REJECTED_CLUTTER">Reject clutter</button><button data-verdict="OFFSHORE_STRUCTURE">Structure</button><button data-verdict="SEA_ICE">Sea ice</button></div></div>
         </div>
       </aside>

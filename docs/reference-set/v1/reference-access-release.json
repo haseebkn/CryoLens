@@ -1,0 +1,11 @@
+{
+  "purpose": "independent_reference_only",
+  "manifest_sha256": "fab81f3438142aedfcc01cce27b836412c9d29e82f85c294b48d7315521d60ee",
+  "reference_protocol_sha256": "bcf377d2ce4f735ff0a7856d7a2c7399af43d4e5f115a61e96505a3ceb13cef0",
+  "scene_ids": [
+    "20190119T101218_cis_prep.nc"
+  ],
+  "detector_execution": false,
+  "chart_label_access": false,
+  "authorization": "User requested Step 4 independent held-out reference preparation and chose to personally review the pilot. This release authorizes SAR reference preparation only; model evaluation and chart labels stay sealed."
+}

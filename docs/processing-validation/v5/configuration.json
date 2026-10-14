@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "recipe_id": "complete-corrected-ew-iw-v1",
+  "purpose": "Predeclared complete corrected outputs on already qualified development EW/IW products; unchanged scientific limits.",
+  "policy": {
+    "version": "safe-quality-v1",
+    "max_nonpositive_fraction": 0.05,
+    "min_valid_fraction": 0.1,
+    "incidence_min_deg": 15.0,
+    "incidence_max_deg": 50.0,
+    "max_polarization_geolocation_error_m": 20.0
+  },
+  "frozen_manifest": "docs/evaluation/v1/manifest.json",
+  "graph": "configs/snap/validation-corrected-output-v1.xml",
+  "reference_image": "cryolens-snap-reference:14.0.0",
+  "reference_image_id": "sha256:ac08abe1c070613c2336d9cfa06746ef9eb7d12b99373f28fe878f27a2a70fa7",
+  "window_size_px": 512,
+  "sampling_fractions": [
+    [
+      0.1,
+      0.1
+    ],
+    [
+      0.1,
+      0.5
+    ],
+    [
+      0.1,
+      0.9
+    ],
+    [
+      0.5,
+      0.1
+    ],
+    [
+      0.5,
+      0.5
+    ],
+    [
+      0.5,
+      0.9
+    ],
+    [
+      0.9,
+      0.1
+    ],
+    [
+      0.9,
+      0.5
+    ],
+    [
+      0.9,
+      0.9
+    ]
+  ],
+  "block_size": 256,
+  "scan_rows": 32,
+  "products": [
+    {
+      "name": "ew",
+      "mode": "EW",
+      "path": "D:\\CryoLens-data\\sentinel1-step2-20261012\\raw\\S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG\\S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG.SAFE",
+      "scratch": "D:\\CL12-snap-final\\S1C_EW_GRDM_1SDH_20260325T212436_20260325T212536_006926_00E035_FB61_COG.SAFE",
+      "qualified_report": "docs/processing-validation/v3/source-bound-approval/ew-northern-qualified/report.json",
+      "prior_receipt": "docs/processing-validation/v3/source-bound-approval/ew-northern-qualified/reference-receipts/ew-northern-pass-r0.1-c0.1-receipt.json"
+    },
+    {
+      "name": "iw",
+      "mode": "IW",
+      "path": "C:\\CryoLens-data\\sentinel1-south-20261012\\raw\\S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG\\S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG.SAFE",
+      "scratch": "C:\\CL13-snap-r2\\S1C_IW_GRDH_1SDH_20251206T093305_20251206T093330_005329_00A97F_8597_COG.SAFE",
+      "qualified_report": "docs/processing-validation/v4/iw-december-qualified/report.json",
+      "prior_receipt": "docs/processing-validation/v4/iw-december-qualified/reference-receipts/southern-iw-4-r0.1-c0.1-receipt.json"
+    }
+  ]
+}

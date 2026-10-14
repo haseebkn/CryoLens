@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "recipe_id": "short-block-v3",
+  "purpose": "Fresh development calibration and signed-noise short-block comparison only",
+  "frozen_manifest": "docs/evaluation/v1/manifest.json",
+  "graph": "configs/snap/validation-reference.xml",
+  "reference_image": "cryolens-snap-reference:14.0.0",
+  "window": [224, 4894, 99, 2078],
+  "product": "S1C_EW_GRDM_1SDH_20260911T211525_20260911T211630_009405_012B51_594D_COG.SAFE",
+  "geocoding_acceptance_claimed": false
+}

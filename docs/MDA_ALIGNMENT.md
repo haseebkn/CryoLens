@@ -1,6 +1,6 @@
 # Maritime domain awareness alignment
 
-Reviewed 2026-09-05. This is a requirements traceability note, not a compliance
+Reviewed 2026-10-05. This is a requirements traceability note, not a compliance
 certificate. No C-CORE internal operating procedure, acceptance threshold or
 contractual interface specification was provided. The implementation is an
 independent research demonstration.
@@ -35,11 +35,12 @@ not evidence that a radar target is an iceberg or an illicit vessel.
 | Concern | Implemented response | Remaining evidence or integration |
 |---|---|---|
 | Geographic scope | Shared NL study polygon; pixel and API containment | Official customer AOI if required; this is a study boundary |
-| Radiometric integrity | Real SAFE measurements; validated metadata; no invented noise or successful mock products | Real SAFE calibration/geolocation cross-check against trusted processing |
+| Radiometric integrity | Matched EW/IW calibration/noise checks against actual SNAP; marine geometry corrections; measured rejection receipts; no fabricated signal | Broader seasonal/regional availability and independent absolute field geolocation; see the [current processing qualifications](processing-validation/v5/README.md) |
 | Target identity | CFAR candidates unclassified; score semantics explicit | Independent ship/iceberg labels, calibrated classifier, AIS and structure deconfliction |
 | False alarms | Masks, contextual gating, component filtering, per-stage removal ledger | Representative confirmed positives/negatives and missed-target survey |
 | Observation context | Source scene/time, processing settings, unknown context exposed | Source latency and coverage service-level requirements |
 | Human quality control | Protected, attributed analyst review history | Operational multi-user authentication and independent adjudication |
+| Optical corroboration | Real Sentinel-2 RGB/NIR/SCL native crops, time/movement-aware paired chips and separate append-only evidence; see the [current fresh review report](optical-review/fresh-v1/README.md) | Broader measured candidate visibility; independent review and matched target identity. Human corroboration remains separate from screened visibility |
 | Interchange | WGS84 GeoJSON; source metadata preserved | Customer schema conformance tests; no MANICE/STAC compliance claim |
 | Forecast integrity | Disabled without verified forcing/model validation | Real forcing, bathymetry, physical parameters and trajectory error assessment |
 | Reproducibility | Locked dependencies, executable checks, versioned evidence | Independent reruns on broader seasons and Grand Banks coverage |

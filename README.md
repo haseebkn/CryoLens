@@ -38,6 +38,7 @@ behavior and identifies the missing operational capabilities.
 - Land/coast, border, seam and optional sea-ice exclusion; an auditable suppression ledger.
 - Unclassified candidate geometry and radiometry, source timestamps and review provenance.
 - A FastAPI/Leaflet analyst dashboard with bounded queries and protected review writes.
+- Real Sentinel-2 RGB/NIR/SCL native crops, paired radar/optical review and separate optical evidence history.
 - Tests, type checks, dependency locking, database migrations and real PostGIS checks in CI.
 
 **Gamma-CFAR is not a K-distribution detector.** The historical `k_distribution`
@@ -96,6 +97,18 @@ uv run --frozen python -m cryolens.detect --help
 uv run --frozen python -m cryolens.preprocess --help
 ```
 
+For an existing HH/HV SAFE product, ordinary Python preprocessing writes a
+complete corrected research COG and separate source/output receipts into a new
+product directory under `--output-dir`:
+
+```text
+uv run --frozen python -m cryolens.preprocess --engine python --scene path/to/product.SAFE --output-dir data/processed/new-run
+```
+
+Use a fresh output location for each run; occupied product directories are
+refused. See the [processing contract and reference workflow](docs/processing-validation/v5/README.md)
+for memory controls, fixed output geometry and the separate detection release.
+
 Raw imagery, credentials, trained weights and generated databases are excluded
 from Git. GSHHG shorelines are public and are required by the raw COG detection
 path (`make fetch-shorelines` on systems with Make). See
@@ -105,6 +118,29 @@ The raw SAFE/COG path lacks aligned sea-ice context and requires explicit
 unknown-ice research opt-in (`--allow-unknown-ice` for the detection CLI,
 `PipelineRunner(allow_unknown_ice=True)` in Python). The charted public-scene
 import above uses conservative open-water screening by default.
+
+## Acquisition mode and coverage
+
+Measured against the CDSE catalogue on 2026-09-16, counting Sentinel-1 products
+intersecting each area across the 2020, 2024 and 2026 February-July seasons:
+
+| Area | EW GRDM HH+HV | IW GRDH |
+|---|---:|---:|
+| Grand Banks | **0** | 100+ |
+| NE Newfoundland Shelf | **0** | 100+ |
+| Labrador Shelf | 100+ | 100+ |
+| Labrador Sea (north) | 100+ | 100+ |
+
+**Extra Wide swath does not cover the southern half of the study area.** ESA's
+acquisition plan uses EW over ice-affected Labrador waters and IW further south.
+An earlier version of this project asserted the opposite. IW over the Grand Banks
+is roughly 76 percent dual-pol HH+HV, so the polarimetric basis survives.
+
+The reader supports annotated IW GRD HH/HV measurements. The
+[current processing report](docs/processing-validation/v5/README.md) owns the
+representative EW/IW outcomes and remaining qualification requirements.
+**Operational southern NL coverage remains unvalidated**;
+successful downloading and mode parsing do not establish detection coverage.
 
 ## Geographic scope
 
@@ -117,6 +153,40 @@ the study area are excluded. Coverage is reported as analyzed area; masked
 water is not evidence that no icebergs are present.
 
 ## Validation
+
+The [frozen evaluation protocol](docs/EVALUATION_PROTOCOL.md) defines separate
+detection, sea-ice segmentation and identification tasks, acquisition groups,
+development/test partitions and real MLflow tracking. Its
+[coverage map](docs/evaluation/v1/coverage.png) shows acquisition footprints;
+eligible surveyed water remains a separate measurement.
+
+The [independent reference workflow](docs/REFERENCE_SET.md) prepares whole-area
+surveys before retained/rejected candidate review, records sampling probabilities,
+and supports concealed repeats, adjudication and exact coverage masks. The
+[real pilot](docs/reference-set/v1/README.md) has 193 development survey tiles,
+28 retained and 68 sampled rejected reviews, and 64 held-out survey tiles.
+See the [validated pilot corrections](docs/reference-set/corrections-v1/README.md)
+for the held-out review and pending adoption status. **Reference completion
+remains pending; no reference-derived precision, recall or false-alarm rate is
+available.** January test SAR was prepared for human reference review
+only; its chart labels and model evaluation remain sealed.
+
+See the [current SAFE processing evidence](docs/processing-validation/v5/README.md)
+for authentic downloads, representative passing products, retained rejections
+and the separate regional deployment and scientific-release gates.
+The [prior processing corrections](docs/processing-validation/v2/README.md)
+remain documented.
+
+The [qualified EW/IW optical-review report](docs/optical-review/fresh-v1/README.md)
+owns the current measured coverage, strict screening receipts and commands for
+the separate fresh analyst interface. Its predeclared spatial locations are
+review context; fresh target detection remains blocked. Human optical review
+and reference completion remain separate from software workflow completion.
+Missing optical evidence never automatically rejects a radar candidate.
+
+The earlier [AI4Arctic paired-review pilot](docs/optical-review/v1/README.md)
+and [CDSE alternative-provider report](docs/optical-review/cdse-v1/README.md)
+retain their historical measurements and candidate-dashboard workflow.
 
 ```text
 uv run --frozen pytest
@@ -138,8 +208,13 @@ are absent. CI uses locked dependencies and a real PostGIS service.
 |---|---|
 | Statistical radar candidate screening | Implemented; thresholds require regional validation |
 | Analyst review and geographic API | Implemented; local API-key protection |
-| SAFE calibration and GCP geolocation | Research implementation; not operationally validated |
-| Precise-orbit correction in Python pipeline | Not applied; never claimed in provenance |
+| Independent target references | Real packets and human review underway; repeat review and adjudication pending. AI assistance must be disclosed; see the [roadmap audit](docs/ROADMAP_AUDIT.md) |
+| Sentinel-2 paired review | Planetary Computer and CDSE providers; verified original SAFE alternative, native crops, cloud/shadow/valid-data screening and separate attributed evidence; pilot coverage is limited |
+| SAFE EW/IW calibration and geolocation | Marine range-Doppler, EGM96 height, residual timing and matched SNAP checks; see [current validation](docs/processing-validation/v5/README.md). Absolute geolocation accuracy is not established |
+| ESA standard thermal noise removal | Sampled agreement does not establish usable observations; see the [current processing outcomes](docs/processing-validation/v5/README.md) |
+| Fresh SAFE detection deployment | Blocked by separate processing-quality and scientific-release gates; no current producer grants a release |
+| Precise-orbit acquisition | Implemented; POEORB/RESORB fetched from public ESA/ASF mirrors, no credentials needed |
+| Precise-orbit **correction** in Python pipeline | Not applied; marine geocoding uses annotated orbit/range metadata and records that source |
 | Trained ship/iceberg classifier | Not implemented |
 | Live AIS deconfliction | Not connected; no match does not establish iceberg identity |
 | Drift prediction / grounding | Disabled; verified forcing and skill assessment missing |
@@ -160,6 +235,7 @@ src/cryolens/
   detect/       CFAR, suppression, scene runner, training export
   geo/          shared NL area and target geometry
   eval/         candidate-density reports and contextual matching
+  review/       Sentinel-1/Sentinel-2 pairs, native crops and optical visibility
   api/ db/ web/ analyst interface, persistence and provenance
   drift/        explicit unavailable interfaces
 ```

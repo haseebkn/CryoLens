@@ -208,3 +208,39 @@ class IIPSightingModel(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
+
+
+class OpticalPairModel(Base):
+    """Immutable generated optical context, separate from target classification."""
+
+    __tablename__ = "optical_pairs"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    detection_id: Mapped[str] = mapped_column(
+        String(64), ForeignKey("detections.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    manifest_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    metadata_json: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
+class OpticalEvidenceModel(Base):
+    """Append-only analyst optical evidence; never changes the radar verdict."""
+
+    __tablename__ = "optical_evidence"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=lambda: str(uuid.uuid4()))
+    pair_id: Mapped[str] = mapped_column(
+        String(64), ForeignKey("optical_pairs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    assessment: Mapped[str] = mapped_column(String(32), nullable=False)
+    visibility: Mapped[str] = mapped_column(String(32), nullable=False)
+    observed_lonlat: Mapped[list[float] | None] = mapped_column(JSON_TYPE, nullable=True)
+    analyst_id: Mapped[str] = mapped_column(String(128), nullable=False)
+    notes: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        server_default=func.now(),
+    )

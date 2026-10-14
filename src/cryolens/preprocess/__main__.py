@@ -3,13 +3,11 @@
 import argparse
 import logging
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from cryolens.config.settings import get_app_config
-from cryolens.preprocess.python_chain import PurePythonSARProcessor
-from cryolens.preprocess.safe_reader import SAFEProductReader
 from cryolens.preprocess.snap_chain import SNAPChainRunner
-from cryolens.preprocess.stack import COGStackBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +17,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--scene", required=True, help="Path to an existing .SAFE product")
     parser.add_argument("--engine", choices=["python", "snap"], default=None)
     parser.add_argument("--output-dir", default="./data/processed")
+    parser.add_argument("--block-size", type=int, default=256)
+    parser.add_argument("--scan-rows", type=int, default=32)
+    parser.add_argument(
+        "--grid-reference",
+        type=Path,
+        help="Optional independently generated EPSG:3978/40 m reference grid phase",
+    )
     return parser.parse_args()
 
 
@@ -34,34 +39,17 @@ def main() -> int:
         if (args.engine or config.project.preprocessing.engine) == "snap":
             SNAPChainRunner().run_preprocessing(safe, output_dir=args.output_dir)
             return 0
-        reader = SAFEProductReader(safe)
-        hh = reader.read_sigma0("HH")
-        hv = reader.read_sigma0("HV")
-        processor = PurePythonSARProcessor(
-            target_crs=config.project.spatial.target_crs,
-            pixel_spacing_m=config.project.spatial.pixel_spacing_m,
-        )
-        result = processor.process_calibrated_arrays(
-            hh["sigma0_linear"],
-            hv["sigma0_linear"],
-            hh["incidence_angle_deg"],
-            hh["latitude"],
-            hh["longitude"],
-            apply_denoise=False,
-        )
-        output = COGStackBuilder(args.output_dir).build_and_export_cog(
-            scene_id=safe.stem,
-            bands=result["bands"],
-            transform=result["transform"],
-            crs=result["crs"],
-            nodata=result["nodata"],
+        from cryolens.preprocess.product import process_safe_product
+
+        output = process_safe_product(
+            safe, Path(args.output_dir), args.block_size, args.scan_rows, args.grid_reference
         )
         logger.info(
-            "Wrote %s using annotation GCPs; precise orbit and terrain correction are not applied.",
+            "Wrote %s using marine range-Doppler geocoding with EGM96 sea-surface height.",
             output,
         )
         return 0
-    except (ValueError, FileNotFoundError, RuntimeError) as exc:
+    except (ValueError, OSError, RuntimeError, ET.ParseError) as exc:
         logger.error("Preprocessing failed: %s", exc)
         return 1
 
