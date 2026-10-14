@@ -21,7 +21,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (unreadable.has(name)) throw new Error('Existing storage is unreadable');
     localStorage.setItem(name, JSON.stringify(value));
   }
-  let saved = readStore(key), drafts = readStore(draftKey), restoring = false, storageFailed = false, savedStorageFailed = false;
+  let saved = readStore(key), drafts = readStore(draftKey), restoring = false, storageFailed = false, saving = false;
+  const pending = new Map();
   let savedBaseline = structuredClone(saved);
   let index = 0, marks = [], regions = [], position = null, regionStart = null, image = null, imageRequest = 0, elapsed = 0, lastTick = performance.now(), viewedChannels = new Set(), active = !document.hidden;
   const tick = () => { const now = performance.now(); if (active) elapsed += (now - lastTick) / 1000; lastTick = now; };
@@ -32,6 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (restoring || !task()) return true;
     tick();
     const draft = {
+      saved_baseline: savedBaseline[task().task_id] || null,
       marks: structuredClone(marks), excluded_regions: structuredClone(regions),
       position: position ? [...position] : null, elapsed,
       viewed_channels: [...viewedChannels],
@@ -57,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   $('review-form').addEventListener('input', editorChanged);
   $('review-form').addEventListener('change', editorChanged);
   window.addEventListener('beforeunload', event => {
-    if (!persistDraft() || storageFailed || savedStorageFailed) { event.preventDefault(); event.returnValue = ''; }
+    if (!persistDraft() || storageFailed || pending.size || saving) { event.preventDefault(); event.returnValue = ''; }
   });
   $('queue').textContent = packet.queue;
   $('boundary').textContent = packet.identity_claim_boundary;
@@ -96,6 +98,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     const draft = drafts[task().task_id];
     if (draft) {
+      savedBaseline[task().task_id] = draft.saved_baseline || undefined;
       marks = structuredClone(draft.marks); regions = structuredClone(draft.excluded_regions);
       position = draft.position; elapsed = draft.elapsed; viewedChannels = new Set(draft.viewed_channels);
       for (const id of fields) if (id !== 'reviewer' || !packet.assignment) $(id).value = draft.fields[id];
@@ -135,27 +138,52 @@ document.addEventListener('DOMContentLoaded', async () => {
     list(); draw(); persistDraft(); return true;
   }
   $('add-mark').onclick=()=>{recordPoint();};
-  $('review-form').onsubmit=event=>{
+  $('review-form').onsubmit=async event=>{
+    event.preventDefault(); if (saving) return;
     event.preventDefault();tick();const reviewer=$('reviewer').value.trim();if(!image||!reviewer||!$('attest').checked||$('notes').value.trim().length<3){$('message').textContent='Load the image, enter your ID, inspection notes and personal-inspection attestation.';return;}
     if($('status').value==='complete'&&viewedChannels.size!==2){$('message').textContent='Inspect both HH and HV before declaring complete coverage.';return;}
     // A selected point is an explicit assessment, never an implied empty survey.
     // Validate and record it atomically with Save, or leave the response unsaved.
     if(position&&!recordPoint())return;
     if(task().mode==='candidate'&&$('status').value==='complete'&&marks.length!==1){$('message').textContent='Record one explicit candidate assessment before completing.';return;}
-    const latest = readStore(key);
-    if (!unreadable.has(key) && JSON.stringify(latest[task().task_id]) !== JSON.stringify(savedBaseline[task().task_id])) {
-      $('message').textContent = 'This response changed in another tab. Your draft is retained; export saved responses there and resolve the conflicting review before saving here.';
-      return;
-    }
-    // Other tasks saved in another tab must not be replaced by our older snapshot.
-    saved = { ...saved, ...latest };
-    saved[task().task_id]={workspace_id:packet.workspace_id,task_id:task().task_id,phase:packet.phase,reviewer_id:reviewer,reviewed_utc:new Date().toISOString(),status:$('status').value,active_seconds:Math.min(86400,Math.max(1,elapsed+(saved[task().task_id]?.active_seconds||0))),personally_inspected:true,viewed_channels:[...viewedChannels],notes:$('notes').value.trim(),marks:structuredClone(marks),excluded_regions:structuredClone(regions)};
-    let persisted=false;
-    try{writeStore(key,saved);savedBaseline=structuredClone(saved);savedStorageFailed=false;persisted=true;$('message').textContent=`Response saved locally with ${marks.length} recorded object(s). Export and import to validate it; no server write occurred.`;}catch{savedStorageFailed=true;$('message').textContent='Browser storage unavailable; response is only in memory. Export this session before leaving.';}
-    elapsed=0;
-    // Update the draft after saving so restored drafts never reintroduce a pending
-    // point or double count elapsed time. This does not alter the submission schema.
-    if(persisted)persistDraft();
+    const id = task().task_id;
+    const response = {workspace_id:packet.workspace_id,task_id:id,phase:packet.phase,reviewer_id:reviewer,reviewed_utc:new Date().toISOString(),status:$('status').value,active_seconds:Math.min(86400,Math.max(1,elapsed+(saved[id]?.active_seconds||0))),personally_inspected:true,viewed_channels:[...viewedChannels],notes:$('notes').value.trim(),marks:structuredClone(marks),excluded_regions:structuredClone(regions)};
+    const commit = () => {
+      const latest = readStore(key);
+      if (!unreadable.has(key) && JSON.stringify(latest[id]) !== JSON.stringify(savedBaseline[id])) {
+        $('message').textContent = 'This response changed in another tab. Your draft is retained; export saved responses there and resolve the conflicting review before saving here.';
+        return;
+      }
+      pending.set(id, response);
+      const retained = Object.fromEntries(pending);
+      saved = { ...saved, ...latest, ...retained };
+      elapsed = 0;
+      if ([...pending.keys()].some(taskId => JSON.stringify(latest[taskId]) !== JSON.stringify(savedBaseline[taskId]))) {
+        $('message').textContent = 'This response changed in another tab. Unpersisted responses remain in memory; export this session before leaving.';
+        return;
+      }
+      try {
+        if (!navigator.locks) throw new Error('Safe browser storage locking unavailable');
+        writeStore(key, saved);
+        for (const taskId of pending.keys()) {
+          savedBaseline[taskId] = structuredClone(saved[taskId]);
+          if (drafts[taskId]) drafts[taskId].saved_baseline = savedBaseline[taskId];
+        }
+        pending.clear();
+        $('message').textContent = `Response saved locally with ${marks.length} recorded object(s). Export and import to validate it; no server write occurred.`;
+        persistDraft();
+      } catch {
+        $('message').textContent = 'Browser storage unavailable; response is only in memory. Use a local review server with browser locking support, or export this session before leaving.';
+      }
+    };
+    saving = true; document.querySelector('main').inert = true;
+    try {
+      if (navigator.locks) await navigator.locks.request(key, commit);
+      else commit();
+    } catch {
+      pending.set(id, response); saved[id] = response; elapsed = 0;
+      $('message').textContent = 'Browser storage unavailable; response is only in memory. Export this session before leaving.';
+    } finally { saving = false; document.querySelector('main').inert = false; }
     $('progress').textContent=`Task ${index+1} of ${packet.tasks.length}; ${Object.keys(saved).length} responses in this session.`;
   };
   $('export').onclick=()=>{const rows=Object.values(saved);if(!rows.length){$('message').textContent='No personally inspected responses have been saved.';return;}const blob=new Blob([JSON.stringify(rows,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=`reference-${packet.workspace_id.slice(0,12)}-${packet.phase}.json`;link.click();URL.revokeObjectURL(url);};

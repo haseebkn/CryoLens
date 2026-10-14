@@ -15,6 +15,15 @@ viewer explains that a saved response is only in memory and must be exported.
 Export still contains only explicitly saved responses, using the existing schema.
 Both-channel inspection and independent-evidence requirements remain unchanged.
 
+Saved-response writes use an exclusive browser lock around the read, conflict
+check, merge and write. Open the local review server in a browser with Web Locks
+support; when locking is unavailable, explicitly saved responses stay in memory
+for export and the viewer warns before leaving. Failed saved revisions remain
+in memory until a successful write persists them, including when saving another
+task. Each draft retains its originating saved response for conflict checks after
+reload. Older drafts without that metadata cannot replace an existing response;
+their contents remain recoverable for review.
+
 These changes apply to newly prepared review packets. Existing packets contain
 hash-sealed viewer copies: **do not overwrite their assets**, their manifests, or
 their submissions to apply this fix. Prepare new packets through the normal
